@@ -1,0 +1,28 @@
+KMControllersSのdummy版を作るにあたって最低限変更したい機能
+
+・モータオブジェクトの生成
+	m = KMControllersS.USBController('/dev/ttyUSB0')
+	getMotorDic()の中で使用する。
+	ここでUSBControllerのインスタンスにidをもたせるか？
+・read_SN().decode()
+	motordicを作るときに必要
+・enable()
+・disable()
+・reboot()
+・close()
+・free()
+・interface(8)
+・(saveAllRegisters())
+・runForward()
+・runReverse()
+・stop()
+・speed(num)
+・maxTorque(num)
+・presetPosition(num)
+・moveTo(num)
+・(moveTo_scaled(num))
+・read_motor_measurement()
+	return (position, velocity, torque)←これらはUSBControllerのメンバ変数(m_*)
+
+その他
+motordicはどうしよ。。。
