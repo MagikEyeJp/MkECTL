@@ -147,7 +147,7 @@ class Ui(QtWidgets.QMainWindow):
             #     m.speed(self.ui.tiltSpeedSpin.value())
             #     print('tilt speed = ' + str(self.ui.tiltSpeedSpin.value()) + 'rad/s')
                 ### ↓試す
-            m.speed(self.motorGUI['speedSpin'][p['id']])
+            m.speed(self.motorGUI['speedSpin'][p['id']].value())
             print(p['id'] + 'speed  = ' + str(self.motorGUI['speedSpin'][p['id']].value()) + 'rad/s')
 
             self.motors[p['id']] = m    # member valuable of class
