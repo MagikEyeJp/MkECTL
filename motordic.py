@@ -1,5 +1,5 @@
 from math import pi
-import KMControllersS
+import KMControllersS, KMControllersS_dummy
 import os
 import glob
 from time import sleep
@@ -8,7 +8,7 @@ serials = {'pan': 'KM-1S K1UK#E45', 'tilt': 'KM-1S CBG3#573', 'slider': 'KM-1S S
 scales = {'tilt': 2 * pi / 360.0, 'pan': 2 * pi / 360.0, 'slider': -2 * pi / 54.0, 'test': 2 * pi / 54.0}
 
 def specifySN():
-    # devices = []  # device name of motors
+    # devices: list
     devices = glob.glob(os.path.join('/dev', 'ttyUSB*'))
 
     motordic = {}
@@ -44,15 +44,26 @@ def idToDeviceChar(id):
 
 
 def getMotorDic():
-    # devices = []  # device name of motors
-    devices = glob.glob(os.path.join('/dev', 'ttyUSB*'))
-
+    # devices: list
     motordic = {}
+    calib_flag: bool = True
+
+    devices = glob.glob(os.path.join('/dev', 'ttyUSB*'))
+    if len(devices) == 3 or len(devices) == 1:  # real calibration or test one
+        pass
+    else:   # dummy  devices: dictionary
+        devices = ['slider', 'pan', 'tilt']  # pseudo port name = id
+        calib_flag = False
 
     for d in devices:
-        motor = KMControllersS.USBController(d)
-        # sleep(1.0)
-        serialnum = motor.read_SN().decode()  # Serial Number
+        if calib_flag == True:  # real calibration or test one
+            motor = KMControllersS.USBController(d)
+            # sleep(1.0)
+            serialnum = motor.read_SN().decode()  # Serial Number
+        else:  # dummy
+            serialnum = serials[d]
+            motor = KMControllersS_dummy.USBController(d, serialnum)
+
         if serialnum in serials.values():
             id = {v: k for k, v in serials.items()}[serialnum]  # https://note.nkmk.me/python-dict-swap-key-value/
             param = {}
