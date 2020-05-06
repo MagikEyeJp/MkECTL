@@ -230,9 +230,15 @@ class Controller:
         """
         interface settings.
         """
-        command=b'\x2E'
-        values=uint8_t2bytes(flag)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x2E'
+        # values=uint8_t2bytes(flag)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        if flag == 8:
+            print('Using USBController')
+        else:
+            print('Choose 8 to use USBController')
 
     def limitCurrent(self,current,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -292,16 +298,24 @@ class Controller:
         """
         Enable motor action.
         """
-        command=b'\x51'
-        self.run_command(command+identifier+crc16,'motor_control')
+        # command=b'\x51'
+        # self.run_command(command+identifier+crc16,'motor_control')
+
+        ########## dummy ##########
+        print(self.port + ' was enabled.')
+
 
     def speed(self,speed,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the speed of rotation to the positive 'speed' in rad/sec.
         """
-        command=b'\x58'
-        values=float2bytes(speed)
-        self.run_command(command+identifier+values+crc16,'motor_control')
+        # command=b'\x58'
+        # values=float2bytes(speed)
+        # self.run_command(command+identifier+values+crc16,'motor_control')
+
+        ########## dummy ##########
+        # print(self.port + ' speed = ' + str(speed))
+        print(self.port + ' speed was changed.')
 
     def presetPosition(self,position,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -690,12 +704,12 @@ def recv_thread(obj):
 
 
 class USBController(Controller):
-    def __init__(self,port='/dev/ttyUSB0'):
+    def __init__(self, port='/dev/ttyUSB0', serialnum='KM-1 CS9B#B12'):
         super().__init__()
         # print('init port')
         self.port = port
         # self.serial = serial.Serial(port, 115200, 8, 'N', 1, 0.5, False, True)
-        self.serial = serial.Serial(port, 115200, 8, 'N', 1, 0.5, False, True, None, False, None, None)
+        # self.serial = serial.Serial(port, 115200, 8, 'N', 1, 0.5, False, True, None, False, None, None)
         # motor measurement value
         self.m_position = 0
         self.m_velocity = 0
@@ -721,27 +735,35 @@ class USBController(Controller):
         self.m_log_index_max = 0
         self.m_log_data = []
         #threading
-        self.m_lock = threading.RLock()
-        self.m_th = threading.Thread(target=recv_thread, args=(self,), daemon=True)
-        self.m_alive = False
-        self.m_th.start()
-        sleep(.1)
-        while not self.m_alive:
-            print('wait')
-            sleep(.1)
+        # self.m_lock = threading.RLock()
+        # self.m_th = threading.Thread(target=recv_thread, args=(self,), daemon=True)
+        # self.m_alive = False
+        # self.m_th.start()
+        # sleep(.1)
+        # while not self.m_alive:
+        #     print('wait')
+        #     sleep(.1)
         # print('init port end')
+
+        ########## dummy ##########
+        self.id = port
+        self.serial = serialnum
+
 
     def __del__(self):
         self.close()
 
     def close(self):
-        self.m_lock.acquire()
-        self.m_alive = False
-        self.m_th.join()
-        if self.serial is not None:
-            self.serial.close()
-            self.serial = None
-        self.m_lock.release()
+        # self.m_lock.acquire()
+        # self.m_alive = False
+        # self.m_th.join()
+        # if self.serial is not None:
+        #     self.serial.close()
+        #     self.serial = None
+        # self.m_lock.release()
+
+        ########## dummy ##########
+        print(self.port + 'was closed.')
 
     def run_command(self,val,characteristics=None):
         self.serial.write(val)
