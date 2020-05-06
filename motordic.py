@@ -4,8 +4,8 @@ import os
 import glob
 from time import sleep
 
-serials = {'pan': 'KM-1S K1UK#E45', 'tilt': 'KM-1S CBG3#573', 'slider': 'KM-1S SW59#0E9'}
-scales = {'tilt': 2 * pi / 360.0, 'pan': 2 * pi / 360.0, 'slider': -2 * pi / 54.0}
+serials = {'pan': 'KM-1S K1UK#E45', 'tilt': 'KM-1S CBG3#573', 'slider': 'KM-1S SW59#0E9', 'test': 'KM-1 CS9B#B12'}
+scales = {'tilt': 2 * pi / 360.0, 'pan': 2 * pi / 360.0, 'slider': -2 * pi / 54.0, 'test': 2 * pi / 54.0}
 
 def specifySN():
     # devices = []  # device name of motors
@@ -68,7 +68,8 @@ def getMotorDic():
 
 
 if __name__ == '__main__':
-    print(specifySN())
+    # print(specifySN())
+    print(getMotorDic())
     # print(idToDeviceChar('slider'))
     # print(idToDeviceChar('tilt'))
     # print(idToDeviceChar('pan')
