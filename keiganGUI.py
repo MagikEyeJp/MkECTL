@@ -137,15 +137,18 @@ class Ui(QtWidgets.QMainWindow):
             m.enable()
             m.interface(8)  # USB
 
-            if p['id'] == 'slider':
-                m.speed(self.ui.sliderSpeedSpin.value())
-                print('slider speed  = ' + str(self.ui.sliderSpeedSpin.value()) + 'rad/s')
-            elif p['id'] == 'pan':
-                m.speed(self.ui.panSpeedSpin.value())
-                print('pan speed = ' + str(self.ui.panSpeedSpin.value()) + 'rad/s')
-            elif p['id'] == 'tilt':
-                m.speed(self.ui.tiltSpeedSpin.value())
-                print('tilt speed = ' + str(self.ui.tiltSpeedSpin.value()) + 'rad/s')
+            # if p['id'] == 'slider':
+            #     m.speed(self.ui.sliderSpeedSpin.value())
+            #     print('slider speed  = ' + str(self.ui.sliderSpeedSpin.value()) + 'rad/s')
+            # elif p['id'] == 'pan':
+            #     m.speed(self.ui.panSpeedSpin.value())
+            #     print('pan speed = ' + str(self.ui.panSpeedSpin.value()) + 'rad/s')
+            # elif p['id'] == 'tilt':
+            #     m.speed(self.ui.tiltSpeedSpin.value())
+            #     print('tilt speed = ' + str(self.ui.tiltSpeedSpin.value()) + 'rad/s')
+                ### ↓試す
+            m.speed(self.motorGUI['speedSpin'][p['id']])
+            print(p['id'] + 'speed  = ' + str(self.motorGUI['speedSpin'][p['id']].value()) + 'rad/s')
 
             self.motors[p['id']] = m    # member valuable of class
 
