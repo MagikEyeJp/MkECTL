@@ -2,6 +2,7 @@
 
 # Reference: http://melpystudio.blog82.fc2.com/blog-entry-138.html
 # Other page: https://gist.github.com/mieki256/1b73aae707cee97fffab544af9bc0637
+#            https://mfumi.hatenadiary.org/entry/20141112/1415806010
 import sys
 from PyQt5 import QtWidgets, QtGui, QtCore
 
