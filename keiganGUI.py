@@ -72,7 +72,6 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.presetValue.setValidator(QtGui.QDoubleValidator(-100.0, 2100.0, 2, self.ui.presetValue))
 
         # spinbox returnPressed
-
         self.ui.sliderPosSpin.setKeyboardTracking(False)
         self.ui.sliderPosSpin.valueChanged.connect(lambda: self.exeButtonClicked('sliderMoveExe'))
         self.ui.panPosSpin.setKeyboardTracking(False)

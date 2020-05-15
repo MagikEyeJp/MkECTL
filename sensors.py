@@ -42,7 +42,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.ISOlineEdit.setToolTip('select \"Custom\" and set integer here')
 
         # first connect
-        # self.connectToSensor()
+        self.connectToSensor()
 
     def changeIPaddress(self):
         self.IPaddress = self.ui_s.IPlineEdit.text()
@@ -83,8 +83,13 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         print('connectToSensor')
 
         # temp
-        self.ui_s.sensorImage = ImageViewScene.ImageViewer()
-        self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
+        self.scene = ImageViewScene.ImageViewScene()
+        # self.scene.setSceneRect(QtCore.QRectF(self.rect()))
+        self.ui_s.sensorImage.setScene(self.scene)
+        self.scene.setFile('script/M_TOF_sample_image.png')
+
+        # self.ui_s.sensorImage = ImageViewScene.ImageViewer()
+        # self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
         self.ui_s.sensorImage.show()
 
     # def resizeEvent(self, event):   # https://gist.github.com/mieki256/1b73aae707cee97fffab544af9bc0637

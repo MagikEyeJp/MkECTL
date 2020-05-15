@@ -138,7 +138,9 @@ class ImageViewScene(QtWidgets.QGraphicsScene):
         self.__pressedButton = None
         QtWidgets.qApp.restoreOverrideCursor()
         super(ImageViewScene, self).mouseReleaseEvent(event)
+
     # =========================================================================
+
     def addScrollBarValue(self, dx, dy):
         """ スクロールバーの現在値を変化させる """
         x = self.horizontalScrollBar().value()
@@ -152,11 +154,11 @@ class ImageViewScene(QtWidgets.QGraphicsScene):
         y = event.pos().y()
 
         kind = ""
-        if event.buttons() & Qt.LeftButton:
+        if event.buttons() & QtCore.Qt.LeftButton:
             kind = "Left "
-        if event.button() & Qt.MidButton:
+        if event.button() & QtCore.Qt.MidButton:
             kind += "Mid "
-        if event.button() & Qt.RightButton:
+        if event.button() & QtCore.Qt.RightButton:
             kind += "Right "
 
         global status
