@@ -16,7 +16,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui = mainwindow_ui.Ui_keigan()
         self.ui.setupUi(self)
 
-        self.subWindow = sensors.SensorWindow()  # 20200325remote
+        self.subWindow = sensors.SensorWindow()
 
         self.initializeProcessFlag = False
 

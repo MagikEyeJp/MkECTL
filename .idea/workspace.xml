@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="added new class to show images">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImageViewScene.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageViewScene.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/keiganGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/keiganGUI.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensorwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/sensorwindow.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensorwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensorwindow_ui.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -234,7 +234,14 @@
       <option name="project" value="LOCAL" />
       <updated>1589516467035</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="modified GraphicsViewer part">
+      <created>1589518867795</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1589518867795</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -270,6 +277,7 @@
     <MESSAGE value="assigned functions and edited GUI" />
     <MESSAGE value="added new class to show images" />
     <MESSAGE value="added a reference" />
-    <option name="LAST_COMMIT_MESSAGE" value="added a reference" />
+    <MESSAGE value="modified GraphicsViewer part" />
+    <option name="LAST_COMMIT_MESSAGE" value="modified GraphicsViewer part" />
   </component>
 </project>
