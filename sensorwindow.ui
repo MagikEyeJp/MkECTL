@@ -27,7 +27,7 @@
    <property name="geometry">
     <rect>
      <x>680</x>
-     <y>40</y>
+     <y>70</y>
      <width>231</width>
      <height>251</height>
     </rect>
@@ -217,7 +217,7 @@
    <property name="geometry">
     <rect>
      <x>680</x>
-     <y>310</y>
+     <y>340</y>
      <width>231</width>
      <height>181</height>
     </rect>
@@ -327,29 +327,33 @@
      </rect>
     </property>
     <property name="text">
-     <string>set</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
     </property>
    </widget>
    <widget class="QLabel" name="CurrentLaserPattern_label">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>130</y>
-      <width>161</width>
+      <width>221</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Current Laser Pattern:</string>
+     <string>Current Laser Pattern(No.1-16):</string>
     </property>
    </widget>
    <widget class="QLabel" name="CurrentLaserPattern_value">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>150</y>
-      <width>191</width>
-      <height>17</height>
+      <width>211</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -362,28 +366,6 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>10</y>
-     <width>231</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QLabel" name="IPlabel">
-      <property name="text">
-       <string>RPi adress</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="IPlineEdit"/>
-    </item>
-   </layout>
   </widget>
   <widget class="QLabel" name="cameraStatusLabel">
    <property name="geometry">
@@ -852,6 +834,42 @@
    <property name="text">
     <string>Reconnect</string>
    </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>680</x>
+     <y>11</y>
+     <width>231</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="IPlabel">
+      <property name="text">
+       <string>RPi adress</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLineEdit" name="IPlineEdit"/>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="setIPaddressButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
