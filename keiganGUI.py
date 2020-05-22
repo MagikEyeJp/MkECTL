@@ -2,8 +2,8 @@ from PyQt5 import QtWidgets, uic, QtGui, QtCore
 import sys
 import time
 import os
-import math
 import re
+import serial
 
 import motordic
 import mainwindow_ui
@@ -19,6 +19,11 @@ class Ui(QtWidgets.QMainWindow):
         self.subWindow = sensors.SensorWindow()
 
         self.initializeProcessFlag = False
+
+        # IR light
+        self.isPortOpen = True
+        self.IRport = None
+        self.openIR('/dev/ttyACM0')
 
         # 画面サイズを取得 (a.desktop()は QtWidgets.QDesktopWidget )  https://ja.stackoverflow.com/questions/44060/pyqt5%E3%81%A7%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AE%E4%B8%AD%E5%A4%AE%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%97%E3%81%9F%E3%81%84
         a = QtWidgets.qApp
@@ -42,7 +47,6 @@ class Ui(QtWidgets.QMainWindow):
         self.make_motorGUI()
 
         # connect to exeButtonClicked
-
         # self.ui.sliderMoveExe.clicked.connect(lambda: self.exeButtonClicked('sliderMoveExe'))
         # self.ui.panMoveExe.clicked.connect(lambda: self.exeButtonClicked('panMoveExe'))
         # self.ui.tiltMoveExe.clicked.connect(lambda: self.exeButtonClicked('tiltMoveExe'))
@@ -61,9 +65,12 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.selectScript_toolButton.clicked.connect(self.openFile)
         self.ui.executeScript_button.clicked.connect(self.run_script)
         self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(geometry, framesize))
-
         self.ui.sliderOriginButton.clicked.connect(self.setSliderOrigin)
         self.ui.freeButton.clicked.connect(self.freeAllMotors)
+        self.ui.onL1Button.clicked.connect(lambda: self.IRlightControl('a'))
+        self.ui.offL1Button.clicked.connect(lambda: self.IRlightControl('A'))
+        self.ui.onL2Button.clicked.connect(lambda: self.IRlightControl('b'))
+        self.ui.offL2Button.clicked.connect(lambda: self.IRlightControl('B'))
 
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
@@ -333,6 +340,22 @@ class Ui(QtWidgets.QMainWindow):
     def showSubWindow(self, geometry, framesize):
         self.subWindow.show()
         self.subWindow.move(geometry.width() / 2 - framesize.width() / 16, geometry.height() / 2 - framesize.height() / 3)
+
+    def openIR(self, tty):
+        # https://qiita.com/macha1972/items/4869b71c14d25fa5b8f8
+        try:
+            self.IRport = serial.Serial(tty, 1)
+            self.isPortOpen = True
+        except Exception as e:
+            # QtWidgets.QMessageBox.critical(self, 'IR port open', 'Could not open port of IR lights')
+            print(e)
+            self.isPortOpen = False
+
+    def IRlightControl(self, serial):
+        if self.isPortOpen:
+            self.IRport.write(serial)
+        else:
+            print('could not send ' + serial)
 
 
 app = QtWidgets.QApplication(sys.argv)

@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="">
+    <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="mainly changed laser control part">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/keiganGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/keiganGUI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensorwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/sensorwindow.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensorwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensorwindow_ui.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,7 +27,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$/.local/bin/pyuic5" />
     <property name="run.code.analysis.last.selected.profile" value="aDefault" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PythonContentEntriesConfigurable" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -44,7 +41,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.sensors">
+  <component name="RunManager" selected="Python.keiganGUI">
     <configuration name="ImageViewScene" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="keiganGUI" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -152,9 +149,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.keiganGUI" />
         <item itemvalue="Python.sensors" />
         <item itemvalue="Python.ImageViewScene" />
-        <item itemvalue="Python.keiganGUI" />
         <item itemvalue="Python.motordic" />
         <item itemvalue="Python.keiganGUI_chromebook" />
       </list>
@@ -241,7 +238,28 @@
       <option name="project" value="LOCAL" />
       <updated>1589518867795</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="mainly changed laser control part">
+      <created>1589530026508</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1589530026508</updated>
+    </task>
+    <task id="LOCAL-00012" summary="mke-sdk">
+      <created>1590035284516</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1590035284516</updated>
+    </task>
+    <task id="LOCAL-00013" summary="modified and added">
+      <created>1590046862923</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1590046862923</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -278,6 +296,9 @@
     <MESSAGE value="added new class to show images" />
     <MESSAGE value="added a reference" />
     <MESSAGE value="modified GraphicsViewer part" />
-    <option name="LAST_COMMIT_MESSAGE" value="modified GraphicsViewer part" />
+    <MESSAGE value="mainly changed laser control part" />
+    <MESSAGE value="mke-sdk" />
+    <MESSAGE value="modified and added" />
+    <option name="LAST_COMMIT_MESSAGE" value="modified and added" />
   </component>
 </project>
