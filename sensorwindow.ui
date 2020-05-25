@@ -377,7 +377,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>!!No cameras were detected.</string>
+    <string>CAMERA STATE</string>
    </property>
   </widget>
   <widget class="QPushButton" name="reconnectButton">
@@ -835,7 +835,7 @@
     <string>Reconnect</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>680</x>

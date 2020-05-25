@@ -5,10 +5,19 @@ import numpy as np
 import datetime
 import time
 import math
+import struct
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
 from PyQt5 import QtWidgets
 
 # import KMControllersS
 import motordic
+
+# from mke-sdk
+import pymkecli.client
+import pymkecli.bus
 
 commands = {  # 'root': ['set_root', False],
             'set': ['set_img', False],
@@ -24,6 +33,89 @@ commands = {  # 'root': ['set_root', False],
             }
 
 app = QtWidgets.qApp
+
+# ------ from mke-sdk ------
+# ------------------------------------------------------------------------------
+
+REQUEST_GET_STATE = 20
+REQUEST_SET_STATE = 21
+REQUEST_GET_FRAME = 26
+REPLY_OK = 200
+STATE_IDLE = 1
+STATE_DEPTH_SENSOR = 2
+
+STATES = {STATE_IDLE:           'STATE_IDLE',
+          STATE_DEPTH_SENSOR:   'STATE_DEPTH_SENSOR'}
+
+# ------------------------------------------------------------------------------
+
+def mke_send(conn, cmd, seq_id, params=bytes(8)):
+    assert (len(params) == 8)  # params must have 8 bytes
+
+    # assemble request
+
+    req_header = b'MKERQ100'  # ASCII header of request
+    cmd = bytes('%04d' % cmd, 'ascii')  # ASCII REQUEST_GET_STATE
+    seq_id = struct.pack('<I', seq_id)  # binary sequence id
+    request = req_header + cmd + seq_id + params
+    # assembled whole request
+
+    print("SENT:     %s %s %s %s" % (request[0:8], request[8:12], request[12:16], request[16:]))
+    # nice print of whole request by parts
+
+    # send datagram to device
+
+    if conn.send(request) == 0:
+        raise RuntimeError("Socket broken")
+
+
+def mke_recv(conn, cmd, seq_id, exp_status):
+    # wait for 48 bytes long reply
+
+    reply = bytes()
+
+    while len(reply) < 48:
+        tmp = conn.recv(48)
+        if len(tmp) == 0:
+            raise RuntimeError("Socket closed");
+        reply += tmp
+
+    print(
+        "RECEIVED: %s %s %s %s %s %s" % (reply[0:8], reply[8:12], reply[12:16], reply[16:20], reply[20:24], reply[24:]))
+    # nice print of whole reply by parts
+
+    # check reply
+
+    assert (reply[0:8] == b'MKERP100')  # reply should start with header MKERP100
+    assert (int(reply[8:12]) == cmd)  # command should be same
+    assert (reply[16:20] == struct.pack('<I', seq_id))
+    # sequence id should be same
+
+    payload_size = struct.unpack('<I', reply[20:24])[0];
+
+    # if there is some payload - read it
+
+    while len(reply) < (48 + payload_size):
+        tmp = conn.recv(payload_size)
+        if len(tmp) == 0:
+            raise RuntimeError("Socket closed");
+        reply += tmp
+
+    if payload_size > 0:
+        print("PAYLOAD[%d bytes]:  %s" % (payload_size, reply[48:64] if len(reply) > 64 else reply[48:]))
+
+    # check expected status code
+
+    ret_code = int(reply[12:16])
+    if ret_code != exp_status:
+        raise RuntimeError("Reply with unexcepted status code %d" % ret_code)
+
+    # return params and payload
+
+    return (reply[24:48], reply[48:])
+
+# ------------------------------------------------------------------------------
+
 
 def execute_script(scriptName, devices, params):
     # print(commands['root'][0])
@@ -162,6 +254,207 @@ def set_light(args, devices, params):
     #     print('フォルダ ' + line + ' は既に存在しています')
     # else:
     #     os.mkdir(line)
+
+def switch_to_depth_sensor(conn):
+    # switch to STATE_DEPTH_SENSOR -----
+
+    mke_send(conn, REQUEST_GET_STATE, 1)
+    (params, payload) = mke_recv(conn, REQUEST_GET_STATE, 1, REPLY_OK)
+
+    current_state = struct.unpack('<I', params[0:4])[0]
+
+    assert (params[4:] == bytes(20))  # rest of params should be zero
+    assert (len(payload) == 0)  # no payload expected
+
+    # ------------------------------------------------------------------------------
+
+    # if in IDLE go to DEPTH_SENSOR
+
+    if current_state == STATE_IDLE:
+
+        print('Switching to ', STATES.get(STATE_DEPTH_SENSOR))
+
+        mke_send(conn, REQUEST_SET_STATE, 2, struct.pack('<I', STATE_DEPTH_SENSOR) + bytes(4))
+        (params, payload) = mke_recv(conn, REQUEST_SET_STATE, 2, REPLY_OK)
+
+        assert (params == bytes(24))  # no params expected
+        assert (len(payload) == 0)  # no payload expected
+
+        print('Device is in STATE_DEPTH_SENSOR.')
+
+    else:
+        print('Already in STATE_DEPTH_SENSOR');
+
+    # ------------------------------------------------------------------------------
+
+
+def get_frame(conn):
+    # get one frame
+
+    mke_send(conn, REQUEST_GET_FRAME, 3, struct.pack('<H', 1) + bytes(6))  # use FRAME_TYPE_2
+    (params, payload) = mke_recv(conn, REQUEST_GET_FRAME, 3, REPLY_OK)
+
+    # read params
+
+    (timer, seqn, data_type, frame_type, num_data) = struct.unpack('<QQIHH', params)
+
+    # prepare lists
+
+    ids = []
+    xs = []
+    ys = []
+    zs = []
+
+    for i in range(num_data):
+        sz = {1: 8, 2: 12}.get(frame_type)
+        loc = payload[i * sz:(i + 1) * sz]
+
+        ids.append(struct.unpack('<H', loc[0:2])[0])
+        xs.append(struct.unpack('<h', loc[2:4])[0])
+        ys.append(struct.unpack('<h', loc[4:6])[0])
+        zs.append(struct.unpack('<h', loc[6:8])[0])
+
+    # plot data
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.plot(xs, ys, zs, 'b.')
+    plt.show()
+
+
+def client_getframe(host, port):
+    client = None
+
+    try:
+        bus = pymkecli.bus.TcpBus(host, port)
+        client = pymkecli.client.SyncClient(bus)
+
+        # go to state depth sensing
+
+        state = client.get_state()
+        print("Current state: %d" % state)
+
+        if state != pymkecli.client.Api.STATE_DEPTH_SENSOR:
+            print("Invalid state, let's change it")
+
+            # firstly set state to IDLE
+            if state != pymkecli.client.Api.STATE_IDLE:
+                client.set_state(pymkecli.client.Api.STATE_IDLE)
+
+            # then change state to DEPTH_SENSOR
+            client.set_state(pymkecli.client.Api.STATE_DEPTH_SENSOR)
+
+            # now the device is in DEPTH_SENSOR state
+            print("Current state: %d" % client.get_state())
+        else:
+            print("Already in correct state.")
+
+        # get one frame
+        frame = client.get_frame(pymkecli.client.Api.FRAME_TYPE_1)
+
+        # show the frame
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.plot(frame.lut3d[:, 0], frame.lut3d[:, 1], frame.lut3d[:, 2], 'b.')
+        plt.title("This is example of getting frame from MagikEye sensor.")
+        plt.show()
+
+        print("Correct termination");
+
+    except Exception as e:
+        print("An error occured: %s" % str(e))
+    finally:
+        if client:
+            client.set_state(pymkecli.client.Api.STATE_IDLE)
+
+
+def client_pushframes(host, port):
+    client = None
+
+    try:
+        bus = pymkecli.bus.TcpBus(host, port)
+        client = pymkecli.client.SyncClient(bus)
+
+        # go to state depth sensing
+
+        state = client.get_state()
+
+        if state != pymkecli.client.Api.STATE_DEPTH_SENSOR:
+
+            print("Invalid state, let's change it to DEPTH_SENSOR")
+
+            # firstly set state to IDLE
+
+            if state != pymkecli.client.Api.STATE_IDLE:
+                client.set_state(pymkecli.client.Api.STATE_IDLE)
+
+            # then change state to DEPTH_SENSOR
+
+            client.set_state(pymkecli.client.Api.STATE_DEPTH_SENSOR)
+
+        else:
+
+            print("Already in correct state.")
+
+        # main body ------------------------------------------------------------------
+
+        # prepare figure
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        plt.ioff()
+        fig.show()
+
+        # prepare variables
+
+        start_time = time.time()  # start of capturing
+        timeout = 10  # when should be stop_frame_push called
+        num = 0  # number of received images
+        frame_type = 1  # used frame type
+
+        # start pushing frames
+
+        start_seq_id = client.start_frame_push(frame_type)
+        stop_seq_id = None
+
+        while True:
+
+            # send stop push after num frames
+
+            if stop_seq_id is None and (time.time() - start_time) >= timeout:
+                stop_seq_id = client.stop_frame_push()
+
+            # get next frame from the bus
+
+            frame = client.get_pushed_frame(start_seq_id, stop_seq_id)
+
+            # None denotes no more data
+
+            if frame is None:
+                print("Correctly finished loop")
+
+                # all replies should be processed
+                break
+
+            # convert data and plot them
+
+            ax.cla()
+            ax.plot(frame.lut3d[:, 0], frame.lut3d[:, 1], frame.lut3d[:, 2], 'b.')
+            plt.pause(0.001)
+
+            num += 1
+
+        print("Average displayed FPS: %.2f" % (num / (time.time() - start_time)))
+
+        print("Correct termination");
+
+    except Exception as e:
+        print("An error occured: ", str(e))
+    finally:
+        if client:
+            client.set_state(pymkecli.client.Api.STATE_IDLE)
+
 
 if __name__ == '__main__':
     execute_script('./script/script_2019-12-05_M_TOF_Archimedes_N=12_lendt=2.txt')

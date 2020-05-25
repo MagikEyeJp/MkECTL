@@ -2,13 +2,11 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import sys
 import re
 
-# from mke-sdk
-import pymkecli.client
-import pymkecli.bus
+import socket
 
 import sensorwindow_ui
 import ImageViewScene
-
+import read_script
 
 # xのあるbit位置が0か1か調べる
 def getbit(x, b):
@@ -18,6 +16,7 @@ def getbit(x, b):
 def setbit(x, b, v):
     return x & ~(1 << b) | (v << b)
 
+
 class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
     def __init__(self, parent=None):
         super(SensorWindow, self).__init__(parent)
@@ -25,8 +24,11 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s = sensorwindow_ui.Ui_sensor()
         self.ui_s.setupUi(self)
 
+        # connect
+        self.conn = None
+
         # Variables (initialized with default values)
-        self.IPaddress = '192.168.100.140'  # dummy
+        self.IPaddress = '192.168.0.158'  # default
         self.portNum: int = 8888
         self.RPiaddress = self.IPaddress + ':' + str(self.portNum)
         self.shutterSpeed: int = 30000
@@ -91,10 +93,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             d = re.search(pattern, self.RPiaddress)
             self.IPaddress = d.group(1)
             self.portNum = int(d.group(2))
-            print(1)
         else:
             self.IPaddress = self.RPiaddress
-            print(2)
 
     def changeShutter(self):
         if self.ui_s.shutterLineEdit.text() == "":
@@ -128,7 +128,20 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
     def connectToSensor(self):
         # connect to sensor and display again
-        # print('connectToSensor')
+        try:
+            # 時間がかかる 特にreconnect
+            self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.conn.connect((self.IPaddress, self.portNum))
+            self.ui_s.cameraStatusLabel.setText('Successfully connected to a camera')
+
+        except Exception as e:
+            self.ui_s.cameraStatusLabel.setText('!!! Camera was not detected.')
+
+        # read_script.switch_to_depth_sensor(self.conn)
+        # read_script.get_frame(self.conn)
+
+        read_script.client_getframe(self.IPaddress, self.portNum)  # one frame
+        # read_script.client_pushframes(self.IPaddress, self.portNum)  # sequential frames
 
         # temp
         self.scene = ImageViewScene.ImageViewScene()
@@ -164,9 +177,9 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.ui_s.CurrentLaserPattern_value.setText('-'.join(laserpattern_print[::-1]))
             # https://qiita.com/Hawk84/items/ecd0c7239e490ea22308   https://note.nkmk.me/python-string-concat/
 
-            for i in range(16):
-                # print(getbit(self.decLaserPattern, i))
-                print(setbit(self.decLaserPattern, i, int(laserpattern_print[15-i])))
+            # for i in range(16):
+            #     print(getbit(self.decLaserPattern, i))
+            #     print(setbit(self.decLaserPattern, i, int(laserpattern_print[15-i])))
 
 
 

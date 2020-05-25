@@ -346,10 +346,13 @@ class Ui(QtWidgets.QMainWindow):
         try:
             self.IRport = serial.Serial(tty, 1)
             self.isPortOpen = True
+            self.ui.IRstateLabel.setText('IR lights \n are ready.')
         except Exception as e:
             # QtWidgets.QMessageBox.critical(self, 'IR port open', 'Could not open port of IR lights')
             print(e)
             self.isPortOpen = False
+            self.ui.IRstateLabel.setText('Cannot open \n ' + tty + '.')
+
 
     def IRlightControl(self, serial):
         if self.isPortOpen:
