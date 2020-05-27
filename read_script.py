@@ -6,6 +6,7 @@ import datetime
 import time
 import math
 import struct
+import string
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -118,6 +119,9 @@ def mke_recv(conn, cmd, seq_id, exp_status):
 
 
 def execute_script(scriptName, devices, params):
+    # devices: motors, lights, 3D sensors(sensor window)
+    # params: motorDic
+
     # print(commands['root'][0])
     f = open(scriptName)
     lines = f.read().splitlines()
@@ -151,6 +155,7 @@ def execute_script(scriptName, devices, params):
         # print(com_args)
         # print(commands[com_args[0]][0])
 
+        # jump to a method(function)
         eval(commands[com][0])(args, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
         args_hist.append(args)
 
@@ -161,6 +166,7 @@ def execute_script(scriptName, devices, params):
 def set_img(args, devices, params):
     print('---set_img---')
 
+    # ---------- make directory for images ----------
     now = datetime.datetime.now()
     dir_num: int = 1
 
@@ -179,9 +185,19 @@ def set_img(args, devices, params):
             dir_path = dir_path.replace(str(ymd) + "_" + str(dir_num - 1), str(ymd) + "_" + str(dir_num))
 
         os.makedirs(dir_path)  # https://note.nkmk.me/python-os-mkdir-makedirs/
+    # ------------------------------
+
+    ### 正規表現の解読と、画像保存ルールを作る
+
 
 def snap_image(args, devices, params):
     print('---snap_image---')
+    app.processEvents()
+
+    ### Request to get image
+
+    ### Save image
+
 
 def move_robot(args, devices, params):
     print('---move_robot---')
@@ -224,29 +240,56 @@ def move_robot(args, devices, params):
 
 def home_robot(args, devices, params):
     print('---home_robot---')
+    app.processEvents()
+
     print('move to ' + str(args))
     move_robot(args, devices, params)
 
 def set_shutter(args, devices, params):
     print('---set_shutter---')
-    print('shatter speed: ' + str(args[0]))
+    app.processEvents()
+
+    devices['3Dsensors'].shutterSpeed = args[0]
+    print('shutter speed: ' + str(args[0]))
+    # print('in 3D sensors: ' + str(devices['3Dsensors'].shutterSpeed))
+
+    ### Request to set shutter speed (args[0])
+
 
 def set_gainiso(args, devices, params):
     print('---set_gainiso---')
+    app.processEvents()
+
+    devices['3Dsensors'].gainiso = args[0]
     print('gainiso: ' + str(args[0]))
+
+    ### Request to set gainiso (args[0])
+
 
 def set_lasers(args, devices, params):
     print('---set_lasers---')
-    if(args[0] == 1):
-        print('laser : ON')
-    else:
-        print('laser : OFF')
+    app.processEvents()
+
+    ### Request to set lasers (args[0])
+
+
 
 def set_light(args, devices, params):
     print('---set_light---')
+    app.processEvents()
+
     if (args[1] == 1):
+        try:
+            # https://miyayamo.com/post-1924/
+            devices['lights'].write(string.ascii_uppercase[args[0] - 1])  # A or B
+        except Exception as e:
+            print('cannot send serial ' + string.ascii_uppercase[args[0] - 1])
         print('light ' + str(args[0]) + ' : ON')
     else:
+        try:
+            devices['lights'].write(string.ascii_lowercase[args[0] - 1])  # a or b
+        except Exception as e:
+            print('cannot send serial ' + string.ascii_lowercase[args[0] - 1])
         print('light ' + str(args[0]) + ' : OFF')
 
     # # make folder ### https://tonari-it.com/python-split-splitlines/
@@ -255,6 +298,8 @@ def set_light(args, devices, params):
     # else:
     #     os.mkdir(line)
 
+
+# ---------- from mke sdk ----------
 def switch_to_depth_sensor(conn):
     # switch to STATE_DEPTH_SENSOR -----
 

@@ -109,9 +109,12 @@ class Controller:
         """
         Set the maximum torque to the positive 'max_torque' in N.m.
         """
-        command=b'\x0E'
-        values=float2bytes(max_torque)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x0E'
+        # values=float2bytes(max_torque)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('maxTorque : ' + str(max_torque))
 
     def qCurrentP(self,q_current_p,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -321,16 +324,22 @@ class Controller:
         """
         Preset the current absolute position as the specified 'position' in rad. (Set it to zero when setting origin)
         """
-        command=b'\x5A'
-        values=float2bytes(position)
-        self.run_command(command+identifier+values+crc16,'motor_control')
+        # command=b'\x5A'
+        # values=float2bytes(position)
+        # self.run_command(command+identifier+values+crc16,'motor_control')
+
+        ########## dummy ##########
+        print('Preset position of ' + self.port + ' as ' + str(position))
 
     def runForward(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Rotate the motor forward (counter clock-wise) at the speed set by 0x58: speed.
         """
-        command=b'\x60'
-        self.run_command(command+identifier+crc16,'motor_control')
+        # command=b'\x60'
+        # self.run_command(command+identifier+crc16,'motor_control')
+
+        ########## dummy ##########
+        print('runForward')
 
     def runReverse(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -343,9 +352,13 @@ class Controller:
         """
         Move the motor to the specified absolute 'position' at the speed set by 0x58: speed.
         """
-        command=b'\x66'
-        values=float2bytes(position)
-        self.run_command(command+identifier+values+crc16,'motor_control')
+        # command=b'\x66'
+        # values=float2bytes(position)
+        # self.run_command(command+identifier+values+crc16,'motor_control')
+
+        ########## dummy ##########
+        self.goalPos = position
+        # print(self.port + ' is moving to ' + str(position))
 
     def moveBy(self,distance,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -359,8 +372,11 @@ class Controller:
         """
         Stop the motor's excitation
         """
-        command=b'\x6C'
-        self.run_command(command+identifier+crc16,'motor_control')
+        # command=b'\x6C'
+        # self.run_command(command+identifier+crc16,'motor_control')
+
+        ########## dummy ##########
+        print('free ' + self.port)
 
     def stop(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -551,8 +567,11 @@ class Controller:
         """
         Reboot the system.
         """
-        command=b'\xF0'
-        self.run_command(command+identifier+crc16,'motor_control')
+        # command=b'\xF0'
+        # self.run_command(command+identifier+crc16,'motor_control')
+
+        ########## dummy ##########
+        print(self.port + ' was rebooted.')
 
     def enableCheckSum(self,identifier=b'\x00\x00',crc16=b'\x6f\x43'):
         """
@@ -734,7 +753,7 @@ class USBController(Controller):
         self.m_log_index = 0
         self.m_log_index_max = 0
         self.m_log_data = []
-        #threading
+        # threading
         # self.m_lock = threading.RLock()
         # self.m_th = threading.Thread(target=recv_thread, args=(self,), daemon=True)
         # self.m_alive = False
@@ -748,6 +767,7 @@ class USBController(Controller):
         ########## dummy ##########
         self.id = port
         self.serial = serialnum
+        self.goalPos = 0.0
 
 
     def __del__(self):
@@ -763,7 +783,7 @@ class USBController(Controller):
         # self.m_lock.release()
 
         ########## dummy ##########
-        print(self.port + 'was closed.')
+        print(self.port + ' was closed.')
 
     def run_command(self,val,characteristics=None):
         self.serial.write(val)
@@ -787,12 +807,17 @@ class USBController(Controller):
         return ret
 
     def read_motor_measurement(self):
-        self.m_lock.acquire()
+        # self.m_lock.acquire()
         position = self.m_position
         velocity = self.m_velocity
         torque = self.m_torque
-        self.m_lock.release()
-        return (position, velocity, torque)
+        # self.m_lock.release()
+        # return (position, velocity, torque)
+
+        ########## dummy ##########
+        # position = self.goalPos
+        return (self.goalPos, velocity, torque)
+
 
     def start_log(self, nums):
         self.m_log_index = 0

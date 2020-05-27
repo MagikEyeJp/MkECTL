@@ -35,14 +35,15 @@ class Ui(QtWidgets.QMainWindow):
         # self.move(geometry.width() / 2 - framesize.width() / 2, geometry.height() / 2 - framesize.height() / 2)
         self.move(geometry.width() / 2 - framesize.width(), geometry.height() / 2 - framesize.height() / 2)
 
-
         # variables
         self.params = {}  # motorDic
         self.scriptName: str = ''
         self.motorSet = ['slider', 'pan', 'tilt']
-        self.devices: dict = {}  # 'motors', 'lights', 'laser' etc.  # Dict of dictionaries
+        self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
         self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin'  # GUI objects related to motors  # Dict of dictionaries
+
+        self.devices['3Dsensors'] = self.subWindow  # 荒業
 
         self.make_motorGUI()
 
@@ -67,10 +68,10 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(geometry, framesize))
         self.ui.sliderOriginButton.clicked.connect(self.setSliderOrigin)
         self.ui.freeButton.clicked.connect(self.freeAllMotors)
-        self.ui.onL1Button.clicked.connect(lambda: self.IRlightControl('a'))
-        self.ui.offL1Button.clicked.connect(lambda: self.IRlightControl('A'))
-        self.ui.onL2Button.clicked.connect(lambda: self.IRlightControl('b'))
-        self.ui.offL2Button.clicked.connect(lambda: self.IRlightControl('B'))
+        self.ui.onL1Button.clicked.connect(lambda: self.IRlightControl('A'))
+        self.ui.offL1Button.clicked.connect(lambda: self.IRlightControl('a'))
+        self.ui.onL2Button.clicked.connect(lambda: self.IRlightControl('B'))
+        self.ui.offL2Button.clicked.connect(lambda: self.IRlightControl('b'))
 
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
@@ -290,6 +291,8 @@ class Ui(QtWidgets.QMainWindow):
     def run_script(self):
         if self.scriptName == '':
             QtWidgets.QMessageBox.critical(self, "Cannot open a file", 'Please select a script.')
+        elif not self.scriptName.endswith('.txt'):
+            QtWidgets.QMessageBox.critical(self, "Cannot open a file", 'Please select a text file.')
         else:
             read_script.execute_script(self.scriptName, self.devices, self.params)
 
@@ -346,6 +349,8 @@ class Ui(QtWidgets.QMainWindow):
         try:
             self.IRport = serial.Serial(tty, 1)
             self.isPortOpen = True
+            self.devices['lights'] = self.IRport
+
             self.ui.IRstateLabel.setText('IR lights \n are ready.')
         except Exception as e:
             # QtWidgets.QMessageBox.critical(self, 'IR port open', 'Could not open port of IR lights')
@@ -366,3 +371,6 @@ keiganWindow = Ui()
 keiganWindow.show()
 # sensorWindow = SensorWindow()
 app.exec_()
+
+# if keiganWindow.ui.dummyMode.isEnabled():
+#     keiganWindow.ui.sliderCurrentLabel.setText(keiganWindow.devices['motors']['slider'].m_posion)

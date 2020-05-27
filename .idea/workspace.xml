@@ -3,13 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KMControllersS_dummy.py" beforeDir="false" afterPath="$PROJECT_DIR$/KMControllersS_dummy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/keiganGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/keiganGUI.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mainwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow.ui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mainwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow_ui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/read_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/read_script.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensorwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/sensorwindow.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensorwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensorwindow_ui.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -272,7 +271,14 @@
       <option name="project" value="LOCAL" />
       <updated>1590106834057</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="connected to sensor using mke-sdk for the first time">
+      <created>1590369416445</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1590369416445</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -313,6 +319,7 @@
     <MESSAGE value="mke-sdk" />
     <MESSAGE value="modified and added" />
     <MESSAGE value="added IR serial part" />
-    <option name="LAST_COMMIT_MESSAGE" value="added IR serial part" />
+    <MESSAGE value="connected to sensor using mke-sdk for the first time" />
+    <option name="LAST_COMMIT_MESSAGE" value="connected to sensor using mke-sdk for the first time" />
   </component>
 </project>

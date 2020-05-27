@@ -33,13 +33,13 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.RPiaddress = self.IPaddress + ':' + str(self.portNum)
         self.shutterSpeed: int = 30000
         self.frames: int = 5
-        self.ISOvalue: int = 400    # value in the list of combo box
+        self.gainiso: int = 400    # value in the list of combo box
         self.hexLaserPattern: hex = 0x0000    # Hex 4 digits
         self.binLaserPattern: bin = bin(self.hexLaserPattern)
         self.decLaserPattern: int = int(self.hexLaserPattern)
 
         # Combo Box
-        self.ui_s.ISOcombo.setCurrentText(str(self.ISOvalue))
+        self.ui_s.ISOcombo.setCurrentText(str(self.gainiso))
         self.ui_s.ISOcombo.currentTextChanged.connect(lambda: self.changeISO('comboBox'))
 
         # Check Box
@@ -115,16 +115,16 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             if self.ui_s.ISOcombo.currentText() == "Custom":
                 self.ui_s.ISOlineEdit.setEnabled(True)
             else:
-                self.ISOvalue = int(self.ui_s.ISOcombo.currentText())
+                self.gainiso = int(self.ui_s.ISOcombo.currentText())
                 self.ui_s.ISOlineEdit.setEnabled(False)
-                print(self.ISOvalue)
+                # print(self.gainiso)
 
         elif valueFromX == 'lineEdit':
             if self.ui_s.ISOlineEdit.text() == "":
                 pass
             else:
-                self.ISOvalue = int(self.ui_s.ISOlineEdit.text())
-                print(self.ISOvalue)
+                self.gainiso = int(self.ui_s.ISOlineEdit.text())
+                # print(self.gainiso)
 
     def connectToSensor(self):
         # connect to sensor and display again

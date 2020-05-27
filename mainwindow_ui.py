@@ -304,7 +304,7 @@ class Ui_keigan(object):
         self.dummyMode.setEnabled(True)
         self.dummyMode.setGeometry(QtCore.QRect(370, 440, 281, 131))
         self.dummyMode.setCheckable(True)
-        self.dummyMode.setChecked(True)
+        self.dummyMode.setChecked(False)
         self.dummyMode.setObjectName("dummyMode")
         self.layoutWidget6 = QtWidgets.QWidget(self.dummyMode)
         self.layoutWidget6.setGeometry(QtCore.QRect(10, 30, 261, 91))
