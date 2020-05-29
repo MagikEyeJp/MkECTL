@@ -358,6 +358,8 @@ class Controller:
 
         ########## dummy ##########
         self.goalPos = position
+
+        self.m_position = self.goalPos
         # print(self.port + ' is moving to ' + str(position))
 
     def moveBy(self,distance,identifier=b'\x00\x00',crc16=b'\x00\x00'):

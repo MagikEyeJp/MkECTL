@@ -291,7 +291,7 @@ class Ui(QtWidgets.QMainWindow):
     def run_script(self):
         if self.scriptName == '':
             QtWidgets.QMessageBox.critical(self, "Cannot open a file", 'Please select a script.')
-        elif not self.scriptName.endswith('.txt'):
+        elif not self.scriptName.endswith('.txt'):  # https://pg-chain.com/python-endswith
             QtWidgets.QMessageBox.critical(self, "Cannot open a file", 'Please select a text file.')
         else:
             read_script.execute_script(self.scriptName, self.devices, self.params)

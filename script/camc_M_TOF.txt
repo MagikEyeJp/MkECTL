@@ -1,0 +1,125 @@
+light 1, 1
+light 2, 0
+gainiso 100
+shutter 1500
+set ccalib, "ccalib/img_@{seqn}{4}.png"
+root /home/jheller/MagikEye/data/las_mov-rpi_control-16-11-13-152523/"
+
+
+mov 50, -130, -90
+snap ${ccalib}, 1 
+mov 50, -130, -45
+snap ${ccalib}, 1 
+mov 50, -130, 0
+snap ${ccalib}, 1 
+mov 50, -130, 45
+snap ${ccalib}, 1 
+mov 50, -130, 90
+snap ${ccalib}, 1 
+mov 50, -140, 90
+snap ${ccalib}, 1 
+mov 50, -140, 45
+snap ${ccalib}, 1 
+mov 50, -140, 0
+snap ${ccalib}, 1 
+mov 50, -140, -45
+snap ${ccalib}, 1 
+mov 50, -140, -90
+snap ${ccalib}, 1 
+mov 50, -160, -90
+snap ${ccalib}, 1 
+mov 50, -160, 0
+snap ${ccalib}, 1 
+mov 50, -160, 90
+snap ${ccalib}, 1 
+mov 50, -180, 90
+snap ${ccalib}, 1 
+mov 50, -180, 0
+snap ${ccalib}, 1 
+mov 50, -200, -90
+snap ${ccalib}, 1 
+mov 50, -200, 0
+snap ${ccalib}, 1 
+mov 50, -200, 90
+snap ${ccalib}, 1 
+mov 50, -220, 90
+snap ${ccalib}, 1 
+mov 50, -220, 45
+snap ${ccalib}, 1 
+mov 50, -220, 0
+snap ${ccalib}, 1 
+mov 50, -220, -45
+snap ${ccalib}, 1 
+mov 50, -220, -90
+snap ${ccalib}, 1 
+mov 50, -230, -90
+snap ${ccalib}, 1 
+mov 50, -230, -45
+snap ${ccalib}, 1 
+mov 50, -230, 0
+snap ${ccalib}, 1 
+mov 50, -230, 45
+snap ${ccalib}, 1 
+mov 50, -230, 90
+snap ${ccalib}, 1 
+mov 100, -130, -90
+snap ${ccalib}, 1 
+mov 100, -130, -45
+snap ${ccalib}, 1 
+mov 100, -130, 0
+snap ${ccalib}, 1 
+mov 100, -130, 45
+snap ${ccalib}, 1 
+mov 100, -130, 90
+snap ${ccalib}, 1 
+mov 100, -140, 90
+snap ${ccalib}, 1 
+mov 100, -140, 45
+snap ${ccalib}, 1 
+mov 100, -140, 0
+snap ${ccalib}, 1 
+mov 100, -140, -45
+snap ${ccalib}, 1 
+mov 100, -140, -90
+snap ${ccalib}, 1 
+mov 100, -160, -90
+snap ${ccalib}, 1 
+mov 100, -160, 0
+snap ${ccalib}, 1 
+mov 100, -160, 90
+snap ${ccalib}, 1 
+mov 100, -180, 90
+snap ${ccalib}, 1 
+mov 100, -180, 0
+snap ${ccalib}, 1 
+mov 100, -200, -90
+snap ${ccalib}, 1 
+mov 100, -200, 0
+snap ${ccalib}, 1 
+mov 100, -200, 90
+snap ${ccalib}, 1 
+mov 100, -220, 90
+snap ${ccalib}, 1 
+mov 100, -220, 45
+snap ${ccalib}, 1 
+mov 100, -220, 0
+snap ${ccalib}, 1 
+mov 100, -220, -45
+snap ${ccalib}, 1 
+mov 100, -220, -90
+snap ${ccalib}, 1 
+mov 100, -230, -90
+snap ${ccalib}, 1 
+mov 100, -230, -45
+snap ${ccalib}, 1 
+mov 100, -230, 0
+snap ${ccalib}, 1 
+mov 100, -230, 45
+snap ${ccalib}, 1 
+mov 100, -230, 90
+snap ${ccalib}, 1 
+
+
+home
+light 1, 0
+light 2, 0

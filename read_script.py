@@ -7,6 +7,7 @@ import time
 import math
 import struct
 import string
+import itertools
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -20,7 +21,7 @@ import motordic
 import pymkecli.client
 import pymkecli.bus
 
-commands = {  # 'root': ['set_root', False],
+commands = {'root': ['set_root', False],
             'set': ['set_img', False],
             'snap': ['snap_image', True],
             'mov': ['move_robot', True],
@@ -32,7 +33,22 @@ commands = {  # 'root': ['set_root', False],
             'lasers': ['set_lasers', True],
             'light': ['set_light', True]
             }
+dynvars = {
+            'seqn': 'd',
+            'seqs': 'd',
+            'shutter': 'd',
+            'gainiso': 'd',
+            'pan': 'd',
+            'slide': 'd',
+            'tilt': 'd',
+            'lasers': 'd',
+            'datetime': 't'
+            }
 
+root = None
+saveFileName: dict = {None: None}
+seqn: int = 0
+pos_robots = [0, 0, 0]
 app = QtWidgets.qApp
 
 # ------ from mke-sdk ------
@@ -122,6 +138,8 @@ def execute_script(scriptName, devices, params):
     # devices: motors, lights, 3D sensors(sensor window)
     # params: motorDic
 
+    # num of pictures
+
     # print(commands['root'][0])
     f = open(scriptName)
     lines = f.read().splitlines()
@@ -144,13 +162,15 @@ def execute_script(scriptName, devices, params):
             com_args[1] = com_args[1].replace(" ", "")  # del space
             com_args[1] = com_args[1].replace("\"", "")  # del double-quotation
             com_args[1] = com_args[1].split(",")
-            if com_args[0] != 'set' and com_args[0] != 'snap':
-                com_args[1] = np.array(com_args[1], dtype=int)
+            if com_args[0] == 'set' or com_args[0] == 'root':
+                pass
             elif com_args[0] == 'snap':
                 com_args[1][1] = int(com_args[1][1])
+            else:
+                com_args[1] = np.array(com_args[1], dtype=int)
             # print(type(com_args[1]))
             args = com_args[1]
-        else:  # home
+        else:  # home only
             args = np.array([0, 0, 0], dtype=int)
         # print(com_args)
         # print(commands[com_args[0]][0])
@@ -163,20 +183,117 @@ def execute_script(scriptName, devices, params):
     # return args_hist
 
 ##########
+def expand_dynvars(fileCategory, devices):
+    print('---expand_dynvars---')
+    global pos_robots
+
+    # dv_tokens = regexp(args{i}, '@\{([a-zA-Z_]\w*)\}\{([\w\d_\/\\:\-\+]+)\}', 'tokens');
+    # dv_val = sprintf(sprintf('%%0%dd', dv_pard), systate.seqn);
+
+    # if not re.search('.+_image', args[0]):  # https://www.educative.io/edpresso/how-to-implement-wildcards-in-python
+    #     print(args[0])
+    #     print(type(args[0]))
+
+    ### @{a}{b}をaという変数についてb桁の数字に置き換える
+    # https://note.nkmk.me/python-split-rsplit-splitlines-re/
+    # https://note.nkmk.me/python-re-match-search-findall-etc/
+    # https://userweb.mnet.ne.jp/nakama/
+
+    fileName = saveFileName[fileCategory]
+    pattern = '_@\{([a-zA-Z_]\w*)\}\{([\w\d_\/\\:\-\+]+)\}'
+    dv_tokens = re.split(pattern, saveFileName[fileCategory])
+    # if '' in dv_tokens:
+    dv_tokens = [n for n in dv_tokens if n!='']    # https://hibiki-press.tech/python/pop-del-remove/2871
+    dv_tokens.pop(0)
+    dv_tokens.pop(-1)
+    dv_tokens = [dv_tokens[i:i + 2] for i in range(0, len(dv_tokens), 2)]   # https://www.it-swarm.dev/ja/python/python%E3%83%AA%E3%82%B9%E3%83%88%E3%82%92n%E5%80%8B%E3%81%AE%E3%83%81%E3%83%A3%E3%83%B3%E3%82%AF%E3%81%AB%E5%88%86%E5%89%B2/1047156094/
+    # print(dv_tokens)
+
+    for j in range(len(dv_tokens)):
+        dv_name = dv_tokens[j][0]
+        dv_par = int(dv_tokens[j][1])
+
+        if not dv_name in dynvars:
+            QtWidgets.QMessageBox.critical(devices['3Dsensors'], 'Cannot expand dynamic valuable', 'Unrecognized dynamic variable %s' % (dv_name))
+
+        ### matlab
+#         if (dynvars{idx, 2} == 'd')
+#             dv_pard = str2double(dv_par);
+#             if (isnan(dv_pard))
+#                 errmsg = sprintf('Parameter of "%s" is not a number', dv_name);
+#                 return;
+#             end
+#         elseif(dynvars{idx, 2} == 't')
+#           try
+#                 datestr(now, dv_par);
+#           catch
+#           errmsg = sprintf('Parameter of "%s" in not a valid LDML string: %s', dv_name, dv_par);
+#           return;
+#          end
+#       end
+
+        ### shutter, gainiso, datetimeなども後で追加
+        if dv_name == 'seqn':
+            dv_val = ('{:0=%d}' % (dv_par)).format(seqn)
+        elif dv_name == 'lasers':
+            dv_val = ('{:0=%d}' % (dv_par)).format(devices['3Dsensors'].laserX)
+        elif dv_name == 'slide':
+            # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['slider'].m_position))
+            dv_val = ('{:0=%d}' % (dv_par)).format(round(pos_robots[0]))
+        elif dv_name == 'pan':
+            # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['pan'].m_position))
+            dv_val = ('{:0=%d}' % (dv_par)).format(round(pos_robots[1]))
+        elif dv_name == 'tilt':
+            # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['tilt'].m_position))
+            dv_val = ('{:0=%d}' % (dv_par)).format(round(pos_robots[2]))
+        else:
+            dv_val = 'xxxx'  # temp
+
+        fileName = fileName.replace('@{%s}{%d}' % (dv_name, dv_par), dv_val)
+
+    print('fileName : ' + fileName)
+    # print(('zero padding: {:0=%d}' % (int(dv_tokens[1]))).format(seqn))   # https://note.nkmk.me/python-format-zero-hex/
+
+
+##########
+
+def set_root(args, devices, params):
+    app.processEvents()
+
+    global root
+    root = args[0]
+    # print(root)
+
+    ### よくわからない処理部
+
+
 def set_img(args, devices, params):
     print('---set_img---')
+    app.processEvents()
 
     # ---------- make directory for images ----------
+    # args[0].replace('${', '')
+    # args[0].replace('}', '')
+    saveFileName[args[0]] = args[1]
+
     now = datetime.datetime.now()
     dir_num: int = 1
 
-    if not re.search('.+_image', args[0]):  # https://www.educative.io/edpresso/how-to-implement-wildcards-in-python
-        print(args[0])
-        print(type(args[0]))
+    # ---------- make folders for images ----------
+    # if not re.search('.+_image', args[0]):  # https://www.educative.io/edpresso/how-to-implement-wildcards-in-python
+    #     print(args[0])
+    #     print(type(args[0]))
+    #     pass
+    if args[0] == 'pattern1_dots_destination':
+        # temp
         pass
     else:
         ymd = now.strftime('%Y%m%d')
-        dir_path = str(ymd) + "_" + str(dir_num) + "/" + args[1].replace("/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png","")
+        if args[0] == 'ccalib':
+            dir_path = str(ymd) + "_" + str(dir_num) + "/" + args[0]
+        else:
+            dir_path = str(ymd) + "_" + str(dir_num) + "/" + args[1].replace(
+                "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
         print('var name: ' + str(args[0]))  # <- set var name as img_@...
         # if os.path.exists(str(ymd) + '.+'):
         while os.path.exists(dir_path):
@@ -190,6 +307,7 @@ def set_img(args, devices, params):
     ### 正規表現の解読と、画像保存ルールを作る
 
 
+
 def snap_image(args, devices, params):
     print('---snap_image---')
     app.processEvents()
@@ -197,6 +315,13 @@ def snap_image(args, devices, params):
     ### Request to get image
 
     ### Save image
+    # saveFileName[args[0]]
+    fileCategory = re.search('([a-zA-Z_]\w*)', args[0]).group()
+    # print(fileCategory)
+    expand_dynvars(fileCategory, devices)
+
+    global seqn
+    seqn += 1
 
 
 def move_robot(args, devices, params):
@@ -238,6 +363,10 @@ def move_robot(args, devices, params):
 
     time.sleep(1.0)
 
+    global pos_robots
+    pos_robots = args
+
+
 def home_robot(args, devices, params):
     print('---home_robot---')
     app.processEvents()
@@ -269,6 +398,8 @@ def set_gainiso(args, devices, params):
 def set_lasers(args, devices, params):
     print('---set_lasers---')
     app.processEvents()
+
+    devices['3Dsensors'].laserX = args[0]
 
     ### Request to set lasers (args[0])
 

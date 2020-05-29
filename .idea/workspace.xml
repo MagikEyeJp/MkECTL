@@ -5,8 +5,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KMControllersS_dummy.py" beforeDir="false" afterPath="$PROJECT_DIR$/KMControllersS_dummy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/keiganGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/keiganGUI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow_ui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/read_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/read_script.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensors.py" afterDir="false" />
     </list>
@@ -278,7 +276,14 @@
       <option name="project" value="LOCAL" />
       <updated>1590369416445</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="mainly changed read_script">
+      <created>1590582805259</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1590582805259</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -320,6 +325,7 @@
     <MESSAGE value="modified and added" />
     <MESSAGE value="added IR serial part" />
     <MESSAGE value="connected to sensor using mke-sdk for the first time" />
-    <option name="LAST_COMMIT_MESSAGE" value="connected to sensor using mke-sdk for the first time" />
+    <MESSAGE value="mainly changed read_script" />
+    <option name="LAST_COMMIT_MESSAGE" value="mainly changed read_script" />
   </component>
 </project>

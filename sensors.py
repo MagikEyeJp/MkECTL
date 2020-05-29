@@ -37,6 +37,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.hexLaserPattern: hex = 0x0000    # Hex 4 digits
         self.binLaserPattern: bin = bin(self.hexLaserPattern)
         self.decLaserPattern: int = int(self.hexLaserPattern)
+        self.laserX: int = 0    # laser no. when there is only one
 
         # Combo Box
         self.ui_s.ISOcombo.setCurrentText(str(self.gainiso))
