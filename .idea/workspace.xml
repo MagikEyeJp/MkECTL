@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KMControllersS_dummy.py" beforeDir="false" afterPath="$PROJECT_DIR$/KMControllersS_dummy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keiganGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/keiganGUI.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ImageViewScene.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageViewScene.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/read_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/read_script.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensors.py" afterDir="false" />
     </list>
@@ -283,7 +282,14 @@
       <option name="project" value="LOCAL" />
       <updated>1590582805259</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="expand dynvars!!!">
+      <created>1590758360005</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1590758360005</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -326,6 +332,18 @@
     <MESSAGE value="added IR serial part" />
     <MESSAGE value="connected to sensor using mke-sdk for the first time" />
     <MESSAGE value="mainly changed read_script" />
-    <option name="LAST_COMMIT_MESSAGE" value="mainly changed read_script" />
+    <MESSAGE value="expand dynvars!!!" />
+    <option name="LAST_COMMIT_MESSAGE" value="expand dynvars!!!" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/read_script.py</url>
+          <line>230</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

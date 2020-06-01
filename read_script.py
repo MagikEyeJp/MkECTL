@@ -45,11 +45,23 @@ dynvars = {
             'datetime': 't'
             }
 
-root = None
-saveFileName: dict = {None: None}
-seqn: int = 0
-pos_robots = [0, 0, 0]
+# root = None
+# dir_path = ''
+# saveFileName: dict = {None: None}
+# seqn: int = 0
+# pos_robots = [0, 0, 0]
 app = QtWidgets.qApp
+
+class Systate():
+    def __init__(self):
+        self.root = None
+        self.dir_path = ''
+        self.saveFileName: dict = {None: None}
+        self.seqn: int = 0
+        self.pos_robots = [0, 0, 0]
+        self.args = None
+
+systate = Systate()
 
 # ------ from mke-sdk ------
 # ------------------------------------------------------------------------------
@@ -175,6 +187,9 @@ def execute_script(scriptName, devices, params):
         # print(com_args)
         # print(commands[com_args[0]][0])
 
+        systate.args = args
+        expand_dynvars(args, devices)
+
         # jump to a method(function)
         eval(commands[com][0])(args, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
         args_hist.append(args)
@@ -183,9 +198,10 @@ def execute_script(scriptName, devices, params):
     # return args_hist
 
 ##########
-def expand_dynvars(fileCategory, devices):
+def expand_dynvars(args, devices):
     print('---expand_dynvars---')
-    global pos_robots
+    # global pos_robots
+    # global dir_path
 
     # dv_tokens = regexp(args{i}, '@\{([a-zA-Z_]\w*)\}\{([\w\d_\/\\:\-\+]+)\}', 'tokens');
     # dv_val = sprintf(sprintf('%%0%dd', dv_pard), systate.seqn);
@@ -199,59 +215,70 @@ def expand_dynvars(fileCategory, devices):
     # https://note.nkmk.me/python-re-match-search-findall-etc/
     # https://userweb.mnet.ne.jp/nakama/
 
-    fileName = saveFileName[fileCategory]
-    pattern = '_@\{([a-zA-Z_]\w*)\}\{([\w\d_\/\\:\-\+]+)\}'
-    dv_tokens = re.split(pattern, saveFileName[fileCategory])
-    # if '' in dv_tokens:
-    dv_tokens = [n for n in dv_tokens if n!='']    # https://hibiki-press.tech/python/pop-del-remove/2871
-    dv_tokens.pop(0)
-    dv_tokens.pop(-1)
-    dv_tokens = [dv_tokens[i:i + 2] for i in range(0, len(dv_tokens), 2)]   # https://www.it-swarm.dev/ja/python/python%E3%83%AA%E3%82%B9%E3%83%88%E3%82%92n%E5%80%8B%E3%81%AE%E3%83%81%E3%83%A3%E3%83%B3%E3%82%AF%E3%81%AB%E5%88%86%E5%89%B2/1047156094/
-    # print(dv_tokens)
+    for i in range(len(args)):
+        if type(args[i]) != string:
+            continue
 
-    for j in range(len(dv_tokens)):
-        dv_name = dv_tokens[j][0]
-        dv_par = int(dv_tokens[j][1])
+        # fileName = systate.saveFileName[fileCategory]
+        pattern = '_@\{([a-zA-Z_]\w*)\}\{([\w\d_\/\\:\-\+]+)\}'
+        # dv_tokens = re.split(pattern, saveFileName[fileCategory])
+        dv_tokens = re.split(pattern, args[1])
+        # if '' in dv_tokens:
+        dv_tokens = [n for n in dv_tokens if n!='']    # https://hibiki-press.tech/python/pop-del-remove/2871
+        dv_tokens.pop(0)
+        dv_tokens.pop(-1)
+        dv_tokens = [dv_tokens[i:i + 2] for i in range(0, len(dv_tokens), 2)]   # https://www.it-swarm.dev/ja/python/python%E3%83%AA%E3%82%B9%E3%83%88%E3%82%92n%E5%80%8B%E3%81%AE%E3%83%81%E3%83%A3%E3%83%B3%E3%82%AF%E3%81%AB%E5%88%86%E5%89%B2/1047156094/
+        print(dv_tokens)
 
-        if not dv_name in dynvars:
-            QtWidgets.QMessageBox.critical(devices['3Dsensors'], 'Cannot expand dynamic valuable', 'Unrecognized dynamic variable %s' % (dv_name))
+        for j in range(len(dv_tokens)):
+            dv_name = dv_tokens[j][0]
+            dv_par = int(dv_tokens[j][1])
 
-        ### matlab
-#         if (dynvars{idx, 2} == 'd')
-#             dv_pard = str2double(dv_par);
-#             if (isnan(dv_pard))
-#                 errmsg = sprintf('Parameter of "%s" is not a number', dv_name);
-#                 return;
-#             end
-#         elseif(dynvars{idx, 2} == 't')
-#           try
-#                 datestr(now, dv_par);
-#           catch
-#           errmsg = sprintf('Parameter of "%s" in not a valid LDML string: %s', dv_name, dv_par);
-#           return;
-#          end
-#       end
+            if not dv_name in dynvars:
+                QtWidgets.QMessageBox.critical(devices['3Dsensors'], 'Cannot expand dynamic valuable', 'Unrecognized dynamic variable %s' % (dv_name))
 
-        ### shutter, gainiso, datetimeなども後で追加
-        if dv_name == 'seqn':
-            dv_val = ('{:0=%d}' % (dv_par)).format(seqn)
-        elif dv_name == 'lasers':
-            dv_val = ('{:0=%d}' % (dv_par)).format(devices['3Dsensors'].laserX)
-        elif dv_name == 'slide':
-            # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['slider'].m_position))
-            dv_val = ('{:0=%d}' % (dv_par)).format(round(pos_robots[0]))
-        elif dv_name == 'pan':
-            # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['pan'].m_position))
-            dv_val = ('{:0=%d}' % (dv_par)).format(round(pos_robots[1]))
-        elif dv_name == 'tilt':
-            # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['tilt'].m_position))
-            dv_val = ('{:0=%d}' % (dv_par)).format(round(pos_robots[2]))
-        else:
-            dv_val = 'xxxx'  # temp
+            ### matlab
+    #         if (dynvars{idx, 2} == 'd')
+    #             dv_pard = str2double(dv_par);
+    #             if (isnan(dv_pard))
+    #                 errmsg = sprintf('Parameter of "%s" is not a number', dv_name);
+    #                 return;
+    #             end
+    #         elseif(dynvars{idx, 2} == 't')
+    #           try
+    #                 datestr(now, dv_par);
+    #           catch
+    #           errmsg = sprintf('Parameter of "%s" in not a valid LDML string: %s', dv_name, dv_par);
+    #           return;
+    #          end
+    #       end
 
-        fileName = fileName.replace('@{%s}{%d}' % (dv_name, dv_par), dv_val)
+            ### datetimeも後で追加
+            if dv_name == 'seqn':
+                dv_val = ('{:0=%d}' % (dv_par)).format(seqn)
+            elif dv_name == 'lasers':
+                dv_val = ('{:0=%d}' % (dv_par)).format(devices['3Dsensors'].laserX)
+            elif dv_name == 'shutter':
+                dv_val = ('{:0=%d}' % (dv_par)).format(devices['3Dsensors'].shutterSpeed)
+            elif dv_name == 'gainiso':
+                dv_val = ('{:0=%d}' % (dv_par)).format(devices['3Dsensors'].gainiso)
+            elif dv_name == 'slide':
+                # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['slider'].m_position))
+                dv_val = ('{:0=%d}' % (dv_par)).format(round(systate.pos_robots[0]))
+            elif dv_name == 'pan':
+                # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['pan'].m_position))
+                dv_val = ('{:0=%d}' % (dv_par)).format(round(systate.pos_robots[1]))
+            elif dv_name == 'tilt':
+                # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['tilt'].m_position))
+                dv_val = ('{:0=%d}' % (dv_par)).format(round(systate.pos_robots[2]))
+            else:
+                dv_val = 'xxxx'  # temp
 
-    print('fileName : ' + fileName)
+            # fileName = fileName.replace('@{%s}{%d}' % (dv_name, dv_par), dv_val)
+            args[i] = args[i].replace('@{%s}{%d}' % (dv_name, dv_par), dv_val)
+
+        devices['3Dsensors'].imgPath = systate.dir_path + args[len(args) - 1]
+        print('fileName : ' + args[len(args) - 1])
     # print(('zero padding: {:0=%d}' % (int(dv_tokens[1]))).format(seqn))   # https://note.nkmk.me/python-format-zero-hex/
 
 
@@ -271,10 +298,12 @@ def set_img(args, devices, params):
     print('---set_img---')
     app.processEvents()
 
+    # global dir_path
+
     # ---------- make directory for images ----------
     # args[0].replace('${', '')
     # args[0].replace('}', '')
-    saveFileName[args[0]] = args[1]
+    systate.saveFileName[args[0]] = args[1]
 
     now = datetime.datetime.now()
     dir_num: int = 1
@@ -284,27 +313,28 @@ def set_img(args, devices, params):
     #     print(args[0])
     #     print(type(args[0]))
     #     pass
-    if args[0] == 'pattern1_dots_destination':
+    if '_dots_destination' in args[0]:
         # temp
         pass
     else:
         ymd = now.strftime('%Y%m%d')
         if args[0] == 'ccalib':
-            dir_path = str(ymd) + "_" + str(dir_num) + "/" + args[0]
+            systate.dir_path = str(ymd) + "_" + str(dir_num) + "/" + args[0]
         else:
-            dir_path = str(ymd) + "_" + str(dir_num) + "/" + args[1].replace(
+            systate.dir_path = str(ymd) + "_" + str(dir_num) + "/" + args[1].replace(
                 "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
         print('var name: ' + str(args[0]))  # <- set var name as img_@...
         # if os.path.exists(str(ymd) + '.+'):
-        while os.path.exists(dir_path):
-            print('folder "' + dir_path + '" already exists')
+        while os.path.exists(systate.dir_path):
+            print('folder "' + systate.dir_path + '" already exists')
             dir_num += 1
-            dir_path = dir_path.replace(str(ymd) + "_" + str(dir_num - 1), str(ymd) + "_" + str(dir_num))
+            systate.dir_path = systate.dir_path.replace(str(ymd) + "_" + str(dir_num - 1), str(ymd) + "_" + str(dir_num))
 
-        os.makedirs(dir_path)  # https://note.nkmk.me/python-os-mkdir-makedirs/
+        os.makedirs(systate.dir_path)  # https://note.nkmk.me/python-os-mkdir-makedirs/
     # ------------------------------
 
     ### 正規表現の解読と、画像保存ルールを作る
+
 
 
 
@@ -317,11 +347,13 @@ def snap_image(args, devices, params):
     ### Save image
     # saveFileName[args[0]]
     fileCategory = re.search('([a-zA-Z_]\w*)', args[0]).group()
-    # print(fileCategory)
-    expand_dynvars(fileCategory, devices)
 
-    global seqn
-    seqn += 1
+    # print(fileCategory)
+    # expand_dynvars(fileCategory, devices)
+
+    # global seqn
+    global systate
+    systate.seqn += 1
 
 
 def move_robot(args, devices, params):
@@ -363,8 +395,8 @@ def move_robot(args, devices, params):
 
     time.sleep(1.0)
 
-    global pos_robots
-    pos_robots = args
+    # global pos_robots
+    systate.pos_robots = args
 
 
 def home_robot(args, devices, params):
