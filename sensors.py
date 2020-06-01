@@ -24,7 +24,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s = sensorwindow_ui.Ui_sensor()
         self.ui_s.setupUi(self)
 
-        # connect
+        # connection
         self.conn = None
 
         # Variables (initialized with default values)
@@ -60,7 +60,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.hex4dLineEdit.returnPressed.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
 
-
         # set validator of line edit
         self.ui_s.shutterLineEdit.setValidator(QtGui.QIntValidator(self))
         self.ui_s.framesLineEdit.setValidator(QtGui.QIntValidator(self))
@@ -75,6 +74,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.offAllLaserButton.clicked.connect(lambda: self.setLaser('0x0000'))
         self.ui_s.setHex4dLaserButton.clicked.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
+        self.ui_s.save1Button.clicked.connect(self.saveImg)
 
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
@@ -85,6 +85,10 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
         # first connect
         self.connectToSensor()
+
+        # image
+        self.img: QtGui.QPixmap() = None
+        self.imgPath = ''
 
     def changeIPaddress(self):
         self.RPiaddress = self.ui_s.IPlineEdit.text()
@@ -148,11 +152,12 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.scene = ImageViewScene.ImageViewScene()
         # self.scene.setSceneRect(QtCore.QRectF(self.rect()))
         self.ui_s.sensorImage.setScene(self.scene)
-        self.scene.setFile('script/M_TOF_sample_image.png')
+        self.img = self.scene.setFile('script/M_TOF_sample_image.png')
 
         # self.ui_s.sensorImage = ImageViewScene.ImageViewer()
         # self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
         self.ui_s.sensorImage.show()
+
 
     # def resizeEvent(self, event):   # https://gist.github.com/mieki256/1b73aae707cee97fffab544af9bc0637
     #     """ リサイズ時に呼ばれる処理 """
@@ -181,6 +186,11 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             # for i in range(16):
             #     print(getbit(self.decLaserPattern, i))
             #     print(setbit(self.decLaserPattern, i, int(laserpattern_print[15-i])))
+
+    def saveImg(self):
+        # self.ui_s.sensorImage.grab().save('imgs/QImage.png')    # https://qiita.com/akegure/items/0bce65da71e64728a307
+        self.img.save('imgs/QPixmap.png')
+
 
 
 

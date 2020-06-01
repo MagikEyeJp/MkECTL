@@ -50,6 +50,8 @@ class ImageViewScene(QtWidgets.QGraphicsScene):
 
         self.fitImage()
 
+        return pixmap
+
     def imageItem(self):
         return self.__imageItem
 
