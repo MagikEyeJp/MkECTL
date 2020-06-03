@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImageViewScene.py" beforeDir="false" afterPath="$PROJECT_DIR$/ImageViewScene.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/read_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/read_script.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensors.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -289,7 +287,28 @@
       <option name="project" value="LOCAL" />
       <updated>1590758360005</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="saveImg">
+      <created>1590991738091</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1590991738091</updated>
+    </task>
+    <task id="LOCAL-00019" summary="edit expand dynavers">
+      <created>1590991778415</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1590991778415</updated>
+    </task>
+    <task id="LOCAL-00020" summary="saved images">
+      <created>1590991789019</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1590991789019</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -333,15 +352,18 @@
     <MESSAGE value="connected to sensor using mke-sdk for the first time" />
     <MESSAGE value="mainly changed read_script" />
     <MESSAGE value="expand dynvars!!!" />
-    <option name="LAST_COMMIT_MESSAGE" value="expand dynvars!!!" />
+    <MESSAGE value="saveImg" />
+    <MESSAGE value="edit expand dynavers" />
+    <MESSAGE value="saved images" />
+    <option name="LAST_COMMIT_MESSAGE" value="saved images" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/read_script.py</url>
-          <line>230</line>
-          <option name="timeStamp" value="7" />
+          <line>218</line>
+          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

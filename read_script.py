@@ -55,11 +55,16 @@ app = QtWidgets.qApp
 class Systate():
     def __init__(self):
         self.root = None
-        self.dir_path = ''
+        self.dir_path: dict = {None: None}
+        # self.dir_path = ''
         self.saveFileName: dict = {None: None}
         self.seqn: int = 0
         self.pos_robots = [0, 0, 0]
         self.args = None
+        self.skip = False
+        self.now = datetime.datetime.now()
+        self.ymd = ''
+        self.dir_num = 0
 
 systate = Systate()
 
@@ -147,6 +152,7 @@ def mke_recv(conn, cmd, seq_id, exp_status):
 
 
 def execute_script(scriptName, devices, params):
+    global systate
     # devices: motors, lights, 3D sensors(sensor window)
     # params: motorDic
 
@@ -188,10 +194,12 @@ def execute_script(scriptName, devices, params):
         # print(commands[com_args[0]][0])
 
         systate.args = args
-        expand_dynvars(args, devices)
+        # expand_dynvars(args, devices)
+
+        systate.skip = commands[com][1]
 
         # jump to a method(function)
-        eval(commands[com][0])(args, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
+        eval(commands[com][0])(systate.args, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
         args_hist.append(args)
 
     # print(args_hist)
@@ -200,15 +208,8 @@ def execute_script(scriptName, devices, params):
 ##########
 def expand_dynvars(args, devices):
     print('---expand_dynvars---')
-    # global pos_robots
-    # global dir_path
-
-    # dv_tokens = regexp(args{i}, '@\{([a-zA-Z_]\w*)\}\{([\w\d_\/\\:\-\+]+)\}', 'tokens');
-    # dv_val = sprintf(sprintf('%%0%dd', dv_pard), systate.seqn);
-
-    # if not re.search('.+_image', args[0]):  # https://www.educative.io/edpresso/how-to-implement-wildcards-in-python
-    #     print(args[0])
-    #     print(type(args[0]))
+    global systate
+    print('args : ' + str(args))
 
     ### @{a}{b}をaという変数についてb桁の数字に置き換える
     # https://note.nkmk.me/python-split-rsplit-splitlines-re/
@@ -216,19 +217,21 @@ def expand_dynvars(args, devices):
     # https://userweb.mnet.ne.jp/nakama/
 
     for i in range(len(args)):
-        if type(args[i]) != string:
+        if type(args[i]) != str:
             continue
 
         # fileName = systate.saveFileName[fileCategory]
         pattern = '_@\{([a-zA-Z_]\w*)\}\{([\w\d_\/\\:\-\+]+)\}'
         # dv_tokens = re.split(pattern, saveFileName[fileCategory])
-        dv_tokens = re.split(pattern, args[1])
-        # if '' in dv_tokens:
+        dv_tokens = re.split(pattern, args[i])
+
+        if len(dv_tokens) < 2:
+            continue    # temp
+
         dv_tokens = [n for n in dv_tokens if n!='']    # https://hibiki-press.tech/python/pop-del-remove/2871
         dv_tokens.pop(0)
-        dv_tokens.pop(-1)
+        dv_tokens.pop(-1)   # https://note.nkmk.me/python-list-clear-pop-remove-del/
         dv_tokens = [dv_tokens[i:i + 2] for i in range(0, len(dv_tokens), 2)]   # https://www.it-swarm.dev/ja/python/python%E3%83%AA%E3%82%B9%E3%83%88%E3%82%92n%E5%80%8B%E3%81%AE%E3%83%81%E3%83%A3%E3%83%B3%E3%82%AF%E3%81%AB%E5%88%86%E5%89%B2/1047156094/
-        print(dv_tokens)
 
         for j in range(len(dv_tokens)):
             dv_name = dv_tokens[j][0]
@@ -255,7 +258,7 @@ def expand_dynvars(args, devices):
 
             ### datetimeも後で追加
             if dv_name == 'seqn':
-                dv_val = ('{:0=%d}' % (dv_par)).format(seqn)
+                dv_val = ('{:0=%d}' % (dv_par)).format(systate.seqn)
             elif dv_name == 'lasers':
                 dv_val = ('{:0=%d}' % (dv_par)).format(devices['3Dsensors'].laserX)
             elif dv_name == 'shutter':
@@ -277,7 +280,6 @@ def expand_dynvars(args, devices):
             # fileName = fileName.replace('@{%s}{%d}' % (dv_name, dv_par), dv_val)
             args[i] = args[i].replace('@{%s}{%d}' % (dv_name, dv_par), dv_val)
 
-        devices['3Dsensors'].imgPath = systate.dir_path + args[len(args) - 1]
         print('fileName : ' + args[len(args) - 1])
     # print(('zero padding: {:0=%d}' % (int(dv_tokens[1]))).format(seqn))   # https://note.nkmk.me/python-format-zero-hex/
 
@@ -285,11 +287,10 @@ def expand_dynvars(args, devices):
 ##########
 
 def set_root(args, devices, params):
+    print('---set_root---')
     app.processEvents()
-
-    global root
-    root = args[0]
-    # print(root)
+    global systate
+    systate.root = args[0]
 
     ### よくわからない処理部
 
@@ -297,16 +298,16 @@ def set_root(args, devices, params):
 def set_img(args, devices, params):
     print('---set_img---')
     app.processEvents()
-
-    # global dir_path
+    global systate
 
     # ---------- make directory for images ----------
     # args[0].replace('${', '')
     # args[0].replace('}', '')
-    systate.saveFileName[args[0]] = args[1]
+    systate.saveFileName[args[0]] = systate.args[1]
+    print('systate.args[1] : ' + systate.args[1])
 
-    now = datetime.datetime.now()
-    dir_num: int = 1
+    # now = datetime.datetime.now()
+    systate.dir_num = 1
 
     # ---------- make folders for images ----------
     # if not re.search('.+_image', args[0]):  # https://www.educative.io/edpresso/how-to-implement-wildcards-in-python
@@ -317,48 +318,50 @@ def set_img(args, devices, params):
         # temp
         pass
     else:
-        ymd = now.strftime('%Y%m%d')
+        systate.ymd = systate.now.strftime('%Y%m%d')
         if args[0] == 'ccalib':
-            systate.dir_path = str(ymd) + "_" + str(dir_num) + "/" + args[0]
+            systate.dir_path[args[0]] = str(systate.ymd) + "_" + str(systate.dir_num) + "/" + args[0]
         else:
-            systate.dir_path = str(ymd) + "_" + str(dir_num) + "/" + args[1].replace(
+            systate.dir_path[args[0]] = str(systate.ymd) + "_" + str(systate.dir_num) + "/" + args[1].replace(
                 "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
         print('var name: ' + str(args[0]))  # <- set var name as img_@...
         # if os.path.exists(str(ymd) + '.+'):
-        while os.path.exists(systate.dir_path):
-            print('folder "' + systate.dir_path + '" already exists')
-            dir_num += 1
-            systate.dir_path = systate.dir_path.replace(str(ymd) + "_" + str(dir_num - 1), str(ymd) + "_" + str(dir_num))
+        while os.path.exists(systate.dir_path[args[0]]):
+            print('folder "' + systate.dir_path[args[0]] + '" already exists')
+            systate.dir_num += 1
+            systate.dir_path[args[0]] = systate.dir_path.replace(str(systate.ymd) + "_" + str(systate.dir_num - 1), str(systate.ymd) + "_" + str(systate.dir_num))
 
-        os.makedirs(systate.dir_path)  # https://note.nkmk.me/python-os-mkdir-makedirs/
+        os.makedirs(systate.dir_path[args[0]])  # https://note.nkmk.me/python-os-mkdir-makedirs/
     # ------------------------------
-
-    ### 正規表現の解読と、画像保存ルールを作る
-
-
-
 
 def snap_image(args, devices, params):
     print('---snap_image---')
     app.processEvents()
+    global systate
+
 
     ### Request to get image
+    # img = ***
 
     ### Save image
-    # saveFileName[args[0]]
+    fileName = []
+
     fileCategory = re.search('([a-zA-Z_]\w*)', args[0]).group()
+    fileName.append(systate.saveFileName[fileCategory])
+    expand_dynvars(fileName, devices)
 
-    # print(fileCategory)
-    # expand_dynvars(fileCategory, devices)
+    # devices['3Dsensors'].img = img
+    devices['3Dsensors'].imgPath = systate.ymd + '_' + str(systate.dir_num) + '/' + fileName[0]
+    print(devices['3Dsensors'].imgPath)
+    devices['3Dsensors'].img.save(devices['3Dsensors'].imgPath)
 
-    # global seqn
-    global systate
     systate.seqn += 1
 
 
 def move_robot(args, devices, params):
     print('---move_robot---')
     print('move to ' + str(args))
+    global systate
     motorSet = ['slider', 'pan', 'tilt']
 
     m = []
@@ -402,6 +405,7 @@ def move_robot(args, devices, params):
 def home_robot(args, devices, params):
     print('---home_robot---')
     app.processEvents()
+    global systate
 
     print('move to ' + str(args))
     move_robot(args, devices, params)
@@ -409,6 +413,7 @@ def home_robot(args, devices, params):
 def set_shutter(args, devices, params):
     print('---set_shutter---')
     app.processEvents()
+    global systate
 
     devices['3Dsensors'].shutterSpeed = args[0]
     print('shutter speed: ' + str(args[0]))
@@ -420,6 +425,7 @@ def set_shutter(args, devices, params):
 def set_gainiso(args, devices, params):
     print('---set_gainiso---')
     app.processEvents()
+    global systate
 
     devices['3Dsensors'].gainiso = args[0]
     print('gainiso: ' + str(args[0]))
@@ -430,6 +436,7 @@ def set_gainiso(args, devices, params):
 def set_lasers(args, devices, params):
     print('---set_lasers---')
     app.processEvents()
+    global systate
 
     devices['3Dsensors'].laserX = args[0]
 
@@ -440,6 +447,7 @@ def set_lasers(args, devices, params):
 def set_light(args, devices, params):
     print('---set_light---')
     app.processEvents()
+    global systate
 
     if (args[1] == 1):
         try:
