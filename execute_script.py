@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 from PyQt5 import QtWidgets
+import scriptProgress_ui
 
 # import KMControllersS
 import motordic
@@ -45,12 +46,50 @@ dynvars = {
             'datetime': 't'
             }
 
-# root = None
-# dir_path = ''
-# saveFileName: dict = {None: None}
-# seqn: int = 0
-# pos_robots = [0, 0, 0]
 app = QtWidgets.qApp
+
+class ProgressWindow(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super(ProgressWindow, self).__init__(parent)
+
+        self.ui_script = scriptProgress_ui.Ui_script()
+        self.ui_script.setupUi(self)
+
+        self.done = 0
+        self.total = 100
+        self.percent = 0
+
+        self.stopClicked = False
+
+        # window position
+        desktop = app.desktop()
+        self.geometry = desktop.screenGeometry()
+        # ウインドウサイズ(枠込)を取得
+        self.framesize = self.frameSize()
+        # ウインドウの位置を指定
+        self.move(self.geometry.width() / 2 - self.framesize.width() / 2, self.geometry.height() / 2 - self.framesize.height() / 2)
+        # self.move(self.geometry.width() / 2 - self.framesize.width(), self.geometry.height() / 2 - self.framesize.height() / 2)
+
+
+        self.ui_script.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
+        self.ui_script.progressBar.setValue(self.percent)
+        self.ui_script.stopButton.clicked.connect(self.interrupt)
+
+
+    def updatePercentage(self):
+        self.percent = self.done / self.total * 100
+        # print(self.percent)
+        self.ui_script.progressBar.setValue(self.percent)
+        return self.percent
+
+    def updateProgressLabel(self):
+        self.ui_script.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
+
+    def interrupt(self):
+        self.stopClicked = True
+        self.close()
+
+
 
 class Systate():
     def __init__(self):
@@ -59,12 +98,30 @@ class Systate():
         # self.dir_path = ''
         self.saveFileName: dict = {None: None}
         self.seqn: int = 0
-        self.pos_robots = [0, 0, 0]
         self.args = None
         self.skip = False
         self.now = datetime.datetime.now()
         self.ymd = ''
         self.dir_num = 0
+        self.folderCreated: dict = {}
+        self.folderCreated = False
+
+        self.past_parameters = Systate.PastParameters()
+
+        self.pos = [0, 0, 0]
+        self.shatter = 0
+        self.gainiso = 0
+        self.lasers = 0
+        self.light = [0, 0]
+
+    class PastParameters():
+        def __init__(self):
+            self.pos = [0, 0, 0]
+            self.shatter = 0
+            self.gainiso = 0
+            self.lasers = 0
+            self.light = [0, 0]
+
 
 systate = Systate()
 
@@ -163,9 +220,21 @@ def execute_script(scriptName, devices, params):
     lines = f.read().splitlines()
     f.close()
 
+    progressBar = ProgressWindow()  # make an instance
+    progressBar.total = len(lines)
+    progressBar.updateProgressLabel()
+    progressBar.show()
+
     args_hist: list = []
 
-    for line in lines:
+    for i, line in enumerate(lines):
+        if progressBar.stopClicked:
+            print('Interrupted')
+            break
+
+        print(' ########## ' + str(i) + '/' + str(len(lines)) + ' ########## ')
+
+
         app.processEvents()
         if(len(line) == 0) or ("#" in line):  # (length of character = 0) or include "#"
             continue
@@ -198,9 +267,17 @@ def execute_script(scriptName, devices, params):
 
         systate.skip = commands[com][1]
 
+        # GUI
+        progressBar.ui_script.commandLabel.setText(com)
+
         # jump to a method(function)
         eval(commands[com][0])(systate.args, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
         args_hist.append(args)
+
+        # GUI
+        progressBar.done = i
+        progressBar.updateProgressLabel()
+        progressBar.updatePercentage()
 
     # print(args_hist)
     # return args_hist
@@ -305,9 +382,10 @@ def set_img(args, devices, params):
     # args[0].replace('}', '')
     systate.saveFileName[args[0]] = systate.args[1]
     print('systate.args[1] : ' + systate.args[1])
+    # if not args[0] in systate.folderCreated:
+    #     systate.folderCreated[args[0]] = False
 
     # now = datetime.datetime.now()
-    systate.dir_num = 1
 
     # ---------- make folders for images ----------
     # if not re.search('.+_image', args[0]):  # https://www.educative.io/edpresso/how-to-implement-wildcards-in-python
@@ -325,13 +403,23 @@ def set_img(args, devices, params):
             systate.dir_path[args[0]] = str(systate.ymd) + "_" + str(systate.dir_num) + "/" + args[1].replace(
                 "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
         print('var name: ' + str(args[0]))  # <- set var name as img_@...
-        # if os.path.exists(str(ymd) + '.+'):
-        while os.path.exists(systate.dir_path[args[0]]):
-            print('folder "' + systate.dir_path[args[0]] + '" already exists')
+        # while os.path.exists(systate.dir_path[args[0]]):
+        #     print('folder "' + systate.dir_path[args[0]] + '" already exists')
+        #     systate.dir_num += 1
+        #     systate.dir_path[args[0]] = systate.dir_path[args[0]].replace(str(systate.ymd) + "_" + str(systate.dir_num - 1), str(systate.ymd) + "_" + str(systate.dir_num))
+
+
+        while os.path.exists(str(systate.ymd) + "_" + str(systate.dir_num)):
+            # if systate.folderCreated[args[0]]:
+            if systate.folderCreated:
+                break
+            print('folder "' + str(systate.ymd) + "_" + str(systate.dir_num) + '" already exists')
             systate.dir_num += 1
-            systate.dir_path[args[0]] = systate.dir_path.replace(str(systate.ymd) + "_" + str(systate.dir_num - 1), str(systate.ymd) + "_" + str(systate.dir_num))
+            systate.dir_path[args[0]] = systate.dir_path[args[0]].replace(str(systate.ymd) + "_" + str(systate.dir_num - 1), str(systate.ymd) + "_" + str(systate.dir_num))
 
         os.makedirs(systate.dir_path[args[0]])  # https://note.nkmk.me/python-os-mkdir-makedirs/
+        # systate.folderCreated[args[0]] = True
+        systate.folderCreated = True
     # ------------------------------
 
 def snap_image(args, devices, params):
@@ -342,6 +430,7 @@ def snap_image(args, devices, params):
 
     ### Request to get image
     # img = ***
+    # devices['3Dsensors'].img =
 
     ### Save image
     fileName = []
@@ -398,7 +487,6 @@ def move_robot(args, devices, params):
 
     time.sleep(1.0)
 
-    # global pos_robots
     systate.pos_robots = args
 
 

@@ -6,7 +6,7 @@ import socket
 
 import sensorwindow_ui
 import ImageViewScene
-import read_script
+import execute_script
 
 # xのあるbit位置が0か1か調べる
 def getbit(x, b):
@@ -83,12 +83,13 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # tooltip
         self.ui_s.ISOlineEdit.setToolTip('select \"Custom\" and set integer here')
 
-        # first connect
-        self.connectToSensor()
-
         # image
         self.img: QtGui.QPixmap() = None
         self.imgPath = ''
+
+        # first connect
+        self.connectToSensor()
+
 
     def changeIPaddress(self):
         self.RPiaddress = self.ui_s.IPlineEdit.text()
@@ -145,7 +146,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # read_script.switch_to_depth_sensor(self.conn)
         # read_script.get_frame(self.conn)
 
-        read_script.client_getframe(self.IPaddress, self.portNum)  # one frame
+        execute_script.client_getframe(self.IPaddress, self.portNum)  # one frame
         # read_script.client_pushframes(self.IPaddress, self.portNum)  # sequential frames
 
         # temp

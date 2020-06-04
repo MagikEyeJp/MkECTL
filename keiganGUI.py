@@ -7,7 +7,8 @@ import serial
 
 import motordic
 import mainwindow_ui
-import read_script
+import execute_script
+import execute_script2
 import sensors
 
 class Ui(QtWidgets.QMainWindow):
@@ -28,12 +29,12 @@ class Ui(QtWidgets.QMainWindow):
         # 画面サイズを取得 (a.desktop()は QtWidgets.QDesktopWidget )  https://ja.stackoverflow.com/questions/44060/pyqt5%E3%81%A7%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AE%E4%B8%AD%E5%A4%AE%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%97%E3%81%9F%E3%81%84
         a = QtWidgets.qApp
         desktop = a.desktop()
-        geometry = desktop.screenGeometry()
+        self.geometry = desktop.screenGeometry()
         # ウインドウサイズ(枠込)を取得
-        framesize = self.frameSize()
+        self.framesize = self.frameSize()
         # ウインドウの位置を指定
         # self.move(geometry.width() / 2 - framesize.width() / 2, geometry.height() / 2 - framesize.height() / 2)
-        self.move(geometry.width() / 2 - framesize.width(), geometry.height() / 2 - framesize.height() / 2)
+        self.move(self.geometry.width() / 2 - self.framesize.width(), self.geometry.height() / 2 - self.framesize.height() / 2)
 
         # variables
         self.params = {}  # motorDic
@@ -42,6 +43,7 @@ class Ui(QtWidgets.QMainWindow):
         self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
         self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin'  # GUI objects related to motors  # Dict of dictionaries
+        self.subWindow_isOpen = False
 
         self.devices['3Dsensors'] = self.subWindow  # 荒業
 
@@ -64,8 +66,9 @@ class Ui(QtWidgets.QMainWindow):
         # self.ui.initializeButton.clicked.connect(self.grayOut)
         self.ui.MagikEye.clicked.connect(self.demo)
         self.ui.selectScript_toolButton.clicked.connect(self.openFile)
-        self.ui.executeScript_button.clicked.connect(self.run_script)
-        self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(geometry, framesize))
+        self.ui.executeScript_button.clicked.connect(lambda: self.run_script(False))
+        self.ui.continueButton.clicked.connect(lambda: self.run_script(True))
+        self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(self.geometry, self.framesize))
         self.ui.sliderOriginButton.clicked.connect(self.setSliderOrigin)
         self.ui.freeButton.clicked.connect(self.freeAllMotors)
         self.ui.onL1Button.clicked.connect(lambda: self.IRlightControl('A'))
@@ -102,6 +105,7 @@ class Ui(QtWidgets.QMainWindow):
         self.deleteLater()
         event.accept()
         self.subWindow.close()  # mainwindowが閉じたらsubwindowも閉じる
+        exit()
 
     def make_motorGUI(self):  # 20200304remote
         # make dictionaries of member valuables
@@ -281,20 +285,24 @@ class Ui(QtWidgets.QMainWindow):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            read_script.execute_script(demo_script, self.devices, self.params)
+            execute_script.execute_script(demo_script, self.devices, self.params)
 
     def keyPressEvent(self, event):
         key = event.key()
         if key == QtCore.Qt.Key_Escape:
             self.close()
 
-    def run_script(self):
+    def run_script(self, isContinue):
         if self.scriptName == '':
             QtWidgets.QMessageBox.critical(self, "Cannot open a file", 'Please select a script.')
         elif not self.scriptName.endswith('.txt'):  # https://pg-chain.com/python-endswith
             QtWidgets.QMessageBox.critical(self, "Cannot open a file", 'Please select a text file.')
         else:
-            read_script.execute_script(self.scriptName, self.devices, self.params)
+            self.showSubWindow(self.geometry, self.framesize)
+            if isContinue:
+                execute_script2.execute_script2(self.scriptName, self.devices, self.params)
+            else:
+                execute_script.execute_script(self.scriptName, self.devices, self.params)
 
     def setHome(self):  # 20200325remote
         for m in self.motors:
@@ -343,6 +351,7 @@ class Ui(QtWidgets.QMainWindow):
     def showSubWindow(self, geometry, framesize):
         self.subWindow.show()
         self.subWindow.move(geometry.width() / 2 - framesize.width() / 16, geometry.height() / 2 - framesize.height() / 3)
+        self.subWindow_isOpen = True
 
     def openIR(self, tty):
         # https://qiita.com/macha1972/items/4869b71c14d25fa5b8f8
@@ -357,7 +366,6 @@ class Ui(QtWidgets.QMainWindow):
             print(e)
             self.isPortOpen = False
             self.ui.IRstateLabel.setText('Cannot open \n ' + tty + '.')
-
 
     def IRlightControl(self, serial):
         if self.isPortOpen:
