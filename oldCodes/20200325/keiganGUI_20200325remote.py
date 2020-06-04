@@ -8,7 +8,7 @@ import re
 import motordic
 import mainwindow_ui
 # import read_script
-import read_script
+import execute_script
 
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
@@ -264,7 +264,7 @@ class Ui(QtWidgets.QMainWindow):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            read_script.execute_script(demo_script, self.devices, self.params)
+            execute_script.execute_script(demo_script, self.devices, self.params)
 
             # args_hist: list = read_script.execute_script(demo_script, self.motors)
             # # print(args_hist)
@@ -293,7 +293,7 @@ class Ui(QtWidgets.QMainWindow):
 
     def run_script(self):
         self.showSubWindow()    # 20200325remote
-        read_script.execute_script(self.scriptName, self.devices, self.params)
+        execute_script.execute_script(self.scriptName, self.devices, self.params)
 
     def setHome(self):  # 20200325remote
         for m in self.motors:

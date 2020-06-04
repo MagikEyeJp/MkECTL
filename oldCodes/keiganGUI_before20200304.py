@@ -6,7 +6,7 @@ import math
 
 import motordic
 import mainwindow_ui
-import read_script
+import execute_script
 
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
@@ -205,7 +205,7 @@ class Ui(QtWidgets.QMainWindow):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            args_hist: list = read_script.execute_script(demo_script)
+            args_hist: list = execute_script.execute_script(demo_script)
             # print(args_hist)
             for args_i in range(len(args_hist)):  # https://stackoverflow.com/questions/55117021/python-warning-expected-collection-iterable-got-int-instead
                 for param_i in range(args_hist[args_i].size):
