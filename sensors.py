@@ -196,6 +196,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
 
 
+
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     sensorWindow = SensorWindow()

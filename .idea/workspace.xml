@@ -3,11 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keiganGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/keiganGUI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/20200325/keiganGUI_20200325remote.py" beforeDir="false" afterPath="$PROJECT_DIR$/oldCodes/20200325/keiganGUI_20200325remote.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/keiganGUI_before20200304.py" beforeDir="false" afterPath="$PROJECT_DIR$/oldCodes/keiganGUI_before20200304.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/keiganGUI_before20200323.py" beforeDir="false" afterPath="$PROJECT_DIR$/oldCodes/keiganGUI_before20200323.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/read_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/execute_script.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/execute_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/execute_script.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensors.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -325,7 +321,21 @@
       <option name="project" value="LOCAL" />
       <updated>1591170476260</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="old codes">
+      <created>1591252814575</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1591252814575</updated>
+    </task>
+    <task id="LOCAL-00023" summary="show progress bar during executing script">
+      <created>1591252868784</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1591252868784</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -373,7 +383,9 @@
     <MESSAGE value="edit expand dynavers" />
     <MESSAGE value="saved images" />
     <MESSAGE value="save image during executing a script" />
-    <option name="LAST_COMMIT_MESSAGE" value="save image during executing a script" />
+    <MESSAGE value="old codes" />
+    <MESSAGE value="show progress bar during executing script" />
+    <option name="LAST_COMMIT_MESSAGE" value="show progress bar during executing script" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -382,11 +394,6 @@
           <url>file://$PROJECT_DIR$/execute_script.py</url>
           <line>229</line>
           <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/execute_script.py</url>
-          <line>411</line>
-          <option name="timeStamp" value="13" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

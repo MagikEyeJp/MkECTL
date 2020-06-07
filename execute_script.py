@@ -12,7 +12,7 @@ import itertools
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 import scriptProgress_ui
 
 # import KMControllersS
@@ -427,10 +427,9 @@ def snap_image(args, devices, params):
     app.processEvents()
     global systate
 
+    # im: QtGui.QPixmap() = None
 
-    ### Request to get image
-    # img = ***
-    # devices['3Dsensors'].img =
+    devices['3Dsensors'].frames = args[1]
 
     ### Save image
     fileName = []
@@ -439,9 +438,11 @@ def snap_image(args, devices, params):
     fileName.append(systate.saveFileName[fileCategory])
     expand_dynvars(fileName, devices)
 
-    # devices['3Dsensors'].img = img
+    # im = snap_frame(devices)  ### error
+    # devices['3Dsensors'].img = im
+
     devices['3Dsensors'].imgPath = systate.ymd + '_' + str(systate.dir_num) + '/' + fileName[0]
-    print(devices['3Dsensors'].imgPath)
+    # print(devices['3Dsensors'].imgPath)
     devices['3Dsensors'].img.save(devices['3Dsensors'].imgPath)
 
     systate.seqn += 1
@@ -557,6 +558,66 @@ def set_light(args, devices, params):
     # else:
     #     os.mkdir(line)
 
+def snap_frame(devices):
+    global systate
+
+    im = []
+    # im = np.empty_like(np.array(devices['3Dsensors'].img))
+
+    ### Request to get image
+    # im = ***
+    if devices['3Dsensors'].frames == 1:
+        # matlab
+        # execute_remote_cmd('snap', fname, handles);
+        time.sleep(0.5)
+        # im = execute_remote_cmd('img', fname, handles, 1);
+    else:
+        for i in range(devices['3Dsensors'].frames):
+            snapim = qt_image_to_array(devices['3Dsensors'].img.toImage())   # temp
+            print(type(snapim))
+            print(snapim)
+            # if not im:  # if list im is empty
+            #     im = snapim
+            # else:
+            try:
+                # im = im + snapim
+                im.append(snapim)
+                print(type(im))
+            except Exception as e:
+                print(e)
+        im = np.array(im)
+        # im = im / devices['3Dsensors'].frames
+        mean_im = im.mean(axis=0)   # https://teratail.com/questions/235043
+
+    qImg = QtGui.QImage(mean_im)
+    qPix = QtGui.QPixmap(qImg)
+
+    return qPix
+
+
+def qt_image_to_array(img):
+    # https://stackoverflow.com/questions/37552924/convert-qpixmap-to-numpy
+    assert isinstance(img, QtGui.QImage), "img must be a QtGui.QImage object"
+    assert img.format() == QtGui.QImage.Format.Format_RGB32, \
+        "img format must be QImage.Format.Format_RGB32, got: {}".format(img.format())
+
+    img_size = img.size()
+    buffer = img.constBits()
+
+    # Sanity check
+    n_bits_buffer = len(buffer) * 8  ### error
+    n_bits_image  = img_size.width() * img_size.height() * img.depth()
+    assert n_bits_buffer == n_bits_image, \
+        "size mismatch: {} != {}".format(n_bits_buffer, n_bits_image)
+
+    assert img.depth() == 32, "unexpected image depth: {}".format(img.depth())
+
+    # Note the different width height parameter order!
+    arr = np.ndarray(shape  = (img_size.height(), img_size.width(), img.depth()//8),
+                     buffer = buffer,
+                     dtype  = np.uint8)
+
+    return arr
 
 # ---------- from mke sdk ----------
 def switch_to_depth_sensor(conn):
