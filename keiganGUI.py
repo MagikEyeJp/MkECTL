@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-<<<<<<< HEAD
-
-=======
 # coding: utf-8
->>>>>>> 4de076523e85b2fdb7167b9c46dde47fc9606ef9
 from PyQt5 import QtWidgets, uic, QtGui, QtCore
 import sys
 import time
