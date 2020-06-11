@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from PyQt5 import QtWidgets, uic, QtGui, QtCore
 import sys
 import time
@@ -75,6 +77,8 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.offL1Button.clicked.connect(lambda: self.IRlightControl('a'))
         self.ui.onL2Button.clicked.connect(lambda: self.IRlightControl('B'))
         self.ui.offL2Button.clicked.connect(lambda: self.IRlightControl('b'))
+        self.ui.setAsHomeButton.clicked.connect(self.setHome)
+        self.ui.goHomeButton.clicked.connect(self.goHome)
 
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
@@ -100,6 +104,11 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.tiltSpeedSpin.setKeyboardTracking(False)
         self.ui.tiltSpeedSpin.valueChanged.connect(lambda: self.updateSpeed('tiltSpeedSpin'))
 
+    def get_key_from_value(self, d, val):   # https://note.nkmk.me/python-dict-get-key-from-value/
+        keys = [k for k, v in d.items() if v == val]
+        if keys:
+            return keys[0]
+        return None
 
     def closeEvent(self, event):  # https://www.qtcentre.org/threads/20895-PyQt4-Want-to-connect-a-window-s-close-button
         self.deleteLater()
@@ -148,16 +157,6 @@ class Ui(QtWidgets.QMainWindow):
             m.enable()
             m.interface(8)  # USB
 
-            # if p['id'] == 'slider':
-            #     m.speed(self.ui.sliderSpeedSpin.value())
-            #     print('slider speed  = ' + str(self.ui.sliderSpeedSpin.value()) + 'rad/s')
-            # elif p['id'] == 'pan':
-            #     m.speed(self.ui.panSpeedSpin.value())
-            #     print('pan speed = ' + str(self.ui.panSpeedSpin.value()) + 'rad/s')
-            # elif p['id'] == 'tilt':
-            #     m.speed(self.ui.tiltSpeedSpin.value())
-            #     print('tilt speed = ' + str(self.ui.tiltSpeedSpin.value()) + 'rad/s')
-                ### ↓試す
             m.speed(self.motorGUI['speedSpin'][p['id']].value())
             print(p['id'] + 'speed  = ' + str(self.motorGUI['speedSpin'][p['id']].value()) + 'rad/s')
 
@@ -170,6 +169,7 @@ class Ui(QtWidgets.QMainWindow):
         print('--initialization completed--')
         self.ui.initializeProgressBar.setValue(100)
         self.ui.initializeButton.setEnabled(False)
+        self.ui.initializeProgressBar.setEnabled(False)
         self.ui.initializeProgressLabel.setText('Initialized all motors')
 
         self.devices['motors'] = self.motors
@@ -201,13 +201,6 @@ class Ui(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
 
     def freeAllMotors(self):
-        # print('FREE All Motors Button was clicked')
-        # freeall.freeAllMotors()
-        # m = self.params['slider']['cont']
-        # for p in self.params.values():
-        #     m = p['cont']
-        #     m.free()
-
         for m in self.motors.values():
             m.free()
         QtWidgets.QMessageBox.information(self, "free", "All motors have been freed.")
@@ -305,9 +298,9 @@ class Ui(QtWidgets.QMainWindow):
                 execute_script.execute_script(self.scriptName, self.devices, self.params)
 
     def setHome(self):  # 20200325remote
-        for m in self.motors:
+        for m in self.devices['motors'].values():
             m.presetPosition(0.0)
-            self.motorGUI['posSpin'][self.get_keys_from_value(self.motors, m)].setValue(0.0)
+            self.motorGUI['posSpin'][self.get_key_from_value(self.devices['motors'], m)].setValue(0.0)
 
     def goHome(self):   # 20200325remote
         self.ui.initializeProgressBar.setEnabled(True)

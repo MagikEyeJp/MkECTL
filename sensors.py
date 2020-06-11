@@ -88,7 +88,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.imgPath = ''
 
         # first connect
-        self.connectToSensor()
+#        self.connectToSensor()
 
 
     def changeIPaddress(self):
