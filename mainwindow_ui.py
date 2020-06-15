@@ -444,7 +444,7 @@ class Ui_keigan(object):
         self.sliderpantiltLabel.setGeometry(QtCore.QRect(480, 91, 101, 20))
         self.sliderpantiltLabel.setObjectName("sliderpantiltLabel")
         self.widget = QtWidgets.QWidget(self.robotControl)
-        self.widget.setGeometry(QtCore.QRect(470, 200, 151, 101))
+        self.widget.setGeometry(QtCore.QRect(490, 200, 131, 101))
         self.widget.setObjectName("widget")
         self.gridLayout = QtWidgets.QGridLayout(self.widget)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)

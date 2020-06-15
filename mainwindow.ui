@@ -1217,9 +1217,9 @@
     <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>470</x>
+       <x>490</x>
        <y>200</y>
-       <width>151</width>
+       <width>131</width>
        <height>101</height>
       </rect>
      </property>
