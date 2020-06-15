@@ -28,7 +28,7 @@
       <x>20</x>
       <y>40</y>
       <width>631</width>
-      <height>331</height>
+      <height>341</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -763,8 +763,8 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>160</y>
-       <width>461</width>
+       <y>170</y>
+       <width>441</width>
        <height>161</height>
       </rect>
      </property>
@@ -926,7 +926,7 @@
      <widget class="QLabel" name="presetLabel">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>220</x>
         <y>30</y>
         <width>69</width>
         <height>20</height>
@@ -958,7 +958,7 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>220</x>
         <y>110</y>
         <width>68</width>
         <height>38</height>
@@ -1009,9 +1009,6 @@
            <height>30</height>
           </size>
          </property>
-         <property name="shortcut">
-          <string>Return</string>
-         </property>
         </widget>
        </item>
       </layout>
@@ -1019,7 +1016,7 @@
      <widget class="QLabel" name="originLabel">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>220</x>
         <y>90</y>
         <width>69</width>
         <height>20</height>
@@ -1051,7 +1048,7 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>220</x>
         <y>50</y>
         <width>211</width>
         <height>29</height>
@@ -1133,6 +1130,163 @@
       </layout>
      </widget>
     </widget>
+    <widget class="QPushButton" name="saveButton">
+     <property name="geometry">
+      <rect>
+       <x>268</x>
+       <y>140</y>
+       <width>41</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="savedPosCombo">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>110</y>
+       <width>141</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <property name="currentText">
+      <string/>
+     </property>
+     <property name="insertPolicy">
+      <enum>QComboBox::InsertAtBottom</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="GoButton">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>140</y>
+       <width>24</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>24</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
+     </property>
+     <property name="autoDefault">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="savedPositionslabel">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>80</y>
+       <width>111</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Saved Positions</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="sliderpantiltLabel">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>91</y>
+       <width>101</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>[slider pan tilt]</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>470</x>
+       <y>200</y>
+       <width>151</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="1">
+       <widget class="QLabel" name="currentPoslabel">
+        <property name="text">
+         <string>Current Pos.</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="currentSliderLabel">
+        <property name="text">
+         <string>slider</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="sliderCurrentPos">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="currentPanLabel">
+        <property name="text">
+         <string>pan</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="panCurrentPos">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="currentTiltLabel">
+        <property name="text">
+         <string>tilt</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="tiltCurrentPos">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
    <widget class="QPushButton" name="MagikEye">
     <property name="geometry">
@@ -1154,7 +1308,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>460</y>
+      <y>470</y>
       <width>331</width>
       <height>111</height>
      </rect>
@@ -1713,8 +1867,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>380</y>
-      <width>341</width>
+      <y>390</y>
+      <width>331</width>
       <height>71</height>
      </rect>
     </property>
@@ -1842,14 +1996,17 @@
     <widget class="QLabel" name="IRstateLabel">
      <property name="geometry">
       <rect>
-       <x>240</x>
-       <y>30</y>
-       <width>91</width>
-       <height>31</height>
+       <x>230</x>
+       <y>20</y>
+       <width>101</width>
+       <height>51</height>
       </rect>
      </property>
      <property name="text">
-      <string>IR state</string>
+      <string>Not connected</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>
