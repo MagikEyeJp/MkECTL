@@ -355,6 +355,10 @@ class Ui(QtWidgets.QMainWindow):
                 break
             percentToGoal = 0.0
 
+        for m in self.devices['motors'].values():
+            self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText('{:.2f}'.format(0.0))
+
+
     def savePositions(self):
         save_name = ''
         for posspin in self.motorGUI['posSpin'].values():

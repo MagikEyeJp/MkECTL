@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="Add a snapshot">
+    <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="Misc changes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GUI_snapshots/keiganGUI_window.png" beforeDir="false" afterPath="$PROJECT_DIR$/GUI_snapshots/keiganGUI_window.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/keiganGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/keiganGUI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow_ui.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,6 +20,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="MERGE" />
   </component>
   <component name="ProjectId" id="1X3s0bjhF0LjxV4Mhq3S7OwsC7F" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -351,7 +349,28 @@
       <option name="project" value="LOCAL" />
       <updated>1592216484294</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Edit GUI">
+      <created>1592221448031</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1592221448031</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Add functions to move motors to saved positions">
+      <created>1592221536740</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1592221536740</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Misc changes">
+      <created>1592221560391</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1592221560391</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -378,9 +397,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added motor 'test'" />
-    <MESSAGE value="added if __name__ == 'main'" />
-    <MESSAGE value="changed 'initializeAllMotors()'" />
     <MESSAGE value="edited some lines for dummy script" />
     <MESSAGE value="modified" />
     <MESSAGE value="modified for dummy" />
@@ -403,7 +419,10 @@
     <MESSAGE value="show progress bar during executing script" />
     <MESSAGE value="Add a snapshot" />
     <MESSAGE value="Add scaling for motors" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add scaling for motors" />
+    <MESSAGE value="Edit GUI" />
+    <MESSAGE value="Add functions to move motors to saved positions" />
+    <MESSAGE value="Misc changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Misc changes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -415,7 +434,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/keiganGUI.py</url>
-          <line>400</line>
+          <line>404</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
