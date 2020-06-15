@@ -26,7 +26,7 @@ class Ui(QtWidgets.QMainWindow):
         # IR light
         self.isPortOpen = True
         self.IRport = None
-        self.openIR('/dev/ttyACM0')
+        # self.openIR('/dev/ttyACM0')
 
         # 画面サイズを取得 (a.desktop()は QtWidgets.QDesktopWidget )  https://ja.stackoverflow.com/questions/44060/pyqt5%E3%81%A7%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AE%E4%B8%AD%E5%A4%AE%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%97%E3%81%9F%E3%81%84
         a = QtWidgets.qApp
@@ -79,6 +79,8 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.offL2Button.clicked.connect(lambda: self.IRlightControl('b'))
         self.ui.setAsHomeButton.clicked.connect(self.setHome)
         self.ui.goHomeButton.clicked.connect(self.goHome)
+        self.ui.saveButton.clicked.connect(self.savePositions)
+        self.ui.GoButton.clicked.connect(self.goToSavedPositions)
 
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
@@ -121,6 +123,7 @@ class Ui(QtWidgets.QMainWindow):
         exeButtons: dict = {}
         posSpinboxes: dict = {}
         speedSpinboxes: dict = {}
+        currentPosLabels: dict = {}
 
         for m_name in self.motorSet:
             # https://teratail.com/questions/51674
@@ -130,11 +133,13 @@ class Ui(QtWidgets.QMainWindow):
             exec(posSpinCode)
             speedSpinCode = '%s[\'%s\'] = %s%s%s' % ('speedSpinboxes', m_name, 'self.ui.', m_name, 'SpeedSpin')  # speedSpinboxes[~~] = self.ui.~~SpeedSpin
             exec(speedSpinCode)
-
+            speedSpinCode = '%s[\'%s\'] = %s%s%s' % ('currentPosLabels', m_name, 'self.ui.', m_name, 'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
+            exec(speedSpinCode)
 
         self.motorGUI['exe'] = exeButtons  # ex.) motorGUI['exe']['slider'] == self.ui.sliderMoveExe
         self.motorGUI['posSpin'] = posSpinboxes  # ex.) motorGUI['posSpin']['slider'] == self.ui.sliderPosSpin
         self.motorGUI['speedSpin'] = speedSpinboxes  # ex.) motorGUI['speedSpin']['slider'] == self.ui.sliderSpeedSpin
+        self.motorGUI['currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
     def grayOut(self):  # for trial
         self.ui.robotControl.setEnabled(False)
@@ -173,6 +178,9 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.initializeProgressLabel.setText('Initialized all motors')
 
         self.devices['motors'] = self.motors
+
+        # IR light
+        self.openIR('/dev/ttyACM0')
 
     def setSliderOrigin(self):
         m = self.motors['slider']  # 20200304remote
@@ -223,6 +231,8 @@ class Ui(QtWidgets.QMainWindow):
             # m.speed(self.motorGUI['speedSpin'][motorID].value())
             m.moveTo(motorPos * scale)
 
+            self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(motorPos))
+
         elif buttonName == 'presetExe':
             motorID = self.ui.presetMotorCombo.currentText()
             m = self.motors[motorID]
@@ -234,6 +244,7 @@ class Ui(QtWidgets.QMainWindow):
 
             self.motorGUI['posSpin'][motorID].setValue(pos)
 
+            self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(pos))
 
     def rebootButtonClicked(self):
         for m in self.motors.values():
@@ -302,7 +313,10 @@ class Ui(QtWidgets.QMainWindow):
             m.presetPosition(0.0)
             self.motorGUI['posSpin'][self.get_key_from_value(self.devices['motors'], m)].setValue(0.0)
 
+            self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText('{:.2f}'.format(0.0))
+
     def goHome(self):   # 20200325remote
+        print('Going Home')
         self.ui.initializeProgressBar.setEnabled(True)
         self.ui.initializeProgressLabel.setEnabled(True)
         self.ui.initializeProgressLabel.setText('Moving motors to Home position...')
@@ -340,6 +354,21 @@ class Ui(QtWidgets.QMainWindow):
                 self.ui.initializeProgressLabel.setText('All motors are at the origin now')
                 break
             percentToGoal = 0.0
+
+    def savePositions(self):
+        save_name = ''
+        for posspin in self.motorGUI['posSpin'].values():
+            save_name += str('{:.2f}'.format(posspin.value())) + ' '
+            save_name.strip()  # https://itsakura.com/python-strip#s2
+        if not save_name in [self.ui.savedPosCombo.itemText(i) for i in range(self.ui.savedPosCombo.count())]:  # https://stackoverflow.com/questions/7479915/getting-all-items-of-qcombobox-pyqt4-python
+            self.ui.savedPosCombo.addItem(save_name)
+        print(save_name)
+
+    def goToSavedPositions(self):
+        pos = self.ui.savedPosCombo.currentText().split()  # list
+        for i in range(len(self.motorSet)):
+            self.devices['motors'][self.motorSet[i]].moveTo_scaled(float(pos[i]))
+            self.motorGUI['currentPosLabel'][self.motorSet[i]].setText('{:.2f}'.format(float(pos[i])))
 
     def showSubWindow(self, geometry, framesize):
         self.subWindow.show()
