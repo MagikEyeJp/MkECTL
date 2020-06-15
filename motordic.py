@@ -73,6 +73,8 @@ def getMotorDic():
             param['SN'] = serialnum
             motordic[id] = param
 
+            motor.set_scaling(scales[id], 0.0)  # offset = 0.0 (temp)
+
     return motordic
 
 
