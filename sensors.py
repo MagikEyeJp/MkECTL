@@ -43,6 +43,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # Combo Box
         self.ui_s.ISOcombo.setCurrentText(str(self.gainiso))
         self.ui_s.ISOcombo.currentTextChanged.connect(lambda: self.changeISO('comboBox'))
+        self.ui_s.ISOcombo.setValidator(QtGui.QIntValidator(self))
 
         # Check Box
         self.ui_s.hex4dCheckBox.stateChanged.connect(self.laser_custom)
@@ -139,10 +140,10 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             # 時間がかかる 特にreconnect
             self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.conn.connect((self.IPaddress, self.portNum))
-            self.ui_s.cameraStatusLabel.setText('Successfully connected to a camera')
+            self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor')
 
         except Exception as e:
-            self.ui_s.cameraStatusLabel.setText('!!! Camera was not detected.')
+            self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
 
         # read_script.switch_to_depth_sensor(self.conn)
         # read_script.get_frame(self.conn)
