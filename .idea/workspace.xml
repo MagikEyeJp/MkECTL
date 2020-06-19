@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="Misc changes">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mainwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensorwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/sensorwindow.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensorwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensorwindow_ui.py" afterDir="false" />
-    </list>
+    <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -387,7 +381,14 @@
       <option name="project" value="LOCAL" />
       <updated>1592566231404</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="delete ISOlineEdit and edit code">
+      <created>1592570778602</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1592570778602</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -414,7 +415,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="modified for dummy" />
     <MESSAGE value="assigned functions and edited GUI" />
     <MESSAGE value="added new class to show images" />
     <MESSAGE value="added a reference" />
@@ -439,7 +439,8 @@
     <MESSAGE value="Misc changes" />
     <MESSAGE value="add images for documentation" />
     <MESSAGE value="edit image" />
-    <option name="LAST_COMMIT_MESSAGE" value="edit image" />
+    <MESSAGE value="delete ISOlineEdit and edit code" />
+    <option name="LAST_COMMIT_MESSAGE" value="delete ISOlineEdit and edit code" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
