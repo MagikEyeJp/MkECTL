@@ -14,7 +14,7 @@ then go to terminal and you can run this command:
 Then, you will see the main window like the image below.
 
 ## Main Window ("KeiganGUI")
-![keiganGUI](https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png)
+![keiganGUI](https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png)  
 This window mainly consists of 3 parts, **Robot Control**, **IR Light Control**, and **Scripting**.
 ### Robot Control
 In this part, you can configure and move the motors. There are three motors in the calibration robot: **Slider**, **Pan**, and **Tilt**. 
