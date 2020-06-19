@@ -42,7 +42,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
         # Combo Box
         self.ui_s.ISOcombo.setCurrentText(str(self.gainiso))
-        self.ui_s.ISOcombo.currentTextChanged.connect(lambda: self.changeISO('comboBox'))
+        # self.ui_s.ISOcombo.currentTextChanged.connect(lambda: self.changeISO('comboBox'))
+        self.ui_s.ISOcombo.currentTextChanged.connect(self.changeISO)
         self.ui_s.ISOcombo.setValidator(QtGui.QIntValidator(self))
 
         # Check Box
@@ -55,7 +56,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.shutterLineEdit.textChanged.connect(self.changeShutter)
         self.ui_s.framesLineEdit.setText(str(self.frames))
         self.ui_s.framesLineEdit.textChanged.connect(self.changeFrames)
-        self.ui_s.ISOlineEdit.textChanged.connect(lambda: self.changeISO('lineEdit'))
+        # self.ui_s.ISOlineEdit.textChanged.connect(lambda: self.changeISO('lineEdit'))
 
         # Line edit returnPressed
         self.ui_s.IPlineEdit.returnPressed.connect(self.changeIPaddress)
@@ -65,7 +66,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # set validator of line edit
         self.ui_s.shutterLineEdit.setValidator(QtGui.QIntValidator(self))
         self.ui_s.framesLineEdit.setValidator(QtGui.QIntValidator(self))
-        self.ui_s.ISOlineEdit.setValidator(QtGui.QIntValidator(self))
+        # self.ui_s.ISOlineEdit.setValidator(QtGui.QIntValidator(self))
 
         # Push buttons
         self.ui_s.reconnectButton.clicked.connect(self.connectToSensor)
@@ -83,7 +84,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.CurrentLaserPattern_value.setText('-'.join(self.binLaserPattern.replace('0b', '').zfill(16)))
 
         # tooltip
-        self.ui_s.ISOlineEdit.setToolTip('select \"Custom\" and set integer here')
+        # self.ui_s.ISOlineEdit.setToolTip('select \"Custom\" and set integer here')
 
         # image
         self.img: QtGui.QPixmap() = None
@@ -133,6 +134,13 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             else:
                 self.gainiso = int(self.ui_s.ISOlineEdit.text())
                 # print(self.gainiso)
+
+    def changeISO(self):
+        if self.ui_s.ISOcombo.currentText() == "":
+            pass
+        else:
+            self.gainiso = int(self.ui_s.ISOcombo.currentText())
+            # print('iso: ' + str(self.gainiso))
 
     def connectToSensor(self):
         # connect to sensor and display again

@@ -3,7 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="Misc changes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keiganGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/keiganGUI.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mainwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensorwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/sensorwindow.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sensorwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensorwindow_ui.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,7 +31,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$USER_HOME$/.local/bin/pyuic5" />
     <property name="run.code.analysis.last.selected.profile" value="aDefault" />
-    <property name="settings.editor.selected.configurable" value="watcher.settings" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -370,7 +373,21 @@
       <option name="project" value="LOCAL" />
       <updated>1592221560391</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="add images for documentation">
+      <created>1592561375467</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1592561375467</updated>
+    </task>
+    <task id="LOCAL-00030" summary="edit image">
+      <created>1592566231404</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1592566231404</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -397,8 +414,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="edited some lines for dummy script" />
-    <MESSAGE value="modified" />
     <MESSAGE value="modified for dummy" />
     <MESSAGE value="assigned functions and edited GUI" />
     <MESSAGE value="added new class to show images" />
@@ -422,7 +437,9 @@
     <MESSAGE value="Edit GUI" />
     <MESSAGE value="Add functions to move motors to saved positions" />
     <MESSAGE value="Misc changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Misc changes" />
+    <MESSAGE value="add images for documentation" />
+    <MESSAGE value="edit image" />
+    <option name="LAST_COMMIT_MESSAGE" value="edit image" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
