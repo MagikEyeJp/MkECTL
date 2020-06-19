@@ -32,7 +32,7 @@ The function of each numbered widgets in the GUI is as follows:
 - motor initialization (when clicked ①)
 - going to origin (when clicked ⑫)
 
-6. In this part (`Motor Positions`), you can input specify the position of each motor in the spin box. Notice that the unit of value for Slider, Pan, and Tilt are mm, deg, and deg respectively. If you click buttons with the icon of play![play button = 10x10](https://github.com/NarinOka/keiganGUI/blob/master/GUI_icons/exec.png), you can send a command to each motor and the robot will change the posture by moving the motor. 
+6. In this part (`Motor Positions`), you can input specify the position of each motor in the spin box. Notice that the unit of value for Slider, Pan, and Tilt are mm, deg, and deg respectively. If you click buttons with the icon of play<img src = "https://github.com/NarinOka/keiganGUI/blob/master/GUI_icons/exec.png", width = "10">, you can send a command to each motor and the robot will change the posture by moving the motor. 
 
 7. `Save Button` allows you to save motor positions as indicated in the spin boxes in `Motor Positions`. Sets of motor positions will be stored in the combo box ⑧.
 
