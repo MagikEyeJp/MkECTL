@@ -81,7 +81,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
-        self.ui_s.CurrentLaserPattern_value.setText('-'.join(self.binLaserPattern.replace('0b', '').zfill(16)))
+        # self.ui_s.CurrentLaserPattern_value.setText('-'.join(self.binLaserPattern.replace('0b', '').zfill(16)))
+        self.ui_s.CurrentLaserPattern_value.setText('0000-0000-0000-0000')
 
         # tooltip
         # self.ui_s.ISOlineEdit.setToolTip('select \"Custom\" and set integer here')
@@ -191,7 +192,13 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.binLaserPattern = bin(int(hex4d, 16))
             self.decLaserPattern = int(hex4d, 16)
             laserpattern_print = self.binLaserPattern.replace('0b', '').zfill(16)
-            self.ui_s.CurrentLaserPattern_value.setText('-'.join(laserpattern_print[::-1]))
+            laserpattern_print_list = [laserpattern_print[:4], laserpattern_print[4:8], laserpattern_print[8:12], laserpattern_print[12:]]
+            laserpattern_print = ''
+            for i in range(len(laserpattern_print_list)):
+                laserpattern_print += laserpattern_print_list[i] + '-'
+            laserpattern_print = laserpattern_print[:-1]    # https://techracho.bpsinc.jp/baba/2010_04_21/1409
+            # self.ui_s.CurrentLaserPattern_value.setText('-'.join(laserpattern_print[::-1]))
+            self.ui_s.CurrentLaserPattern_value.setText(laserpattern_print)
             # https://qiita.com/Hawk84/items/ecd0c7239e490ea22308   https://note.nkmk.me/python-string-concat/
 
             # for i in range(16):
