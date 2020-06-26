@@ -18,13 +18,14 @@ Then, you will see the main window like the image below.
 <!-- 
 ![keiganGUI](https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png)  
 -->
-![keiganGUI](GUI_snapshots/keiganGUI_window_documentation.png)  
+<img src = "GUI_snapshots/keiganGUI_window_documentation.png" width = "480">  
+
 This window mainly consists of 3 parts, **Robot Control**, **IR Light Control**, and **Scripting**.
 ### Robot Control
 In this part, you can configure and move the motors. There are three motors in the calibration robot: **Slider**, **Pan**, and **Tilt**. 
 The function of each numbered widgets in the GUI is as follows: 
 
-1. `Initialize Button` initializes all of the three motors and open the port of IR lights. 
+1. `Initialize Button` initializes all of the three motors and open the port of IR lights. This button will be disabled after finishing initialization.
 
 2. `Set Slider Origin Button` can set the origin point of the slider motor. When finished, information message will be popped up so be patient until then.
 
@@ -56,5 +57,9 @@ The function of each numbered widgets in the GUI is as follows:
 
 
 ## Sub Window ("Sensor Window")
+<img src = "GUI_snapshots/Sensor_window_documentation.png" width = "480">  
+
 
 ## Scripting Window ("Progress")
+<img src = "GUI_snapshots/Scripting_window_documentation.png" width = "240">  
+
