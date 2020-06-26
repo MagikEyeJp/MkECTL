@@ -377,7 +377,10 @@ then go to terminal and you can run this command:
 <code>python3 bin/keiganGUI/keiganGUI.py</code></p>
 <p>Then, you will see the main window like the image below.</p>
 <h2 id="main-window-%22keigangui%22">Main Window (&quot;KeiganGUI&quot;)</h2>
-<p><img src="https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png" alt="keiganGUI"><br>
+<!-- 
+![keiganGUI](https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png)  
+-->
+<p><img src="GUI_snapshots/keiganGUI_window_documentation.png" alt="keiganGUI"><br>
 This window mainly consists of 3 parts, <strong>Robot Control</strong>, <strong>IR Light Control</strong>, and <strong>Scripting</strong>.</p>
 <h3 id="robot-control">Robot Control</h3>
 <p>In this part, you can configure and move the motors. There are three motors in the calibration robot: <strong>Slider</strong>, <strong>Pan</strong>, and <strong>Tilt</strong>.
@@ -405,13 +408,28 @@ The function of each numbered widgets in the GUI is as follows:</p>
 </ul>
 <ol start="6">
 <li>
-<p>In this part (<code>Motor Positions</code>), you can input specify the position of each motor in the spin box. Notice that the unit of value for Slider, Pan, and Tilt are mm, deg, and deg respectively. If you click buttons with the icon of play <img src = "https://github.com/NarinOka/keiganGUI/blob/master/GUI_icons/exec.png" width = "12">, you can send a command to each motor and the robot will change the posture by moving the motor.</p>
+<p>In this part (<code>Motor Positions</code>), you can input specify the position of each motor in the spin box. Notice that the unit of value for Slider, Pan, and Tilt are mm, deg, and deg respectively. If you click <img src = "GUI_icons/exec.png" width = "12"> buttons, you can send a command to each motor and the robot will change the posture by moving the motor.</p>
 </li>
 <li>
 <p><code>Save Button</code> allows you to save motor positions as indicated in the spin boxes in <code>Motor Positions</code>. Sets of motor positions will be stored in the combo box ⑧.</p>
 </li>
 <li>
-<p><code>Saved Positions</code></p>
+<p><code>Saved Positions</code> stores motor positions which you saves. You can choose a set of motor positions from the combo box, and move motors by clicking <img src = "GUI_icons/exec.png" width = "12"> button.</p>
+</li>
+<li>
+<p><code>Set speed</code> allows you to change the rotation speed of each motor.</p>
+</li>
+<li>
+<p>In <code>Preset</code>, firstly choose a motor ID from the combo box and type a value which you want to set as the motor's current position. The text of the label indicating the unit will be changed depending on the motor ID.</p>
+</li>
+<li>
+<p><code>SET Origin Button</code> sets the current positions of all motors origin (0, 0, 0).</p>
+</li>
+<li>
+<p><code>GO TO Origin Button</code> moves all motors to the point of origin.</p>
+</li>
+<li>
+<p>In <code>Current Pos.</code>, you can check the current positions of all motors.</p>
 </li>
 </ol>
 <h3 id="ir-light-control">IR Light Control</h3>

@@ -15,7 +15,10 @@ then go to terminal and you can run this command:
 Then, you will see the main window like the image below.
 
 ## Main Window ("KeiganGUI")
+<!-- 
 ![keiganGUI](https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png)  
+-->
+![keiganGUI](GUI_snapshots/keiganGUI_window_documentation.png)  
 This window mainly consists of 3 parts, **Robot Control**, **IR Light Control**, and **Scripting**.
 ### Robot Control
 In this part, you can configure and move the motors. There are three motors in the calibration robot: **Slider**, **Pan**, and **Tilt**. 
@@ -33,11 +36,11 @@ The function of each numbered widgets in the GUI is as follows:
 - motor initialization (when clicked ①)
 - going to origin (when clicked ⑫)
 
-6. In this part (`Motor Positions`), you can input specify the position of each motor in the spin box. Notice that the unit of value for Slider, Pan, and Tilt are mm, deg, and deg respectively. If you click <img src = "https://github.com/NarinOka/keiganGUI/blob/master/GUI_icons/exec.png" width = "12"> buttons, you can send a command to each motor and the robot will change the posture by moving the motor. 
+6. In this part (`Motor Positions`), you can input specify the position of each motor in the spin box. Notice that the unit of value for Slider, Pan, and Tilt are mm, deg, and deg respectively. If you click <img src = "GUI_icons/exec.png" width = "12"> buttons, you can send a command to each motor and the robot will change the posture by moving the motor. 
 
 7. `Save Button` allows you to save motor positions as indicated in the spin boxes in `Motor Positions`. Sets of motor positions will be stored in the combo box ⑧.
 
-8. `Saved Positions` stores motor positions which you saves. You can choose a set of motor positions from the combo box, and move motors by clicking <img src = "https://github.com/NarinOka/keiganGUI/blob/master/GUI_icons/exec.png" width = "12"> button.
+8. `Saved Positions` stores motor positions which you saves. You can choose a set of motor positions from the combo box, and move motors by clicking <img src = "GUI_icons/exec.png" width = "12"> button.
 
 9. `Set speed` allows you to change the rotation speed of each motor.
 10. In `Preset`, firstly choose a motor ID from the combo box and type a value which you want to set as the motor's current position. The text of the label indicating the unit will be changed depending on the motor ID.
