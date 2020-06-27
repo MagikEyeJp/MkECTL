@@ -4,6 +4,7 @@ import sys
 import re
 
 import socket
+import SensorDevice
 
 import sensorwindow_ui
 import ImageViewScene
@@ -26,7 +27,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.setupUi(self)
 
         # connection
-        self.conn = None
+        self.conn = None    # not used
+        self.sensor = SensorDevice.SensorDevice()
 
         # Variables (initialized with default values)
         self.IPaddress = '192.168.0.158'  # default
@@ -107,11 +109,18 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.IPaddress = self.RPiaddress
 
     def changeShutter(self):
-        if self.ui_s.shutterLineEdit.text() == "":
+        if self.ui_s.shutterLineEdit.text() == '':
             pass
         else:
             self.shutterSpeed = int(self.ui_s.shutterLineEdit.text())
             # print(self.shutterSpeed)
+            try:
+                self.sensor.set_shutter(self.shutterSpeed)
+                self.ui_s.cameraStatusLabel.setText('Set shutter speed as ' + str(self.shutterSpeed))
+
+            except Exception:
+                self.ui_s.cameraStatusLabel.setText('Sensor is not connected.')
+
 
     def changeFrames(self):
         if self.ui_s.framesLineEdit.text() == "":
@@ -143,12 +152,25 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.gainiso = int(self.ui_s.ISOcombo.currentText())
             # print('iso: ' + str(self.gainiso))
 
+            try:
+                self.sensor.set_gainiso(self.gainiso)
+                self.ui_s.cameraStatusLabel.setText('Set ISO as ' + str(self.gainiso))
+
+            except Exception:
+                self.ui_s.cameraStatusLabel.setText('Sensor is not connected.')
+
     def connectToSensor(self):
-        # connect to sensor and display again
+        # connect to sensors and display again
+        # self.sensor = SensorDevice.SensorDevice()
+
         try:
             # 時間がかかる 特にreconnect
-            self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.conn.connect((self.IPaddress, self.portNum))
+            # self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # self.conn.connect((self.IPaddress, self.portNum))
+
+            self.sensor.close()   # for when reconnecting
+
+            self.sensor.open(self.IPaddress, self.portNum)
             self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor')
 
         except Exception as e:
@@ -157,14 +179,15 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # read_script.switch_to_depth_sensor(self.conn)
         # read_script.get_frame(self.conn)
 
-        execute_script.client_getframe(self.IPaddress, self.portNum)  # one frame
+        # execute_script.client_getframe(self.IPaddress, self.portNum)  # one frame
         # read_script.client_pushframes(self.IPaddress, self.portNum)  # sequential frames
+        self.sensor.get_image(1)    # might be skipped
 
         # temp
         self.scene = ImageViewScene.ImageViewScene()
         # self.scene.setSceneRect(QtCore.QRectF(self.rect()))
         self.ui_s.sensorImage.setScene(self.scene)
-        self.img = self.scene.setFile('script/M_TOF_sample_image.png')
+        self.img = self.scene.setFile('script/M_TOF_sample_image.png')  # これをget_imageのものにしたい。もしくはこの処理はここではskip
 
         # self.ui_s.sensorImage = ImageViewScene.ImageViewer()
         # self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
@@ -192,14 +215,15 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.binLaserPattern = bin(int(hex4d, 16))
             self.decLaserPattern = int(hex4d, 16)
             laserpattern_print = self.binLaserPattern.replace('0b', '').zfill(16)
+            laserpattern_print = laserpattern_print[::-1]
             laserpattern_print_list = [laserpattern_print[:4], laserpattern_print[4:8], laserpattern_print[8:12], laserpattern_print[12:]]
             laserpattern_print = ''
             for i in range(len(laserpattern_print_list)):
                 laserpattern_print += laserpattern_print_list[i] + '-'
             laserpattern_print = laserpattern_print[:-1]    # https://techracho.bpsinc.jp/baba/2010_04_21/1409
             # self.ui_s.CurrentLaserPattern_value.setText('-'.join(laserpattern_print[::-1]))
-            self.ui_s.CurrentLaserPattern_value.setText(laserpattern_print)
             # https://qiita.com/Hawk84/items/ecd0c7239e490ea22308   https://note.nkmk.me/python-string-concat/
+            self.ui_s.CurrentLaserPattern_value.setText(laserpattern_print)
 
             # for i in range(16):
             #     print(getbit(self.decLaserPattern, i))
