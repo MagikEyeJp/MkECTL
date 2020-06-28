@@ -387,16 +387,20 @@ then go to terminal and you can run this command:
 The function of each numbered widgets in the GUI is as follows:</p>
 <ol>
 <li>
-<p><code>Initialize Button</code> initializes all of the three motors and open the port of IR lights. This button will be disabled after finishing initialization.</p>
+<p><code>Initialize Button</code> initializes all of the three motors and open the port of IR lights. This button will be disabled after finishing initialization.<br>
+<img src = "flowchart/keiganGUI_1.png" width = "360"></p>
 </li>
 <li>
-<p><code>Set Slider Origin Button</code> can set the origin point of the slider motor. When finished, information message will be popped up so be patient until then.</p>
+<p><code>Set Slider Origin Button</code> can set the origin point of the slider motor. When finished, information message will be popped up so be patient until then.<br>
+<img src = "flowchart/keiganGUI_2.png" width = "360"></p>
 </li>
 <li>
-<p><code>FREE all motors Button</code> releases the restrain states of all motors. Holding torque will be reduced while the configuration of motors will be maintained.</p>
+<p><code>FREE all motors Button</code> releases the restrain states of all motors. Holding torque will be reduced while the configuration of motors will be maintained.<br>
+<img src = "flowchart/keiganGUI_3.png" width = "360"></p>
 </li>
 <li>
-<p><code>REBOOT all motors Button</code>, on the other hand, turns off all motors and the configuration will not be maintained. If you want to use motors again, you should click <code>Initialize Button</code>.</p>
+<p><code>REBOOT all motors Button</code>, on the other hand, turns off all motors and the configuration will not be maintained. If you want to use motors again, you should click <code>Initialize Button</code>.<br>
+<img src = "flowchart/keiganGUI_4.png" width = "360"></p>
 </li>
 <li>
 <p>This <code>Progress Bar</code> can be used when you want to check the progress of</p>
@@ -408,34 +412,123 @@ The function of each numbered widgets in the GUI is as follows:</p>
 </ul>
 <ol start="6">
 <li>
-<p>In this part (<code>Motor Positions</code>), you can input specify the position of each motor in the spin box. Notice that the unit of value for Slider, Pan, and Tilt are mm, deg, and deg respectively. If you click <img src = "GUI_icons/exec.png" width = "12"> buttons, you can send a command to each motor and the robot will change the posture by moving the motor.</p>
+<p>In this part (<code>Motor Positions</code>), you can input specify the position of each motor in the spin box. Notice that the unit of value for Slider, Pan, and Tilt are mm, deg, and deg respectively. If you click <img src = "GUI_icons/exec.png" width = "12"> buttons, you can send a command to each motor and the robot will change the posture by moving the motor.<br>
+<img src = "flowchart/keiganGUI_6.png" width = "360"></p>
 </li>
 <li>
-<p><code>Save Button</code> allows you to save motor positions as indicated in the spin boxes in <code>Motor Positions</code>. Sets of motor positions will be stored in the combo box ⑧.</p>
+<p><code>Save Button</code> allows you to save motor positions as indicated in the spin boxes in <code>Motor Positions</code>. Sets of motor positions will be stored in the combo box ⑧.<br>
+<img src = "flowchart/keiganGUI_7.png" width = "360"></p>
 </li>
 <li>
-<p><code>Saved Positions</code> stores motor positions which you saves. You can choose a set of motor positions from the combo box, and move motors by clicking <img src = "GUI_icons/exec.png" width = "12"> button.</p>
+<p><code>Saved Positions</code> stores motor positions which you saves. You can choose a set of motor positions from the combo box, and move motors by clicking <img src = "GUI_icons/exec.png" width = "12"> button.<br>
+<img src = "flowchart/keiganGUI_8.png" width = "360"></p>
 </li>
 <li>
-<p><code>Set speed</code> allows you to change the rotation speed of each motor.</p>
+<p><code>Set speed</code> allows you to change the rotation speed of each motor.<br>
+<img src = "flowchart/keiganGUI_9.png" width = "360"></p>
 </li>
 <li>
-<p>In <code>Preset</code>, firstly choose a motor ID from the combo box and type a value which you want to set as the motor's current position. The text of the label indicating the unit will be changed depending on the motor ID.</p>
+<p>In <code>Preset</code>, firstly choose a motor ID from the combo box and type a value which you want to set as the motor's current position. The text of the label indicating the unit will be changed depending on the motor ID.<br>
+<img src = "flowchart/keiganGUI_10.png" width = "360"></p>
 </li>
 <li>
-<p><code>SET Origin Button</code> sets the current positions of all motors origin (0, 0, 0).</p>
+<p><code>SET Origin Button</code> sets the current positions of all motors origin (0, 0, 0).<br>
+<img src = "flowchart/keiganGUI_11.png" width = "360"></p>
 </li>
 <li>
-<p><code>GO TO Origin Button</code> moves all motors to the point of origin.</p>
+<p><code>GO TO Origin Button</code> moves all motors to the point of origin.<br>
+<img src = "flowchart/keiganGUI_12.png" width = "360"></p>
 </li>
 <li>
 <p>In <code>Current Pos.</code>, you can check the current positions of all motors.</p>
 </li>
 </ol>
 <h3 id="ir-light-control">IR Light Control</h3>
+<ol start="14">
+<li>You can control lights (L1 and L2) respectively. By clicking <img src = "GUI_icons/lightON.png" width = "12">, the light will be turned on. On the other hand, <img src = "GUI_icons/lightOFF.png" width = "12"> button allows you to turn off the light.<br>
+<img src = "flowchart/keiganGUI_14.png" width = "360"></li>
+</ol>
 <h3 id="scripting">Scripting</h3>
+<ol start="15">
+<li>
+<p>The name of a script you chose will be shown here.</p>
+</li>
+<li>
+<p>If you click <code>Select Script tool button</code>, file dialog will be opened and you can select a script. Choose a file with extension <u>.txt</u>.
+<img src = "flowchart/keiganGUI_16.png" width = "360"></p>
+</li>
+<li>
+<p>If <code>Continue Script button</code> is clicked, the selected script will be resumed where you left off last session. If you haven't clicked ⑱, this button has the same role as ⑱.
+<img src = "flowchart/keiganGUI_17.png" width = "360"></p>
+</li>
+<li>
+<p>If <code>Execute Script button</code> is clicked, the selected script will be executed from the beginning. Acquired data while scripting will be saved in a different folder so as not to overwrite the existing data.<br>
+<img src = "flowchart/keiganGUI_18.png" width = "360"></p>
+</li>
+</ol>
+<h3 id="other">Other</h3>
+<ol start="19">
+<li>
+<p>By clicking <code>Sensor Window button</code>, the sensor window will appear.<br>
+<img src = "flowchart/keiganGUI_19.png" width = "360"></p>
+</li>
+<li>
+<p><code>MagikEye button</code> is a button for performing a demonstration of the calibration machine. The robot will move along a demo-script.<br>
+<img src = "flowchart/keiganGUI_20.png" width = "360"></p>
+</li>
+</ol>
 <h2 id="sub-window-%22sensor-window%22">Sub Window (&quot;Sensor Window&quot;)</h2>
 <img src = "GUI_snapshots/Sensor_window_documentation.png" width = "480">  
+<p>You can directly control the state of sensor devices through this window.
+It mainly consists of 3 parts, <strong>RPi address</strong>, <strong>Camera Control</strong>, and <strong>Laser Control</strong>.</p>
+<h3 id="rpi-address">RPi address</h3>
+<ol>
+<li>Before connecting sensors, specify the IP address and port number. The format is <u>(IP address):(port number)</u>.You can also specify only IP address. In that case, port number will be set as default(8888).
+<img src = "flowchart/SensorWindow_1.png" width = "360"></li>
+</ol>
+<h3 id="camera-control">Camera Control</h3>
+<p>In this part, you can change parameters of a camera, get images.</p>
+<ol start="2">
+<li>
+<p>You can change <code>Shutter Speed</code> of the camera. Notice that the unit of the value is <u>μs</u>.<br>
+<img src = "flowchart/SensorWindow_2.png" width = "360"></p>
+</li>
+<li>
+<p>You can specify the <code>number of frames</code> for averaging image.<br>
+<img src = "flowchart/SensorWindow_3.png" width = "360"></p>
+</li>
+<li>
+<p>You can change <code>ISO value</code> by both selecting from the combo box and typing a number.
+<img src = "flowchart/SensorWindow_4.png" width = "360"></p>
+</li>
+<li>
+<p>You can <code>preview</code> an image from the camera. <code>1</code> button is for normal image, and <code>#</code> button is for averaged image.<br>
+<img src = "flowchart/SensorWindow_5.png" width = "360"></p>
+</li>
+<li>
+<p>You can <code>preview and save</code> an image from the camera. Function of each button is same as ⑤.<br>
+<img src = "flowchart/SensorWindow_6.png" width = "360"></p>
+</li>
+</ol>
+<h3 id="laser-control">Laser Control</h3>
+<p>In this part, you can control lasers and check the state.</p>
+<ol start="7">
+<li>
+<p>You can set a laser pattern by clicking buttons. <code>EVEN</code> button is for turning on even-numbered lasers, <code>ODD</code> for odd-numbered, <img src = "GUI_icons/lightON.png" width = "12"> for all lasers, and <img src = "GUI_icons/lightOFF.png" width = "12"> for turning off all lasers.<br>
+<img src = "flowchart/ SensorWindow_7-8.png" width = "360"></p>
+</li>
+<li>
+<p>The flowchart is same as ⑦.</p>
+</li>
+<li></li>
+</ol>
+<h3 id="other">Other</h3>
+<ol start="10">
+<li></li>
+<li></li>
+<li></li>
+</ol>
+<img src = "flowchart/SensorWindow_12.png" width = "360"> 
 <h2 id="scripting-window-%22progress%22">Scripting Window (&quot;Progress&quot;)</h2>
 <img src = "GUI_snapshots/Scripting_window_documentation.png" width = "240">  
 

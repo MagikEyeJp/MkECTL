@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/sensors.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -405,7 +404,14 @@
       <option name="project" value="LOCAL" />
       <updated>1593157844131</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="add SensorDevice">
+      <created>1593256366746</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1593256366746</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -432,7 +438,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added a reference" />
     <MESSAGE value="modified GraphicsViewer part" />
     <MESSAGE value="mainly changed laser control part" />
     <MESSAGE value="mke-sdk" />
@@ -457,7 +462,8 @@
     <MESSAGE value="delete ISOlineEdit and edit code" />
     <MESSAGE value="add README.html and .pdf" />
     <MESSAGE value="update README.md (use relative path for images)" />
-    <option name="LAST_COMMIT_MESSAGE" value="update README.md (use relative path for images)" />
+    <MESSAGE value="add SensorDevice" />
+    <option name="LAST_COMMIT_MESSAGE" value="add SensorDevice" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
