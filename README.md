@@ -120,7 +120,7 @@ In this part, you can change parameters of a camera, get images.
 In this part, you can control lasers and check the state.
 
 7. You can set a laser pattern by clicking buttons. `EVEN` button is for turning on even-numbered lasers, `ODD` for odd-numbered, <img src = "GUI_icons/lightON.png" width = "12"> for all lasers, and <img src = "GUI_icons/lightOFF.png" width = "12"> for turning off all lasers.  
-<img src = "flowchart/ SensorWindow_7-8.png" width = "360"> 
+<img src = "flowchart/SensorWindow_7-8.png" width = "360"> 
 
 8. You can set a laser pattern by specifying with a 4-digit hexadecimal number. The flowchart is same as ⑦.  
 
