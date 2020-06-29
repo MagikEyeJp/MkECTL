@@ -71,7 +71,7 @@ The function of each numbered widgets in the GUI is as follows:
 ### Scripting
 15. The name of a script you chose will be shown here.  
 
-16. If you click `Select Script tool button`, file dialog will be opened and you can select a script. Choose a file with extension <u>.txt</u>.
+16. If you click `Select Script tool button`, file dialog will be opened and you can select a script. Choose a file with extension <u>.txt</u>.  
 <img src = "flowchart/keiganGUI_16.png" width = "240"> 
 
 17. If `Continue Script button` is clicked, scripting will be resumed where you left off last session. If you haven't clicked ⑱, this button has the same role as ⑱. 
