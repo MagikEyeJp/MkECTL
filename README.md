@@ -1,8 +1,25 @@
 
-
-
+<a id="markdown-documentation-for-the-calibration-machine-of-magikeye" name="documentation-for-the-calibration-machine-of-magikeye"></a>
 # Documentation for the calibration machine of MagikEye
+<!-- TOC -->
 
+- [Documentation for the calibration machine of MagikEye](#documentation-for-the-calibration-machine-of-magikeye)
+    - [Operating environment](#operating-environment)
+    - [Main Window ("KeiganGUI")](#main-window-keigangui)
+        - [Robot Control](#robot-control)
+        - [IR Light Control](#ir-light-control)
+        - [Scripting](#scripting)
+        - [Other](#other)
+    - [Sub Window ("Sensor Window")](#sub-window-sensor-window)
+        - [RPi address](#rpi-address)
+        - [Camera Control](#camera-control)
+        - [Laser Control](#laser-control)
+        - [Other](#other-1)
+    - [Scripting Window ("Progress")](#scripting-window-progress)
+
+<!-- /TOC -->
+
+<a id="markdown-operating-environment" name="operating-environment"></a>
 ## Operating environment
 - Ubuntu xxx
 - Python 3.6.9 or newer
@@ -14,6 +31,7 @@ then go to terminal and you can run this command:
 
 Then, you will see the main window like the image below.
 
+<a id="markdown-main-window-keigangui" name="main-window-keigangui"></a>
 ## Main Window ("KeiganGUI")
 <!-- 
 ![keiganGUI](https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png)  
@@ -21,6 +39,7 @@ Then, you will see the main window like the image below.
 <img src = "GUI_snapshots/keiganGUI_window_documentation.png" width = "480">  
 
 This window mainly consists of 3 parts, **Robot Control**, **IR Light Control**, and **Scripting**.
+<a id="markdown-robot-control" name="robot-control"></a>
 ### Robot Control
 In this part, you can configure and move the motors. There are three motors in the calibration robot: **Slider**, **Pan**, and **Tilt**. 
 The function of each numbered widgets in the GUI is as follows: 
@@ -64,10 +83,12 @@ The function of each numbered widgets in the GUI is as follows:
 
 13. In `Current Pos.`, you can check the current positions of all motors.  
 
+<a id="markdown-ir-light-control" name="ir-light-control"></a>
 ### IR Light Control
 14. You can control lights (L1 and L2) respectively. By clicking <img src = "GUI_icons/lightON.png" width = "12">, the light will be turned on. On the other hand, <img src = "GUI_icons/lightOFF.png" width = "12"> button allows you to turn off the light.   
 <img src = "flowchart/keiganGUI_14.png" width = "360"> 
 
+<a id="markdown-scripting" name="scripting"></a>
 ### Scripting
 15. The name of a script you chose will be shown here.  
 
@@ -80,6 +101,7 @@ The function of each numbered widgets in the GUI is as follows:
 18. If `Execute Script button` is clicked, the selected script will be executed from the beginning. Acquired data while scripting will be saved in a different folder so as not to overwrite the existing data.  
 <img src = "flowchart/keiganGUI_18.png" width = "360"> 
 
+<a id="markdown-other" name="other"></a>
 ### Other
 19. By clicking `Sensor Window button`, the sensor window will appear.  
 <img src = "flowchart/keiganGUI_19.png" width = "240"> 
@@ -87,16 +109,19 @@ The function of each numbered widgets in the GUI is as follows:
 20. `MagikEye button` is a button for performing a demonstration of the calibration machine. The robot will move along a demo-script.  
 <img src = "flowchart/keiganGUI_20.png" width = "360"> 
 
+<a id="markdown-sub-window-sensor-window" name="sub-window-sensor-window"></a>
 ## Sub Window ("Sensor Window")
 <img src = "GUI_snapshots/Sensor_window_documentation.png" width = "480">  
 
 You can directly control the state of sensor devices through this window.
 It mainly consists of 3 parts, **RPi address**, **Camera Control**, and **Laser Control**.
 
+<a id="markdown-rpi-address" name="rpi-address"></a>
 ### RPi address
 1. Before connecting sensors, specify the IP address and port number here. The format is <u>(IP address):(port number)</u>.You can also specify only IP address. In that case, port number will be set as default(8888). 
 <img src = "flowchart/SensorWindow_1.png" width = "360"> 
 
+<a id="markdown-camera-control" name="camera-control"></a>
 ### Camera Control
 In this part, you can change parameters of a camera and get images.
 
@@ -116,6 +141,7 @@ In this part, you can change parameters of a camera and get images.
 <img src = "flowchart/SensorWindow_6.png" width = "360"> 
 
 
+<a id="markdown-laser-control" name="laser-control"></a>
 ### Laser Control
 In this part, you can control lasers and check the state.
 
@@ -127,6 +153,7 @@ In this part, you can control lasers and check the state.
 9. You can check the current laser patten. Lasers are from No.1 to No.16.  
 
 
+<a id="markdown-other-1" name="other-1"></a>
 ### Other
 10. Here, you will see `Sensor Image` by clicking buttons in ⑤ or ⑥.   
 
@@ -135,6 +162,7 @@ In this part, you can control lasers and check the state.
 12. By clicking `Reconnect button`, you can reconnect to sensors.  
 <img src = "flowchart/SensorWindow_12.png" width = "360"> 
 
+<a id="markdown-scripting-window-progress" name="scripting-window-progress"></a>
 ## Scripting Window ("Progress")
 <img src = "GUI_snapshots/Scripting_window_documentation.png" width = "240">  
 
