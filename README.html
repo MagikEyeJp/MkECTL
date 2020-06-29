@@ -372,6 +372,8 @@ code {
 <li><a href="#documentation-for-the-calibration-machine-of-magikeye">Documentation for the calibration machine of MagikEye</a>
 <ul>
 <li><a href="#operating-environment">Operating environment</a></li>
+<li><a href="#operation-manual">Operation Manual</a>
+<ul>
 <li><a href="#main-window-keigangui">Main Window (&quot;KeiganGUI&quot;)</a>
 <ul>
 <li><a href="#robot-control">Robot Control</a></li>
@@ -391,8 +393,32 @@ code {
 <li><a href="#scripting-window-progress">Scripting Window (&quot;Progress&quot;)</a></li>
 </ul>
 </li>
+<li><a href="#script-grammar">Script Grammar</a></li>
+<li><a href="#flowcharts">Flowcharts</a>
+<ul>
+<li><a href="#main-window-keigangui-1">Main Window (&quot;KeiganGUI&quot;)</a>
+<ul>
+<li><a href="#robot-control-1">Robot Control</a></li>
+<li><a href="#ir-light-control-1">IR Light Control</a></li>
+<li><a href="#scripting-1">Scripting</a></li>
+<li><a href="#other-2">Other</a></li>
+</ul>
+</li>
+<li><a href="#sub-window-sensor-window-1">Sub Window (&quot;Sensor Window&quot;)</a>
+<ul>
+<li><a href="#rpi-address-1">RPi address</a></li>
+<li><a href="#camera-control-1">Camera Control</a></li>
+<li><a href="#laser-control-1">Laser Control</a></li>
+<li><a href="#other-3">Other</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <!-- /TOC -->
+<!-- https://dev.classmethod.jp/articles/vscode-markdown-toc-for-blog/ -->
 <p><a id="markdown-operating-environment" name="operating-environment"></a></p>
 <h2 id="operating-environment">Operating environment</h2>
 <ul>
@@ -401,36 +427,34 @@ code {
 </ul>
 <p>First, check if the project <code>keiganGUI</code> exists at
 <code>\home\bin</code>
-then go to terminal and you can run this command:
+then go to terminal and you can run this command:<br>
 <code>python3 bin/keiganGUI/keiganGUI.py</code></p>
 <p>Then, you will see the main window like the image below.</p>
+<p><a id="markdown-operation-manual" name="operation-manual"></a></p>
+<h2 id="operation-manual">Operation Manual</h2>
 <p><a id="markdown-main-window-keigangui" name="main-window-keigangui"></a></p>
-<h2 id="main-window-%22keigangui%22">Main Window (&quot;KeiganGUI&quot;)</h2>
+<h3 id="main-window-%22keigangui%22">Main Window (&quot;KeiganGUI&quot;)</h3>
 <!-- 
 ![keiganGUI](https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png)  
 -->
 <img src = "GUI_snapshots/keiganGUI_window_documentation.png" width = "480">  
 <p>This window mainly consists of 3 parts, <strong>Robot Control</strong>, <strong>IR Light Control</strong>, and <strong>Scripting</strong>.
 <a id="markdown-robot-control" name="robot-control"></a></p>
-<h3 id="robot-control">Robot Control</h3>
+<h4 id="robot-control">Robot Control</h4>
 <p>In this part, you can configure and move the motors. There are three motors in the calibration robot: <strong>Slider</strong>, <strong>Pan</strong>, and <strong>Tilt</strong>.
 The function of each numbered widgets in the GUI is as follows:</p>
 <ol>
 <li>
-<p><code>Initialize button</code> initializes all of the three motors and open the port of IR lights. This button will be disabled after finishing initialization.<br>
-<img src = "flowchart/keiganGUI_1.png" width = "360"></p>
+<p><code>Initialize button</code> initializes all of the three motors and open the port of IR lights. This button will be disabled after finishing initialization.</p>
 </li>
 <li>
-<p><code>Set Slider Origin button</code> can set the origin point of the slider motor. When finished, information message will be popped up so be patient until then.<br>
-<img src = "flowchart/keiganGUI_2.png" width = "360"></p>
+<p><code>Set Slider Origin button</code> can set the origin point of the slider motor. When finished, information message will be popped up so be patient until then.</p>
 </li>
 <li>
-<p><code>FREE all motors button</code> releases the restrain states of all motors. Holding torque will be reduced whereas the configuration of motors will be maintained.<br>
-<img src = "flowchart/keiganGUI_3.png" width = "360"></p>
+<p><code>FREE all motors button</code> releases the restrain states of all motors. Holding torque will be reduced whereas the configuration of motors will be maintained.</p>
 </li>
 <li>
-<p><code>REBOOT all motors button</code>, on the other hand, turns off all motors and the configuration will not be maintained. If you want to use motors again, you should click <code>Initialize button</code>.<br>
-<img src = "flowchart/keiganGUI_4.png" width = "360"></p>
+<p><code>REBOOT all motors button</code>, on the other hand, turns off all motors and the configuration will not be maintained. If you want to use motors again, you should click <code>Initialize button</code>.</p>
 </li>
 <li>
 <p>This <code>Progress Bar</code> can be used when you want to check the progress of</p>
@@ -442,117 +466,97 @@ The function of each numbered widgets in the GUI is as follows:</p>
 </ul>
 <ol start="6">
 <li>
-<p>In this part (<code>Motor Positions</code>), you can specify the position of each motor in the spin box. Notice that the unit of value for Slider, Pan, and Tilt are <u>mm</u>, <u>deg</u>, and <u>deg</u> respectively. If you click <img src = "GUI_icons/exec.png" width = "12"> buttons, you can send a command to each motor and the robot will change the posture by moving the motor.<br>
-<img src = "flowchart/keiganGUI_6.png" width = "240"></p>
+<p>In this part (<code>Motor Positions</code>), you can specify the position of each motor in the spin box. Notice that the unit of value for Slider, Pan, and Tilt are <u>mm</u>, <u>deg</u>, and <u>deg</u> respectively. If you click <img src = "GUI_icons/exec.png" width = "12"> buttons, you can send a command to each motor and the robot will change the posture by moving the motor.</p>
 </li>
 <li>
-<p><code>Save button</code> allows you to save motor positions as specified at the spin boxes in <code>Motor Positions</code>. Sets of motor positions will be stored in the combo box ⑧.<br>
-<img src = "flowchart/keiganGUI_7.png" width = "360"></p>
+<p><code>Save button</code> allows you to save motor positions as specified at the spin boxes in <code>Motor Positions</code>. Sets of motor positions will be stored in the combo box ⑧.</p>
 </li>
 <li>
-<p><code>Saved Positions</code> stores motor positions which you saves. You can choose a set of motor positions from the combo box, and move motors by clicking <img src = "GUI_icons/exec.png" width = "12"> button.<br>
-<img src = "flowchart/keiganGUI_8.png" width = "360"></p>
+<p><code>Saved Positions</code> stores motor positions which you saves. You can choose a set of motor positions from the combo box, and move motors by clicking <img src = "GUI_icons/exec.png" width = "12"> button.</p>
 </li>
 <li>
-<p><code>Set speed</code> allows you to change the rotation speed of each motor.<br>
-<img src = "flowchart/keiganGUI_9.png" width = "240"></p>
+<p><code>Set speed</code> allows you to change the rotation speed of each motor.</p>
 </li>
 <li>
-<p>In <code>Preset</code>, firstly choose a motor ID from the combo box and type a value which you want to set as the motor's current position. The text of the label indicating the unit will be changed depending on the motor ID.<br>
-<img src = "flowchart/keiganGUI_10.png" width = "240"></p>
+<p>In <code>Preset</code>, firstly choose a motor ID from the combo box and type a value which you want to set as the motor's current position. The text of the label indicating the unit will be changed depending on the motor ID.</p>
 </li>
 <li>
-<p><code>SET Origin button</code> sets the current positions of all motors origin (0, 0, 0).<br>
-<img src = "flowchart/keiganGUI_11.png" width = "360"></p>
+<p><code>SET Origin button</code> sets the current positions of all motors origin (0, 0, 0).</p>
 </li>
 <li>
-<p><code>GO TO Origin button</code> moves all motors to the point of origin.<br>
-<img src = "flowchart/keiganGUI_12.png" width = "360"></p>
+<p><code>GO TO Origin button</code> moves all motors to the point of origin.</p>
 </li>
 <li>
 <p>In <code>Current Pos.</code>, you can check the current positions of all motors.</p>
 </li>
 </ol>
 <p><a id="markdown-ir-light-control" name="ir-light-control"></a></p>
-<h3 id="ir-light-control">IR Light Control</h3>
+<h4 id="ir-light-control">IR Light Control</h4>
 <ol start="14">
-<li>You can control lights (L1 and L2) respectively. By clicking <img src = "GUI_icons/lightON.png" width = "12">, the light will be turned on. On the other hand, <img src = "GUI_icons/lightOFF.png" width = "12"> button allows you to turn off the light.<br>
-<img src = "flowchart/keiganGUI_14.png" width = "360"></li>
+<li>You can control lights (L1 and L2) respectively. By clicking <img src = "GUI_icons/lightON.png" width = "12">, the light will be turned on. On the other hand, <img src = "GUI_icons/lightOFF.png" width = "12"> button allows you to turn off the light.</li>
 </ol>
 <p><a id="markdown-scripting" name="scripting"></a></p>
-<h3 id="scripting">Scripting</h3>
+<h4 id="scripting">Scripting</h4>
 <ol start="15">
 <li>
 <p>The name of a script you chose will be shown here.</p>
 </li>
 <li>
-<p>If you click <code>Select Script tool button</code>, file dialog will be opened and you can select a script. Choose a file with extension <u>.txt</u>.<br>
-<img src = "flowchart/keiganGUI_16.png" width = "240"></p>
+<p>If you click <code>Select Script button</code>, file dialog will be opened and you can select a script. Choose a file with extension <u>.txt</u>.</p>
 </li>
 <li>
-<p>If <code>Continue Script button</code> is clicked, scripting will be resumed where you left off last session. If you haven't clicked ⑱, this button has the same role as ⑱.
-<img src = "flowchart/keiganGUI_17.png" width = "360"></p>
+<p>If <code>Continue Script button</code> is clicked, scripting will be resumed where you left off last session. If you haven't clicked ⑱, this button has the same role as ⑱.</p>
 </li>
 <li>
-<p>If <code>Execute Script button</code> is clicked, the selected script will be executed from the beginning. Acquired data while scripting will be saved in a different folder so as not to overwrite the existing data.<br>
-<img src = "flowchart/keiganGUI_18.png" width = "360"></p>
+<p>If <code>Execute Script button</code> is clicked, the selected script will be executed from the beginning. Acquired data while scripting will be saved in a different folder so as not to overwrite the existing data.</p>
 </li>
 </ol>
 <p><a id="markdown-other" name="other"></a></p>
-<h3 id="other">Other</h3>
+<h4 id="other">Other</h4>
 <ol start="19">
 <li>
-<p>By clicking <code>Sensor Window button</code>, the sensor window will appear.<br>
-<img src = "flowchart/keiganGUI_19.png" width = "240"></p>
+<p>By clicking <code>Sensor Window button</code>, the sensor window will appear.</p>
 </li>
 <li>
-<p><code>MagikEye button</code> is a button for performing a demonstration of the calibration machine. The robot will move along a demo-script.<br>
-<img src = "flowchart/keiganGUI_20.png" width = "360"></p>
+<p><code>MagikEye button</code> is a button for performing a demonstration of the calibration machine. The robot will move along a demo-script.</p>
 </li>
 </ol>
 <p><a id="markdown-sub-window-sensor-window" name="sub-window-sensor-window"></a></p>
-<h2 id="sub-window-%22sensor-window%22">Sub Window (&quot;Sensor Window&quot;)</h2>
+<h3 id="sub-window-%22sensor-window%22">Sub Window (&quot;Sensor Window&quot;)</h3>
 <img src = "GUI_snapshots/Sensor_window_documentation.png" width = "480">  
 <p>You can directly control the state of sensor devices through this window.
 It mainly consists of 3 parts, <strong>RPi address</strong>, <strong>Camera Control</strong>, and <strong>Laser Control</strong>.</p>
 <p><a id="markdown-rpi-address" name="rpi-address"></a></p>
-<h3 id="rpi-address">RPi address</h3>
+<h4 id="rpi-address">RPi address</h4>
 <ol>
-<li>Before connecting sensors, specify the IP address and port number here. The format is <u>(IP address):(port number)</u>.You can also specify only IP address. In that case, port number will be set as default(8888).
-<img src = "flowchart/SensorWindow_1.png" width = "360"></li>
+<li>Before connecting sensors, specify the IP address and port number here. The format is <u>(IP address):(port number)</u>.You can also specify only IP address. In that case, port number will be set as default(8888).</li>
 </ol>
 <p><a id="markdown-camera-control" name="camera-control"></a></p>
-<h3 id="camera-control">Camera Control</h3>
+<h4 id="camera-control">Camera Control</h4>
 <p>In this part, you can change parameters of a camera and get images.</p>
 <ol start="2">
 <li>
-<p>You can change <code>Shutter Speed</code> of the camera. Notice that the unit of the value is <u>μs</u>.<br>
-<img src = "flowchart/SensorWindow_2.png" width = "360"></p>
+<p>You can change <code>Shutter Speed</code> of the camera. Notice that the unit of the value is <u>μs</u>.</p>
 </li>
 <li>
-<p>You can specify the <code>number of frames</code> for averaging images.<br>
-<img src = "flowchart/SensorWindow_3.png" width = "240"></p>
+<p>You can specify the <code>number of frames</code> for averaging images.</p>
 </li>
 <li>
-<p>You can change <code>ISO value</code> by both selecting from the combo box and typing a number.
-<img src = "flowchart/SensorWindow_4.png" width = "360"></p>
+<p>You can change <code>ISO value</code> by both selecting from the combo box and typing a number.</p>
 </li>
 <li>
-<p>You can <code>preview</code> an image from the camera. <code>1</code> button is for a normal image, and <code>#</code> button is for an averaged image.<br>
-<img src = "flowchart/SensorWindow_5.png" width = "360"></p>
+<p>You can <code>preview</code> an image from the camera. <code>1</code> button is for a normal image, and <code>#</code> button is for an averaged image.</p>
 </li>
 <li>
-<p>You can <code>preview and save</code> an image from the camera. Function of each button is same as ⑤.<br>
-<img src = "flowchart/SensorWindow_6.png" width = "360"></p>
+<p>You can <code>preview and save</code> an image from the camera. Function of each button is same as ⑤.</p>
 </li>
 </ol>
 <p><a id="markdown-laser-control" name="laser-control"></a></p>
-<h3 id="laser-control">Laser Control</h3>
+<h4 id="laser-control">Laser Control</h4>
 <p>In this part, you can control lasers and check the state.</p>
 <ol start="7">
 <li>
-<p>You can set a laser pattern by clicking buttons. <code>EVEN</code> button is for turning on only even-numbered lasers, <code>ODD</code> for odd-numbered, <img src = "GUI_icons/lightON.png" width = "12"> for all lasers, and <img src = "GUI_icons/lightOFF.png" width = "12"> for turning off all lasers.<br>
-<img src = "flowchart/SensorWindow_7-8.png" width = "360"></p>
+<p>You can set a laser pattern by clicking buttons. <code>EVEN</code> button is for turning on only even-numbered lasers, <code>ODD</code> for odd-numbered, <img src = "GUI_icons/lightON.png" width = "12"> for all lasers, and <img src = "GUI_icons/lightOFF.png" width = "12"> for turning off all lasers.</p>
 </li>
 <li>
 <p>You can set a laser pattern by specifying with a 4-digit hexadecimal number. The flowchart is same as ⑦.</p>
@@ -562,7 +566,7 @@ It mainly consists of 3 parts, <strong>RPi address</strong>, <strong>Camera Cont
 </li>
 </ol>
 <p><a id="markdown-other-1" name="other-1"></a></p>
-<h3 id="other">Other</h3>
+<h4 id="other">Other</h4>
 <ol start="10">
 <li>
 <p>Here, you will see <code>Sensor Image</code> by clicking buttons in ⑤ or ⑥.</p>
@@ -571,12 +575,11 @@ It mainly consists of 3 parts, <strong>RPi address</strong>, <strong>Camera Cont
 <p>You can check the status of the camera. A message will be shown if there is a trial to connect to sensors, or parameters are changed.</p>
 </li>
 <li>
-<p>By clicking <code>Reconnect button</code>, you can reconnect to sensors.<br>
-<img src = "flowchart/SensorWindow_12.png" width = "360"></p>
+<p>By clicking <code>Reconnect button</code>, you can reconnect to sensors.</p>
 </li>
 </ol>
 <p><a id="markdown-scripting-window-progress" name="scripting-window-progress"></a></p>
-<h2 id="scripting-window-%22progress%22">Scripting Window (&quot;Progress&quot;)</h2>
+<h3 id="scripting-window-%22progress%22">Scripting Window (&quot;Progress&quot;)</h3>
 <img src = "GUI_snapshots/Scripting_window_documentation.png" width = "240">  
 <p>While scripting, this window will appear.</p>
 <ol>
@@ -589,6 +592,152 @@ It mainly consists of 3 parts, <strong>RPi address</strong>, <strong>Camera Cont
 <li>
 <p>By clicking <code>Stop button</code>, this window will be closed and the process of scripting will be interrupted.</p>
 </li>
+</ol>
+<p><a id="markdown-script-grammar" name="script-grammar"></a></p>
+<h2 id="script-grammar">Script Grammar</h2>
+<p>変数名にseqnとかslideとか入る
+seqn : 画像シーケンス番号(1始まり)
+lasers : レーザー発光パターン (10進数 bit0 : Laser 0, bit1:Laser1 …)
+slide : スライダー位置 (mm)
+@{変数名}[4]の[4]とかで桁指定ができる</p>
+<p><a href="script/script_2019-12-05_M_TOF_Archimedes_N=12_lendt=2.txt">Script</a></p>
+<p><a id="markdown-flowcharts" name="flowcharts"></a></p>
+<h2 id="flowcharts">Flowcharts</h2>
+<p><a id="markdown-main-window-keigangui-1" name="main-window-keigangui-1"></a></p>
+<h3 id="main-window-%22keigangui%22">Main Window (&quot;KeiganGUI&quot;)</h3>
+<!-- 
+![keiganGUI](https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png)  
+-->
+<img src = "GUI_snapshots/keiganGUI_window_documentation.png" width = "480">  
+<p>This window mainly consists of 3 parts, <strong>Robot Control</strong>, <strong>IR Light Control</strong>, and <strong>Scripting</strong>.
+<a id="markdown-robot-control-1" name="robot-control-1"></a></p>
+<h4 id="robot-control">Robot Control</h4>
+<ol>
+<li>
+<p><code>Initialized button</code><br>
+<img src = "flowchart/keiganGUI_1.png" width = "360"></p>
+</li>
+<li>
+<p><code>Set Slider Origin button</code><br>
+<img src = "flowchart/keiganGUI_2.png" width = "360"></p>
+</li>
+<li>
+<p><code>FREE all motors button</code><br>
+<img src = "flowchart/keiganGUI_3.png" width = "360"></p>
+</li>
+<li>
+<p><code>REBOOT all motors button</code><br>
+<img src = "flowchart/keiganGUI_4.png" width = "360"></p>
+</li>
+</ol>
+</t>
+<ol start="6">
+<li>
+<p><code>Motor Positions</code><br>
+<img src = "flowchart/keiganGUI_6.png" width = "240"></p>
+</li>
+<li>
+<p><code>Save button</code><br>
+<img src = "flowchart/keiganGUI_7.png" width = "360"></p>
+</li>
+<li>
+<p><code>Saved Positions</code><br>
+<img src = "flowchart/keiganGUI_8.png" width = "360"></p>
+</li>
+<li>
+<p><code>Set speed</code><br>
+<img src = "flowchart/keiganGUI_9.png" width = "240"></p>
+</li>
+<li>
+<p><code>Preset</code><br>
+<img src = "flowchart/keiganGUI_10.png" width = "240"></p>
+</li>
+<li>
+<p><code>SET Origin button</code><br>
+<img src = "flowchart/keiganGUI_11.png" width = "360"></p>
+</li>
+<li>
+<p><code>GO TO Origin button</code><br>
+<img src = "flowchart/keiganGUI_12.png" width = "360"></p>
+</li>
+</ol>
+<p><a id="markdown-ir-light-control-1" name="ir-light-control-1"></a></p>
+<h4 id="ir-light-control">IR Light Control</h4>
+<ol start="14">
+<li>IR Light Control<br>
+<img src = "flowchart/keiganGUI_14.png" width = "360"></li>
+</ol>
+<p><a id="markdown-scripting-1" name="scripting-1"></a></p>
+<h4 id="scripting">Scripting</h4>
+<ol start="16">
+<li>
+<p><code>Select Script button</code><br>
+<img src = "flowchart/keiganGUI_16.png" width = "240"></p>
+</li>
+<li>
+<p><code>Continue Script button</code><br>
+<img src = "flowchart/keiganGUI_17.png" width = "360"></p>
+</li>
+<li>
+<p><code>Execute Script button</code><br>
+<img src = "flowchart/keiganGUI_18.png" width = "360"></p>
+</li>
+</ol>
+<p><a id="markdown-other-2" name="other-2"></a></p>
+<h4 id="other">Other</h4>
+<ol start="19">
+<li>
+<p><code>Sensor Window button</code><br>
+<img src = "flowchart/keiganGUI_19.png" width = "240"></p>
+</li>
+<li>
+<p><code>MagikEye button</code><br>
+<img src = "flowchart/keiganGUI_20.png" width = "360"></p>
+</li>
+</ol>
+<p><a id="markdown-sub-window-sensor-window-1" name="sub-window-sensor-window-1"></a></p>
+<h3 id="sub-window-%22sensor-window%22">Sub Window (&quot;Sensor Window&quot;)</h3>
+<p><a id="markdown-rpi-address-1" name="rpi-address-1"></a></p>
+<h4 id="rpi-address">RPi address</h4>
+<ol>
+<li><code>RPi address</code><br>
+<img src = "flowchart/SensorWindow_1.png" width = "360"></li>
+</ol>
+<p><a id="markdown-camera-control-1" name="camera-control-1"></a></p>
+<h4 id="camera-control">Camera Control</h4>
+<ol start="2">
+<li>
+<p><code>Shutter Speed</code><br>
+<img src = "flowchart/SensorWindow_2.png" width = "360"></p>
+</li>
+<li>
+<p><code>number of frames</code><br>
+<img src = "flowchart/SensorWindow_3.png" width = "240"></p>
+</li>
+<li>
+<p><code>ISO value</code><br>
+<img src = "flowchart/SensorWindow_4.png" width = "360"></p>
+</li>
+<li>
+<p><code>preview</code><br>
+<img src = "flowchart/SensorWindow_5.png" width = "360"></p>
+</li>
+<li>
+<p><code>preview and save</code><br>
+<img src = "flowchart/SensorWindow_6.png" width = "360"></p>
+</li>
+</ol>
+<p><a id="markdown-laser-control-1" name="laser-control-1"></a></p>
+<h4 id="laser-control">Laser Control</h4>
+<ol start="7">
+<li><code>EVEN</code>, <code>ODD</code>, <img src = "GUI_icons/lightON.png" width = "12">, <img src = "GUI_icons/lightOFF.png" width = "12"><br>
+<img src = "flowchart/SensorWindow_7-8.png" width = "360"></li>
+</ol>
+<p><a id="markdown-other-3" name="other-3"></a></p>
+<h4 id="other">Other</h4>
+<ol start="12">
+<li><code>Reconnect button</code><br>
+<img src = "flowchart/SensorWindow_12.png" width = "360"></li>
 </ol>
 
 </body>
