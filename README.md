@@ -166,12 +166,12 @@ While scripting, this window will appear.
 3. By clicking `Stop button`, this window will be closed and the process of scripting will be interrupted.
 
 <a id="markdown-script-grammar" name="script-grammar"></a>
-## Script Grammar
-変数名にseqnとかslideとか入る
-seqn : 画像シーケンス番号(1始まり)
-lasers : レーザー発光パターン (10進数 bit0 : Laser 0, bit1:Laser1 …)
-slide : スライダー位置 (mm)
-@{変数名}[4]の[4]とかで桁指定ができる
+## Script Grammar  
+変数名にseqnとかslideとか入る  
+seqn : 画像シーケンス番号(1始まり)  
+lasers : レーザー発光パターン (10進数 bit0 : Laser 0, bit1:Laser1 …)  
+slide : スライダー位置 (mm)  
+@{変数名}[4]の[4]とかで桁指定ができる  
 
 [Script](script/script_2019-12-05_M_TOF_Archimedes_N=12_lendt=2.txt)
 
