@@ -371,7 +371,7 @@ code {
 <ul>
 <li><a href="#documentation-for-the-calibration-machine-of-magikeye">Documentation for the calibration machine of MagikEye</a>
 <ul>
-<li><a href="#operating-environment">Operating environment</a></li>
+<li><a href="#operating-environment">Operating Environment</a></li>
 <li><a href="#operation-manual">Operation Manual</a>
 <ul>
 <li><a href="#main-window-keigangui">Main Window (&quot;KeiganGUI&quot;)</a>
@@ -393,7 +393,18 @@ code {
 <li><a href="#scripting-window-progress">Scripting Window (&quot;Progress&quot;)</a></li>
 </ul>
 </li>
-<li><a href="#script-grammar">Script Grammar</a></li>
+<li><a href="#script-grammar">Script Grammar</a>
+<ul>
+<li><a href="#set-command">set (command)</a></li>
+<li><a href="#mov-command">mov (command)</a></li>
+<li><a href="#home-command">home (command)</a></li>
+<li><a href="#lasers-command">lasers (command)</a></li>
+<li><a href="#light-command">light (command)</a></li>
+<li><a href="#gainiso-command">gainiso (command)</a></li>
+<li><a href="#shutter-command">shutter (command)</a></li>
+<li><a href="#snap-command">snap (command)</a></li>
+</ul>
+</li>
 <li><a href="#flowcharts">Flowcharts</a>
 <ul>
 <li><a href="#main-window-keigangui-1">Main Window (&quot;KeiganGUI&quot;)</a>
@@ -420,10 +431,10 @@ code {
 <!-- /TOC -->
 <!-- https://dev.classmethod.jp/articles/vscode-markdown-toc-for-blog/ -->
 <p><a id="markdown-operating-environment" name="operating-environment"></a></p>
-<h2 id="operating-environment">Operating environment</h2>
+<h2 id="operating-environment">Operating Environment</h2>
 <ul>
-<li>Ubuntu xxx</li>
-<li>Python 3.6.9 or newer</li>
+<li>Ubuntu 18.04.3 LTS</li>
+<li>Python 3.6.9</li>
 </ul>
 <p>First, check if the project <code>keiganGUI</code> exists at
 <code>\home\bin</code>
@@ -595,22 +606,55 @@ It mainly consists of 3 parts, <strong>RPi address</strong>, <strong>Camera Cont
 </ol>
 <p><a id="markdown-script-grammar" name="script-grammar"></a></p>
 <h2 id="script-grammar">Script Grammar</h2>
-<p>変数名にseqnとかslideとか入る<br>
-seqn : 画像シーケンス番号(1始まり)<br>
-lasers : レーザー発光パターン (10進数 bit0 : Laser 0, bit1:Laser1 …)<br>
-slide : スライダー位置 (mm)<br>
-@{変数名}[4]の[4]とかで桁指定ができる</p>
-<p><a href="script/script_2019-12-05_M_TOF_Archimedes_N=12_lendt=2.txt">Script</a></p>
+<p>You can see an example script <a href="script/script_2019-12-05_M_TOF_Archimedes_N=12_lendt=2.txt">here</a>.</p>
+<p>Lines which start with &quot;#&quot; or empty ones will be skipped while executing.
+The general structure is:<br>
+<code>command</code> <code>1st argument, 2nd argument, 3rd argument</code>.
+However, the number of arguments is different depending on commands.</p>
+<p><a id="markdown-set-command" name="set-command"></a></p>
+<h3 id="set-command">set (command)</h3>
+<p>This command sets a value of 1st argument as 2nd argument.
+For example,</p>
+<blockquote>
+<p>set pattern1_laser_image, &quot;pattern1/laser/img_@{seqn}{4}<em>@{lasers}{4}</em>@{slide}{4}<em>@{pan}{4}</em>@{tilt}{4}.png&quot;</p>
+</blockquote>
+<p>this means that a variable <code>pattern1_laser_image</code> has a value <code>pattern1/laser/img_@{seqn}{4}@{lasers}{4}@{slide}{4}@{pan}{4}@{tilt}{4}.png</code> which is a file path to save an image and represented as a regular expression.
+The structure is <code>@{variable name}{the number of digit}</code>.
+Each variable means:</p>
+<ul>
+<li>seqn: sequence number of am image(start from 1)</li>
+<li>lasers: light emitting pattern of lasers (decimal bit0: Laser 1, bit1: Laser 2, ..., bit15, Laser 16)</li>
+<li>slider: position of Slider [mm]</li>
+<li>pan: position of Pan [deg]</li>
+<li>tilt: position of Tilt [deg]</li>
+</ul>
+<p>If seqn = 40, lasers = 1, slider = 500, pan = 45, and tilt = 90, then the value will be <code>pattern1/laser/img_0040_0001_0500_0045_0090.png</code></p>
+<p><a id="markdown-mov-command" name="mov-command"></a></p>
+<h3 id="mov-command">mov (command)</h3>
+<p>This command has 3 arguments which specify positions of Slider, Pan, and Tilt. The robot will move to the position.</p>
+<p><a id="markdown-home-command" name="home-command"></a></p>
+<h3 id="home-command">home (command)</h3>
+<p>This command has no arguments and can make the robot move to the home position(origin). This command is equivalent to <code>mov 0, 0, 0</code></p>
+<p><a id="markdown-lasers-command" name="lasers-command"></a></p>
+<h3 id="lasers-command">lasers (command)</h3>
+<p>This command has an argument which is corresponding to the laser number to emit light. Note that this is different from 'lasers' as an variable.</p>
+<p><a id="markdown-light-command" name="light-command"></a></p>
+<h3 id="light-command">light (command)</h3>
+<p>This command has 2 arguments. The 1st argument represents IR light number(No.1 or No.2), and the 2nd argument represents ON(1)/OFF(0).</p>
+<p><a id="markdown-gainiso-command" name="gainiso-command"></a></p>
+<h3 id="gainiso-command">gainiso (command)</h3>
+<p>This command can set ISO value as the 1st argument.</p>
+<p><a id="markdown-shutter-command" name="shutter-command"></a></p>
+<h3 id="shutter-command">shutter (command)</h3>
+<p>This command can set shutter speed as the 1st argument.</p>
+<p><a id="markdown-snap-command" name="snap-command"></a></p>
+<h3 id="snap-command">snap (command)</h3>
+<p>This command has 2 arguments. The 1st argument is image category, which was defined at <a href="#set-command">set command</a>. The image will be saved based on the state of the robot at that time. The 2nd argument is a frame number for averaging the image.</p>
 <p><a id="markdown-flowcharts" name="flowcharts"></a></p>
 <h2 id="flowcharts">Flowcharts</h2>
 <p><a id="markdown-main-window-keigangui-1" name="main-window-keigangui-1"></a></p>
 <h3 id="main-window-%22keigangui%22">Main Window (&quot;KeiganGUI&quot;)</h3>
-<!-- 
-![keiganGUI](https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png)  
--->
-<img src = "GUI_snapshots/keiganGUI_window_documentation.png" width = "480">  
-<p>This window mainly consists of 3 parts, <strong>Robot Control</strong>, <strong>IR Light Control</strong>, and <strong>Scripting</strong>.
-<a id="markdown-robot-control-1" name="robot-control-1"></a></p>
+<p><a id="markdown-robot-control-1" name="robot-control-1"></a></p>
 <h4 id="robot-control">Robot Control</h4>
 <ol>
 <li>

@@ -4,7 +4,7 @@
 <!-- TOC -->
 
 - [Documentation for the calibration machine of MagikEye](#documentation-for-the-calibration-machine-of-magikeye)
-    - [Operating environment](#operating-environment)
+    - [Operating Environment](#operating-environment)
     - [Operation Manual](#operation-manual)
         - [Main Window ("KeiganGUI")](#main-window-keigangui)
             - [Robot Control](#robot-control)
@@ -18,6 +18,14 @@
             - [Other](#other-1)
         - [Scripting Window ("Progress")](#scripting-window-progress)
     - [Script Grammar](#script-grammar)
+        - [set (command)](#set-command)
+        - [mov (command)](#mov-command)
+        - [home (command)](#home-command)
+        - [lasers (command)](#lasers-command)
+        - [light (command)](#light-command)
+        - [gainiso (command)](#gainiso-command)
+        - [shutter (command)](#shutter-command)
+        - [snap (command)](#snap-command)
     - [Flowcharts](#flowcharts)
         - [Main Window ("KeiganGUI")](#main-window-keigangui-1)
             - [Robot Control](#robot-control-1)
@@ -34,9 +42,9 @@
 <!-- https://dev.classmethod.jp/articles/vscode-markdown-toc-for-blog/ -->
 
 <a id="markdown-operating-environment" name="operating-environment"></a>
-## Operating environment
-- Ubuntu xxx
-- Python 3.6.9 or newer
+## Operating Environment
+* Ubuntu 18.04.3 LTS
+* Python 3.6.9
 
 First, check if the project `keiganGUI` exists at 
 `\home\bin`
@@ -167,25 +175,64 @@ While scripting, this window will appear.
 
 <a id="markdown-script-grammar" name="script-grammar"></a>
 ## Script Grammar  
-変数名にseqnとかslideとか入る  
-seqn : 画像シーケンス番号(1始まり)  
-lasers : レーザー発光パターン (10進数 bit0 : Laser 0, bit1:Laser1 …)  
-slide : スライダー位置 (mm)  
-@{変数名}[4]の[4]とかで桁指定ができる  
+You can see an example script [here](script/script_2019-12-05_M_TOF_Archimedes_N=12_lendt=2.txt).
 
-[Script](script/script_2019-12-05_M_TOF_Archimedes_N=12_lendt=2.txt)
+Lines which start with "#" or empty ones will be skipped while executing.
+The general structure is:  
+`command` `1st argument, 2nd argument, 3rd argument`.
+However, the number of arguments is different depending on commands.
 
+<a id="markdown-set-command" name="set-command"></a>
+### set (command)
+This command sets a value of 1st argument as 2nd argument.
+For example, 
+> set pattern1_laser_image, "pattern1/laser/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png"
+
+this means that a variable `pattern1_laser_image` has a value `pattern1/laser/img_@{seqn}{4}@{lasers}{4}@{slide}{4}@{pan}{4}@{tilt}{4}.png` which is a file path to save an image and represented as a regular expression.
+The structure is `@{variable name}{the number of digit}`.
+Each variable means:
+* seqn: sequence number of am image(start from 1)
+* lasers: light emitting pattern of lasers (decimal bit0: Laser 1, bit1: Laser 2, ..., bit15, Laser 16)
+* slider: position of Slider [mm]
+* pan: position of Pan [deg]
+* tilt: position of Tilt [deg]
+
+If seqn = 40, lasers = 1, slider = 500, pan = 45, and tilt = 90, then the value will be `pattern1/laser/img_0040_0001_0500_0045_0090.png`
+
+<a id="markdown-mov-command" name="mov-command"></a>
+### mov (command)
+This command has 3 arguments which specify positions of Slider, Pan, and Tilt. The robot will move to the position.
+
+<a id="markdown-home-command" name="home-command"></a>
+### home (command) 
+This command has no arguments and can make the robot move to the home position(origin). This command is equivalent to `mov 0, 0, 0`
+
+<a id="markdown-lasers-command" name="lasers-command"></a>
+### lasers (command)
+This command has an argument which is corresponding to the laser number to emit light. Note that this is different from 'lasers' as an variable.
+
+<a id="markdown-light-command" name="light-command"></a>
+### light (command)
+This command has 2 arguments. The 1st argument represents IR light number(No.1 or No.2), and the 2nd argument represents ON(1)/OFF(0).
+
+<a id="markdown-gainiso-command" name="gainiso-command"></a>
+### gainiso (command)
+This command can set ISO value as the 1st argument.
+
+<a id="markdown-shutter-command" name="shutter-command"></a>
+### shutter (command)
+This command can set shutter speed as the 1st argument.
+
+<a id="markdown-snap-command" name="snap-command"></a>
+### snap (command)
+This command has 2 arguments. The 1st argument is image category, which was defined at [set command](#set-command). The image will be saved based on the state of the robot at that time. The 2nd argument is a frame number for averaging the image.
 
 <a id="markdown-flowcharts" name="flowcharts"></a>
 ## Flowcharts
+
 <a id="markdown-main-window-keigangui-1" name="main-window-keigangui-1"></a>
 ### Main Window ("KeiganGUI")
-<!-- 
-![keiganGUI](https://github.com/NarinOka/keiganGUI/blob/master/GUI_snapshots/keiganGUI_window_documentation.png)  
--->
-<img src = "GUI_snapshots/keiganGUI_window_documentation.png" width = "480">  
 
-This window mainly consists of 3 parts, **Robot Control**, **IR Light Control**, and **Scripting**.
 <a id="markdown-robot-control-1" name="robot-control-1"></a>
 #### Robot Control
 
