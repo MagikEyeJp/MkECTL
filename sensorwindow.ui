@@ -249,8 +249,8 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset>
-      <normaloff>GUI_icons/lightON.png</normaloff>GUI_icons/lightON.png</iconset>
+     <iconset resource="resources.qrc">
+      <normaloff>:/GUI_icons/lightON.png</normaloff>:/GUI_icons/lightON.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="offAllLaserButton">
@@ -266,8 +266,8 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset>
-      <normaloff>GUI_icons/lightOFF.png</normaloff>GUI_icons/lightOFF.png</iconset>
+     <iconset resource="resources.qrc">
+      <normaloff>:/GUI_icons/lightOFF.png</normaloff>:/GUI_icons/lightOFF.png</iconset>
     </property>
    </widget>
    <widget class="QLineEdit" name="hex4dLineEdit">
@@ -315,8 +315,8 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset>
-      <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
+     <iconset resource="resources.qrc">
+      <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
     </property>
    </widget>
    <widget class="QLabel" name="CurrentLaserPattern_label">
@@ -849,14 +849,16 @@
        <string/>
       </property>
       <property name="icon">
-       <iconset>
-        <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
+       <iconset resource="resources.qrc">
+        <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>GUI_icons/exec.png</file>
+        <file>GUI_icons/goTo.png</file>
+        <file>GUI_icons/keigan_icon.png</file>
+        <file>GUI_icons/lightOFF.png</file>
+        <file>GUI_icons/lightON.png</file>
+        <file>GUI_icons/setHome.png</file>
+    </qresource>
+</RCC>

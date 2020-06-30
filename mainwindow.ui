@@ -69,8 +69,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
         </property>
         <property name="autoDefault">
          <bool>true</bool>
@@ -112,8 +112,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
         </property>
         <property name="autoDefault">
          <bool>true</bool>
@@ -132,8 +132,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
         </property>
         <property name="autoDefault">
          <bool>true</bool>
@@ -983,8 +983,8 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
-           <normaloff>GUI_icons/setHome.png</normaloff>GUI_icons/setHome.png</iconset>
+          <iconset resource="resources.qrc">
+           <normaloff>:/GUI_icons/setHome.png</normaloff>:/GUI_icons/setHome.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -1012,8 +1012,8 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
-           <normaloff>GUI_icons/goTo.png</normaloff>GUI_icons/goTo.png</iconset>
+          <iconset resource="resources.qrc">
+           <normaloff>:/GUI_icons/goTo.png</normaloff>:/GUI_icons/goTo.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -1131,8 +1131,8 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
-           <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
+          <iconset resource="resources.qrc">
+           <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
          </property>
          <property name="autoDefault">
           <bool>true</bool>
@@ -1193,8 +1193,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
-       <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
+      <iconset resource="resources.qrc">
+       <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
      </property>
      <property name="autoDefault">
       <bool>true</bool>
@@ -1354,8 +1354,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
-       <normaloff>GUI_icons/exec.png</normaloff>GUI_icons/exec.png</iconset>
+      <iconset resource="resources.qrc">
+       <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
      </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
@@ -1922,8 +1922,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>GUI_icons/lightON.png</normaloff>GUI_icons/lightON.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/GUI_icons/lightON.png</normaloff>:/GUI_icons/lightON.png</iconset>
         </property>
        </widget>
       </item>
@@ -1939,8 +1939,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>GUI_icons/lightOFF.png</normaloff>GUI_icons/lightOFF.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/GUI_icons/lightOFF.png</normaloff>:/GUI_icons/lightOFF.png</iconset>
         </property>
        </widget>
       </item>
@@ -1981,8 +1981,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>GUI_icons/lightON.png</normaloff>GUI_icons/lightON.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/GUI_icons/lightON.png</normaloff>:/GUI_icons/lightON.png</iconset>
         </property>
        </widget>
       </item>
@@ -1998,8 +1998,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>GUI_icons/lightOFF.png</normaloff>GUI_icons/lightOFF.png</iconset>
+         <iconset resource="resources.qrc">
+          <normaloff>:/GUI_icons/lightOFF.png</normaloff>:/GUI_icons/lightOFF.png</iconset>
         </property>
        </widget>
       </item>
@@ -2055,6 +2055,8 @@
   <tabstop>freeButton</tabstop>
   <tabstop>executeScript_button</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
