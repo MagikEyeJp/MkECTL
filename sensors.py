@@ -176,11 +176,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
 
-        # read_script.switch_to_depth_sensor(self.conn)
-        # read_script.get_frame(self.conn)
-
-        # execute_script.client_getframe(self.IPaddress, self.portNum)  # one frame
-        # read_script.client_pushframes(self.IPaddress, self.portNum)  # sequential frames
         self.sensor.get_image(1)    # might be skipped
 
         # temp
