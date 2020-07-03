@@ -6,12 +6,14 @@ import time
 import os
 import re
 import serial
+import MyDoubleSpinBox
 
 import motordic
 import mainwindow_ui
 import execute_script
 import execute_script2
 import sensors
+
 
 class Ui(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
@@ -91,10 +93,13 @@ class Ui(QtWidgets.QMainWindow):
         # spinbox returnPressed
         self.ui.sliderPosSpin.setKeyboardTracking(False)
         self.ui.sliderPosSpin.valueChanged.connect(lambda: self.exeButtonClicked('sliderMoveExe'))
+        self.ui.sliderPosSpin.returnPressed.connect(lambda: self.exeButtonClicked('sliderMoveExe'))
         self.ui.panPosSpin.setKeyboardTracking(False)
         self.ui.panPosSpin.valueChanged.connect(lambda: self.exeButtonClicked('panMoveExe'))
+        self.ui.panPosSpin.returnPressed.connect(lambda: self.exeButtonClicked('panMoveExe'))
         self.ui.tiltPosSpin.setKeyboardTracking(False)
         self.ui.tiltPosSpin.valueChanged.connect(lambda: self.exeButtonClicked('tiltMoveExe'))
+        self.ui.tiltPosSpin.returnPressed.connect(lambda: self.exeButtonClicked('tiltMoveExe'))
 
         self.ui.presetValue.returnPressed.connect(lambda: self.exeButtonClicked('presetExe'))
 
