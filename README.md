@@ -184,7 +184,7 @@ However, the number of arguments is different depending on commands.
 
 <a id="markdown-set-command" name="set-command"></a>
 ### set (command)
-This command sets a value of 1st argument as 2nd argument.
+This command sets a variable of 1st argument as a value of 2nd argument.
 For example, 
 > set pattern1_laser_image, "pattern1/laser/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png"
 
