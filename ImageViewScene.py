@@ -30,6 +30,25 @@ class ImageViewScene(QtWidgets.QGraphicsScene):
         self.__currentPos = None
         self.__pressedButton = None
 
+    def setPixMap(self, pixmap):
+        # 既にシーンにPixmapアイテムがある場合は削除する。
+        if self.__imageItem:
+            self.removeItem(self.__imageItem)
+
+        # 与えられたイメージをPixmapアイテムとしてシーンに追加する。-----------
+        item = QtWidgets.QGraphicsPixmapItem(pixmap)
+        # アイテムを移動可能アイテムとして設定。
+        item.setFlags(
+            QtWidgets.QGraphicsItem.ItemIsMovable
+        )
+        self.addItem(item)
+        self.__imageItem = item
+        # ---------------------------------------------------------------------
+
+        self.fitImage()
+
+        return pixmap
+
     def setFile(self, filepath):
         # イメージをアイテムとしてシーンに追加するためのメソッド。
         pixmap = QtGui.QPixmap(filepath)

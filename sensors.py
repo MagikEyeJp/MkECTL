@@ -2,6 +2,8 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import sys
 import re
+import matplotlib.pyplot as plt
+from PIL import Image
 
 import socket
 import SensorDevice
@@ -31,7 +33,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.sensor = SensorDevice.SensorDevice()
 
         # Variables (initialized with default values)
-        self.IPaddress = '192.168.0.158'  # default
+        self.IPaddress = '192.168.10.38'  # default
         self.portNum: int = 8888
         self.RPiaddress = self.IPaddress + ':' + str(self.portNum)
         self.shutterSpeed: int = 30000
@@ -39,7 +41,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.gainiso: int = 400    # value in the list of combo box
         self.hexLaserPattern: hex = 0x0000    # Hex 4 digits
         self.binLaserPattern: bin = bin(self.hexLaserPattern)
-        self.decLaserPattern: int = int(self.hexLaserPattern)
+        self.laserPattern: int = int(self.hexLaserPattern)
         self.laserX: int = 0    # laser no. when there is only one
 
         # Combo Box
@@ -176,7 +178,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
 
-        self.sensor.get_image(1)    # might be skipped
+        # self.sensor.get_image(1)    # might be skipped
 
         # temp
         self.scene = ImageViewScene.ImageViewScene()
@@ -208,7 +210,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             # https://stackoverflow.com/questions/21879454/how-to-convert-a-hex-string-to-hex-number
             self.hexLaserPattern = hex(int(hex4d, 16))
             self.binLaserPattern = bin(int(hex4d, 16))
-            self.decLaserPattern = int(hex4d, 16)
+            self.laserPattern = int(hex4d, 16)
             laserpattern_print = self.binLaserPattern.replace('0b', '').zfill(16)
             laserpattern_print = laserpattern_print[::-1]
             laserpattern_print_list = [laserpattern_print[:4], laserpattern_print[4:8], laserpattern_print[8:12], laserpattern_print[12:]]
@@ -219,6 +221,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             # self.ui_s.CurrentLaserPattern_value.setText('-'.join(laserpattern_print[::-1]))
             # https://qiita.com/Hawk84/items/ecd0c7239e490ea22308   https://note.nkmk.me/python-string-concat/
             self.ui_s.CurrentLaserPattern_value.setText(laserpattern_print)
+            self.sensor.set_lasers(self.laserPattern)
 
             # for i in range(16):
             #     print(getbit(self.decLaserPattern, i))
@@ -226,9 +229,19 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
     def saveImg(self):
         # self.ui_s.sensorImage.grab().save('imgs/QImage.png')    # https://qiita.com/akegure/items/0bce65da71e64728a307
-        self.img.save('imgs/QPixmap.png')
-
-
+        # self.img.save('imgs/QPixmap.png')
+        img = self.sensor.get_image(1)
+        print(img)
+        img.format = "PNG"
+        img2 = img.get_image()
+        image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
+        pixmap = QtGui.QPixmap(image)
+        print(type(image))
+        self.scene.setPixMap(pixmap)
+        self.ui_s.sensorImage.show()
+        # print(type(img2))
+        # img3 = Image.new('L', (len(img2[0]), len(img2)))
+        # img3.show()
 
 
 
