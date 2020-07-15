@@ -81,7 +81,11 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.offAllLaserButton.clicked.connect(lambda: self.setLaser('0x0000'))
         self.ui_s.setHex4dLaserButton.clicked.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
-        self.ui_s.save1Button.clicked.connect(self.saveImg)
+
+        self.ui_s.prev1Button.clicked.connect(lambda: self.saveImg(1))
+        self.ui_s.prevAveButton.clicked.connect(lambda: self.saveImg(self.frames))
+        self.ui_s.save1Button.clicked.connect(lambda: self.saveImg(1))
+        self.ui_s.saveAveButton.clicked.connect(lambda: self.saveImg(self.frames))
 
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
@@ -109,6 +113,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.portNum = int(d.group(2))
         else:
             self.IPaddress = self.RPiaddress
+
+        self.connectToSensor()
 
     def changeShutter(self):
         if self.ui_s.shutterLineEdit.text() == '':
@@ -184,11 +190,12 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.scene = ImageViewScene.ImageViewScene()
         # self.scene.setSceneRect(QtCore.QRectF(self.rect()))
         self.ui_s.sensorImage.setScene(self.scene)
-        self.img = self.scene.setFile('script/M_TOF_sample_image.png')  # これをget_imageのものにしたい。もしくはこの処理はここではskip
+        # self.img = self.scene.setFile('script/M_TOF_sample_image.png')  # これをget_imageのものにしたい。もしくはこの処理はここではskip
 
         # self.ui_s.sensorImage = ImageViewScene.ImageViewer()
         # self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
-        self.ui_s.sensorImage.show()
+        # self.ui_s.sensorImage.show()
+        self.getImg(self.frames)
 
 
     # def resizeEvent(self, event):   # https://gist.github.com/mieki256/1b73aae707cee97fffab544af9bc0637
@@ -227,21 +234,40 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             #     print(getbit(self.decLaserPattern, i))
             #     print(setbit(self.decLaserPattern, i, int(laserpattern_print[15-i])))
 
-    def saveImg(self):
+    def prevImg(self, frames):
+        self.getImg(frames)
+
+    def saveImg(self, frames):
         # self.ui_s.sensorImage.grab().save('imgs/QImage.png')    # https://qiita.com/akegure/items/0bce65da71e64728a307
         # self.img.save('imgs/QPixmap.png')
-        img = self.sensor.get_image(1)
-        print(img)
+
+        self.getImg(frames)
+        ### add save process
+
+
+
+    def getImg(self, frames):
+        img = self.sensor.get_image(frames)
+        # print(img)
         img.format = "PNG"
         img2 = img.get_image()
         image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
         pixmap = QtGui.QPixmap(image)
-        print(type(image))
-        self.scene.setPixMap(pixmap)
-        self.ui_s.sensorImage.show()
+        # print(type(image))
         # print(type(img2))
         # img3 = Image.new('L', (len(img2[0]), len(img2)))
         # img3.show()
+
+        self.scene.setPixMap(pixmap)
+
+        # self.ui_s.sensorImage.setFixedSize(len(img2[0]), len(img2))
+        # self.ui_s.sensorImage.resize(pixmap.size())
+        self.ui_s.sensorImage.setBaseSize(len(img2[0]), len(img2))
+        self.ui_s.sensorImage.setSceneRect(0, 0, len(img2[0]), len(img2))
+        self.ui_s.sensorImage.fitInView(self.scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+        # self.scene.fitImage()
+
+        self.ui_s.sensorImage.show()
 
 
 
