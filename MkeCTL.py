@@ -25,6 +25,8 @@ class Ui(QtWidgets.QMainWindow):
 
         self.initializeProcessFlag = False
 
+        self.ui.motorConfigration.setEnabled(False)
+
         # IR light
         self.isPortOpen = True
         self.IRport = None
@@ -181,6 +183,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.initializeButton.setEnabled(False)
         self.ui.initializeProgressBar.setEnabled(False)
         self.ui.initializeProgressLabel.setText('Initialized all motors')
+        self.ui.motorConfigration.setEnabled(True)
 
         self.devices['motors'] = self.motors
 
@@ -259,6 +262,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.initializeButton.setEnabled(True)
         self.ui.initializeProgressBar.setValue(0)
         self.ui.initializeProgressLabel.setText('Initializing motors...')
+        self.ui.motorConfigration.setEnabled(False)
 
 
         QtWidgets.QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"

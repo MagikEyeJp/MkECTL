@@ -2,28 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keiganGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/MkeCTL.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MkeCTL.py" beforeDir="false" afterPath="$PROJECT_DIR$/MkeCTL.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mainwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow.ui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mainwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow_ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/20200325/keiganGUI_20200325remote.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/20200325/mainwindow_20200325.ui" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/20200325/mainwindow_20200325_ui.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/20200325/mainwindow_ui.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/keiganGUI_before20200304.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/keiganGUI_before20200323.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/read_script_before20200304.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/read_script_before20200323.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/Sw2.qml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/Sw2Form.ui.qml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/main.pyproject" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/main.pyproject.user" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/sw2.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/sw2.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/sw2.ui" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/sw2_ui.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -446,7 +428,14 @@
       <option name="project" value="LOCAL" />
       <updated>1594810773099</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="keiganGUI-&gt;MkeCTL, delete oldCodes">
+      <created>1595557124466</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1595557124466</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -473,7 +462,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="mainly changed laser control part" />
     <MESSAGE value="mke-sdk" />
     <MESSAGE value="modified and added" />
     <MESSAGE value="added IR serial part" />
@@ -498,14 +486,15 @@
     <MESSAGE value="update README.md (use relative path for images)" />
     <MESSAGE value="add SensorDevice" />
     <MESSAGE value="fix: fit image" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: fit image" />
+    <MESSAGE value="keiganGUI-&gt;MkeCTL, delete oldCodes" />
+    <option name="LAST_COMMIT_MESSAGE" value="keiganGUI-&gt;MkeCTL, delete oldCodes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/MkeCTL.py</url>
-          <line>409</line>
+          <line>413</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>
