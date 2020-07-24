@@ -1,7 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="" />
+    <list default="true" id="c5cad7ff-4bba-43e2-ab59-e5bff94e0900" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/keiganGUI.py" beforeDir="false" afterPath="$PROJECT_DIR$/MkeCTL.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mainwindow.ui" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mainwindow_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/mainwindow_ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/20200325/keiganGUI_20200325remote.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/20200325/mainwindow_20200325.ui" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/20200325/mainwindow_20200325_ui.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/20200325/mainwindow_ui.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/keiganGUI_before20200304.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/keiganGUI_before20200323.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/read_script_before20200304.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/read_script_before20200323.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/Sw2.qml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/Sw2Form.ui.qml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/main.pyproject" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/main.pyproject.user" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/sw2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/sw2.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/sw2.ui" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/oldCodes/sw2/sw2_ui.py" beforeDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +46,7 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/.local/bin/pyuic5" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="run.code.analysis.last.selected.profile" value="aDefault" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
@@ -44,7 +67,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.keiganGUI">
+  <component name="RunManager" selected="Python.MkeCTL">
     <configuration name="ImageViewScene" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="keiganGUI" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -66,7 +89,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="keiganGUI" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="MkeCTL" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="keiganGUI" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -78,7 +101,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/keiganGUI.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/MkeCTL.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -150,9 +173,16 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.ImageViewScene" />
+      <item itemvalue="Python.MkeCTL" />
+      <item itemvalue="Python.keiganGUI_chromebook" />
+      <item itemvalue="Python.motordic" />
+      <item itemvalue="Python.sensors" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.keiganGUI" />
+        <item itemvalue="Python.MkeCTL" />
         <item itemvalue="Python.sensors" />
         <item itemvalue="Python.ImageViewScene" />
         <item itemvalue="Python.motordic" />
@@ -409,7 +439,14 @@
       <option name="project" value="LOCAL" />
       <updated>1593256366746</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="fix: fit image">
+      <created>1594810773098</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1594810773099</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -436,7 +473,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="modified GraphicsViewer part" />
     <MESSAGE value="mainly changed laser control part" />
     <MESSAGE value="mke-sdk" />
     <MESSAGE value="modified and added" />
@@ -461,19 +497,15 @@
     <MESSAGE value="add README.html and .pdf" />
     <MESSAGE value="update README.md (use relative path for images)" />
     <MESSAGE value="add SensorDevice" />
-    <option name="LAST_COMMIT_MESSAGE" value="add SensorDevice" />
+    <MESSAGE value="fix: fit image" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: fit image" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/execute_script.py</url>
-          <line>229</line>
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/keiganGUI.py</url>
-          <line>404</line>
+          <url>file://$PROJECT_DIR$/MkeCTL.py</url>
+          <line>409</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
       </breakpoints>

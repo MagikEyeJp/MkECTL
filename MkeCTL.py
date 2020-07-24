@@ -1,37 +1,59 @@
+#!/usr/bin/env python3
+# coding: utf-8
 from PyQt5 import QtWidgets, uic, QtGui, QtCore
 import sys
 import time
 import os
-import math
 import re
+import serial
+import MyDoubleSpinBox
 
 import motordic
 import mainwindow_ui
-# import read_script
 import execute_script
+import execute_script2
+import sensors
+
 
 class Ui(QtWidgets.QMainWindow):
-    def __init__(self):
-        super(Ui, self).__init__()
-        self.ui = mainwindow_ui.Ui_keigan()
+    def __init__(self, parent=None):
+        super(Ui, self).__init__(parent)
+        self.ui = mainwindow_ui.Ui_mainwindow()
         self.ui.setupUi(self)
 
-        self.subWindow = SensorWindow()  # 20200325remote
+        self.subWindow = sensors.SensorWindow()
 
         self.initializeProcessFlag = False
+
+        # IR light
+        self.isPortOpen = True
+        self.IRport = None
+        # self.openIR('/dev/ttyACM0')
+
+        # 画面サイズを取得 (a.desktop()は QtWidgets.QDesktopWidget )  https://ja.stackoverflow.com/questions/44060/pyqt5%E3%81%A7%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AE%E4%B8%AD%E5%A4%AE%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%97%E3%81%9F%E3%81%84
+        a = QtWidgets.qApp
+        desktop = a.desktop()
+        self.geometry = desktop.screenGeometry()
+        # ウインドウサイズ(枠込)を取得
+        self.framesize = self.frameSize()
+        # ウインドウの位置を指定
+        # self.move(geometry.width() / 2 - framesize.width() / 2, geometry.height() / 2 - framesize.height() / 2)
+        self.move(self.geometry.width() / 2 - self.framesize.width(), self.geometry.height() / 2 - self.framesize.height() / 2)
 
         # variables
         self.params = {}  # motorDic
         self.scriptName: str = ''
         self.motorSet = ['slider', 'pan', 'tilt']
-        self.devices: dict = {}  # 'motors', 'lights', 'laser' etc.  # Dict of dictionaries
+        self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
         self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin'  # GUI objects related to motors  # Dict of dictionaries
+        self.subWindow_isOpen = False
+
+        self.devices['3Dsensors'] = self.subWindow  # 荒業
 
         self.make_motorGUI()
 
         # connect to exeButtonClicked
-
         # self.ui.sliderMoveExe.clicked.connect(lambda: self.exeButtonClicked('sliderMoveExe'))
         # self.ui.panMoveExe.clicked.connect(lambda: self.exeButtonClicked('panMoveExe'))
         # self.ui.tiltMoveExe.clicked.connect(lambda: self.exeButtonClicked('tiltMoveExe'))
@@ -47,13 +69,20 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.initializeButton.clicked.connect(self.initializeMotors)
         # self.ui.initializeButton.clicked.connect(self.grayOut)
         self.ui.MagikEye.clicked.connect(self.demo)
-        self.ui.selectScriptButton.clicked.connect(self.openFile)
-        self.ui.executeScriptButton.clicked.connect(self.run_script)
-        self.ui.setAsHomeButton.clicked.connect(self.setHome)
-        self.ui.goHomeButton.clicked.connect(self.goHome)
-
+        self.ui.selectScript_toolButton.clicked.connect(self.openFile)
+        self.ui.executeScript_button.clicked.connect(lambda: self.run_script(False))
+        self.ui.continueButton.clicked.connect(lambda: self.run_script(True))
+        self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(self.geometry, self.framesize))
         self.ui.sliderOriginButton.clicked.connect(self.setSliderOrigin)
         self.ui.freeButton.clicked.connect(self.freeAllMotors)
+        self.ui.onL1Button.clicked.connect(lambda: self.IRlightControl('A'))
+        self.ui.offL1Button.clicked.connect(lambda: self.IRlightControl('a'))
+        self.ui.onL2Button.clicked.connect(lambda: self.IRlightControl('B'))
+        self.ui.offL2Button.clicked.connect(lambda: self.IRlightControl('b'))
+        self.ui.setAsHomeButton.clicked.connect(self.setHome)
+        self.ui.goHomeButton.clicked.connect(self.goHome)
+        self.ui.saveButton.clicked.connect(self.savePositions)
+        self.ui.GoButton.clicked.connect(self.goToSavedPositions)
 
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
@@ -62,20 +91,16 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.presetValue.setValidator(QtGui.QDoubleValidator(-100.0, 2100.0, 2, self.ui.presetValue))
 
         # spinbox returnPressed
-
         self.ui.sliderPosSpin.setKeyboardTracking(False)
         self.ui.sliderPosSpin.valueChanged.connect(lambda: self.exeButtonClicked('sliderMoveExe'))
+        self.ui.sliderPosSpin.returnPressed.connect(lambda: self.exeButtonClicked('sliderMoveExe'))
         self.ui.panPosSpin.setKeyboardTracking(False)
         self.ui.panPosSpin.valueChanged.connect(lambda: self.exeButtonClicked('panMoveExe'))
+        self.ui.panPosSpin.returnPressed.connect(lambda: self.exeButtonClicked('panMoveExe'))
         self.ui.tiltPosSpin.setKeyboardTracking(False)
         self.ui.tiltPosSpin.valueChanged.connect(lambda: self.exeButtonClicked('tiltMoveExe'))
-        # for m_name in self.motorSet:
-        #     code_keytrack: str = 'self.motorGUI[\'posSpin\'][\'%s\'].setKeyboardTracking(False)' % m_name
-        #     code_valuechange: str = 'self.motorGUI[\'posSpin\'][\'%s\'].valueChanged.connect' \
-        #                           '(lambda: self.exeButtonClicked(self.motorGUI[\'exe\'][\'%s\'].objectName()))' \
-        #                           % (m_name, m_name)
-        #     exec(code_keytrack)
-        #     exec(code_valuechange)
+        self.ui.tiltPosSpin.returnPressed.connect(lambda: self.exeButtonClicked('tiltMoveExe'))
+
         self.ui.presetValue.returnPressed.connect(lambda: self.exeButtonClicked('presetExe'))
 
         # update speed
@@ -86,14 +111,24 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.tiltSpeedSpin.setKeyboardTracking(False)
         self.ui.tiltSpeedSpin.valueChanged.connect(lambda: self.updateSpeed('tiltSpeedSpin'))
 
-    def get_keys_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
-        return [k for k, v in d.items() if v == val]
+    def get_key_from_value(self, d, val):   # https://note.nkmk.me/python-dict-get-key-from-value/
+        keys = [k for k, v in d.items() if v == val]
+        if keys:
+            return keys[0]
+        return None
+
+    def closeEvent(self, event):  # https://www.qtcentre.org/threads/20895-PyQt4-Want-to-connect-a-window-s-close-button
+        self.deleteLater()
+        event.accept()
+        self.subWindow.close()  # mainwindowが閉じたらsubwindowも閉じる
+        exit()
 
     def make_motorGUI(self):  # 20200304remote
         # make dictionaries of member valuables
         exeButtons: dict = {}
         posSpinboxes: dict = {}
         speedSpinboxes: dict = {}
+        currentPosLabels: dict = {}
 
         for m_name in self.motorSet:
             # https://teratail.com/questions/51674
@@ -103,11 +138,13 @@ class Ui(QtWidgets.QMainWindow):
             exec(posSpinCode)
             speedSpinCode = '%s[\'%s\'] = %s%s%s' % ('speedSpinboxes', m_name, 'self.ui.', m_name, 'SpeedSpin')  # speedSpinboxes[~~] = self.ui.~~SpeedSpin
             exec(speedSpinCode)
-
+            speedSpinCode = '%s[\'%s\'] = %s%s%s' % ('currentPosLabels', m_name, 'self.ui.', m_name, 'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
+            exec(speedSpinCode)
 
         self.motorGUI['exe'] = exeButtons  # ex.) motorGUI['exe']['slider'] == self.ui.sliderMoveExe
         self.motorGUI['posSpin'] = posSpinboxes  # ex.) motorGUI['posSpin']['slider'] == self.ui.sliderPosSpin
         self.motorGUI['speedSpin'] = speedSpinboxes  # ex.) motorGUI['speedSpin']['slider'] == self.ui.sliderSpeedSpin
+        self.motorGUI['currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
     def grayOut(self):  # for trial
         self.ui.robotControl.setEnabled(False)
@@ -121,6 +158,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.initializeProgressLabel.setEnabled(True)
         count += 10
         self.ui.initializeProgressBar.setValue(count)
+
         self.params = motordic.getMotorDic()
 
         for p in self.params.values():  # https://note.nkmk.me/python-dict-in-values-items/
@@ -129,15 +167,8 @@ class Ui(QtWidgets.QMainWindow):
             m.enable()
             m.interface(8)  # USB
 
-            if p['id'] == 'slider':
-                m.speed(self.ui.sliderSpeedSpin.value())
-                print('slider speed  = ' + str(self.ui.sliderSpeedSpin.value()) + 'rad/s')
-            elif p['id'] == 'pan':
-                m.speed(self.ui.panSpeedSpin.value())
-                print('pan speed = ' + str(self.ui.panSpeedSpin.value()) + 'rad/s')
-            elif p['id'] == 'tilt':
-                m.speed(self.ui.tiltSpeedSpin.value())
-                print('tilt speed = ' + str(self.ui.tiltSpeedSpin.value()) + 'rad/s')
+            m.speed(self.motorGUI['speedSpin'][p['id']].value())
+            print(p['id'] + 'speed  = ' + str(self.motorGUI['speedSpin'][p['id']].value()) + 'rad/s')
 
             self.motors[p['id']] = m    # member valuable of class
 
@@ -148,9 +179,13 @@ class Ui(QtWidgets.QMainWindow):
         print('--initialization completed--')
         self.ui.initializeProgressBar.setValue(100)
         self.ui.initializeButton.setEnabled(False)
+        self.ui.initializeProgressBar.setEnabled(False)
         self.ui.initializeProgressLabel.setText('Initialized all motors')
 
         self.devices['motors'] = self.motors
+
+        # IR light
+        self.openIR('/dev/ttyACM0')
 
     def setSliderOrigin(self):
         m = self.motors['slider']  # 20200304remote
@@ -179,13 +214,6 @@ class Ui(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
 
     def freeAllMotors(self):
-        # print('FREE All Motors Button was clicked')
-        # freeall.freeAllMotors()
-        # m = self.params['slider']['cont']
-        # for p in self.params.values():
-        #     m = p['cont']
-        #     m.free()
-
         for m in self.motors.values():
             m.free()
         QtWidgets.QMessageBox.information(self, "free", "All motors have been freed.")
@@ -208,6 +236,8 @@ class Ui(QtWidgets.QMainWindow):
             # m.speed(self.motorGUI['speedSpin'][motorID].value())
             m.moveTo(motorPos * scale)
 
+            self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(motorPos))
+
         elif buttonName == 'presetExe':
             motorID = self.ui.presetMotorCombo.currentText()
             m = self.motors[motorID]
@@ -219,7 +249,7 @@ class Ui(QtWidgets.QMainWindow):
 
             self.motorGUI['posSpin'][motorID].setValue(pos)
 
-            print('preset position of ' + motorID + ' as ' + str(pos))
+            self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(pos))
 
     def rebootButtonClicked(self):
         for m in self.motors.values():
@@ -266,41 +296,32 @@ class Ui(QtWidgets.QMainWindow):
         else:
             execute_script.execute_script(demo_script, self.devices, self.params)
 
-            # args_hist: list = read_script.execute_script(demo_script, self.motors)
-            # # print(args_hist)
-            # for args_i in range(len(args_hist)):  # https://stackoverflow.com/questions/55117021/python-warning-expected-collection-iterable-got-int-instead
-            #     for param_i in range(args_hist[args_i].size):
-            #         m = self.params[self.motorSet[param_i]]['cont']
-            #         scale = self.params[self.motorSet[param_i]]['scale']
-            #         motorPos = args_hist[args_i][param_i]
-            #         m.speed(self.ui.sliderSpeedSpin.value())
-            #         print(self.motorSet[param_i] + str(motorPos))
-            #
-            #         m.moveTo(motorPos * scale)
-            #         time.sleep(0.2)
-            #
-            #         while True:
-            #             (pos, vel, torque) = m.read_motor_measurement()
-            #             if math.fabs(pos - motorPos * scale) < 0.1:
-            #                 print(pos)
-            #                 print(torque)
-            #                 break
-
     def keyPressEvent(self, event):
         key = event.key()
         if key == QtCore.Qt.Key_Escape:
             self.close()
 
-    def run_script(self):
-        self.showSubWindow()    # 20200325remote
-        execute_script.execute_script(self.scriptName, self.devices, self.params)
+    def run_script(self, isContinue):
+        if self.scriptName == '':
+            QtWidgets.QMessageBox.critical(self, "Cannot open a file", 'Please select a script.')
+        elif not self.scriptName.endswith('.txt'):  # https://pg-chain.com/python-endswith
+            QtWidgets.QMessageBox.critical(self, "Cannot open a file", 'Please select a text file.')
+        else:
+            self.showSubWindow(self.geometry, self.framesize)
+            if isContinue:
+                execute_script2.execute_script2(self.scriptName, self.devices, self.params)
+            else:
+                execute_script.execute_script(self.scriptName, self.devices, self.params)
 
     def setHome(self):  # 20200325remote
-        for m in self.motors:
+        for m in self.devices['motors'].values():
             m.presetPosition(0.0)
-            self.motorGUI['posSpin'][self.get_keys_from_value(self.motors, m)].setValue(0.0)
+            self.motorGUI['posSpin'][self.get_key_from_value(self.devices['motors'], m)].setValue(0.0)
+
+            self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText('{:.2f}'.format(0.0))
 
     def goHome(self):   # 20200325remote
+        print('Going Home')
         self.ui.initializeProgressBar.setEnabled(True)
         self.ui.initializeProgressLabel.setEnabled(True)
         self.ui.initializeProgressLabel.setText('Moving motors to Home position...')
@@ -339,19 +360,56 @@ class Ui(QtWidgets.QMainWindow):
                 break
             percentToGoal = 0.0
 
-    def showSubWindow(self):  # 20200325remote
+        for m in self.devices['motors'].values():
+            self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText('{:.2f}'.format(0.0))
+
+
+    def savePositions(self):
+        save_name = ''
+        for posspin in self.motorGUI['posSpin'].values():
+            save_name += str('{:.2f}'.format(posspin.value())) + ' '
+            save_name.strip()  # https://itsakura.com/python-strip#s2
+        if not save_name in [self.ui.savedPosCombo.itemText(i) for i in range(self.ui.savedPosCombo.count())]:  # https://stackoverflow.com/questions/7479915/getting-all-items-of-qcombobox-pyqt4-python
+            self.ui.savedPosCombo.addItem(save_name)
+        print(save_name)
+
+    def goToSavedPositions(self):
+        pos = self.ui.savedPosCombo.currentText().split()  # list
+        for i in range(len(self.motorSet)):
+            self.devices['motors'][self.motorSet[i]].moveTo_scaled(float(pos[i]))
+            self.motorGUI['currentPosLabel'][self.motorSet[i]].setText('{:.2f}'.format(float(pos[i])))
+
+    def showSubWindow(self, geometry, framesize):
         self.subWindow.show()
+        self.subWindow.move(geometry.width() / 2 - framesize.width() / 16, geometry.height() / 2 - framesize.height() / 3)
+        self.subWindow_isOpen = True
 
-class SensorWindow(QtWidgets.QWiget):   # 20200325remote https://teratail.com/questions/118024
-    def __init__(self):
-        super().__init__()
-        self.initUI()
+    def openIR(self, tty):
+        # https://qiita.com/macha1972/items/4869b71c14d25fa5b8f8
+        try:
+            self.IRport = serial.Serial(tty, 1)
+            self.isPortOpen = True
+            self.devices['lights'] = self.IRport
 
-    def initUI(self):
-        pass
-        # """新しいウィンドウのウィジットに関する記述"""
+            self.ui.IRstateLabel.setText('IR lights \n are ready.')
+        except Exception as e:
+            # QtWidgets.QMessageBox.critical(self, 'IR port open', 'Could not open port of IR lights')
+            print(e)
+            self.isPortOpen = False
+            self.ui.IRstateLabel.setText('Cannot open \n ' + tty + '.')
+
+    def IRlightControl(self, serial):
+        if self.isPortOpen:
+            self.IRport.write(serial)
+        else:
+            print('could not send ' + serial)
+
 
 app = QtWidgets.QApplication(sys.argv)
-window = Ui()
-window.show()
+keiganWindow = Ui()
+keiganWindow.show()
+# sensorWindow = SensorWindow()
 app.exec_()
+
+# if keiganWindow.ui.dummyMode.isEnabled():
+#     keiganWindow.ui.sliderCurrentLabel.setText(keiganWindow.devices['motors']['slider'].m_posion)

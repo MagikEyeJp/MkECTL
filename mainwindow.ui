@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>keigan</class>
- <widget class="QMainWindow" name="keigan">
+ <class>mainwindow</class>
+ <widget class="QMainWindow" name="mainwindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>keiganGUI</string>
+   <string>MkeCTL</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="robotControl">
