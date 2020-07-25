@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>MkeCTL</string>
+   <string>MkECTL</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="robotControl">
@@ -588,7 +588,7 @@
        <enum>QComboBox::InsertAtBottom</enum>
       </property>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>10</x>
