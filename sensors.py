@@ -82,10 +82,12 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.setHex4dLaserButton.clicked.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
 
-        self.ui_s.prev1Button.clicked.connect(lambda: self.saveImg(1))
-        self.ui_s.prevAveButton.clicked.connect(lambda: self.saveImg(self.frames))
+        self.ui_s.prev1Button.clicked.connect(lambda: self.prevImg(1))
+        self.ui_s.prevAveButton.clicked.connect(lambda: self.prevImg(self.frames))
         self.ui_s.save1Button.clicked.connect(lambda: self.saveImg(1))
         self.ui_s.saveAveButton.clicked.connect(lambda: self.saveImg(self.frames))
+
+        self.ui_s.selectDirectoryButton.clicked.connect(self.selectDirectory)
 
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
@@ -172,10 +174,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # self.sensor = SensorDevice.SensorDevice()
 
         try:
-            # 時間がかかる 特にreconnect
-            # self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            # self.conn.connect((self.IPaddress, self.portNum))
-
             self.sensor.close()   # for when reconnecting
 
             self.sensor.open(self.IPaddress, self.portNum)
@@ -184,23 +182,17 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
 
-        # self.sensor.get_image(1)    # might be skipped
 
         # temp
         self.scene = ImageViewScene.ImageViewScene()
         # self.scene.setSceneRect(QtCore.QRectF(self.rect()))
         self.ui_s.sensorImage.setScene(self.scene)
-        # self.img = self.scene.setFile('script/M_TOF_sample_image.png')  # これをget_imageのものにしたい。もしくはこの処理はここではskip
 
         # self.ui_s.sensorImage = ImageViewScene.ImageViewer()
         # self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
         # self.ui_s.sensorImage.show()
         self.getImg(self.frames)
 
-
-    # def resizeEvent(self, event):   # https://gist.github.com/mieki256/1b73aae707cee97fffab544af9bc0637
-    #     """ リサイズ時に呼ばれる処理 """
-    #     super(SensorWindow, self).resizeEvent(event)
 
     def laser_custom(self):
         if self.ui_s.hex4dCheckBox.isChecked():
@@ -238,12 +230,13 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.getImg(frames)
 
     def saveImg(self, frames):
-        # self.ui_s.sensorImage.grab().save('imgs/QImage.png')    # https://qiita.com/akegure/items/0bce65da71e64728a307
-        # self.img.save('imgs/QPixmap.png')
+        pixmap = self.getImg(frames)
+        pixmap.save('QPixmap.png')
 
-        self.getImg(frames)
-        ### add save process
-
+    def selectDirectory(self):
+        dir_path = QtWidgets.QFileDialog.getExistingDirectory(self)
+        print(dir_path)
+        self.ui_s.saveDirecoryName.setText(dir_path)
 
 
     def getImg(self, frames):
@@ -268,6 +261,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # self.scene.fitImage()
 
         self.ui_s.sensorImage.show()
+
+        return pixmap
 
 
 

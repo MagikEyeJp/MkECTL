@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>673</width>
-    <height>573</height>
+    <width>560</width>
+    <height>576</height>
    </rect>
   </property>
   <property name="font">
@@ -27,8 +27,8 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>631</width>
-      <height>371</height>
+      <width>521</width>
+      <height>381</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -88,10 +88,10 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>200</y>
-       <width>441</width>
-       <height>161</height>
+       <x>160</x>
+       <y>20</y>
+       <width>201</width>
+       <height>135</height>
       </rect>
      </property>
      <property name="autoFillBackground">
@@ -112,10 +112,10 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>50</y>
+        <x>10</x>
+        <y>43</y>
         <width>181</width>
-        <height>94</height>
+        <height>91</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -226,8 +226,8 @@
      <widget class="QLabel" name="setSpeedLabel">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>30</y>
+        <x>10</x>
+        <y>25</y>
         <width>100</width>
         <height>16</height>
        </rect>
@@ -246,233 +246,15 @@
        </font>
       </property>
       <property name="text">
-       <string>Set speed</string>
+       <string>Speed</string>
       </property>
-     </widget>
-     <widget class="QLabel" name="presetLabel">
-      <property name="geometry">
-       <rect>
-        <x>220</x>
-        <y>30</y>
-        <width>69</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>70</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <family>Ubuntu</family>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Preset</string>
-      </property>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>220</x>
-        <y>110</y>
-        <width>108</width>
-        <height>46</height>
-       </rect>
-      </property>
-      <layout class="QGridLayout" name="homeGridLayout">
-       <item row="0" column="0">
-        <widget class="QPushButton" name="setAsHomeButton">
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="resources.qrc">
-           <normaloff>:/GUI_icons/setHome.png</normaloff>:/GUI_icons/setHome.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="goHomeButton">
-         <property name="minimumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="resources.qrc">
-           <normaloff>:/GUI_icons/goTo.png</normaloff>:/GUI_icons/goTo.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>30</width>
-           <height>30</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QLabel" name="originLabel">
-      <property name="geometry">
-       <rect>
-        <x>220</x>
-        <y>90</y>
-        <width>69</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>70</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <family>Ubuntu</family>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Origin</string>
-      </property>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>220</x>
-        <y>50</y>
-        <width>211</width>
-        <height>38</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QComboBox" name="presetMotorCombo">
-         <property name="maximumSize">
-          <size>
-           <width>70</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <item>
-          <property name="text">
-           <string>slider</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>pan</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>tilt</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLineEdit" name="presetValue">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="unitLabel">
-           <property name="minimumSize">
-            <size>
-             <width>30</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>mm</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QPushButton" name="presetExe">
-         <property name="maximumSize">
-          <size>
-           <width>24</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="resources.qrc">
-           <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
-         </property>
-         <property name="autoDefault">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>480</x>
-       <y>220</y>
+       <x>370</x>
+       <y>50</y>
        <width>131</width>
        <height>101</height>
       </rect>
@@ -541,17 +323,17 @@
       </item>
      </layout>
     </widget>
-    <widget class="QGroupBox" name="motorConfigration">
+    <widget class="QGroupBox" name="manualOperation">
      <property name="geometry">
       <rect>
-       <x>150</x>
-       <y>30</y>
-       <width>471</width>
-       <height>181</height>
+       <x>10</x>
+       <y>140</y>
+       <width>491</width>
+       <height>231</height>
       </rect>
      </property>
      <property name="title">
-      <string>Motor Configuration</string>
+      <string>Manual Operation</string>
      </property>
      <property name="checkable">
       <bool>false</bool>
@@ -559,10 +341,10 @@
      <widget class="QPushButton" name="saveButton">
       <property name="geometry">
        <rect>
-        <x>400</x>
-        <y>130</y>
+        <x>406</x>
+        <y>134</y>
         <width>51</width>
-        <height>21</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -572,9 +354,9 @@
      <widget class="QComboBox" name="savedPosCombo">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>150</y>
-        <width>181</width>
+        <x>184</x>
+        <y>160</y>
+        <width>291</width>
         <height>25</height>
        </rect>
       </property>
@@ -663,7 +445,7 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>184</x>
         <y>30</y>
         <width>297</width>
         <height>92</height>
@@ -804,8 +586,8 @@
      <widget class="QLabel" name="savedPositionslabel">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>130</y>
+        <x>184</x>
+        <y>140</y>
         <width>211</width>
         <height>16</height>
        </rect>
@@ -817,11 +599,17 @@
      <widget class="QPushButton" name="GoButton">
       <property name="geometry">
        <rect>
-        <x>350</x>
-        <y>150</y>
+        <x>456</x>
+        <y>134</y>
         <width>24</width>
         <height>24</height>
        </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
       <property name="maximumSize">
        <size>
@@ -839,6 +627,226 @@
       <property name="autoDefault">
        <bool>true</bool>
       </property>
+     </widget>
+     <widget class="QLabel" name="originLabel">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>195</y>
+        <width>51</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>70</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Ubuntu</family>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Origin</string>
+      </property>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>404</x>
+        <y>190</y>
+        <width>71</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="homeGridLayout">
+       <item row="0" column="1">
+        <widget class="QPushButton" name="goHomeButton">
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/GUI_icons/goTo.png</normaloff>:/GUI_icons/goTo.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="setAsHomeButton">
+         <property name="minimumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/GUI_icons/setHome.png</normaloff>:/GUI_icons/setHome.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>129</y>
+        <width>131</width>
+        <height>64</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="presetLabel">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>70</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Ubuntu</family>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Preset</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="presetMotorCombo">
+           <property name="maximumSize">
+            <size>
+             <width>70</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <item>
+            <property name="text">
+             <string>slider</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>pan</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>tilt</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLineEdit" name="presetValue">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="unitLabel">
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>mm</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QPushButton" name="presetExe">
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
+           </property>
+           <property name="autoDefault">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QPushButton" name="initializeButton">
@@ -1309,7 +1317,7 @@
    <widget class="QPushButton" name="MagikEye">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>440</x>
       <y>10</y>
       <width>101</width>
       <height>25</height>
@@ -1326,13 +1334,13 @@
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>410</y>
-      <width>331</width>
+      <y>420</y>
+      <width>271</width>
       <height>111</height>
      </rect>
     </property>
     <property name="title">
-     <string>Scripting</string>
+     <string>Script</string>
     </property>
     <widget class="QLabel" name="showScriptName_label">
      <property name="geometry">
@@ -1350,7 +1358,7 @@
     <widget class="QPushButton" name="executeScript_button">
      <property name="geometry">
       <rect>
-       <x>210</x>
+       <x>226</x>
        <y>80</y>
        <width>24</width>
        <height>24</height>
@@ -1369,7 +1377,7 @@
       <rect>
        <x>10</x>
        <y>50</y>
-       <width>311</width>
+       <width>241</width>
        <height>26</height>
       </rect>
      </property>
@@ -1389,6 +1397,10 @@
         <property name="text">
          <string>...</string>
         </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/GUI_icons/049-folder-open.png</normaloff>:/GUI_icons/049-folder-open.png</iconset>
+        </property>
        </widget>
       </item>
      </layout>
@@ -1396,7 +1408,7 @@
     <widget class="QPushButton" name="continueButton">
      <property name="geometry">
       <rect>
-       <x>118</x>
+       <x>134</x>
        <y>80</y>
        <width>91</width>
        <height>24</height>
@@ -1423,7 +1435,7 @@
    <widget class="QPushButton" name="viewSensorWinButton">
     <property name="geometry">
      <rect>
-      <x>410</x>
+      <x>310</x>
       <y>10</y>
       <width>121</width>
       <height>25</height>
@@ -1885,7 +1897,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>410</y>
+      <y>420</y>
       <width>231</width>
       <height>111</height>
      </rect>
@@ -2017,7 +2029,7 @@
        <x>10</x>
        <y>70</y>
        <width>211</width>
-       <height>31</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -2035,7 +2047,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>673</width>
+     <width>560</width>
      <height>22</height>
     </rect>
    </property>

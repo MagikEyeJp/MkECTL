@@ -529,7 +529,7 @@
        <property name="minimumSize">
         <size>
          <width>240</width>
-         <height>200</height>
+         <height>240</height>
         </size>
        </property>
        <property name="title">
@@ -557,7 +557,11 @@
           </rect>
          </property>
          <property name="text">
-          <string>1</string>
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/GUI_icons/014-image.png</normaloff>:/GUI_icons/014-image.png</iconset>
          </property>
         </widget>
         <widget class="QPushButton" name="prevAveButton">
@@ -570,7 +574,11 @@
           </rect>
          </property>
          <property name="text">
-          <string>#</string>
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/GUI_icons/015-images.png</normaloff>:/GUI_icons/015-images.png</iconset>
          </property>
         </widget>
        </widget>
@@ -596,7 +604,11 @@
           </rect>
          </property>
          <property name="text">
-          <string>#</string>
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/GUI_icons/015-images.png</normaloff>:/GUI_icons/015-images.png</iconset>
          </property>
         </widget>
         <widget class="QPushButton" name="save1Button">
@@ -609,7 +621,11 @@
           </rect>
          </property>
          <property name="text">
-          <string>1</string>
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/GUI_icons/014-image.png</normaloff>:/GUI_icons/014-image.png</iconset>
          </property>
         </widget>
        </widget>
@@ -696,6 +712,36 @@
           </widget>
          </item>
         </layout>
+       </widget>
+       <widget class="QToolButton" name="selectDirectoryButton">
+        <property name="geometry">
+         <rect>
+          <x>190</x>
+          <y>200</y>
+          <width>26</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/GUI_icons/049-folder-open.png</normaloff>:/GUI_icons/049-folder-open.png</iconset>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="saveDirecoryName">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>200</y>
+          <width>161</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
        </widget>
       </widget>
      </item>

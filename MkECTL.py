@@ -25,7 +25,7 @@ class Ui(QtWidgets.QMainWindow):
 
         self.initializeProcessFlag = False
 
-        self.ui.motorConfigration.setEnabled(False)
+        self.ui.manualOperation.setEnabled(False)
 
         # IR light
         self.isPortOpen = True
@@ -51,7 +51,7 @@ class Ui(QtWidgets.QMainWindow):
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin'  # GUI objects related to motors  # Dict of dictionaries
         self.subWindow_isOpen = False
 
-        self.devices['3Dsensors'] = self.subWindow  # 荒業
+        self.devices['3Dsensors'] = self.subWindow
 
         self.make_motorGUI()
 
@@ -77,10 +77,10 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(self.geometry, self.framesize))
         self.ui.sliderOriginButton.clicked.connect(self.setSliderOrigin)
         self.ui.freeButton.clicked.connect(self.freeAllMotors)
-        self.ui.onL1Button.clicked.connect(lambda: self.IRlightControl('A'))
-        self.ui.offL1Button.clicked.connect(lambda: self.IRlightControl('a'))
-        self.ui.onL2Button.clicked.connect(lambda: self.IRlightControl('B'))
-        self.ui.offL2Button.clicked.connect(lambda: self.IRlightControl('b'))
+        self.ui.onL1Button.clicked.connect(lambda: self.IRlightControl(1, True))
+        self.ui.offL1Button.clicked.connect(lambda: self.IRlightControl(1, False))
+        self.ui.onL2Button.clicked.connect(lambda: self.IRlightControl(2, True))
+        self.ui.offL2Button.clicked.connect(lambda: self.IRlightControl(2, False))
         self.ui.setAsHomeButton.clicked.connect(self.setHome)
         self.ui.goHomeButton.clicked.connect(self.goHome)
         self.ui.saveButton.clicked.connect(self.savePositions)
@@ -125,7 +125,7 @@ class Ui(QtWidgets.QMainWindow):
         self.subWindow.close()  # mainwindowが閉じたらsubwindowも閉じる
         exit()
 
-    def make_motorGUI(self):  # 20200304remote
+    def make_motorGUI(self):
         # make dictionaries of member valuables
         exeButtons: dict = {}
         posSpinboxes: dict = {}
@@ -183,7 +183,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.initializeButton.setEnabled(False)
         self.ui.initializeProgressBar.setEnabled(False)
         self.ui.initializeProgressLabel.setText('Initialized all motors')
-        self.ui.motorConfigration.setEnabled(True)
+        self.ui.manualOperation.setEnabled(True)
 
         self.devices['motors'] = self.motors
 
@@ -191,7 +191,7 @@ class Ui(QtWidgets.QMainWindow):
         self.openIR('/dev/ttyACM0')
 
     def setSliderOrigin(self):
-        m = self.motors['slider']  # 20200304remote
+        m = self.motors['slider']
         # m = self.params['slider']['cont']
         # scale = self.params['slider']['scale']
         m.speed(10.0)
@@ -230,7 +230,7 @@ class Ui(QtWidgets.QMainWindow):
 
     def exeButtonClicked(self, buttonName):
         # print(buttonName)  # type->str
-        # if buttonName == '.+MoveExe':  # 20200304remote
+        # if buttonName == '.+MoveExe':
         if re.search('.+MoveExe', buttonName):
             motorID = buttonName.replace('MoveExe', '')
             m = self.motors[motorID]
@@ -262,7 +262,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.initializeButton.setEnabled(True)
         self.ui.initializeProgressBar.setValue(0)
         self.ui.initializeProgressLabel.setText('Initializing motors...')
-        self.ui.motorConfigration.setEnabled(False)
+        self.ui.manualOperation.setEnabled(False)
 
 
         QtWidgets.QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
@@ -317,14 +317,14 @@ class Ui(QtWidgets.QMainWindow):
             else:
                 execute_script.execute_script(self.scriptName, self.devices, self.params)
 
-    def setHome(self):  # 20200325remote
+    def setHome(self):
         for m in self.devices['motors'].values():
             m.presetPosition(0.0)
             self.motorGUI['posSpin'][self.get_key_from_value(self.devices['motors'], m)].setValue(0.0)
 
             self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText('{:.2f}'.format(0.0))
 
-    def goHome(self):   # 20200325remote
+    def goHome(self):
         print('Going Home')
         self.ui.initializeProgressBar.setEnabled(True)
         self.ui.initializeProgressLabel.setEnabled(True)
@@ -391,20 +391,23 @@ class Ui(QtWidgets.QMainWindow):
     def openIR(self, tty):
         # https://qiita.com/macha1972/items/4869b71c14d25fa5b8f8
         try:
-            self.IRport = serial.Serial(tty, 1)
+            self.IRport = serial.Serial(tty, 115200)
             self.isPortOpen = True
             self.devices['lights'] = self.IRport
 
-            self.ui.IRstateLabel.setText('IR lights \n are ready.')
+            self.ui.IRstateLabel.setText('IR lights are ready.')
         except Exception as e:
             # QtWidgets.QMessageBox.critical(self, 'IR port open', 'Could not open port of IR lights')
             print(e)
             self.isPortOpen = False
             self.ui.IRstateLabel.setText('Cannot open \n ' + tty + '.')
 
-    def IRlightControl(self, serial):
+    def IRlightControl(self, ch, state):
         if self.isPortOpen:
-            self.IRport.write(serial)
+            cmd = ord('A') if state else ord('a')
+            if 0 < ch < 3:
+                cmd = cmd + ch - 1
+            self.IRport.write(bytes([cmd]))
         else:
             print('could not send ' + serial)
 

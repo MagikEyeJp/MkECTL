@@ -6,5 +6,8 @@
         <file>GUI_icons/lightOFF.png</file>
         <file>GUI_icons/lightON.png</file>
         <file>GUI_icons/setHome.png</file>
+        <file>GUI_icons/014-image.png</file>
+        <file>GUI_icons/015-images.png</file>
+        <file>GUI_icons/049-folder-open.png</file>
     </qresource>
 </RCC>

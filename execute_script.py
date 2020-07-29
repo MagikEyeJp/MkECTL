@@ -355,7 +355,10 @@ def snap_image(args, devices, params):
 
     devices['3Dsensors'].imgPath = systate.ymd + '_' + str(systate.dir_num) + '/' + fileName[0]
     # print(devices['3Dsensors'].imgPath)
-    devices['3Dsensors'].img.save(devices['3Dsensors'].imgPath)
+    # devices['3Dsensors'].img.save(devices['3Dsensors'].imgPath)
+
+    pixmap = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
+    pixmap.save(devices['3Dsensors'].imgPath)
 
     systate.seqn += 1
 
@@ -442,7 +445,7 @@ def set_lasers(args, devices, params):
     devices['3Dsensors'].laserX = args[0]
 
     ### Request to set lasers (args[0])
-
+    devices['3Dsensors'].sensor.set_lasers(int(args[0]))
 
 
 def set_light(args, devices, params):
@@ -450,19 +453,26 @@ def set_light(args, devices, params):
     app.processEvents()
     global systate
 
-    if (args[1] == 1):
-        try:
-            # https://miyayamo.com/post-1924/
-            devices['lights'].write(string.ascii_uppercase[args[0] - 1])  # A or B
-        except Exception as e:
-            print('cannot send serial ' + string.ascii_uppercase[args[0] - 1])
-        print('light ' + str(args[0]) + ' : ON')
-    else:
-        try:
-            devices['lights'].write(string.ascii_lowercase[args[0] - 1])  # a or b
-        except Exception as e:
-            print('cannot send serial ' + string.ascii_lowercase[args[0] - 1])
-        print('light ' + str(args[0]) + ' : OFF')
+    ch = int(args[0])
+
+    cmd = ord('A') if int(args[1]) > 0 else ord('a')
+    if 0 < ch < 3:
+        cmd = cmd + ch - 1
+    devices['lights'].write(bytes([cmd]))
+
+    # if (args[1] == 1):
+    #     try:
+    #         # https://miyayamo.com/post-1924/
+    #         devices['lights'].write(string.ascii_uppercase[args[0] - 1])  # A or B
+    #     except Exception as e:
+    #         print('cannot send serial ' + string.ascii_uppercase[args[0] - 1])
+    #     print('light ' + str(args[0]) + ' : ON')
+    # else:
+    #     try:
+    #         devices['lights'].write(string.ascii_lowercase[args[0] - 1])  # a or b
+    #     except Exception as e:
+    #         print('cannot send serial ' + string.ascii_lowercase[args[0] - 1])
+    #     print('light ' + str(args[0]) + ' : OFF')
 
     # # make folder ### https://tonari-it.com/python-split-splitlines/
     # if os.path.exists(line):
@@ -505,6 +515,9 @@ def snap_frame(devices):
     qPix = QtGui.QPixmap(qImg)
 
     return qPix
+
+
+
 
 
 def qt_image_to_array(img):

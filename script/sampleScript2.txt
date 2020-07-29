@@ -1,0 +1,1300 @@
+set pattern1_laser_image, "pattern1/laser/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png"
+set pattern1_target_image, "pattern1/target/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png"
+set pattern1_dots_destination, "pattern1/beam_pattern_dots.mat"
+
+
+home
+
+gainiso 100
+
+mov 100, 10, 20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 4000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 100, 10, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 4000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 100, 10, -20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 4000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 100, -10, -20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 4000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 100, -10, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 4000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 100, -10, 20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 4000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 211, -10, 20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3443
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 211, -10, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3443
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 211, -10, -20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3443
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 211, 10, -20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3443
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 211, 10, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3443
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 211, 10, 20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3443
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 270, 10, 20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3152
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 270, 10, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3152
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 270, 10, -20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3152
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 270, -10, -20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3152
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 270, -10, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3152
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 270, -10, 20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 3152
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 300, 23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2500
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 300, 23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2500
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 300, 23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2500
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 300, -23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2500
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 300, -23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2500
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 300, -23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2500
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 362, -23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2129
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 362, -23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2129
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 362, -23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2129
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 362, 23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2129
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 362, 23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2129
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 362, 23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 2129
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 407, 23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1861
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 407, 23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1861
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 407, 23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1861
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 407, -23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1861
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 407, -23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1861
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 407, -23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1861
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 439, -23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1667
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 439, -23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1667
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 439, -23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1667
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 439, 23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1667
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 439, 23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1667
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 439, 23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1667
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 462, 23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1527
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 462, 23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1527
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 462, 23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1527
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 462, -23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1527
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 462, -23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1527
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 462, -23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1527
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 479, -23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1426
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 479, -23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1426
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 479, -23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1426
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 479, 23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1426
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 479, 23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1426
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 479, 23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1426
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 491, 23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1353
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 491, 23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1353
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 491, 23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1353
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 491, -23, -10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1353
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 491, -23, 0
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1353
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 491, -23, 10
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1353
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 500, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1300
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 500, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1300
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 500, -35, -15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1300
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 500, -35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1300
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 531, -35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1207
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 531, -35, -15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1207
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 531, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1207
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 531, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1207
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 553, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1140
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 553, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1140
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 553, -35, -15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1140
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 553, -35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1140
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 569, -35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1092
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 569, -35, -15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1092
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 569, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1092
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 569, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1092
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 581, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1057
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 581, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1057
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 581, -35, -15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1057
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 581, -35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1057
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 590, -35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1031
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 590, -35, -15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1031
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 590, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1031
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 590, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1031
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 596, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1013
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 596, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1013
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 596, -35, -15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1013
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 596, -35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1013
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 600, -35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 600, -35, -15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 600, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+mov 600, 35, 15
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 1000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+
+
+home
