@@ -91,14 +91,14 @@ class ProgressWindow(QtWidgets.QWidget):
 class Systate():
     def __init__(self):
         self.root = None
-        self.dir_path: dict = {None: None}
+        self.dir_path: dict = {}
         # self.dir_path = ''
-        self.saveFileName: dict = {None: None}
+        self.saveFileName: dict = {}
         self.seqn: int = 0
         self.args = None
         self.skip = False
         self.now = datetime.datetime.now()
-        self.ymd = ''
+        self.ymd_hms = ''
         self.dir_num = 0
         self.folderCreated: dict = {}
         self.folderCreated = False
@@ -173,11 +173,8 @@ def execute_script(scriptName, devices, params):
             args = com_args[1]
         else:  # home only
             args = np.array([0, 0, 0], dtype=int)
-        # print(com_args)
-        # print(commands[com_args[0]][0])
 
         systate.args = args
-        # expand_dynvars(args, devices)
 
         systate.skip = commands[com][1]
 
@@ -192,9 +189,6 @@ def execute_script(scriptName, devices, params):
         progressBar.done = i
         progressBar.updateProgressLabel()
         progressBar.updatePercentage()
-
-    # print(args_hist)
-    # return args_hist
 
 ##########
 def expand_dynvars(args, devices):
@@ -286,48 +280,30 @@ def set_root(args, devices, params):
 
 def set_img(args, devices, params):
     print('---set_img---')
+
     app.processEvents()
     global systate
 
     # ---------- make directory for images ----------
-    # args[0].replace('${', '')
-    # args[0].replace('}', '')
+    systate.now = datetime.datetime.now()
     systate.saveFileName[args[0]] = systate.args[1]
     print('systate.args[1] : ' + systate.args[1])
-    # if not args[0] in systate.folderCreated:
-    #     systate.folderCreated[args[0]] = False
 
-    # now = datetime.datetime.now()
-
-    # ---------- make folders for images ----------
-    # if not re.search('.+_image', args[0]):  # https://www.educative.io/edpresso/how-to-implement-wildcards-in-python
-    #     print(args[0])
-    #     print(type(args[0]))
-    #     pass
     if '_dots_destination' in args[0]:
         # temp
         pass
     else:
-        systate.ymd = systate.now.strftime('%Y%m%d')
+        systate.ymd_hms = systate.now.strftime('%Y%m%d_%H%M%S')
         if args[0] == 'ccalib':
-            systate.dir_path[args[0]] = str(systate.ymd) + "_" + str(systate.dir_num) + "/" + args[0]
+            # systate.dir_path[args[0]] = str(systate.ymd_hms) + "_" + str(systate.dir_num) + "/" + args[0]
+            systate.dir_path[args[0]] = str(systate.ymd_hms) + "/" + args[0]
         else:
-            systate.dir_path[args[0]] = str(systate.ymd) + "_" + str(systate.dir_num) + "/" + args[1].replace(
+            # systate.dir_path[args[0]] = str(systate.ymd_hms) + "_" + str(systate.dir_num) + "/" + args[1].replace(
+            #     "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
+            systate.dir_path[args[0]] = str(systate.ymd_hms) + "/" + args[1].replace(
                 "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
         print('var name: ' + str(args[0]))  # <- set var name as img_@...
-        # while os.path.exists(systate.dir_path[args[0]]):
-        #     print('folder "' + systate.dir_path[args[0]] + '" already exists')
-        #     systate.dir_num += 1
-        #     systate.dir_path[args[0]] = systate.dir_path[args[0]].replace(str(systate.ymd) + "_" + str(systate.dir_num - 1), str(systate.ymd) + "_" + str(systate.dir_num))
 
-
-        while os.path.exists(str(systate.ymd) + "_" + str(systate.dir_num)):
-            # if systate.folderCreated[args[0]]:
-            if systate.folderCreated:
-                break
-            print('folder "' + str(systate.ymd) + "_" + str(systate.dir_num) + '" already exists')
-            systate.dir_num += 1
-            systate.dir_path[args[0]] = systate.dir_path[args[0]].replace(str(systate.ymd) + "_" + str(systate.dir_num - 1), str(systate.ymd) + "_" + str(systate.dir_num))
 
         os.makedirs(systate.dir_path[args[0]])  # https://note.nkmk.me/python-os-mkdir-makedirs/
         # systate.folderCreated[args[0]] = True
@@ -353,7 +329,8 @@ def snap_image(args, devices, params):
     # im = snap_frame(devices)  ### error
     # devices['3Dsensors'].img = im
 
-    devices['3Dsensors'].imgPath = systate.ymd + '_' + str(systate.dir_num) + '/' + fileName[0]
+    # devices['3Dsensors'].imgPath = systate.ymd_hms + '_' + str(systate.dir_num) + '/' + fileName[0]
+    devices['3Dsensors'].imgPath = systate.ymd_hms + '/' + fileName[0]
     # print(devices['3Dsensors'].imgPath)
     # devices['3Dsensors'].img.save(devices['3Dsensors'].imgPath)
 
