@@ -165,8 +165,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # self.sensor = SensorDevice.SensorDevice()
 
         try:
-            self.sensor.close()   # for when reconnecting
-
             self.sensor.open(self.IPaddress, self.portNum)
             self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor')
 
