@@ -529,7 +529,7 @@
        <property name="minimumSize">
         <size>
          <width>240</width>
-         <height>240</height>
+         <height>250</height>
         </size>
        </property>
        <property name="title">
@@ -719,7 +719,7 @@
           <x>190</x>
           <y>200</y>
           <width>26</width>
-          <height>24</height>
+          <height>21</height>
          </rect>
         </property>
         <property name="text">
@@ -730,17 +730,55 @@
           <normaloff>:/GUI_icons/049-folder-open.png</normaloff>:/GUI_icons/049-folder-open.png</iconset>
         </property>
        </widget>
-       <widget class="QLineEdit" name="saveDirecoryName">
+       <widget class="QLabel" name="saveDirecoryName">
         <property name="geometry">
          <rect>
-          <x>20</x>
+          <x>10</x>
           <y>200</y>
-          <width>161</width>
-          <height>25</height>
+          <width>171</width>
+          <height>20</height>
          </rect>
         </property>
-        <property name="readOnly">
-         <bool>true</bool>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QLabel" name="saveImgName">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>226</y>
+          <width>171</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="resetButton">
+        <property name="geometry">
+         <rect>
+          <x>190</x>
+          <y>225</y>
+          <width>41</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Reset</string>
         </property>
        </widget>
       </widget>

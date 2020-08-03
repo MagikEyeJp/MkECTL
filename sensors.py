@@ -2,6 +2,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import sys
 import re
+import os
 import matplotlib.pyplot as plt
 from PIL import Image
 
@@ -43,6 +44,11 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.binLaserPattern: bin = bin(self.hexLaserPattern)
         self.laserPattern: int = int(self.hexLaserPattern)
         self.laserX: int = 0    # laser no. when there is only one
+        self.captureDirPath = os.getcwd() + '/savedPictures'
+        self.imgCounter = 0
+
+        if not os.path.exists(self.captureDirPath):
+            os.makedirs(self.captureDirPath)
 
         # Combo Box
         self.ui_s.ISOcombo.setCurrentText(str(self.gainiso))
@@ -88,11 +94,14 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.saveAveButton.clicked.connect(lambda: self.saveImg(self.frames))
 
         self.ui_s.selectDirectoryButton.clicked.connect(self.selectDirectory)
+        self.ui_s.resetButton.clicked.connect(self.resetCounter)
 
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
         # self.ui_s.CurrentLaserPattern_value.setText('-'.join(self.binLaserPattern.replace('0b', '').zfill(16)))
         self.ui_s.CurrentLaserPattern_value.setText('0000-0000-0000-0000')
+        self.ui_s.saveDirecoryName.setText(self.captureDirPath)
+        self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
 
         # tooltip
         # self.ui_s.ISOlineEdit.setToolTip('select \"Custom\" and set integer here')
@@ -230,13 +239,34 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.getImg(frames)
 
     def saveImg(self, frames):
-        pixmap = self.getImg(frames)
-        pixmap.save('QPixmap.png')
+        if self.captureDirPath == '':
+            QtWidgets.QMessageBox.critical(self, "Folder not found",
+                                           "Please specify a folder where captured imaged to be saved.")
+        else:
+            pixmap = self.getImg(frames)
+
+            saveName = self.captureDirPath + '/img_' + str(self.imgCounter).zfill(4) + '.png'
+            self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
+
+            if os.path.exists(saveName):
+                ans = QtWidgets.QMessageBox.question(self,'The file already exists',
+                                                     "Are you sure to overwrite \n" + saveName + " ?",
+                                                     QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Yes,
+                                                     defaultButton=QtWidgets.QMessageBox.Yes)
+                if ans == QtWidgets.QMessageBox.Yes:
+                    pixmap.save(saveName)
+                    self.imgCounter += 1
+                else:
+                    pass
+            else:
+                pixmap.save(saveName)
+                self.imgCounter += 1
+
+
 
     def selectDirectory(self):
-        dir_path = QtWidgets.QFileDialog.getExistingDirectory(self)
-        print(dir_path)
-        self.ui_s.saveDirecoryName.setText(dir_path)
+        self.captureDirPath = QtWidgets.QFileDialog.getExistingDirectory(self)
+        self.ui_s.saveDirecoryName.setText(self.captureDirPath)
 
 
     def getImg(self, frames):
@@ -264,6 +294,9 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
         return pixmap
 
+    def resetCounter(self):
+        self.imgCounter = 0
+        self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
 
 
 
