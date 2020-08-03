@@ -66,7 +66,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.shutterLineEdit.textChanged.connect(self.changeShutter)
         self.ui_s.framesLineEdit.setText(str(self.frames))
         self.ui_s.framesLineEdit.textChanged.connect(self.changeFrames)
-        # self.ui_s.ISOlineEdit.textChanged.connect(lambda: self.changeISO('lineEdit'))
 
         # Line edit returnPressed
         self.ui_s.IPlineEdit.returnPressed.connect(self.changeIPaddress)
@@ -76,7 +75,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # set validator of line edit
         self.ui_s.shutterLineEdit.setValidator(QtGui.QIntValidator(self))
         self.ui_s.framesLineEdit.setValidator(QtGui.QIntValidator(self))
-        # self.ui_s.ISOlineEdit.setValidator(QtGui.QIntValidator(self))
 
         # Push buttons
         self.ui_s.reconnectButton.clicked.connect(self.connectToSensor)
@@ -102,9 +100,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.CurrentLaserPattern_value.setText('0000-0000-0000-0000')
         self.ui_s.saveDirecoryName.setText(self.captureDirPath)
         self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
-
-        # tooltip
-        # self.ui_s.ISOlineEdit.setToolTip('select \"Custom\" and set integer here')
 
         # image
         self.img: QtGui.QPixmap() = None
@@ -150,22 +145,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         else:
             self.frames = int(self.ui_s.framesLineEdit.text())
             # print(self.frames)
-
-    def changeISO(self, valueFromX):
-        if valueFromX == 'comboBox':
-            if self.ui_s.ISOcombo.currentText() == "Custom":
-                self.ui_s.ISOlineEdit.setEnabled(True)
-            else:
-                self.gainiso = int(self.ui_s.ISOcombo.currentText())
-                self.ui_s.ISOlineEdit.setEnabled(False)
-                # print(self.gainiso)
-
-        elif valueFromX == 'lineEdit':
-            if self.ui_s.ISOlineEdit.text() == "":
-                pass
-            else:
-                self.gainiso = int(self.ui_s.ISOlineEdit.text())
-                # print(self.gainiso)
 
     def changeISO(self):
         if self.ui_s.ISOcombo.currentText() == "":
