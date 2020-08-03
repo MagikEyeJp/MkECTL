@@ -110,8 +110,9 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.img: QtGui.QPixmap() = None
         self.imgPath = ''
 
-        # first connect
-#        self.connectToSensor()
+        # group
+        self.ui_s.cameraControlGroup.setEnabled(False)
+        self.ui_s.laserControlGroup.setEnabled(False)
 
 
     def changeIPaddress(self):
@@ -126,6 +127,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.IPaddress = self.RPiaddress
 
         self.connectToSensor()
+        self.ui_s.cameraControlGroup.setEnabled(True)
+        self.ui_s.laserControlGroup.setEnabled(True)
 
     def changeShutter(self):
         if self.ui_s.shutterLineEdit.text() == '':
@@ -191,6 +194,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
 
+            self.ui_s.cameraControlGroup.setEnabled(False)
+            self.ui_s.laserControlGroup.setEnabled(False)
 
         # temp
         self.scene = ImageViewScene.ImageViewScene()
