@@ -45,11 +45,16 @@ class Ui(QtWidgets.QMainWindow):
         # variables
         self.params = {}  # motorDic
         self.scriptName: str = ''
+        self.baseFolderName: str = 'data'
+        self.subFolderName: str = ''
         self.motorSet = ['slider', 'pan', 'tilt']
         self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
         self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin'  # GUI objects related to motors  # Dict of dictionaries
         self.subWindow_isOpen = False
+
+        if not os.path.exists(self.baseFolderName):
+            os.makedirs(self.baseFolderName)
 
         self.devices['3Dsensors'] = self.subWindow
 
@@ -71,7 +76,9 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.initializeButton.clicked.connect(self.initializeMotors)
         # self.ui.initializeButton.clicked.connect(self.grayOut)
         self.ui.MagikEye.clicked.connect(self.demo)
-        self.ui.selectScript_toolButton.clicked.connect(self.openFile)
+        self.ui.selectScript_toolButton.clicked.connect(self.openScriptFile)
+        self.ui.selectBaseFolder_toolButton.clicked.connect(self.openBaseFolder)
+        self.ui.selectSubFolder_toolButton.clicked.connect(self.openSubFolder)
         self.ui.executeScript_button.clicked.connect(lambda: self.run_script(False))
         self.ui.continueButton.clicked.connect(lambda: self.run_script(True))
         self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(self.geometry, self.framesize))
@@ -91,6 +98,9 @@ class Ui(QtWidgets.QMainWindow):
 
         # set validator of line edit
         self.ui.presetValue.setValidator(QtGui.QDoubleValidator(-100.0, 2100.0, 2, self.ui.presetValue))
+
+        # label
+        self.ui.baseFolderName_label.setText(os.path.abspath(self.baseFolderName))
 
         # spinbox returnPressed
         self.ui.sliderPosSpin.setKeyboardTracking(False)
@@ -276,15 +286,26 @@ class Ui(QtWidgets.QMainWindow):
         elif motorID == 'pan' or 'tilt':
             self.ui.unitLabel.setText('deg')
 
-    def openFile(self):  # https://www.xsim.info/articles/PySide/special-dialogs.html#OpenFile
+    def openScriptFile(self):  # https://www.xsim.info/articles/PySide/special-dialogs.html#OpenFile
         (fileName, selectedFilter) = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Open file', './script/')
-
-        # if fileName != "":
-        #     QtWidgets.QMessageBox.information(self, "File", fileName)
+            QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', './script/', '*.txt')
 
         self.ui.scriptName_label.setText(os.path.basename(fileName)) # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
         self.scriptName = fileName
+
+    def openBaseFolder(self):
+        fileName = \
+            QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder')
+
+        self.ui.baseFolderName_label.setText(os.path.abspath(fileName))
+        self.baseFolderName = fileName
+
+    def openSubFolder(self):
+        fileName = \
+            QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder', './data/')
+
+        self.ui.subFolderName_label.setText(os.path.abspath(fileName))
+        self.subFolderName = fileName
 
     def demo(self):
         demo_script = 'script/demo.txt'
@@ -298,7 +319,7 @@ class Ui(QtWidgets.QMainWindow):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            execute_script.execute_script(demo_script, self.devices, self.params)
+            execute_script.execute_script(demo_script, self.baseFolderName, self.devices, self.params)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -306,16 +327,21 @@ class Ui(QtWidgets.QMainWindow):
             self.close()
 
     def run_script(self, isContinue):
-        if self.scriptName == '':
-            QtWidgets.QMessageBox.critical(self, "Cannot open a file", 'Please select a script.')
-        elif not self.scriptName.endswith('.txt'):  # https://pg-chain.com/python-endswith
-            QtWidgets.QMessageBox.critical(self, "Cannot open a file", 'Please select a text file.')
-        else:
+        if isContinue:
+            if self.subFolderName == '':
+                self.openSubFolder()
+
+            # sub folderからiniを読み、スクリプトを読み込む（未実装）
             self.showSubWindow(self.geometry, self.framesize)
-            if isContinue:
-                execute_script2.execute_script2(self.scriptName, self.devices, self.params)
-            else:
-                execute_script.execute_script(self.scriptName, self.devices, self.params)
+            execute_script2.execute_script(self.scriptName, self.subFolderName,  self.devices, self.params)
+        else:
+            if self.scriptName == '':
+                self.openScriptFile()
+
+            self.showSubWindow(self.geometry, self.framesize)
+            execute_script.execute_script(self.scriptName, self.baseFolderName, self.devices, self.params)
+
+
 
     def setHome(self):
         for m in self.devices['motors'].values():

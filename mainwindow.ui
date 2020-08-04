@@ -1431,7 +1431,7 @@
       <string>Ops to execute:</string>
      </property>
     </widget>
-    <widget class="QLabel" name="baseFolderName_label">
+    <widget class="QLabel" name="showBaseFolderName_label">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -1455,7 +1455,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <item>
-       <widget class="QLabel" name="baseFolderName_label_2">
+       <widget class="QLabel" name="baseFolderName_label">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -1480,7 +1480,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QLabel" name="subFolderName_label">
+    <widget class="QLabel" name="showSubFolderName_label">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -1504,7 +1504,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
-       <widget class="QLabel" name="subFolderName_label_2">
+       <widget class="QLabel" name="subFolderName_label">
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>

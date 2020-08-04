@@ -124,7 +124,7 @@ class Systate():
 
 systate = Systate()
 
-def execute_script(scriptName, devices, params):
+def execute_script(scriptName, baseFolder, devices, params):
     global systate
     # devices: motors, lights, 3D sensors(sensor window)
     # params: motorDic
@@ -133,6 +133,7 @@ def execute_script(scriptName, devices, params):
 
     # print(commands['root'][0])
     systate.scriptName = scriptName
+    systate.baseFolderName = baseFolder
     f = open(scriptName)
     lines = f.read().splitlines()
     f.close()
@@ -299,11 +300,11 @@ def set_img(args, devices, params):
         systate.ymd_hms = systate.now.strftime('%Y%m%d_%H%M%S')
         if args[0] == 'ccalib':
             # systate.dir_path[args[0]] = str(systate.ymd_hms) + "_" + str(systate.dir_num) + "/" + args[0]
-            systate.dir_path[args[0]] = str(systate.ymd_hms) + "/" + args[0]
+            systate.dir_path[args[0]] = systate.baseFolderName + '/' + str(systate.ymd_hms) + "/" + args[0]
         else:
             # systate.dir_path[args[0]] = str(systate.ymd_hms) + "_" + str(systate.dir_num) + "/" + args[1].replace(
             #     "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
-            systate.dir_path[args[0]] = str(systate.ymd_hms) + "/" + args[1].replace(
+            systate.dir_path[args[0]] = systate.baseFolderName + '/' + str(systate.ymd_hms) + "/" + args[1].replace(
                 "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
         print('var name: ' + str(args[0]))  # <- set var name as img_@...
 
@@ -312,7 +313,7 @@ def set_img(args, devices, params):
         # systate.folderCreated[args[0]] = True
         systate.folderCreated = True
     # ---------- make ini file ----------
-    ini.generateIni(str(systate.ymd_hms), systate.scriptName)
+    ini.generateIni(systate.baseFolderName + '/' + str(systate.ymd_hms), systate.scriptName)
     # ------------------------------
 
 def snap_image(args, devices, params):

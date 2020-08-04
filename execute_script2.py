@@ -122,7 +122,7 @@ class Systate():
 
 systate = Systate()
 
-def execute_script(scriptName, devices, params):
+def execute_script(scriptName, subFolder, devices, params):
     global systate
     # devices: motors, lights, 3D sensors(sensor window)
     # params: motorDic
