@@ -14,6 +14,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from PyQt5 import QtWidgets, QtGui
 import scriptProgress_ui
+import ini
 
 # import KMControllersS
 import motordic
@@ -102,6 +103,7 @@ class Systate():
         self.dir_num = 0
         self.folderCreated: dict = {}
         self.folderCreated = False
+        self.scriptName = ''
 
         self.past_parameters = Systate.PastParameters()
 
@@ -130,6 +132,7 @@ def execute_script(scriptName, devices, params):
     # num of pictures
 
     # print(commands['root'][0])
+    systate.scriptName = scriptName
     f = open(scriptName)
     lines = f.read().splitlines()
     f.close()
@@ -308,6 +311,8 @@ def set_img(args, devices, params):
         os.makedirs(systate.dir_path[args[0]])  # https://note.nkmk.me/python-os-mkdir-makedirs/
         # systate.folderCreated[args[0]] = True
         systate.folderCreated = True
+    # ---------- make ini file ----------
+    ini.generateIni(str(systate.ymd_hms), systate.scriptName)
     # ------------------------------
 
 def snap_image(args, devices, params):
