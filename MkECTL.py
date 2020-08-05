@@ -6,6 +6,7 @@ import time
 import os
 import re
 import serial
+from functools import partial
 import MyDoubleSpinBox
 
 import motordic
@@ -40,7 +41,8 @@ class Ui(QtWidgets.QMainWindow):
         self.framesize = self.frameSize()
         # ウインドウの位置を指定
         # self.move(geometry.width() / 2 - framesize.width() / 2, geometry.height() / 2 - framesize.height() / 2)
-        self.move(self.geometry.width() / 2 - self.framesize.width(), self.geometry.height() / 2 - self.framesize.height() / 2)
+        self.move(self.geometry.width() / 2 - self.framesize.width(),
+                  self.geometry.height() / 2 - self.framesize.height() / 2)
 
         # variables
         self.params = {}  # motorDic
@@ -61,14 +63,11 @@ class Ui(QtWidgets.QMainWindow):
         self.make_motorGUI()
 
         # connect to exeButtonClicked
-        # self.ui.sliderMoveExe.clicked.connect(lambda: self.exeButtonClicked('sliderMoveExe'))
-        # self.ui.panMoveExe.clicked.connect(lambda: self.exeButtonClicked('panMoveExe'))
-        # self.ui.tiltMoveExe.clicked.connect(lambda: self.exeButtonClicked('tiltMoveExe'))
         for m_name in self.motorSet:
-            code_exebutton: str = 'self.motorGUI[\'exe\'][\'%s\'].clicked.connect' \
-                                  '(lambda: self.exeButtonClicked(self.motorGUI[\'exe\'][\'%s\'].objectName()))' \
-                                  % (m_name, m_name)
-            exec(code_exebutton)
+            buttonname: str = self.motorGUI['exe'][m_name].objectName()
+            print(m_name, buttonname)
+            self.motorGUI['exe'][m_name].clicked.connect(partial(lambda n: self.exeButtonClicked(n), buttonname))
+
         self.ui.presetExe.clicked.connect(lambda: self.exeButtonClicked('presetExe'))
         self.ui.rebootButton.clicked.connect(self.rebootButtonClicked)
 
@@ -123,7 +122,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.tiltSpeedSpin.setKeyboardTracking(False)
         self.ui.tiltSpeedSpin.valueChanged.connect(lambda: self.updateSpeed('tiltSpeedSpin'))
 
-    def get_key_from_value(self, d, val):   # https://note.nkmk.me/python-dict-get-key-from-value/
+    def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
         if keys:
             return keys[0]
@@ -144,19 +143,26 @@ class Ui(QtWidgets.QMainWindow):
 
         for m_name in self.motorSet:
             # https://teratail.com/questions/51674
-            exeButtonsCode: str = '%s[\'%s\'] = %s%s%s' % ('exeButtons', m_name, 'self.ui.', m_name, 'MoveExe')  # exeButtons[~~] = self.ui.~~MoveExe
+            exeButtonsCode: str = '%s[\'%s\'] = %s%s%s' % (
+                'exeButtons', m_name, 'self.ui.', m_name, 'MoveExe')  # exeButtons[~~] = self.ui.~~MoveExe
             exec(exeButtonsCode)
-            posSpinCode = '%s[\'%s\'] = %s%s%s' % ('posSpinboxes', m_name, 'self.ui.', m_name, 'PosSpin')  # posSpinboxes[~~] = self.ui.~~PosSpin
+            posSpinCode = '%s[\'%s\'] = %s%s%s' % (
+                'posSpinboxes', m_name, 'self.ui.', m_name, 'PosSpin')  # posSpinboxes[~~] = self.ui.~~PosSpin
             exec(posSpinCode)
-            speedSpinCode = '%s[\'%s\'] = %s%s%s' % ('speedSpinboxes', m_name, 'self.ui.', m_name, 'SpeedSpin')  # speedSpinboxes[~~] = self.ui.~~SpeedSpin
+            speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
+                'speedSpinboxes', m_name, 'self.ui.', m_name, 'SpeedSpin')  # speedSpinboxes[~~] = self.ui.~~SpeedSpin
             exec(speedSpinCode)
-            speedSpinCode = '%s[\'%s\'] = %s%s%s' % ('currentPosLabels', m_name, 'self.ui.', m_name, 'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
+            speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
+                'currentPosLabels', m_name, 'self.ui.', m_name,
+                'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
             exec(speedSpinCode)
 
+        # print(exeButtons)
         self.motorGUI['exe'] = exeButtons  # ex.) motorGUI['exe']['slider'] == self.ui.sliderMoveExe
         self.motorGUI['posSpin'] = posSpinboxes  # ex.) motorGUI['posSpin']['slider'] == self.ui.sliderPosSpin
         self.motorGUI['speedSpin'] = speedSpinboxes  # ex.) motorGUI['speedSpin']['slider'] == self.ui.sliderSpeedSpin
-        self.motorGUI['currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
+        self.motorGUI[
+            'currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
     def grayOut(self):  # for trial
         self.ui.robotControl.setEnabled(False)
@@ -182,7 +188,7 @@ class Ui(QtWidgets.QMainWindow):
             m.speed(self.motorGUI['speedSpin'][p['id']].value())
             print(p['id'] + 'speed  = ' + str(self.motorGUI['speedSpin'][p['id']].value()) + 'rad/s')
 
-            self.motors[p['id']] = m    # member valuable of class
+            self.motors[p['id']] = m  # member valuable of class
 
             count += 30
             time.sleep(0.2)
@@ -239,8 +245,7 @@ class Ui(QtWidgets.QMainWindow):
         m.speed(self.motorGUI['speedSpin'][motorID].value())
 
     def exeButtonClicked(self, buttonName):
-        # print(buttonName)  # type->str
-        # if buttonName == '.+MoveExe':
+        print(buttonName)  # type->str
         if re.search('.+MoveExe', buttonName):
             motorID = buttonName.replace('MoveExe', '')
             m = self.motors[motorID]
@@ -274,10 +279,8 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.initializeProgressLabel.setText('Initializing motors...')
         self.ui.manualOperation.setEnabled(False)
 
-
         QtWidgets.QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
                                                           "Please re-initialize motors to use again.")
-
 
     def changeUnitLabel(self):
         motorID = self.ui.presetMotorCombo.currentText()
@@ -290,7 +293,8 @@ class Ui(QtWidgets.QMainWindow):
         (fileName, selectedFilter) = \
             QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', './script/', '*.txt')
 
-        self.ui.scriptName_label.setText(os.path.basename(fileName)) # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
+        self.ui.scriptName_label.setText(
+            os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
         self.scriptName = fileName
 
     def openBaseFolder(self):
@@ -311,7 +315,7 @@ class Ui(QtWidgets.QMainWindow):
         demo_script = 'script/demo.txt'
 
         if not os.path.exists(demo_script):
-            QtWidgets.QMessageBox.critical\
+            QtWidgets.QMessageBox.critical \
                 (self, "File",
                  'Demo script doesn\'t exist. \n '
                  'Please check \" ~'
@@ -333,7 +337,7 @@ class Ui(QtWidgets.QMainWindow):
 
             # sub folderからiniを読み、スクリプトを読み込む（未実装）
             self.showSubWindow(self.geometry, self.framesize)
-            execute_script2.execute_script(self.scriptName, self.subFolderName,  self.devices, self.params)
+            execute_script2.execute_script(self.scriptName, self.subFolderName, self.devices, self.params)
         else:
             if self.scriptName == '':
                 self.openScriptFile()
@@ -341,14 +345,13 @@ class Ui(QtWidgets.QMainWindow):
             self.showSubWindow(self.geometry, self.framesize)
             execute_script.execute_script(self.scriptName, self.baseFolderName, self.devices, self.params)
 
-
-
     def setHome(self):
         for m in self.devices['motors'].values():
             m.presetPosition(0.0)
             self.motorGUI['posSpin'][self.get_key_from_value(self.devices['motors'], m)].setValue(0.0)
 
-            self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText('{:.2f}'.format(0.0))
+            self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText(
+                '{:.2f}'.format(0.0))
 
     def goHome(self):
         print('Going Home')
@@ -391,15 +394,16 @@ class Ui(QtWidgets.QMainWindow):
             percentToGoal = 0.0
 
         for m in self.devices['motors'].values():
-            self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText('{:.2f}'.format(0.0))
-
+            self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText(
+                '{:.2f}'.format(0.0))
 
     def savePositions(self):
         save_name = ''
         for posspin in self.motorGUI['posSpin'].values():
             save_name += str('{:.2f}'.format(posspin.value())) + ' '
             save_name.strip()  # https://itsakura.com/python-strip#s2
-        if not save_name in [self.ui.savedPosCombo.itemText(i) for i in range(self.ui.savedPosCombo.count())]:  # https://stackoverflow.com/questions/7479915/getting-all-items-of-qcombobox-pyqt4-python
+        if not save_name in [self.ui.savedPosCombo.itemText(i) for i in range(
+                self.ui.savedPosCombo.count())]:  # https://stackoverflow.com/questions/7479915/getting-all-items-of-qcombobox-pyqt4-python
             self.ui.savedPosCombo.addItem(save_name)
         print(save_name)
 
@@ -411,7 +415,8 @@ class Ui(QtWidgets.QMainWindow):
 
     def showSubWindow(self, geometry, framesize):
         self.subWindow.show()
-        self.subWindow.move(geometry.width() / 2 - framesize.width() / 16, geometry.height() / 2 - framesize.height() / 3)
+        self.subWindow.move(geometry.width() / 2 - framesize.width() / 16,
+                            geometry.height() / 2 - framesize.height() / 3)
         self.subWindow_isOpen = True
 
     def openIR(self, tty):
