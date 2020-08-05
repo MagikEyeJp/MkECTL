@@ -282,7 +282,7 @@ class Ui_sensor(object):
         self.saveImgName.setGeometry(QtCore.QRect(10, 226, 171, 20))
         self.saveImgName.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.saveImgName.setText("")
-        self.saveImgName.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.saveImgName.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.saveImgName.setObjectName("saveImgName")
         self.resetButton = QtWidgets.QPushButton(self.cameraControlGroup)
         self.resetButton.setGeometry(QtCore.QRect(190, 225, 41, 20))

@@ -1512,7 +1512,7 @@
          <string/>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -1558,12 +1558,12 @@
       <rect>
        <x>270</x>
        <y>100</y>
-       <width>51</width>
+       <width>91</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>IR on</string>
+      <string>IR light on</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_3">
@@ -1571,12 +1571,12 @@
       <rect>
        <x>390</x>
        <y>100</y>
-       <width>51</width>
+       <width>91</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>IR off</string>
+      <string>IR light off</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="IRonMultiplier">
