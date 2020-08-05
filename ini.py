@@ -16,7 +16,7 @@ def loadIni(dirname):
 def generateIni(dirname, scriptName):
     config = configparser.RawConfigParser()
 
-    section1 = 'general'
+    section1 = 'script'
     config.add_section(section1)
     # config.set(section1, 'env', os.environ.get('ENV'))
     # config.set(section1, 'name', 'myname')
