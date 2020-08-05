@@ -52,7 +52,7 @@ class Ui(QtWidgets.QMainWindow):
         self.motorSet = ['slider', 'pan', 'tilt']
         self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
         self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
-        self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin'  # GUI objects related to motors  # Dict of dictionaries
+        self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
         self.subWindow_isOpen = False
 
         if not os.path.exists(self.baseFolderName):
@@ -62,11 +62,22 @@ class Ui(QtWidgets.QMainWindow):
 
         self.make_motorGUI()
 
-        # connect to exeButtonClicked
+        # motor-related process
         for m_name in self.motorSet:
-            buttonname: str = self.motorGUI['exe'][m_name].objectName()
-            print(m_name, buttonname)
-            self.motorGUI['exe'][m_name].clicked.connect(partial(lambda n: self.exeButtonClicked(n), buttonname))
+            exeButtonName: str = self.motorGUI['exe'][m_name].objectName()
+            speedSpinName: str = self.motorGUI['speedSpin'][m_name].objectName()
+            print(m_name, exeButtonName)
+
+            # exe buttons
+            self.motorGUI['exe'][m_name].clicked.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
+            # position spinboxes
+            self.motorGUI['posSpin'][m_name].setKeyboardTracking(False)
+            self.motorGUI['posSpin'][m_name].valueChanged.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
+            self.motorGUI['posSpin'][m_name].returnPressed.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
+            # speed spinboxes
+            self.motorGUI['speedSpin'][m_name].setKeyboardTracking(False)
+            self.motorGUI['speedSpin'][m_name].valueChanged.connect(partial(lambda n: self.updateSpeed(n), speedSpinName))
+
 
         self.ui.presetExe.clicked.connect(lambda: self.exeButtonClicked('presetExe'))
         self.ui.rebootButton.clicked.connect(self.rebootButtonClicked)
@@ -100,27 +111,6 @@ class Ui(QtWidgets.QMainWindow):
 
         # label
         self.ui.baseFolderName_label.setText(os.path.abspath(self.baseFolderName))
-
-        # spinbox returnPressed
-        self.ui.sliderPosSpin.setKeyboardTracking(False)
-        self.ui.sliderPosSpin.valueChanged.connect(lambda: self.exeButtonClicked('sliderMoveExe'))
-        self.ui.sliderPosSpin.returnPressed.connect(lambda: self.exeButtonClicked('sliderMoveExe'))
-        self.ui.panPosSpin.setKeyboardTracking(False)
-        self.ui.panPosSpin.valueChanged.connect(lambda: self.exeButtonClicked('panMoveExe'))
-        self.ui.panPosSpin.returnPressed.connect(lambda: self.exeButtonClicked('panMoveExe'))
-        self.ui.tiltPosSpin.setKeyboardTracking(False)
-        self.ui.tiltPosSpin.valueChanged.connect(lambda: self.exeButtonClicked('tiltMoveExe'))
-        self.ui.tiltPosSpin.returnPressed.connect(lambda: self.exeButtonClicked('tiltMoveExe'))
-
-        self.ui.presetValue.returnPressed.connect(lambda: self.exeButtonClicked('presetExe'))
-
-        # update speed
-        self.ui.sliderSpeedSpin.setKeyboardTracking(False)
-        self.ui.sliderSpeedSpin.valueChanged.connect(lambda: self.updateSpeed('sliderSpeedSpin'))
-        self.ui.panSpeedSpin.setKeyboardTracking(False)
-        self.ui.panSpeedSpin.valueChanged.connect(lambda: self.updateSpeed('panSpeedSpin'))
-        self.ui.tiltSpeedSpin.setKeyboardTracking(False)
-        self.ui.tiltSpeedSpin.valueChanged.connect(lambda: self.updateSpeed('tiltSpeedSpin'))
 
     def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
@@ -240,12 +230,13 @@ class Ui(QtWidgets.QMainWindow):
         # print('--free completed--')
 
     def updateSpeed(self, speedSpinName):
+        # print(speedSpinName)
         motorID = speedSpinName.replace('SpeedSpin', '')
         m = self.motors[motorID]
         m.speed(self.motorGUI['speedSpin'][motorID].value())
 
     def exeButtonClicked(self, buttonName):
-        print(buttonName)  # type->str
+        # print(buttonName)  # type->str
         if re.search('.+MoveExe', buttonName):
             motorID = buttonName.replace('MoveExe', '')
             m = self.motors[motorID]
@@ -306,7 +297,7 @@ class Ui(QtWidgets.QMainWindow):
 
     def openSubFolder(self):
         fileName = \
-            QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder', './data/')
+            QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder', self.baseFolderName + '/')
 
         self.ui.subFolderName_label.setText(os.path.abspath(fileName))
         self.subFolderName = fileName
