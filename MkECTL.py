@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
+
 from PyQt5 import QtWidgets, uic, QtGui, QtCore
 import sys
 import time
@@ -7,20 +8,33 @@ import os
 import re
 import serial
 from functools import partial
+import datetime
 import MyDoubleSpinBox
 
 import motordic
 import mainwindow_ui
 import execute_script
-import execute_script2
 import sensors
 
+class Handles():
+    def __init__(self):
+        self.now = datetime.datetime.now()
+
+        self.scriptName: str = ''
+        self.baseFolderName: str = 'data'
+        self.subFolderName: str = self.now.strftime('%Y%m%d_%H%M%S')
+        self.isContinue = False
+
+    def renewSubFolderName(self):
+        self.now = datetime.datetime.now()
+        self.subFolderName = self.now.strftime('%Y%m%d_%H%M%S')
 
 class Ui(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(Ui, self).__init__(parent)
         self.ui = mainwindow_ui.Ui_mainwindow()
         self.ui.setupUi(self)
+        self.handles = Handles()
 
         self.subWindow = sensors.SensorWindow()
 
@@ -46,17 +60,15 @@ class Ui(QtWidgets.QMainWindow):
 
         # variables
         self.params = {}  # motorDic
-        self.scriptName: str = ''
-        self.baseFolderName: str = 'data'
-        self.subFolderName: str = ''
+
         self.motorSet = ['slider', 'pan', 'tilt']
         self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
         self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
         self.subWindow_isOpen = False
 
-        if not os.path.exists(self.baseFolderName):
-            os.makedirs(self.baseFolderName)
+        if not os.path.exists(self.handles.baseFolderName):
+            os.makedirs(self.handles.baseFolderName)
 
         self.devices['3Dsensors'] = self.subWindow
 
@@ -77,18 +89,18 @@ class Ui(QtWidgets.QMainWindow):
             # speed spinboxes
             self.motorGUI['speedSpin'][m_name].setKeyboardTracking(False)
             self.motorGUI['speedSpin'][m_name].valueChanged.connect(partial(lambda n: self.updateSpeed(n), speedSpinName))
-
+            # https://melpon.hatenadiary.org/entry/20121206/1354636589
 
         self.ui.presetExe.clicked.connect(lambda: self.exeButtonClicked('presetExe'))
         self.ui.rebootButton.clicked.connect(self.rebootButtonClicked)
 
         # other buttons
         self.ui.initializeButton.clicked.connect(self.initializeMotors)
-        # self.ui.initializeButton.clicked.connect(self.grayOut)
         self.ui.MagikEye.clicked.connect(self.demo)
         self.ui.selectScript_toolButton.clicked.connect(self.openScriptFile)
         self.ui.selectBaseFolder_toolButton.clicked.connect(self.openBaseFolder)
         self.ui.selectSubFolder_toolButton.clicked.connect(self.openSubFolder)
+        self.ui.renewSubFolder_toolButton.clicked.connect(self.renewSubFolder)
         self.ui.executeScript_button.clicked.connect(lambda: self.run_script(False))
         self.ui.continueButton.clicked.connect(lambda: self.run_script(True))
         self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(self.geometry, self.framesize))
@@ -108,9 +120,12 @@ class Ui(QtWidgets.QMainWindow):
 
         # set validator of line edit
         self.ui.presetValue.setValidator(QtGui.QDoubleValidator(-100.0, 2100.0, 2, self.ui.presetValue))
+        self.ui.IRonMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRonMultiplier))
+        self.ui.IRoffMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRoffMultiplier))
 
         # label
-        self.ui.baseFolderName_label.setText(os.path.abspath(self.baseFolderName))
+        self.ui.baseFolderName_label.setText(os.path.abspath(self.handles.baseFolderName))
+        self.ui.subFolderName_label.setText(self.handles.subFolderName)
 
     def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
@@ -153,10 +168,6 @@ class Ui(QtWidgets.QMainWindow):
         self.motorGUI['speedSpin'] = speedSpinboxes  # ex.) motorGUI['speedSpin']['slider'] == self.ui.sliderSpeedSpin
         self.motorGUI[
             'currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
-
-    def grayOut(self):  # for trial
-        self.ui.robotControl.setEnabled(False)
-        self.ui.sliderOriginButton.setEnabled(False)
 
     def initializeMotors(self):
         count = 0
@@ -286,24 +297,29 @@ class Ui(QtWidgets.QMainWindow):
 
         self.ui.scriptName_label.setText(
             os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
-        self.scriptName = fileName
+        self.handles.scriptName = fileName
 
     def openBaseFolder(self):
         fileName = \
             QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder')
 
         self.ui.baseFolderName_label.setText(os.path.abspath(fileName))
-        self.baseFolderName = fileName
+        self.handles.baseFolderName = fileName
 
     def openSubFolder(self):
         fileName = \
-            QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder', self.baseFolderName + '/')
+            QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder', self.handles.baseFolderName + '/')
 
-        self.ui.subFolderName_label.setText(os.path.abspath(fileName))
-        self.subFolderName = fileName
+        self.ui.subFolderName_label.setText(os.path.basename(fileName))
+        self.handles.subFolderName = os.path.basename(fileName)
+
+    def renewSubFolder(self):
+        self.handles.renewSubFolderName()
+        self.ui.subFolderName_label.setText(self.handles.subFolderName)
 
     def demo(self):
         demo_script = 'script/demo.txt'
+        self.handles.scriptName = demo_script
 
         if not os.path.exists(demo_script):
             QtWidgets.QMessageBox.critical \
@@ -314,7 +330,7 @@ class Ui(QtWidgets.QMainWindow):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            execute_script.execute_script(demo_script, self.baseFolderName, self.devices, self.params)
+            execute_script.execute_script(self.handles, self.devices, self.params)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -323,18 +339,20 @@ class Ui(QtWidgets.QMainWindow):
 
     def run_script(self, isContinue):
         if isContinue:
-            if self.subFolderName == '':
+            self.handles.isContinue = True
+            if self.handles.subFolderName == '':
                 self.openSubFolder()
 
-            # sub folderからiniを読み、スクリプトを読み込む（未実装）
-            self.showSubWindow(self.geometry, self.framesize)
-            execute_script2.execute_script(self.scriptName, self.subFolderName, self.devices, self.params)
         else:
-            if self.scriptName == '':
+            self.handles.isContinue = False
+            if self.handles.scriptName == '':
                 self.openScriptFile()
 
-            self.showSubWindow(self.geometry, self.framesize)
-            execute_script.execute_script(self.scriptName, self.baseFolderName, self.devices, self.params)
+        if not os.path.exists(self.handles.baseFolderName + '/' + self.handles.subFolderName):
+            os.makedirs(self.handles.baseFolderName + '/' + self.handles.subFolderName)
+        # sub folderからiniを読み、スクリプトを読み込む（未実装）
+        self.showSubWindow(self.geometry, self.framesize)
+        execute_script.execute_script(self.handles, self.devices, self.params)
 
     def setHome(self):
         for m in self.devices['motors'].values():

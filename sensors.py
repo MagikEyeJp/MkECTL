@@ -11,7 +11,6 @@ import SensorDevice
 
 import sensorwindow_ui
 import ImageViewScene
-import execute_script
 
 # xのあるbit位置が0か1か調べる
 def getbit(x, b):
