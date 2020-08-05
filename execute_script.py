@@ -123,7 +123,7 @@ class Systate():
 
 systate = Systate()
 
-def execute_script(handles, devices, params):
+def execute_script(scriptParams, devices, params):
     global systate
     # devices: motors, lights, 3D sensors(sensor window)
     # params: motorDic
@@ -131,7 +131,7 @@ def execute_script(handles, devices, params):
     # num of pictures
 
     # print(commands['root'][0])
-    f = open(handles.scriptName)
+    f = open(scriptParams.scriptName)
     lines = f.read().splitlines()
     f.close()
 
@@ -183,7 +183,7 @@ def execute_script(handles, devices, params):
         progressBar.ui_script.commandLabel.setText(com)
 
         # jump to a method(function)
-        eval(commands[com][0])(systate.args, handles, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
+        eval(commands[com][0])(systate.args, scriptParams, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
         args_hist.append(args)
 
         # GUI
@@ -272,14 +272,14 @@ def expand_dynvars(args, devices):
 
 ##########
 
-def set_root(args, handles, devices, params):
+def set_root(args, scriptParams, devices, params):
     print('---set_root---')
     app.processEvents()
     global systate
     systate.root = args[0]
 
 
-def set_img(args, handles, devices, params):
+def set_img(args, scriptParams, devices, params):
     print('---set_img---')
 
     app.processEvents()
@@ -297,11 +297,11 @@ def set_img(args, handles, devices, params):
         # systate.ymd_hms = systate.now.strftime('%Y%m%d_%H%M%S')
         if args[0] == 'ccalib':
             # systate.dir_path[args[0]] = str(systate.ymd_hms) + "_" + str(systate.dir_num) + "/" + args[0]
-            systate.dir_path[args[0]] = handles.baseFolderName + '/' + handles.subFolderName + "/" + args[0]
+            systate.dir_path[args[0]] = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + "/" + args[0]
         else:
             # systate.dir_path[args[0]] = str(systate.ymd_hms) + "_" + str(systate.dir_num) + "/" + args[1].replace(
             #     "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
-            systate.dir_path[args[0]] = handles.baseFolderName + '/' + handles.subFolderName + "/" + args[1].replace(
+            systate.dir_path[args[0]] = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + "/" + args[1].replace(
                 "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
         print('var name: ' + str(args[0]))  # <- set var name as img_@...
 
@@ -310,10 +310,10 @@ def set_img(args, handles, devices, params):
         # systate.folderCreated[args[0]] = True
         systate.folderCreated = True
     # ---------- make ini file ----------
-    ini.generateIni(handles.baseFolderName + '/' + handles.subFolderName, handles.scriptName)
+    ini.generateIni(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
     # ------------------------------
 
-def snap_image(args, handles, devices, params):
+def snap_image(args, scriptParams, devices, params):
     print('---snap_image---')
     app.processEvents()
     global systate
@@ -330,7 +330,7 @@ def snap_image(args, handles, devices, params):
     expand_dynvars(fileName, devices)
 
     # devices['3Dsensors'].imgPath = systate.ymd_hms + '_' + str(systate.dir_num) + '/' + fileName[0]
-    devices['3Dsensors'].imgPath = handles.baseFolderName + '/' + handles.subFolderName + '/' + fileName[0]
+    devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
     # print(devices['3Dsensors'].imgPath)
     # devices['3Dsensors'].img.save(devices['3Dsensors'].imgPath)
 
@@ -340,7 +340,7 @@ def snap_image(args, handles, devices, params):
     systate.seqn += 1
 
 
-def move_robot(args, handles, devices, params):
+def move_robot(args, scriptParams, devices, params):
     print('---move_robot---')
     print('move to ' + str(args))
     global systate
@@ -383,15 +383,15 @@ def move_robot(args, handles, devices, params):
     systate.pos_robots = args
 
 
-def home_robot(args, handles, devices, params):
+def home_robot(args, scriptParams, devices, params):
     print('---home_robot---')
     app.processEvents()
     global systate
 
     print('move to ' + str(args))
-    move_robot(args, handles, devices, params)
+    move_robot(args, scriptParams, devices, params)
 
-def set_shutter(args, handles, devices, params):
+def set_shutter(args, scriptParams, devices, params):
     print('---set_shutter---')
     app.processEvents()
     global systate
@@ -400,11 +400,17 @@ def set_shutter(args, handles, devices, params):
     print('shutter speed: ' + str(args[0]))
     # print('in 3D sensors: ' + str(devices['3Dsensors'].shutterSpeed))
 
+    isOn = False
+    for l in systate.light:
+        if l > 0:
+            isOn = True
+            break
+
     ### Request to set shutter speed (args[0])
-    devices['3Dsensors'].sensor.set_shutter(int(args[0]))
+    m = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
+    devices['3Dsensors'].sensor.set_shutter(int(m * float(args[0]) + 0.5))
 
-
-def set_gainiso(args, handles, devices, params):
+def set_gainiso(args, scriptParams, devices, params):
     print('---set_gainiso---')
     app.processEvents()
     global systate
@@ -415,7 +421,7 @@ def set_gainiso(args, handles, devices, params):
     ### Request to set gainiso (args[0])
     devices['3Dsensors'].sensor.set_gainiso(int(args[0]))
 
-def set_lasers(args, handles, devices, params):
+def set_lasers(args, scriptParams, devices, params):
     print('---set_lasers---')
     app.processEvents()
     global systate
@@ -426,7 +432,7 @@ def set_lasers(args, handles, devices, params):
     devices['3Dsensors'].sensor.set_lasers(int(args[0]))
 
 
-def set_light(args, handles, devices, params):
+def set_light(args, scriptParams, devices, params):
     print('---set_light---')
     app.processEvents()
     global systate
@@ -436,9 +442,12 @@ def set_light(args, handles, devices, params):
     cmd = ord('A') if int(args[1]) > 0 else ord('a')
     if 0 < ch < 3:
         cmd = cmd + ch - 1
-    devices['lights'].write(bytes([cmd]))
+        systate.light[ch - 1] = int(args[1])
+        devices['lights'].write(bytes([cmd]))
+
+
 
 
 if __name__ == '__main__':
-    execute_script('./script/script_2019-12-05_M_TOF_Archimedes_N=12_lendt=2.txt')
+    execute_script('./script/sampleScript1.txt')
     # execute_script('script/demo.txt')

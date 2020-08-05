@@ -16,7 +16,7 @@ import mainwindow_ui
 import execute_script
 import sensors
 
-class Handles():
+class ScriptParams():
     def __init__(self):
         self.now = datetime.datetime.now()
 
@@ -24,6 +24,9 @@ class Handles():
         self.baseFolderName: str = 'data'
         self.subFolderName: str = self.now.strftime('%Y%m%d_%H%M%S')
         self.isContinue = False
+
+        self.IRonMultiplier = 1.0
+        self.IRoffMultiplier = 1.0
 
     def renewSubFolderName(self):
         self.now = datetime.datetime.now()
@@ -34,7 +37,7 @@ class Ui(QtWidgets.QMainWindow):
         super(Ui, self).__init__(parent)
         self.ui = mainwindow_ui.Ui_mainwindow()
         self.ui.setupUi(self)
-        self.handles = Handles()
+        self.scriptParams = ScriptParams()
 
         self.subWindow = sensors.SensorWindow()
 
@@ -67,8 +70,8 @@ class Ui(QtWidgets.QMainWindow):
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
         self.subWindow_isOpen = False
 
-        if not os.path.exists(self.handles.baseFolderName):
-            os.makedirs(self.handles.baseFolderName)
+        if not os.path.exists(self.scriptParams.baseFolderName):
+            os.makedirs(self.scriptParams.baseFolderName)
 
         self.devices['3Dsensors'] = self.subWindow
 
@@ -78,7 +81,7 @@ class Ui(QtWidgets.QMainWindow):
         for m_name in self.motorSet:
             exeButtonName: str = self.motorGUI['exe'][m_name].objectName()
             speedSpinName: str = self.motorGUI['speedSpin'][m_name].objectName()
-            print(m_name, exeButtonName)
+            # print(m_name, exeButtonName)
 
             # exe buttons
             self.motorGUI['exe'][m_name].clicked.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
@@ -123,9 +126,13 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.IRonMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRonMultiplier))
         self.ui.IRoffMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRoffMultiplier))
 
+        # line edit
+        self.ui.IRonMultiplier.textChanged.connect(self.setMultiplier)
+        self.ui.IRoffMultiplier.textChanged.connect(self.setMultiplier)
+
         # label
-        self.ui.baseFolderName_label.setText(os.path.abspath(self.handles.baseFolderName))
-        self.ui.subFolderName_label.setText(self.handles.subFolderName)
+        self.ui.baseFolderName_label.setText(os.path.abspath(self.scriptParams.baseFolderName))
+        self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
 
     def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
@@ -297,29 +304,29 @@ class Ui(QtWidgets.QMainWindow):
 
         self.ui.scriptName_label.setText(
             os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
-        self.handles.scriptName = fileName
+        self.scriptParams.scriptName = fileName
 
     def openBaseFolder(self):
         fileName = \
             QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder')
 
         self.ui.baseFolderName_label.setText(os.path.abspath(fileName))
-        self.handles.baseFolderName = fileName
+        self.scriptParams.baseFolderName = fileName
 
     def openSubFolder(self):
         fileName = \
-            QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder', self.handles.baseFolderName + '/')
+            QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder', self.scriptParams.baseFolderName + '/')
 
         self.ui.subFolderName_label.setText(os.path.basename(fileName))
-        self.handles.subFolderName = os.path.basename(fileName)
+        self.scriptParams.subFolderName = os.path.basename(fileName)
 
     def renewSubFolder(self):
-        self.handles.renewSubFolderName()
-        self.ui.subFolderName_label.setText(self.handles.subFolderName)
+        self.scriptParams.renewSubFolderName()
+        self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
 
     def demo(self):
         demo_script = 'script/demo.txt'
-        self.handles.scriptName = demo_script
+        self.scriptParams.scriptName = demo_script
 
         if not os.path.exists(demo_script):
             QtWidgets.QMessageBox.critical \
@@ -330,7 +337,7 @@ class Ui(QtWidgets.QMainWindow):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            execute_script.execute_script(self.handles, self.devices, self.params)
+            execute_script.execute_script(self.scriptParams, self.devices, self.params)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -339,20 +346,20 @@ class Ui(QtWidgets.QMainWindow):
 
     def run_script(self, isContinue):
         if isContinue:
-            self.handles.isContinue = True
-            if self.handles.subFolderName == '':
+            self.scriptParams.isContinue = True
+            if self.scriptParams.subFolderName == '':
                 self.openSubFolder()
 
         else:
-            self.handles.isContinue = False
-            if self.handles.scriptName == '':
+            self.scriptParams.isContinue = False
+            if self.scriptParams.scriptName == '':
                 self.openScriptFile()
 
-        if not os.path.exists(self.handles.baseFolderName + '/' + self.handles.subFolderName):
-            os.makedirs(self.handles.baseFolderName + '/' + self.handles.subFolderName)
+        if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
+            os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
         # sub folderからiniを読み、スクリプトを読み込む（未実装）
         self.showSubWindow(self.geometry, self.framesize)
-        execute_script.execute_script(self.handles, self.devices, self.params)
+        execute_script.execute_script(self.scriptParams, self.devices, self.params)
 
     def setHome(self):
         for m in self.devices['motors'].values():
@@ -450,6 +457,10 @@ class Ui(QtWidgets.QMainWindow):
             self.IRport.write(bytes([cmd]))
         else:
             print('could not send ' + serial)
+
+    def setMultiplier(self):
+        self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
+        self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
 
 
 app = QtWidgets.QApplication(sys.argv)
