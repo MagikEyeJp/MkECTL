@@ -115,12 +115,15 @@
         <x>10</x>
         <y>43</y>
         <width>181</width>
-        <height>94</height>
+        <height>91</height>
        </rect>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QHBoxLayout" name="speedLayout">
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QLabel" name="sliderSpeedLabel">
            <property name="text">
@@ -146,6 +149,9 @@
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QDoubleSpinBox" name="sliderSpeedSpin">
            <property name="decimals">
@@ -180,6 +186,9 @@
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QLabel" name="radpersec">
            <property name="minimumSize">
@@ -338,38 +347,6 @@
      <property name="checkable">
       <bool>false</bool>
      </property>
-     <widget class="QPushButton" name="saveButton">
-      <property name="geometry">
-       <rect>
-        <x>406</x>
-        <y>134</y>
-        <width>51</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Save</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="savedPosCombo">
-      <property name="geometry">
-       <rect>
-        <x>184</x>
-        <y>160</y>
-        <width>291</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="editable">
-       <bool>false</bool>
-      </property>
-      <property name="currentText">
-       <string/>
-      </property>
-      <property name="insertPolicy">
-       <enum>QComboBox::InsertAtBottom</enum>
-      </property>
-     </widget>
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
@@ -451,7 +428,7 @@
         <height>92</height>
        </rect>
       </property>
-      <layout class="QGridLayout" name="robotControlLayout">
+      <layout class="QGridLayout" name="positionControlLayout">
        <item row="1" column="0">
         <widget class="QLabel" name="panLabel">
          <property name="text">
@@ -583,51 +560,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QLabel" name="savedPositionslabel">
-      <property name="geometry">
-       <rect>
-        <x>184</x>
-        <y>140</y>
-        <width>211</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Saved Positions [slider pan tilt]</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="GoButton">
-      <property name="geometry">
-       <rect>
-        <x>456</x>
-        <y>134</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>24</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset resource="resources.qrc">
-        <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
-      </property>
-      <property name="autoDefault">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="originLabel">
       <property name="geometry">
        <rect>
@@ -669,7 +601,7 @@
         <height>32</height>
        </rect>
       </property>
-      <layout class="QGridLayout" name="homeGridLayout">
+      <layout class="QGridLayout" name="originLayout">
        <item row="0" column="1">
         <widget class="QPushButton" name="goHomeButton">
          <property name="minimumSize">
@@ -739,7 +671,7 @@
         <height>64</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <layout class="QVBoxLayout" name="presetLayout">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
@@ -845,6 +777,84 @@
           </widget>
          </item>
         </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>184</x>
+        <y>130</y>
+        <width>299</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="saveLayput">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QLabel" name="savedPositionslabel">
+           <property name="text">
+            <string>Saved Positions [slider pan tilt]</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="saveButton">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Save</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="GoButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
+           </property>
+           <property name="autoDefault">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QComboBox" name="savedPosCombo">
+         <property name="editable">
+          <bool>false</bool>
+         </property>
+         <property name="currentText">
+          <string/>
+         </property>
+         <property name="insertPolicy">
+          <enum>QComboBox::InsertAtBottom</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

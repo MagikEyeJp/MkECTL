@@ -160,6 +160,7 @@ def execute_script(scriptParams, devices, params):
     f.close()
 
     progressBar = ProgressWindow()  # make an instance
+    progressBar.stopClicked = False
     progressBar.total = len(lines)
     progressBar.updateProgressLabel()
     progressBar.show()
@@ -169,7 +170,8 @@ def execute_script(scriptParams, devices, params):
     for i, line in enumerate(lines):
         if progressBar.stopClicked:
             print('Interrupted')
-            break
+            return progressBar.stopClicked
+            # break
 
         print(' ########## ' + str(i) + '/' + str(len(lines)) + ' ########## ')
 
@@ -213,6 +215,8 @@ def execute_script(scriptParams, devices, params):
         progressBar.done = i
         progressBar.updateProgressLabel()
         progressBar.updatePercentage()
+
+    return True
 
 ##########
 def expand_dynvars(args, devices):
@@ -333,7 +337,8 @@ def set_img(args, scriptParams, devices, params):
         # systate.folderCreated[args[0]] = True
         systate.folderCreated = True
     # ---------- make ini file ----------
-    ini.generateIni(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+    if not scriptParams.isContinue:
+        ini.generateIni(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
     # ------------------------------
 
 def snap_image(args, scriptParams, devices, params):

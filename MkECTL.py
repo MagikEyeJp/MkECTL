@@ -340,6 +340,7 @@ class Ui(QtWidgets.QMainWindow):
     def demo(self):
         demo_script = 'script/demo.txt'
         self.scriptParams.scriptName = demo_script
+        self.ui.scriptName_label.setText(demo_script)
 
         if not os.path.exists(demo_script):
             QtWidgets.QMessageBox.critical \
@@ -376,9 +377,15 @@ class Ui(QtWidgets.QMainWindow):
 
         if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
             os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
-        # sub folderからiniを読み、スクリプトを読み込む（未実装）
+
         self.showSubWindow(self.geometry, self.framesize)
-        execute_script.execute_script(self.scriptParams, self.devices, self.params)
+
+        # GUI
+        self.GUIwhenScripting(False)
+
+        stopped = execute_script.execute_script(self.scriptParams, self.devices, self.params)
+
+        self.GUIwhenScripting(stopped)
 
     def setHome(self):
         for m in self.devices['motors'].values():
@@ -493,6 +500,17 @@ class Ui(QtWidgets.QMainWindow):
         self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
         self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
 
+    def GUIwhenScripting(self, bool):
+        for m in self.motorSet:
+            self.motorGUI['exe'][m].setEnabled(bool)
+            self.motorGUI['posSpin'][m].setEnabled(bool)
+            self.motorGUI['speedSpin'][m].setEnabled(bool)
+        self.ui.savedPosCombo.setEnabled(bool)
+        self.ui.saveButton.setEnabled(bool)
+        self.ui.goHomeButton.setEnabled(bool)
+        self.ui.setAsHomeButton.setEnabled(bool)
+        self.ui.continueButton.setEnabled(bool)
+        self.ui.executeScript_button.setEnabled(bool)
 
 app = QtWidgets.QApplication(sys.argv)
 keiganWindow = Ui()
