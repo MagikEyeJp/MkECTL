@@ -2073,7 +2073,7 @@
      <string>Sensor Window</string>
     </property>
    </widget>
-   <widget class="QGroupBox" name="laserControlGroup_2">
+   <widget class="QGroupBox" name="IRlightControlGroup">
     <property name="geometry">
      <rect>
       <x>20</x>

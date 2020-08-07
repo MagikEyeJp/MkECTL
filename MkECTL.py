@@ -46,6 +46,9 @@ class Ui(QtWidgets.QMainWindow):
         self.initializeProcessFlag = False
 
         self.ui.manualOperation.setEnabled(False)
+        self.ui.IRlightControlGroup.setEnabled(False)
+        self.ui.continueButton.setEnabled(False)
+        self.ui.executeScript_button.setEnabled(False)
 
         # IR light
         self.isPortOpen = True
@@ -204,17 +207,21 @@ class Ui(QtWidgets.QMainWindow):
             time.sleep(0.2)
             self.ui.initializeProgressBar.setValue(count)
 
+        self.devices['motors'] = self.motors
+
+        # IR light
+        self.openIR('/dev/ttyACM0')
+
+        # GUI
         print('--initialization completed--')
         self.ui.initializeProgressBar.setValue(100)
         self.ui.initializeButton.setEnabled(False)
         self.ui.initializeProgressBar.setEnabled(False)
         self.ui.initializeProgressLabel.setText('Initialized all motors')
         self.ui.manualOperation.setEnabled(True)
-
-        self.devices['motors'] = self.motors
-
-        # IR light
-        self.openIR('/dev/ttyACM0')
+        self.ui.IRlightControlGroup.setEnabled(True)
+        self.ui.continueButton.setEnabled(True)
+        self.ui.executeScript_button.setEnabled(True)
 
     def setSliderOrigin(self):
         m = self.motors['slider']
@@ -285,10 +292,14 @@ class Ui(QtWidgets.QMainWindow):
             m.reboot()
             m.close()
 
+        # GUI
         self.ui.initializeButton.setEnabled(True)
         self.ui.initializeProgressBar.setValue(0)
         self.ui.initializeProgressLabel.setText('Initializing motors...')
         self.ui.manualOperation.setEnabled(False)
+        self.ui.IRlightControlGroup.setEnabled(False)
+        self.ui.continueButton.setEnabled(False)
+        self.ui.executeScript_button.setEnabled(False)
 
         QtWidgets.QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
                                                           "Please re-initialize motors to use again.")
