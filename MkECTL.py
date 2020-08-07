@@ -16,6 +16,7 @@ import motordic
 import mainwindow_ui
 import execute_script
 import sensors
+import ini
 
 class ScriptParams():
     def __init__(self):
@@ -342,19 +343,25 @@ class Ui(QtWidgets.QMainWindow):
 
     def keyPressEvent(self, event):
         key = event.key()
-        if key == QtCore.Qt.Key_Escape:
-            self.close()
+        # if key == QtCore.Qt.Key_Escape:
+        #     self.close()
 
     def run_script(self, isContinue):
         if isContinue:
             self.scriptParams.isContinue = True
             if self.scriptParams.subFolderName == '':
                 self.openSubFolder()
-
+            if os.path.exists(self.scriptParams.baseFolderName + '/'
+                              + self.scriptParams.subFolderName + '/'
+                              + 'Log.ini'):
+                self.scriptParams.scriptName = ini.loadIni(
+                    self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
+                self.ui.scriptName_label.setText(os.path.basename(self.scriptParams.scriptName))
         else:
             self.scriptParams.isContinue = False
-            if self.scriptParams.scriptName == '':
-                self.openScriptFile()
+
+        if self.scriptParams.scriptName == '':
+            self.openScriptFile()
 
         if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
             os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)

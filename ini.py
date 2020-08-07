@@ -7,7 +7,7 @@ import os
 def loadIni(dirname):
     config = configparser.ConfigParser()
     config.read(dirname + '/Log.ini')
-    scriptPath = config.get('general', 'scriptpath')
+    scriptPath = config.get('script', 'scriptpath')
 
     print('scriptpath: ' + scriptPath)
 

@@ -12,7 +12,7 @@ import itertools
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 import scriptProgress_ui
 import ini
 
@@ -89,6 +89,17 @@ class ProgressWindow(QtWidgets.QWidget):
         self.stopClicked = True
         self.close()
 
+    def keyPressEvent(self, event):
+        key = event.key()
+        if key == QtCore.Qt.Key_Escape:
+            self.interrupt()
+
+    def closeEvent(self, event):  # https://www.qtcentre.org/threads/20895-PyQt4-Want-to-connect-a-window-s-close-button
+        # self.deleteLater()
+        # event.accept()
+        self.interrupt()
+
+
 class Systate():
     def __init__(self):
         self.root = None
@@ -105,18 +116,29 @@ class Systate():
         self.folderCreated = False
         self.skip = False
 
-        self.past_parameters = Systate.PastParameters()
-
         self.pos = [0, 0, 0]
-        self.shatter = 0
+        self.shutter = 0
         self.gainiso = 0
         self.lasers = 0
         self.light = [0, 0]
+        self.lightNum = 2
+
+        self.past_parameters = Systate.PastParameters()
+        self.sentSig = Systate.SentSig()
+
+    class SentSig():
+        def __init__(self):
+            self.shutter = False
+            self.gainiso = False
+            self.pos = False
+            self.lasers = False
+            self.light = [False, False]
+
 
     class PastParameters():
         def __init__(self):
             self.pos = [0, 0, 0]
-            self.shatter = 0
+            self.shutter = 0
             self.gainiso = 0
             self.lasers = 0
             self.light = [0, 0]
@@ -126,6 +148,7 @@ systate = Systate()
 
 def execute_script(scriptParams, devices, params):
     global systate
+    systate.seqn = 0
     # devices: motors, lights, 3D sensors(sensor window)
     # params: motorDic
 
@@ -177,7 +200,6 @@ def execute_script(scriptParams, devices, params):
             args = np.array([0, 0, 0], dtype=int)
 
         systate.args = args
-
         systate.skip = commands[com][1]
 
         # GUI
@@ -247,20 +269,20 @@ def expand_dynvars(args, devices):
             if dv_name == 'seqn':
                 dv_val = ('{:0=%d}' % (dv_par)).format(systate.seqn)
             elif dv_name == 'lasers':
-                dv_val = ('{:0=%d}' % (dv_par)).format(devices['3Dsensors'].laserX)
+                dv_val = ('{:0=%d}' % (dv_par)).format(systate.lasers)
             elif dv_name == 'shutter':
-                dv_val = ('{:0=%d}' % (dv_par)).format(devices['3Dsensors'].shutterSpeed)
+                dv_val = ('{:0=%d}' % (dv_par)).format(systate.shutter)
             elif dv_name == 'gainiso':
-                dv_val = ('{:0=%d}' % (dv_par)).format(devices['3Dsensors'].gainiso)
+                dv_val = ('{:0=%d}' % (dv_par)).format(systate.gainiso)
             elif dv_name == 'slide':
                 # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['slider'].m_position))
-                dv_val = ('{:0=%d}' % (dv_par)).format(round(systate.pos_robots[0]))
+                dv_val = ('{:0=%d}' % (dv_par)).format(round(systate.pos[0]))
             elif dv_name == 'pan':
                 # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['pan'].m_position))
-                dv_val = ('{:0=%d}' % (dv_par)).format(round(systate.pos_robots[1]))
+                dv_val = ('{:0=%d}' % (dv_par)).format(round(systate.pos[1]))
             elif dv_name == 'tilt':
                 # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['tilt'].m_position))
-                dv_val = ('{:0=%d}' % (dv_par)).format(round(systate.pos_robots[2]))
+                dv_val = ('{:0=%d}' % (dv_par)).format(round(systate.pos[2]))
             else:
                 dv_val = 'xxxx'  # temp
 
@@ -306,8 +328,8 @@ def set_img(args, scriptParams, devices, params):
                 "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
         print('var name: ' + str(args[0]))  # <- set var name as img_@...
 
-
-        os.makedirs(systate.dir_path[args[0]])  # https://note.nkmk.me/python-os-mkdir-makedirs/
+        if not os.path.exists(systate.dir_path[args[0]]):
+            os.makedirs(systate.dir_path[args[0]])  # https://note.nkmk.me/python-os-mkdir-makedirs/
         # systate.folderCreated[args[0]] = True
         systate.folderCreated = True
     # ---------- make ini file ----------
@@ -332,11 +354,12 @@ def snap_image(args, scriptParams, devices, params):
 
     # devices['3Dsensors'].imgPath = systate.ymd_hms + '_' + str(systate.dir_num) + '/' + fileName[0]
     devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
-    # print(devices['3Dsensors'].imgPath)
-    # devices['3Dsensors'].img.save(devices['3Dsensors'].imgPath)
 
-    pixmap = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
-    pixmap.save(devices['3Dsensors'].imgPath)
+    if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
+        resume_state(scriptParams, devices, params)
+
+        pixmap = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
+        pixmap.save(devices['3Dsensors'].imgPath)
 
     systate.seqn += 1
 
@@ -346,6 +369,8 @@ def move_robot(args, scriptParams, devices, params):
     print('move to ' + str(args))
     global systate
     motorSet = ['slider', 'pan', 'tilt']
+
+    args = np.array(args)
 
     m = []
     scale = []
@@ -362,26 +387,30 @@ def move_robot(args, scriptParams, devices, params):
         scale.append(params[motorSet[param_i]]['scale'])
         motorPos.append(args[param_i])
 
-    while True:
-        for param_i in range(args.size):
-            m[param_i].moveTo(motorPos[param_i] * scale[param_i])
-            time.sleep(0.2)
-            app.processEvents()
+    systate.pos = motorPos
 
-            (pos[param_i], vel[param_i], torque[param_i]) = m[param_i].read_motor_measurement()
-            Error[param_i] = pow(pos[param_i] - motorPos[param_i] * scale[param_i], 2)
-            Errors += Error[param_i]
-            # print(Error[param_i])
+    if not systate.skip:
+        if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
+            while True:
+                for param_i in range(args.size):
+                    m[param_i].moveTo(motorPos[param_i] * scale[param_i])
+                    time.sleep(0.2)
+                    app.processEvents()
 
-        if math.sqrt(Errors) < 0.1:
-                # print(pos)
-                # print(torque)
-                break
-        Errors = 0.0
+                    (pos[param_i], vel[param_i], torque[param_i]) = m[param_i].read_motor_measurement()
+                    Error[param_i] = pow(pos[param_i] - motorPos[param_i] * scale[param_i], 2)
+                    Errors += Error[param_i]
+                    # print(Error[param_i])
 
-    time.sleep(1.0)
+                if math.sqrt(Errors) < 0.1:
+                        # print(pos)
+                        # print(torque)
+                        break
+                Errors = 0.0
 
-    systate.pos_robots = args
+            systate.past_parameters.pos = systate.pos
+            systate.sentSig.pos = True
+            time.sleep(1.0)
 
 
 def home_robot(args, scriptParams, devices, params):
@@ -389,6 +418,7 @@ def home_robot(args, scriptParams, devices, params):
     app.processEvents()
     global systate
 
+    # if not systate.skip:
     print('move to ' + str(args))
     move_robot(args, scriptParams, devices, params)
 
@@ -397,40 +427,61 @@ def set_shutter(args, scriptParams, devices, params):
     app.processEvents()
     global systate
 
-    devices['3Dsensors'].shutterSpeed = args[0]
-    print('shutter speed: ' + str(args[0]))
-    # print('in 3D sensors: ' + str(devices['3Dsensors'].shutterSpeed))
+    systate.shutter = int(args[0])
+    # systate.shutter = args
 
-    isOn = False
-    for l in systate.light:
-        if l > 0:
-            isOn = True
-            break
+    if not systate.skip:
+        if not systate.sentSig.shutter or systate.pos != systate.past_parameters.shutter:
+            devices['3Dsensors'].shutterSpeed = int(args[0])
+            print('shutter speed: ' + str(args[0]))
 
-    ### Request to set shutter speed (args[0])
-    m = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
-    devices['3Dsensors'].sensor.set_shutter(int(m * float(args[0]) + 0.5))
+            isOn = False
+            for l in systate.light:
+                if l > 0:
+                    isOn = True
+                    break
+
+            ### Request to set shutter speed (args[0])
+            m = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
+            devices['3Dsensors'].sensor.set_shutter(int(m * float(args[0]) + 0.5))
+
+            systate.past_parameters.shutter = systate.shutter
+            systate.sentSig.shutter = True
 
 def set_gainiso(args, scriptParams, devices, params):
     print('---set_gainiso---')
     app.processEvents()
     global systate
 
-    devices['3Dsensors'].gainiso = args[0]
-    print('gainiso: ' + str(args[0]))
+    systate.gainiso = int(args[0])
 
-    ### Request to set gainiso (args[0])
-    devices['3Dsensors'].sensor.set_gainiso(int(args[0]))
+    if not systate.skip:
+        if not systate.sentSig.gainiso or systate.pos != systate.past_parameters.gainiso:
+            devices['3Dsensors'].gainiso = args[0]
+            print('gainiso: ' + str(args[0]))
+
+            ### Request to set gainiso (args[0])
+            devices['3Dsensors'].sensor.set_gainiso(int(args[0]))
+
+            systate.past_parameters.gainiso = systate.gainiso
+            systate.sentSig.gainiso = True
 
 def set_lasers(args, scriptParams, devices, params):
     print('---set_lasers---')
     app.processEvents()
     global systate
 
-    devices['3Dsensors'].laserX = args[0]
+    systate.lasers = int(args[0])
 
-    ### Request to set lasers (args[0])
-    devices['3Dsensors'].sensor.set_lasers(int(args[0]))
+    if not systate.skip:
+        if not systate.sentSig.lasers or systate.pos != systate.past_parameters.lasers:
+            devices['3Dsensors'].laserX = args[0]
+
+            ### Request to set lasers (args[0])
+            devices['3Dsensors'].sensor.set_lasers(int(args[0]))
+
+            systate.past_parameters.lasers = systate.lasers
+            systate.sentSig.lasers = True
 
 
 def set_light(args, scriptParams, devices, params):
@@ -440,21 +491,28 @@ def set_light(args, scriptParams, devices, params):
 
     ch = int(args[0])
 
-    cmd = ord('A') if int(args[1]) > 0 else ord('a')
-    if 0 < ch < 3:
-        cmd = cmd + ch - 1
-        systate.light[ch - 1] = int(args[1])
-        devices['lights'].write(bytes([cmd]))
+    systate.light[ch - 1] = int(args[1])
+
+    if not systate.skip:
+        if not systate.sentSig.light[ch - 1] or systate.pos != systate.past_parameters.light[ch - 1]:
+            cmd = ord('A') if int(args[1]) > 0 else ord('a')
+            if 0 < ch < 3:
+                cmd = cmd + ch - 1
+                systate.light[ch - 1] = int(args[1])
+                devices['lights'].write(bytes([cmd]))
+
+            systate.past_parameters.light[ch - 1] = systate.light[ch - 1]
+            systate.sentSig.light[ch - 1] = True
 
 def resume_state(scriptParams, devices, params):
     app.processEvents()
     global systate
     systate.skip = False
 
-    set_shutter(systate.shutter, scriptParams, devices, params)
-    set_gainiso(systate.gainiso, scriptParams, devices, params)
+    set_shutter([systate.shutter], scriptParams, devices, params)
+    set_gainiso([systate.gainiso], scriptParams, devices, params)
     move_robot(systate.pos, scriptParams, devices, params)
-    set_lasers(systate.lasers, scriptParams, devices, params)
+    set_lasers([systate.lasers], scriptParams, devices, params)
     for i in range(len(systate.light)):
         set_light([i, systate.light[i]], scriptParams, devices, params)
 
