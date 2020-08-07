@@ -1,0 +1,26 @@
+set pattern1_laser_image, "pattern1/laser/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png"
+set pattern1_target_image, "pattern1/target/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png"
+set pattern1_dots_destination, "pattern1/beam_pattern_dots.mat"
+
+
+home
+
+gainiso 100
+
+mov 100, 10, 20
+
+######################
+lasers 0 
+light 2, 1
+shutter 50000
+snap ${pattern1_target_image},3
+light 2, 0
+shutter 4000
+lasers 1 
+snap ${pattern1_laser_image},3
+lasers 0 
+######################
+
+
+
+home
