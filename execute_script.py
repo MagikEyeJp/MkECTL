@@ -103,6 +103,7 @@ class Systate():
         self.dir_num = 0
         self.folderCreated: dict = {}
         self.folderCreated = False
+        self.skip = False
 
         self.past_parameters = Systate.PastParameters()
 
@@ -445,8 +446,17 @@ def set_light(args, scriptParams, devices, params):
         systate.light[ch - 1] = int(args[1])
         devices['lights'].write(bytes([cmd]))
 
+def resume_state(scriptParams, devices, params):
+    app.processEvents()
+    global systate
+    systate.skip = False
 
-
+    set_shutter(systate.shutter, scriptParams, devices, params)
+    set_gainiso(systate.gainiso, scriptParams, devices, params)
+    move_robot(systate.pos, scriptParams, devices, params)
+    set_lasers(systate.lasers, scriptParams, devices, params)
+    for i in range(len(systate.light)):
+        set_light([i, systate.light[i]], scriptParams, devices, params)
 
 if __name__ == '__main__':
     execute_script('./script/sampleScript1.txt')
