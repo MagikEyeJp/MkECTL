@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>552</width>
-    <height>752</height>
+    <height>759</height>
    </rect>
   </property>
   <property name="font">
@@ -115,7 +115,7 @@
         <x>10</x>
         <y>43</y>
         <width>181</width>
-        <height>91</height>
+        <height>94</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -1334,7 +1334,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>500</y>
+      <y>510</y>
       <width>511</width>
       <height>201</height>
      </rect>
@@ -2079,7 +2079,7 @@
       <x>20</x>
       <y>420</y>
       <width>511</width>
-      <height>71</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="title">
@@ -2089,7 +2089,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>30</y>
+       <y>36</y>
        <width>101</width>
        <height>32</height>
       </rect>
@@ -2148,7 +2148,7 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>30</y>
+       <y>36</y>
        <width>101</width>
        <height>32</height>
       </rect>
@@ -2207,9 +2207,9 @@
      <property name="geometry">
       <rect>
        <x>230</x>
-       <y>30</y>
+       <y>26</y>
        <width>271</width>
-       <height>31</height>
+       <height>51</height>
       </rect>
      </property>
      <property name="text">

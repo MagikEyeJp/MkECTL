@@ -9,6 +9,7 @@ import re
 import serial
 from functools import partial
 import datetime
+import pty
 import MyDoubleSpinBox
 
 import motordic
@@ -447,16 +448,28 @@ class Ui(QtWidgets.QMainWindow):
             # QtWidgets.QMessageBox.critical(self, 'IR port open', 'Could not open port of IR lights')
             print(e)
             self.isPortOpen = False
-            self.ui.IRstateLabel.setText('Cannot open \n ' + tty + '.')
+
+            # https://stackoverflow.com/questions/2291772/virtual-serial-device-in-python
+            master, slave = pty.openpty()
+            tty_dummy = os.ttyname(slave)
+            self.IRport = serial.Serial(tty_dummy)
+            self.devices['lights'] = self.IRport
+
+            self.ui.IRstateLabel.setText('Cannot open ' + tty + '. \n'
+                                         + 'Using dummy serial device instead(pty).')
 
     def IRlightControl(self, ch, state):
-        if self.isPortOpen:
-            cmd = ord('A') if state else ord('a')
-            if 0 < ch < 3:
-                cmd = cmd + ch - 1
-            self.IRport.write(bytes([cmd]))
-        else:
-            print('could not send ' + serial)
+        # if self.isPortOpen:
+        #     cmd = ord('A') if state else ord('a')
+        #     if 0 < ch < 3:
+        #         cmd = cmd + ch - 1
+        #     self.IRport.write(bytes([cmd]))
+        # else:
+        #     print('could not send serial')
+        cmd = ord('A') if state else ord('a')
+        if 0 < ch < 3:
+            cmd = cmd + ch - 1
+        self.IRport.write(bytes([cmd]))
 
     def setMultiplier(self):
         self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
