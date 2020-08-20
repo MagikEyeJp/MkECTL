@@ -195,7 +195,7 @@ def execute_script(scriptParams, devices, params):
             elif com_args[0] == 'snap':
                 com_args[1][1] = int(com_args[1][1])
             else:
-                com_args[1] = np.array(com_args[1], dtype=int)
+                com_args[1] = np.array(com_args[1], dtype=float)
             # print(type(com_args[1]))
             args = com_args[1]
         else:  # home only
