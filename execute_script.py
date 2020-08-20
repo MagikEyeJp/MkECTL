@@ -9,9 +9,6 @@ import struct
 import string
 import itertools
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-
 from PyQt5 import QtWidgets, QtGui, QtCore
 import scriptProgress_ui
 import ini

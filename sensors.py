@@ -3,7 +3,6 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import sys
 import re
 import os
-import matplotlib.pyplot as plt
 from PIL import Image
 
 import socket
