@@ -166,21 +166,21 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.sensor.open(self.IPaddress, self.portNum)
             self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor')
 
+            # temp
+            self.scene = ImageViewScene.ImageViewScene()
+            # self.scene.setSceneRect(QtCore.QRectF(self.rect()))
+            self.ui_s.sensorImage.setScene(self.scene)
+
+            # self.ui_s.sensorImage = ImageViewScene.ImageViewer()
+            # self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
+            # self.ui_s.sensorImage.show()
+            self.getImg(self.frames)
+
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
-
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
 
-        # temp
-        self.scene = ImageViewScene.ImageViewScene()
-        # self.scene.setSceneRect(QtCore.QRectF(self.rect()))
-        self.ui_s.sensorImage.setScene(self.scene)
-
-        # self.ui_s.sensorImage = ImageViewScene.ImageViewer()
-        # self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
-        # self.ui_s.sensorImage.show()
-        self.getImg(self.frames)
 
 
     def laser_custom(self):
