@@ -513,6 +513,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.executeScript_button.setEnabled(bool)
 
 app = QtWidgets.QApplication(sys.argv)
+app.setWindowIcon(QtGui.QIcon(':/MkECTL.png'))
 keiganWindow = Ui()
 keiganWindow.show()
 # sensorWindow = SensorWindow()

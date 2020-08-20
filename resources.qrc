@@ -11,5 +11,6 @@
         <file>GUI_icons/049-folder-open.png</file>
         <file>GUI_icons/133-spinner11.png</file>
         <file>GUI_icons/file_icon.png</file>
+        <file>MkECTL.png</file>
     </qresource>
 </RCC>
