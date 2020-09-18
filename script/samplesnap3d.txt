@@ -1,0 +1,46 @@
+set csv_file, "frame/frame_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.csv"
+
+home
+
+######################
+mov 100, 0, 0
+snap3d ${csv_file}
+
+######################
+mov 200, 0, 0
+snap3d ${csv_file}
+
+######################
+mov 300, 0, 0
+snap3d ${csv_file}
+
+######################
+mov 400, 0, 0
+snap3d ${csv_file}
+
+######################
+mov 500, 0, 0
+snap3d ${csv_file}
+
+######################
+mov 600, 0, 0
+snap3d ${csv_file}
+
+######################
+mov 700, 0, 0
+snap3d ${csv_file}
+
+######################
+mov 800, 0, 0
+snap3d ${csv_file}
+
+######################
+mov 900, 0, 0
+snap3d ${csv_file}
+
+######################
+mov 1000, 0, 0
+snap3d ${csv_file}
+
+
+
