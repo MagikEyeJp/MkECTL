@@ -20,7 +20,7 @@ import motordic
 import pymkeapi
 
 commands = {'root': ['set_root', False],
-            'set': ['set_img', False],
+            'set': ['set_filename', False],
             'snap': ['snap_image', True],
             'mov': ['move_robot', True],
             # 'movs': ['movs_robot', False],
@@ -303,8 +303,8 @@ def set_root(args, scriptParams, devices, params):
     systate.root = args[0]
 
 
-def set_img(args, scriptParams, devices, params):
-    print('---set_img---')
+def set_filename(args, scriptParams, devices, params):
+    print('---set_filename---')
 
     app.processEvents()
     global systate
@@ -314,25 +314,12 @@ def set_img(args, scriptParams, devices, params):
     systate.saveFileName[args[0]] = systate.args[1]
     print('systate.args[1] : ' + systate.args[1])
 
-    if '_dots_destination' in args[0]:
-        # temp
-        pass
-    else:
-        # systate.ymd_hms = systate.now.strftime('%Y%m%d_%H%M%S')
-        if args[0] == 'ccalib':
-            # systate.dir_path[args[0]] = str(systate.ymd_hms) + "_" + str(systate.dir_num) + "/" + args[0]
-            systate.dir_path[args[0]] = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + "/" + args[0]
-        else:
-            # systate.dir_path[args[0]] = str(systate.ymd_hms) + "_" + str(systate.dir_num) + "/" + args[1].replace(
-            #     "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
-            systate.dir_path[args[0]] = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + "/" + args[1].replace(
-                "/img_@{seqn}{4}_@{lasers}{4}_@{slide}{4}_@{pan}{4}_@{tilt}{4}.png", "")
-        print('var name: ' + str(args[0]))  # <- set var name as img_@...
+    systate.dir_path[args[0]] = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + "/" + os.path.dirname(args[1])
 
-        if not os.path.exists(systate.dir_path[args[0]]):
-            os.makedirs(systate.dir_path[args[0]])  # https://note.nkmk.me/python-os-mkdir-makedirs/
-        # systate.folderCreated[args[0]] = True
-        systate.folderCreated = True
+    if not os.path.exists(systate.dir_path[args[0]]):
+        os.makedirs(systate.dir_path[args[0]])  # https://note.nkmk.me/python-os-mkdir-makedirs/
+    # systate.folderCreated[args[0]] = True
+    systate.folderCreated = True
     # ---------- make ini file ----------
     if not scriptParams.isContinue:
         ini.generateIni(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
@@ -517,6 +504,9 @@ def resume_state(scriptParams, devices, params):
     set_lasers([systate.lasers], scriptParams, devices, params)
     for i in range(len(systate.light)):
         set_light([i, systate.light[i]], scriptParams, devices, params)
+
+# def snap_3D_frame():
+
 
 if __name__ == '__main__':
     execute_script('./script/sampleScript1.txt')
