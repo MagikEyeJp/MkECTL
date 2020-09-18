@@ -356,7 +356,9 @@ class Ui(QtWidgets.QMainWindow):
     def keyPressEvent(self, event):
         key = event.key()
         # if key == QtCore.Qt.Key_Escape:
-        #     self.close()
+        #     # self.close()
+        #     # QtWidgets.QUndoStack.undo()
+        #     self.undoValue()
 
     def run_script(self, isContinue):
         if isContinue:
@@ -511,6 +513,10 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.setAsHomeButton.setEnabled(bool)
         self.ui.continueButton.setEnabled(bool)
         self.ui.executeScript_button.setEnabled(bool)
+
+    def undoValue(self):
+        # if self.state() != QtWidgets.QAbstractItemView.EditingState:
+        self.motorGUI['posSpin']['slider'].QUndoStack.undo()
 
 app = QtWidgets.QApplication(sys.argv)
 app.setWindowIcon(QtGui.QIcon(':/MkECTL.png'))
