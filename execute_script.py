@@ -22,6 +22,7 @@ import pymkeapi
 commands = {'root': ['set_root', False],
             'set': ['set_filename', False],
             'snap': ['snap_image', True],
+            'snap3d': ['snap_3D_frame', True],
             'mov': ['move_robot', True],
             # 'movs': ['movs_robot', False],
             # 'jog': ['jog_robot', False],
@@ -187,7 +188,7 @@ def execute_script(scriptParams, devices, params):
             com_args[1] = com_args[1].replace(" ", "")  # del space
             com_args[1] = com_args[1].replace("\"", "")  # del double-quotation
             com_args[1] = com_args[1].split(",")
-            if com_args[0] == 'set' or com_args[0] == 'root':
+            if com_args[0] == 'set' or com_args[0] == 'root' or com_args[0] == 'snap3d':
                 pass
             elif com_args[0] == 'snap':
                 com_args[1][1] = int(com_args[1][1])
@@ -352,6 +353,26 @@ def snap_image(args, scriptParams, devices, params):
 
     systate.seqn += 1
 
+def snap_3D_frame(args, scriptParams, devices, params):
+    print('---snap_3D_frame---')
+    app.processEvents()
+    global systate
+
+    ### Save 3D frame
+    fileName = []
+
+    fileCategory = re.search('([a-zA-Z_]\w*)', args[0]).group()
+    fileName.append(systate.saveFileName[fileCategory])
+    expand_dynvars(fileName, devices)
+
+    devices['3Dsensors'].csvPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
+
+    if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].csvPath):
+        resume_state(scriptParams, devices, params)
+
+        devices['3Dsensors'].snap3D(devices['3Dsensors'].csvPath)
+
+    systate.seqn += 1
 
 def move_robot(args, scriptParams, devices, params):
     print('---move_robot---')

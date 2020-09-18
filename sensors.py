@@ -106,6 +106,9 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.img: QtGui.QPixmap() = None
         self.imgPath = ''
 
+        # 3D frame data
+        self.csvPath = ''
+
         # group
         self.ui_s.cameraControlGroup.setEnabled(False)
         self.ui_s.laserControlGroup.setEnabled(False)
