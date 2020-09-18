@@ -20,7 +20,7 @@
       <widget class="QGraphicsView" name="sensorImage"/>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0,0">
        <item>
         <widget class="QLabel" name="cameraStatusLabel">
          <property name="text">
@@ -40,6 +40,19 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="frameButton">
+         <property name="maximumSize">
+          <size>
+           <width>50</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>frame</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="reconnectButton">
@@ -635,7 +648,7 @@
           <x>10</x>
           <y>30</y>
           <width>211</width>
-          <height>91</height>
+          <height>120</height>
          </rect>
         </property>
         <layout class="QFormLayout" name="formLayout">

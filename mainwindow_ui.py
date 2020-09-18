@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/magikeye/bin/MkECTL/mainwindow.ui'
+# Form implementation generated from reading ui file '/home/magikeye/proj/MkECTL/mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.2
 #

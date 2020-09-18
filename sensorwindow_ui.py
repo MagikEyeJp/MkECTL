@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/magikeye/bin/MkECTL/sensorwindow.ui'
+# Form implementation generated from reading ui file '/home/magikeye/proj/MkECTL/sensorwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.2
 #
@@ -28,6 +28,10 @@ class Ui_sensor(object):
         self.horizontalLayout_2.addWidget(self.cameraStatusLabel)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
+        self.frameButton = QtWidgets.QPushButton(sensor)
+        self.frameButton.setMaximumSize(QtCore.QSize(50, 16777215))
+        self.frameButton.setObjectName("frameButton")
+        self.horizontalLayout_2.addWidget(self.frameButton)
         self.reconnectButton = QtWidgets.QPushButton(sensor)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
@@ -234,7 +238,7 @@ class Ui_sensor(object):
         self.save1Button.setIcon(icon1)
         self.save1Button.setObjectName("save1Button")
         self.layoutWidget = QtWidgets.QWidget(self.cameraControlGroup)
-        self.layoutWidget.setGeometry(QtCore.QRect(10, 30, 211, 91))
+        self.layoutWidget.setGeometry(QtCore.QRect(10, 30, 211, 120))
         self.layoutWidget.setObjectName("layoutWidget")
         self.formLayout = QtWidgets.QFormLayout(self.layoutWidget)
         self.formLayout.setContentsMargins(0, 0, 0, 0)
@@ -348,6 +352,7 @@ class Ui_sensor(object):
         _translate = QtCore.QCoreApplication.translate
         sensor.setWindowTitle(_translate("sensor", "Sensor Window"))
         self.cameraStatusLabel.setText(_translate("sensor", "CAMERA STATE"))
+        self.frameButton.setText(_translate("sensor", "frame"))
         self.reconnectButton.setText(_translate("sensor", "Reconnect"))
         self.IPlabel.setText(_translate("sensor", "RPi adress"))
         self.cameraControlGroup.setTitle(_translate("sensor", "Camera Control"))
