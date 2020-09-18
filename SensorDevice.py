@@ -9,6 +9,7 @@ class SensorDevice:
         self.port = 'localhost'
         self.addr = 8888
         self.client = None
+        self.clientDepth = None
 
     def open(self, addr='localhost', port=8888):
         self.addr = addr
@@ -17,6 +18,7 @@ class SensorDevice:
             self.close()
         bus = pymkeapi.TcpBus(addr, port)
         self.client = pymkeapi.ReservedSyncClient(bus)
+        self.clientDepth = pymkeapi.SyncClient(bus)
         if self.client.get_state() != pymkeapi.STATE_IDLE:
             self.client.set_state(pymkeapi.STATE_IDLE)
             sleep(0.5)
@@ -63,6 +65,25 @@ class SensorDevice:
     def get_image(self, avgcount):
         image = None
         if self.client:
-            image = self.client.get_image(avgcount)
+            image = self.client.get_image(avgcount, image_format="PNG")
         return image
+
+    def get_frame(self):
+        frame = None
+        if self.clientDepth:
+            if self.client.get_state() != pymkeapi.STATE_IDLE:
+                self.client.set_state(pymkeapi.STATE_IDLE)
+                sleep(0.5)
+            self.clientDepth.set_state(pymkeapi.STATE_DEPTH_SENSOR)
+            sleep(0.5)
+
+            frame = self.clientDepth.get_frame(pymkeapi.FRAME_TYPE_2)
+
+            self.clientDepth.set_state(pymkeapi.STATE_IDLE)
+            sleep(0.5)
+            self.client.set_state(pymkeapi.STATE_SERVICE)
+            sleep(0.5)
+            print(frame.lut3d, frame.uid)
+
+        return frame
 
