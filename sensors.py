@@ -4,6 +4,8 @@ import sys
 import re
 import os
 from PIL import Image
+import csv
+import numpy as np
 
 import socket
 import SensorDevice
@@ -88,6 +90,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.prevAveButton.clicked.connect(lambda: self.prevImg(self.frames))
         self.ui_s.save1Button.clicked.connect(lambda: self.saveImg(1))
         self.ui_s.saveAveButton.clicked.connect(lambda: self.saveImg(self.frames))
+        self.ui_s.frameButton.clicked.connect(lambda: self.snap3D('sample.csv'))
 
         self.ui_s.selectDirectoryButton.clicked.connect(self.selectDirectory)
         self.ui_s.resetButton.clicked.connect(self.resetCounter)
@@ -174,10 +177,11 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             # self.ui_s.sensorImage = ImageViewScene.ImageViewer()
             # self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
             # self.ui_s.sensorImage.show()
-            self.getImg(self.frames)
+            # self.getImg(self.frames)
 
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
+            print(e)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
 
@@ -278,7 +282,19 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.imgCounter = 0
         self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
 
+    def snap3D(self, csvName):
+        frame = self.sensor.get_frame()
 
+        uid = np.array(frame.uid).reshape(-1, 1)
+        lut3d = np.array(frame.lut3d)
+
+        data = np.hstack((uid, lut3d))
+
+        f = open(csvName, 'w')
+        writer = csv.writer(f)
+        writer.writerow(['uid', 'x', 'y', 'z'])
+        writer.writerows(data)
+        f.close()
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
