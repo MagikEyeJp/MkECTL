@@ -438,7 +438,14 @@ def set_shutter(args, scriptParams, devices, params):
     app.processEvents()
     global systate
 
-    systate.shutter = int(args[0])
+    isOn = False
+    for l in systate.light:
+        if l > 0:
+            isOn = True
+            break
+
+    m = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
+    systate.shutter = int(m * float(args[0]) + 0.5)
     # systate.shutter = args
 
     if not systate.skip:
@@ -446,15 +453,9 @@ def set_shutter(args, scriptParams, devices, params):
             devices['3Dsensors'].shutterSpeed = int(args[0])
             print('shutter speed: ' + str(args[0]))
 
-            isOn = False
-            for l in systate.light:
-                if l > 0:
-                    isOn = True
-                    break
-
             ### Request to set shutter speed (args[0])
-            m = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
-            devices['3Dsensors'].sensor.set_shutter(int(m * float(args[0]) + 0.5))
+            print('multiplier=', m)
+            devices['3Dsensors'].sensor.set_shutter(systate.shutter)
 
             systate.past_parameters.shutter = systate.shutter
             systate.sentSig.shutter = True
