@@ -347,6 +347,7 @@ def snap_image(args, scriptParams, devices, params):
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
         resume_state(scriptParams, devices, params)
+        time.sleep(0.2)
 
         pixmap = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
         pixmap.save(devices['3Dsensors'].imgPath)
