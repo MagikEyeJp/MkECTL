@@ -279,7 +279,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
         self.ui_s.sensorImage.show()
 
-        return pixmap
+        return image
 
     def resetCounter(self):
         self.imgCounter = 0
