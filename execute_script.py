@@ -333,7 +333,7 @@ def snap_image(args, scriptParams, devices, params):
 
     # im: QtGui.QPixmap() = None
 
-    devices['3Dsensors'].frames = args[1]
+    devices['3Dsensors'].frames = int(args[1])
 
     ### Save image
     fileName = []
@@ -442,7 +442,7 @@ def set_shutter(args, scriptParams, devices, params):
     # systate.shutter = args
 
     if not systate.skip:
-        if not systate.sentSig.shutter or systate.pos != systate.past_parameters.shutter:
+        if not systate.sentSig.shutter or systate.shutter != systate.past_parameters.shutter:
             devices['3Dsensors'].shutterSpeed = int(args[0])
             print('shutter speed: ' + str(args[0]))
 
@@ -467,7 +467,7 @@ def set_gainiso(args, scriptParams, devices, params):
     systate.gainiso = int(args[0])
 
     if not systate.skip:
-        if not systate.sentSig.gainiso or systate.pos != systate.past_parameters.gainiso:
+        if not systate.sentSig.gainiso or systate.gainiso != systate.past_parameters.gainiso:
             devices['3Dsensors'].gainiso = args[0]
             print('gainiso: ' + str(args[0]))
 
@@ -483,13 +483,15 @@ def set_lasers(args, scriptParams, devices, params):
     global systate
 
     systate.lasers = int(args[0])
+    print('args=', args)
 
     if not systate.skip:
-        if not systate.sentSig.lasers or systate.pos != systate.past_parameters.lasers:
-            devices['3Dsensors'].laserX = args[0]
+        if not systate.sentSig.lasers or systate.lasers != systate.past_parameters.lasers:
+            devices['3Dsensors'].laserX = systate.lasers
 
             ### Request to set lasers (args[0])
-            devices['3Dsensors'].sensor.set_lasers(int(args[0]))
+            devices['3Dsensors'].sensor.set_lasers(systate.lasers)
+            print('set_lasers(', systate.lasers, ")")
 
             systate.past_parameters.lasers = systate.lasers
             systate.sentSig.lasers = True
@@ -501,19 +503,28 @@ def set_light(args, scriptParams, devices, params):
     global systate
 
     ch = int(args[0])
+    print('ch=', ch, 'args=', args)
 
     systate.light[ch - 1] = int(args[1])
 
     if not systate.skip:
-        if not systate.sentSig.light[ch - 1] or systate.pos != systate.past_parameters.light[ch - 1]:
-            cmd = ord('A') if int(args[1]) > 0 else ord('a')
+        if not systate.sentSig.light[ch - 1] or systate.light[ch - 1] != systate.past_parameters.light[ch - 1]:
             if 0 < ch < 3:
-                cmd = cmd + ch - 1
                 systate.light[ch - 1] = int(args[1])
+                cmd = ord('A') if int(args[1]) > 0 else ord('a')
+                cmd = cmd + ch - 1
                 devices['lights'].write(bytes([cmd]))
+                # if int(args[1]) > 0:
+                #     print('HIGH')
+                #     flag = 'H'
+                # else:
+                #     print('LOW')
+                #     flag = 'L'
+                # cmd = bytes("*B1OS" + str(ch) + flag + "\r", 'UTF-8')
+                # devices['lights'].write(cmd)
+                systate.past_parameters.light[ch - 1] = systate.light[ch - 1]
+                systate.sentSig.light[ch - 1] = True
 
-            systate.past_parameters.light[ch - 1] = systate.light[ch - 1]
-            systate.sentSig.light[ch - 1] = True
 
 def resume_state(scriptParams, devices, params):
     app.processEvents()
@@ -525,7 +536,7 @@ def resume_state(scriptParams, devices, params):
     move_robot(systate.pos, scriptParams, devices, params)
     set_lasers([systate.lasers], scriptParams, devices, params)
     for i in range(len(systate.light)):
-        set_light([i, systate.light[i]], scriptParams, devices, params)
+        set_light([i + 1, systate.light[i]], scriptParams, devices, params)
 
 # def snap_3D_frame():
 
