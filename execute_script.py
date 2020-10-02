@@ -432,38 +432,33 @@ def home_robot(args, scriptParams, devices, params):
     print('move to ' + str(args))
     move_robot(args, scriptParams, devices, params)
 
+
 def set_shutter(args, scriptParams, devices, params):
     print('---set_shutter---')
     app.processEvents()
     global systate
 
-    isOn = False
-    for l in systate.light:
-        if l > 0:
-            isOn = True
-            break
-
-    m = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
-    systate.shutter = int(m * float(args[0]) + 0.5)
-    if isOn:
-        systate.shutter_IRon = systate.shutter
-    else:
-        firsttime = systate.shutter_IRoff < 0
-        systate.shutter_IRoff = systate.shutter
-        if firsttime:
-            warm_lasers(scriptParams, devices, params)
+    systate.shutter = int(args[0])
 
     if not systate.skip:
-        if not systate.sentSig.shutter or systate.shutter != systate.past_parameters.shutter:
-            devices['3Dsensors'].shutterSpeed = int(args[0])
-            print('shutter speed: ' + str(args[0]))
+        isOn = False
+        for l in systate.light:
+            if l > 0:
+                isOn = True
+                break
 
-            ### Request to set shutter speed (args[0])
-            print('multiplier=', m)
-            devices['3Dsensors'].sensor.set_shutter(systate.shutter)
+        m = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
+        shutter = int(m * float(systate.shutter) + 0.5)
+        if not systate.sentSig.shutter or shutter != systate.past_parameters.shutter:
+            devices['3Dsensors'].shutterSpeed = shutter
+            print('shutter speed: ' + str(shutter))
 
-            systate.past_parameters.shutter = systate.shutter
+            ### Request to set shutter speed
+            devices['3Dsensors'].sensor.set_shutter(shutter)
+
+            systate.past_parameters.shutter = shutter
             systate.sentSig.shutter = True
+
 
 def set_gainiso(args, scriptParams, devices, params):
     print('---set_gainiso---')
@@ -556,12 +551,13 @@ def resume_state(scriptParams, devices, params):
     global systate
     systate.skip = False
 
-    set_shutter([systate.shutter], scriptParams, devices, params)
-    set_gainiso([systate.gainiso], scriptParams, devices, params)
-    move_robot(systate.pos, scriptParams, devices, params)
-    set_lasers([systate.lasers], scriptParams, devices, params)
     for i in range(len(systate.light)):
         set_light([i + 1, systate.light[i]], scriptParams, devices, params)
+    set_lasers([systate.lasers], scriptParams, devices, params)
+    set_gainiso([systate.gainiso], scriptParams, devices, params)
+    set_shutter([systate.shutter], scriptParams, devices, params)
+    move_robot(systate.pos, scriptParams, devices, params)
+
 
 # def snap_3D_frame():
 
