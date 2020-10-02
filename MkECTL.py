@@ -256,7 +256,6 @@ class Ui(QtWidgets.QMainWindow):
         # m = self.params['slider']['cont']
         # scale = self.params['slider']['scale']
         m.speed(10.0)
-        # m.maxTorque(0.5)
         m.maxTorque(1.0)
         m.runForward()
         time.sleep(0.2)
@@ -273,6 +272,7 @@ class Ui(QtWidgets.QMainWindow):
 
         m.free()
         m.presetPosition(0)
+        m.maxTorque(5.0)
         print('preset current position as 0 mm')
         print('-- slider origin has been set --')
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
