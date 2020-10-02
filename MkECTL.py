@@ -209,6 +209,34 @@ class Ui(QtWidgets.QMainWindow):
 
         self.devices['motors'] = self.motors
 
+        # set motor initial parametors
+        m = self.motors['slider']
+        m.enable()
+        m.curveType(1)
+        m.maxSpeed(250)
+        m.acc(8)
+        m.dec(8)
+        m.speed(20)
+        m.maxTorque(5)
+
+        m = self.motors['pan']
+        m.enable()
+        m.curveType(1)
+        m.maxSpeed(250)
+        m.acc(2)
+        m.dec(2)
+        m.speed(7)
+        m.maxTorque(5)
+
+        m = self.motors['tilt']
+        m.enable()
+        m.curveType(1)
+        m.maxSpeed(250)
+        m.acc(2)
+        m.dec(2)
+        m.speed(7)
+        m.maxTorque(5)
+
         # IR light
         self.openIR('/dev/ttyACM0')
 
