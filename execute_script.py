@@ -394,9 +394,6 @@ def move_robot(args, scriptParams, devices, params):
     pos = [0.0, 0.0, 0.0]
     vel = [0.0, 0.0, 0.0]
     torque = [0.0, 0.0, 0.0]
-    Error = [0.0, 0.0, 0.0]
-    Errors = 0.0
-    # print(devices)
 
     for param_i in range(args.size):
         m.append(devices['motors'][motorSet[param_i]])
@@ -407,22 +404,19 @@ def move_robot(args, scriptParams, devices, params):
 
     if not systate.skip:
         if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
+            for param_i in range(args.size):
+                m[param_i].moveTo(motorPos[param_i] * scale[param_i])
+
             while True:
+                errors = 0.0
                 for param_i in range(args.size):
-                    m[param_i].moveTo(motorPos[param_i] * scale[param_i])
                     time.sleep(0.2)
                     app.processEvents()
-
                     (pos[param_i], vel[param_i], torque[param_i]) = m[param_i].read_motor_measurement()
-                    Error[param_i] = pow(pos[param_i] - motorPos[param_i] * scale[param_i], 2)
-                    Errors += Error[param_i]
-                    # print(Error[param_i])
+                    errors += pow(pos[param_i] - (motorPos[param_i] * scale[param_i]), 2)
 
-                if math.sqrt(Errors) < 0.1:
-                        # print(pos)
-                        # print(torque)
-                        break
-                Errors = 0.0
+                if math.sqrt(errors) < 0.1:
+                    break
 
             systate.past_parameters.pos = systate.pos
             systate.sentSig.pos = True
