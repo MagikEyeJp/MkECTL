@@ -116,6 +116,8 @@ class Systate():
 
         self.pos = [0, 0, 0]
         self.shutter = 0
+        self.shutter_IRon = -1
+        self.shutter_IRoff = -1
         self.gainiso = 0
         self.lasers = 0
         self.light = [0, 0]
@@ -164,6 +166,8 @@ def execute_script(scriptParams, devices, params):
     progressBar.show()
 
     args_hist: list = []
+
+    warm_lasers(scriptParams, devices, params)
 
     for i, line in enumerate(lines):
         if progressBar.stopClicked:
@@ -353,6 +357,7 @@ def snap_image(args, scriptParams, devices, params):
         image.save(devices['3Dsensors'].imgPath)
 
     systate.seqn += 1
+    warm_lasers(scriptParams, devices, params)
 
 def snap_3D_frame(args, scriptParams, devices, params):
     print('---snap_3D_frame---')
@@ -446,7 +451,13 @@ def set_shutter(args, scriptParams, devices, params):
 
     m = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
     systate.shutter = int(m * float(args[0]) + 0.5)
-    # systate.shutter = args
+    if isOn:
+        systate.shutter_IRon = systate.shutter
+    else:
+        firsttime = systate.shutter_IRoff < 0
+        systate.shutter_IRoff = systate.shutter
+        if firsttime:
+            warm_lasers(scriptParams, devices, params)
 
     if not systate.skip:
         if not systate.sentSig.shutter or systate.shutter != systate.past_parameters.shutter:
@@ -525,6 +536,25 @@ def set_light(args, scriptParams, devices, params):
                 # devices['lights'].write(cmd)
                 systate.past_parameters.light[ch - 1] = systate.light[ch - 1]
                 systate.sentSig.light[ch - 1] = True
+
+
+def warm_lasers(scriptParams, devices, params):
+    global systate
+    current_skip = systate.skip
+    current_lasers = systate.lasers
+    current_shutter = systate.shutter
+
+    print('---warm lasers---')
+    systate.skip = False
+    if systate.shutter_IRoff > 0:
+        set_shutter([systate.shutter_IRoff], scriptParams, devices, params)
+        print('  shutter=', systate.shutter_IRoff)
+    set_lasers([255], scriptParams, devices, params)
+
+    systate.skip = current_skip
+    systate.lasers = current_lasers
+    systate.shutter = current_shutter
+    time.sleep(0.1)
 
 
 def resume_state(scriptParams, devices, params):
