@@ -169,9 +169,17 @@ def execute_script(scriptParams, devices, params):
 
     warm_lasers(scriptParams, devices, params)
 
+    # ---------- make ini file ----------
+    if not scriptParams.isContinue:
+        # ini.generateIni(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        ini.updateIni_start(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+    # ------------------------------
+
     for i, line in enumerate(lines):
         if progressBar.stopClicked:
             print('Interrupted')
+            ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+
             return progressBar.stopClicked
             # break
 
@@ -218,6 +226,7 @@ def execute_script(scriptParams, devices, params):
         progressBar.updateProgressLabel()
         progressBar.updatePercentage()
 
+    ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
     return True
 
 ##########
@@ -325,10 +334,7 @@ def set_filename(args, scriptParams, devices, params):
         os.makedirs(systate.dir_path[args[0]])  # https://note.nkmk.me/python-os-mkdir-makedirs/
     # systate.folderCreated[args[0]] = True
     systate.folderCreated = True
-    # ---------- make ini file ----------
-    if not scriptParams.isContinue:
-        ini.generateIni(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-    # ------------------------------
+
 
 def snap_image(args, scriptParams, devices, params):
     print('---snap_image---')
