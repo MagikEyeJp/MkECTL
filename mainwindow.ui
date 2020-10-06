@@ -780,13 +780,13 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>184</x>
         <y>130</y>
         <width>299</width>
-        <height>51</height>
+        <height>54</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="saveLayput">
@@ -1573,7 +1573,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>IR light on</string>
+      <string>IR light -- ON</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_3">
@@ -1586,7 +1586,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>IR light off</string>
+      <string>IR light -- OFF</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="IRonMultiplier">
