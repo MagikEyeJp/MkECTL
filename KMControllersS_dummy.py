@@ -63,17 +63,23 @@ class Controller:
         """
         Set the maximum speed of rotation to the 'max_speed' in rad/sec.
         """
-        command=b'\x02'
-        values=float2bytes(max_speed)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x02'
+        # values=float2bytes(max_speed)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('maxSpeed : ' + str(max_speed))
 
     def minSpeed(self,min_speed,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the minimum speed of rotation to the 'min_speed' in rad/sec.
         """
-        command=b'\x03'
-        values=float2bytes(min_speed)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x03'
+        # values=float2bytes(min_speed)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('minSpeed : ' + str(min_speed))
 
     def curveType(self,curve_type,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -85,25 +91,34 @@ class Controller:
         }
         """
 
-        command=b'\x05'
-        values=uint8_t2bytes(curve_type)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x05'
+        # values=uint8_t2bytes(curve_type)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('curveType : ' + str(curve_type))
 
     def acc(self,_acc,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the acceleration of rotation to the positive 'acc' in rad/sec^2.
         """
-        command=b'\x07'
-        values=float2bytes(_acc)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x07'
+        # values=float2bytes(_acc)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('acc : ' + str(_acc))
 
     def dec(self,_dec,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the deceleration of rotation to the positive 'dec' in rad/sec^2.
         """
-        command=b'\x08'
-        values=float2bytes(_dec)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x08'
+        # values=float2bytes(_dec)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('dec : ' + str(_dec))
 
     def maxTorque(self,max_torque,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
