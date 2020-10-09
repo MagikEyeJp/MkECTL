@@ -77,8 +77,24 @@ def updateIni_finish(dirname, scriptName):
     with open(dirname + '/Log.ini', 'w') as configfile:
         config.write(configfile)
 
+def getPreviousScriptPath(iniFile):
+    config = configparser.ConfigParser()
+    config.read(iniFile)
+    scriptPath = config.get('previous_script', 'scriptpath')
 
+    return scriptPath
+
+def updatePreviousScriptPath(iniFile, scriptName):
+    # update/generate previousScript.ini
+    config_ps = configparser.RawConfigParser()
+
+    section = 'previous_script'
+    config_ps.add_section(section)
+    config_ps.set(section, 'scriptpath', scriptName)
+
+    with open(iniFile, 'w') as configfile:
+        config_ps.write(configfile)
 
 if __name__ == '__main__':
-    generateIni('.')
+    generateIni('.', 'script/sampleScript1.txt')
     loadIni('.')

@@ -340,8 +340,16 @@ class Ui(QtWidgets.QMainWindow):
             self.ui.unitLabel.setText('deg')
 
     def openScriptFile(self):  # https://www.xsim.info/articles/PySide/special-dialogs.html#OpenFile
+        previousScriptPath = ''
+        previousScriptDir = './script/'
+        previousScript_iniFile = 'data/previousScript.ini'
+        if os.path.exists('data/previousScript.ini'):
+            previousScriptPath = ini.getPreviousScriptPath(previousScript_iniFile)
+            if os.path.exists(previousScriptPath):
+                previousScriptDir = os.path.dirname(previousScriptPath)
+
         (fileName, selectedFilter) = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', './script/', '*.txt')
+            QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', previousScriptDir, '*.txt')
 
         self.ui.scriptName_label.setText(
             os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
