@@ -1,48 +1,31 @@
-KMControllersSのdummy版を作るにあたって最低限変更したい機能
-
-・モータオブジェクトの生成
-	m = KMControllersS.USBController('/dev/ttyUSB0')
-	getMotorDic()の中で使用する。
-	ここでUSBControllerのインスタンスにidをもたせるか？
-・read_SN().decode()
-	motordicを作るときに必要
-・enable()
-・disable()
-・reboot()
-・close()
-・free()
-・interface(8)
-・(saveAllRegisters())
-・runForward()
-・runReverse()
-・stop()
-・speed(num)
-・maxTorque(num)
-・presetPosition(num)
-・moveTo(num)
-・(moveTo_scaled(num))
-・read_motor_measurement()
-	return (position, velocity, torque)←これらはUSBControllerのメンバ変数(m_*)
-
-その他
-motordicはどうしよ。。。
-
-
 -----
 TODO & Ideas
 ・プログレスバーはメインウィンドウの下部に組み込みでいいかも(フローティングウィンドウだと迷子になる問題)
 ・Ops to execute:のあとにコマンド数が表示されるはず
-・センサーウィンドウがメインにドッキングするといいかも
+・センサーウィンドウがメインにドッキングするといいかも(Qtにあるかも)
 ・センサーウィンドウの画像表示にズーム機能
 ・センサーウィンドウの画像表示がウィンドウの拡大縮小にリアルタイムに追従
+・センサーウィンドウに十字とか入るといい
 ・スクリプト実行中止後待たされないように
 ・現在のモーターの位置を読み取ってSpinBoxに反映するポタン
 ・ファイル/フォルダ選択の前回の位置を覚えておく機能
 ・クラス関係の整理(かんたんなクラス図を作って考える)
 ・新旧キャリブレータ両対応のソースにする
 ・キャリブレータのモータIDやscaleなどを設定ファイルから読むようにする
-・PIDなどの設定機能
+・PIDなどの設定機能(detailed settingsの追加)
 ・ソースファイルの整形、いらないコメント/処理の整理
 ・センサーオープン時にシャッター速度/ゲインをUIの通りに設定
 ・複数スクリプトを連続実行
+
+・Iniファイルの取り扱い、カメラ側とレーザー側のキャリブレーションをどう扱うか
+・既にあるサブフォルダを選択した上で異なるスクリプトをこのときに指定してしまうと、
+フォルダ内がごっちゃになっちゃうので、そうさせない工夫も今後必要かも知れない
+・flowchartやdocumentationの編集(Readmeにfile watcherのこと書いておく、見直して編集)
+・sample.csvのようなjsonファイルも作れるといい
+・スクリプト実行中、各プロセスの待機中に、stopが押されたかの判定をする
+・スクリプトを選んだら、その場所を保存しておく
+(次回プロジェクトを開いた時に、またそのスクリプトパスのフォルダが開けるといい)
+・モーターが動いた時にキャプチャ
+・Scriptを開くときに、iniのセクション数を読み取って、
+最後のセクションのスクリプトパスでスクリプト選ぶウィンドウを開くように今後する
 
