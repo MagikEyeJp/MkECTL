@@ -351,23 +351,33 @@ class Ui(QtWidgets.QMainWindow):
         (fileName, selectedFilter) = \
             QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', previousScriptDir, '*.txt')
 
-        self.ui.scriptName_label.setText(
-            os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
-        self.scriptParams.scriptName = fileName
+        if fileName == '':  # when cancel pressed
+            pass
+        else:
+            ini.updatePreviousScriptPath(previousScript_iniFile, fileName)
+            self.ui.scriptName_label.setText(
+                os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
+            self.scriptParams.scriptName = fileName
 
     def openBaseFolder(self):
         fileName = \
             QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder')
 
-        self.ui.baseFolderName_label.setText(os.path.abspath(fileName))
-        self.scriptParams.baseFolderName = fileName
+        if fileName == '':  # when cancel pressed
+            pass
+        else:
+            self.ui.baseFolderName_label.setText(os.path.abspath(fileName))
+            self.scriptParams.baseFolderName = fileName
 
     def openSubFolder(self):
         fileName = \
             QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder', self.scriptParams.baseFolderName + '/')
 
-        self.ui.subFolderName_label.setText(os.path.basename(fileName))
-        self.scriptParams.subFolderName = os.path.basename(fileName)
+        if fileName == '':  # when cancel pressed
+            pass
+        else:
+            self.ui.subFolderName_label.setText(os.path.basename(fileName))
+            self.scriptParams.subFolderName = os.path.basename(fileName)
 
     def renewSubFolder(self):
         self.scriptParams.renewSubFolderName()
