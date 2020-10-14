@@ -15,7 +15,7 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・キャリブレータのモータIDやscaleなどを設定ファイルから読むようにする
 ・PIDなどの設定機能(detailed settingsの追加)
 ・ソースファイルの整形、いらないコメント/処理の整理
-・センサーオープン時にシャッター速度/ゲインをUIの通りに設定
+・[DONE]センサーオープン時にシャッター速度/ゲインをUIの通りに設定
 ・複数スクリプトを連続実行
 
 ・iniファイルの取り扱い、カメラ側とレーザー側のキャリブレーションをどう扱うか
@@ -28,5 +28,5 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・Image Capture時にタイムアウト(10秒くらい)するようにする(MkeAPI変えないとだめか?) タイムアウト後はエラー終了するか再要求するかは未定
 
 BUG?
-・センサーをオープンしたまま、センサーを再起動すると、センサーウィンドウでキャプチャできなくなる。MkECTLを立ち上げ直さないと復帰できない。
-・Continue開始されない
+・[DONE]センサーをオープンしたまま、センサーを再起動すると、センサーウィンドウでキャプチャできなくなる。MkECTLを立ち上げ直さないと復帰できない。
+・[almost DONE]Continue開始されない
