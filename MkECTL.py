@@ -424,9 +424,9 @@ class Ui(QtWidgets.QMainWindow):
 
                 if self.ui.scriptName_label.text() != previouslyExecutedScriptName:
                     ret = QtWidgets.QMessageBox.question\
-                        (self, '', "The previously executed script is different from what you chose.\n"
-                                   "- the previous one: " + previouslyExecutedScriptName +"\n"
-                                    "- the one you selected: " + self.ui.scriptName_label.text() + "\n"
+                        (self, '', "The previously executed script is different from what you selected.\n"
+                                   "- The previous one: \"" + previouslyExecutedScriptName +"\"\n"
+                                    "- The one you selected: \"" + self.ui.scriptName_label.text() + "\"\n"
                                     "Click [Yes] to continue the former, or [No] to execute the latter from the top.",
                          QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
 
