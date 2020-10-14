@@ -126,8 +126,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.IPaddress = self.RPiaddress
 
         self.connectToSensor()
-        self.ui_s.cameraControlGroup.setEnabled(True)
-        self.ui_s.laserControlGroup.setEnabled(True)
+
 
     def changeShutter(self):
         if self.ui_s.shutterLineEdit.text() == '':
@@ -169,8 +168,17 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # self.sensor = SensorDevice.SensorDevice()
 
         try:
+            self.sensor = SensorDevice.SensorDevice()
+
             self.sensor.open(self.IPaddress, self.portNum)
-            self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor')
+
+            # initialize values
+            self.changeShutter()
+            self.changeFrames()
+            self.changeISO()
+            self.setLaser('0x0000')
+
+            self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor and set parameter values')
 
             # temp
             self.scene = ImageViewScene.ImageViewScene()
@@ -182,13 +190,16 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             # self.ui_s.sensorImage.show()
             # self.getImg(self.frames)
 
+            self.ui_s.cameraControlGroup.setEnabled(True)
+            self.ui_s.laserControlGroup.setEnabled(True)
+
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
             print(e)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
 
-
+            self.ui_s.sensorImage.setScene(self.scene)
 
     def laser_custom(self):
         if self.ui_s.hex4dCheckBox.isChecked():
