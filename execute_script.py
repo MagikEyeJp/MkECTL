@@ -170,9 +170,15 @@ def execute_script(scriptParams, devices, params):
     warm_lasers(scriptParams, devices, params)
 
     # ---------- make ini file ----------
-    if not scriptParams.isContinue:
-        # ini.generateIni(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-        ini.updateIni_start(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+    # if scriptParams.isContinue:
+    #     # ini.generateIni(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+    #     if not os.path.exists(scriptParams.baseFolderName + '/'
+    #                           + scriptParams.subFolderName + '/'
+    #                           + 'Log.ini'):
+    #         ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
+    # else:
+    #     ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
+    ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
     # ------------------------------
 
     for i, line in enumerate(lines):

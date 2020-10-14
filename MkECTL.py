@@ -414,8 +414,27 @@ class Ui(QtWidgets.QMainWindow):
             if os.path.exists(self.scriptParams.baseFolderName + '/'
                               + self.scriptParams.subFolderName + '/'
                               + 'Log.ini'):
-                self.scriptParams.scriptName = ini.loadIni(
+
+                previouslyExecutedScriptName = os.path.basename(ini.loadIni(
+                    self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName))
+                # previouslyExecutedScriptDir = os.path.dirname(ini.loadIni(
+                #     self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName))
+                previouslyExecutedScript = ini.loadIni(
                     self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
+
+                if self.ui.scriptName_label.text() != previouslyExecutedScriptName:
+                    ret = QtWidgets.QMessageBox.question\
+                        (self, '', "The previously executed script is different from what you chose.\n"
+                                   "- the previous one: " + previouslyExecutedScriptName +"\n"
+                                    "- the one you selected: " + self.ui.scriptName_label.text() + "\n"
+                                    "Click [Yes] to continue the former, or [No] to execute the latter from the top.",
+                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+
+                    if ret == QtWidgets.QMessageBox.Yes:
+                        self.scriptParams.scriptName = previouslyExecutedScript
+                    else:
+                        # self.scriptParams.scriptName = self.ui.scriptName_label.text()
+                        pass
                 self.ui.scriptName_label.setText(os.path.basename(self.scriptParams.scriptName))
         else:
             self.scriptParams.isContinue = False

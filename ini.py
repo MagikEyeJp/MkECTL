@@ -8,7 +8,10 @@ import datetime
 def loadIni(dirname):
     config = configparser.ConfigParser()
     config.read(dirname + '/Log.ini')
-    scriptPath = config.get('script', 'scriptpath')
+
+    sectionNum = len(config.sections())
+
+    scriptPath = config.get('script' + str(sectionNum), 'scriptpath')
 
     print('scriptpath: ' + scriptPath)
 
@@ -33,10 +36,10 @@ def generateIni(dirname, scriptName):
     with open(dirname + '/Log.ini', 'w') as configfile:
         config.write(configfile)
 
-def updateIni_start(dirname, scriptName):
-    if os.path.exists(dirname + '/Log.ini'):
+def updateIni_start(baseFolder, subFolder, scriptName, isContinue):
+    if os.path.exists(baseFolder + '/' + subFolder + '/Log.ini'):
         config = configparser.ConfigParser()
-        config.read(dirname + '/Log.ini')
+        config.read(baseFolder + '/' + subFolder + '/Log.ini')
 
         newSectionNum = len(config.sections()) + 1
         newSection = 'script' + str(newSectionNum)
@@ -44,11 +47,17 @@ def updateIni_start(dirname, scriptName):
         config.set(newSection, 'section_no', str(newSectionNum))
         config.set(newSection, 'scriptpath', scriptName)
 
+        lastExecutedScript = config.get('script' + str(newSectionNum - 1),
+                                        'scriptpath')
+
         dt_start = datetime.datetime.now()
         config.set(newSection, 'start_time', str(dt_start))
 
-        with open(dirname + '/Log.ini', 'w') as configfile:
-            config.write(configfile)
+        if isContinue and lastExecutedScript == scriptName:
+            pass
+        else:
+            with open(baseFolder + '/' + subFolder + '/Log.ini', 'w') as configfile:
+                config.write(configfile)
 
     else:
         config = configparser.RawConfigParser()
@@ -61,7 +70,7 @@ def updateIni_start(dirname, scriptName):
         dt_start = datetime.datetime.now()
         config.set(section1, 'start_time', str(dt_start))
 
-        with open(dirname + '/Log.ini', 'w') as configfile:
+        with open(baseFolder + '/' + subFolder + '/Log.ini', 'w') as configfile:
             config.write(configfile)
 
 def updateIni_finish(dirname, scriptName):
