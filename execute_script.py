@@ -193,7 +193,7 @@ def execute_script(scriptParams, devices, params, mainWindow):
     args_hist: list = []
     com_hist: list = []
 
-    warm_lasers(scriptParams, devices, params)
+    warm_lasers(scriptParams, devices, params, mainWindow)
 
     # ---------- make ini file ----------
     ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
@@ -202,21 +202,20 @@ def execute_script(scriptParams, devices, params, mainWindow):
     commandNum = countCommandNum(scriptParams, args_hist, com_hist)
     mainWindow.ui.numOfCommands_label.setText(str(commandNum))
 
+    mainWindow.stopClicked = False
+    mainWindow.total = len(com_hist)
+    mainWindow.updateProgressLabel()
+    # mainWindow.show()
+
     for i in range(commandNum):
         app.processEvents()
 
         if mainWindow.stopClicked:
             print('Interrupted')
             ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-
             return mainWindow.stopClicked
-            # break
-        print(' ########## ' + str(i) + '/' + str(len(com_hist)) + ' ########## ')
 
-        mainWindow.stopClicked = False
-        mainWindow.total = len(com_hist)
-        mainWindow.updateProgressLabel()
-        mainWindow.show()
+        print(' ########## ' + str(i) + '/' + str(len(com_hist)) + ' ########## ')
 
         systate.args = args_hist[i]
         systate.skip = commands[com_hist[i]][1]
@@ -225,7 +224,7 @@ def execute_script(scriptParams, devices, params, mainWindow):
         mainWindow.ui.commandLabel.setText(com_hist[i])
 
         # jump to a method(function)
-        eval(commands[com_hist[i]][0])(systate.args, scriptParams, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
+        isStop = eval(commands[com_hist[i]][0])(systate.args, scriptParams, devices, params, mainWindow)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
 
         # GUI
         mainWindow.done = i
@@ -316,14 +315,14 @@ def expand_dynvars(args, devices):
 
 ##########
 
-def set_root(args, scriptParams, devices, params):
+def set_root(args, scriptParams, devices, params, mainWindow):
     print('---set_root---')
     app.processEvents()
     global systate
     systate.root = args[0]
 
 
-def set_filename(args, scriptParams, devices, params):
+def set_filename(args, scriptParams, devices, params, mainWindow):
     print('---set_filename---')
 
     app.processEvents()
@@ -342,9 +341,15 @@ def set_filename(args, scriptParams, devices, params):
     systate.folderCreated = True
 
 
-def snap_image(args, scriptParams, devices, params):
+def snap_image(args, scriptParams, devices, params, mainWindow):
     print('---snap_image---')
+
     app.processEvents()
+    if mainWindow.stopClicked:
+        print('Interrupted')
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        return mainWindow.stopClicked
+
     global systate
 
     # im: QtGui.QPixmap() = None
@@ -362,18 +367,24 @@ def snap_image(args, scriptParams, devices, params):
     devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
-        resume_state(scriptParams, devices, params)
+        resume_state(scriptParams, devices, params, mainWindow)
         time.sleep(0.2)
 
         image = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
         image.save(devices['3Dsensors'].imgPath)
 
     systate.seqn += 1
-    warm_lasers(scriptParams, devices, params)
+    warm_lasers(scriptParams, devices, params, mainWindow)
 
-def snap_3D_frame(args, scriptParams, devices, params):
+def snap_3D_frame(args, scriptParams, devices, params, mainWindow):
     print('---snap_3D_frame---')
+
     app.processEvents()
+    if mainWindow.stopClicked:
+        print('Interrupted')
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        return mainWindow.stopClicked
+
     global systate
 
     ### Save 3D frame
@@ -392,7 +403,7 @@ def snap_3D_frame(args, scriptParams, devices, params):
 
     systate.seqn += 1
 
-def move_robot(args, scriptParams, devices, params):
+def move_robot(args, scriptParams, devices, params, mainWindow):
     print('---move_robot---')
     print('move to ' + str(args))
     global systate
@@ -423,7 +434,14 @@ def move_robot(args, scriptParams, devices, params):
                 errors = 0.0
                 for param_i in range(args.size):
                     time.sleep(0.2)
+
                     app.processEvents()
+                    if mainWindow.stopClicked:
+                        print('Interrupted')
+                        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
+                                             scriptParams.scriptName)
+                        return mainWindow.stopClicked
+
                     (pos[param_i], vel[param_i], torque[param_i]) = m[param_i].read_motor_measurement()
                     errors += pow(pos[param_i] - (motorPos[param_i] * scale[param_i]), 2)
 
@@ -435,19 +453,31 @@ def move_robot(args, scriptParams, devices, params):
             time.sleep(1.0)
 
 
-def home_robot(args, scriptParams, devices, params):
+def home_robot(args, scriptParams, devices, params, mainWindow):
     print('---home_robot---')
+
     app.processEvents()
+    if mainWindow.stopClicked:
+        print('Interrupted')
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        return mainWindow.stopClicked
+
     global systate
 
     # if not systate.skip:
     print('move to ' + str(args))
-    move_robot(args, scriptParams, devices, params)
+    move_robot(args, scriptParams, devices, params, mainWindow)
 
 
-def set_shutter(args, scriptParams, devices, params):
+def set_shutter(args, scriptParams, devices, params, mainWindow):
     print('---set_shutter---')
+
     app.processEvents()
+    if mainWindow.stopClicked:
+        print('Interrupted')
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        return mainWindow.stopClicked
+
     global systate
 
     systate.shutter = int(args[0])
@@ -472,9 +502,15 @@ def set_shutter(args, scriptParams, devices, params):
             systate.sentSig.shutter = True
 
 
-def set_gainiso(args, scriptParams, devices, params):
+def set_gainiso(args, scriptParams, devices, params, mainWindow):
     print('---set_gainiso---')
+
     app.processEvents()
+    if mainWindow.stopClicked:
+        print('Interrupted')
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        return mainWindow.stopClicked
+
     global systate
 
     systate.gainiso = int(args[0])
@@ -490,9 +526,15 @@ def set_gainiso(args, scriptParams, devices, params):
             systate.past_parameters.gainiso = systate.gainiso
             systate.sentSig.gainiso = True
 
-def set_lasers(args, scriptParams, devices, params):
+def set_lasers(args, scriptParams, devices, params, mainWindow):
     print('---set_lasers---')
+
     app.processEvents()
+    if mainWindow.stopClicked:
+        print('Interrupted')
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        return mainWindow.stopClicked
+
     global systate
 
     systate.lasers = int(args[0])
@@ -510,9 +552,15 @@ def set_lasers(args, scriptParams, devices, params):
             systate.sentSig.lasers = True
 
 
-def set_light(args, scriptParams, devices, params):
+def set_light(args, scriptParams, devices, params, mainWindow):
     print('---set_light---')
+
     app.processEvents()
+    if mainWindow.stopClicked:
+        print('Interrupted')
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        return mainWindow.stopClicked
+
     global systate
 
     ch = int(args[0])
@@ -539,7 +587,13 @@ def set_light(args, scriptParams, devices, params):
                 systate.sentSig.light[ch - 1] = True
 
 
-def warm_lasers(scriptParams, devices, params):
+def warm_lasers(scriptParams, devices, params, mainWindow):
+    app.processEvents()
+    if mainWindow.stopClicked:
+        print('Interrupted')
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        return mainWindow.stopClicked
+
     global systate
     current_skip = systate.skip
     current_lasers = systate.lasers
@@ -550,7 +604,7 @@ def warm_lasers(scriptParams, devices, params):
     if systate.shutter_IRoff > 0:
         set_shutter([systate.shutter_IRoff], scriptParams, devices, params)
         print('  shutter=', systate.shutter_IRoff)
-    set_lasers([255], scriptParams, devices, params)
+    set_lasers([255], scriptParams, devices, params, mainWindow)
 
     systate.skip = current_skip
     systate.lasers = current_lasers
@@ -558,17 +612,22 @@ def warm_lasers(scriptParams, devices, params):
     time.sleep(0.1)
 
 
-def resume_state(scriptParams, devices, params):
+def resume_state(scriptParams, devices, params, mainWindow):
     app.processEvents()
+    if mainWindow.stopClicked:
+        print('Interrupted')
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        return mainWindow.stopClicked
+
     global systate
     systate.skip = False
 
     for i in range(len(systate.light)):
-        set_light([i + 1, systate.light[i]], scriptParams, devices, params)
-    set_lasers([systate.lasers], scriptParams, devices, params)
-    set_gainiso([systate.gainiso], scriptParams, devices, params)
-    set_shutter([systate.shutter], scriptParams, devices, params)
-    move_robot(systate.pos, scriptParams, devices, params)
+        set_light([i + 1, systate.light[i]], scriptParams, devices, params, mainWindow)
+    set_lasers([systate.lasers], scriptParams, devices, params, mainWindow)
+    set_gainiso([systate.gainiso], scriptParams, devices, params, mainWindow)
+    set_shutter([systate.shutter], scriptParams, devices, params, mainWindow)
+    move_robot(systate.pos, scriptParams, devices, params, mainWindow)
 
 
 # def snap_3D_frame():
