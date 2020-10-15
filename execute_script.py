@@ -152,20 +152,14 @@ def execute_script(scriptParams, devices, params):
     # devices: motors, lights, 3D sensors(sensor window)
     # params: motorDic
 
-    # num of pictures
-
-    # print(commands['root'][0])
     f = open(scriptParams.scriptName)
     lines = f.read().splitlines()
     f.close()
 
     progressBar = ProgressWindow()  # make an instance
-    progressBar.stopClicked = False
-    progressBar.total = len(lines)
-    progressBar.updateProgressLabel()
-    progressBar.show()
 
     args_hist: list = []
+    com_hist: list = []
 
     warm_lasers(scriptParams, devices, params)
 
@@ -182,15 +176,6 @@ def execute_script(scriptParams, devices, params):
     # ------------------------------
 
     for i, line in enumerate(lines):
-        if progressBar.stopClicked:
-            print('Interrupted')
-            ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-
-            return progressBar.stopClicked
-            # break
-
-        print(' ########## ' + str(i) + '/' + str(len(lines)) + ' ########## ')
-
 
         app.processEvents()
         if(len(line) == 0) or ("#" in line):  # (length of character = 0) or include "#"
@@ -217,15 +202,31 @@ def execute_script(scriptParams, devices, params):
         else:  # home only
             args = np.array([0, 0, 0], dtype=int)
 
-        systate.args = args
-        systate.skip = commands[com][1]
+        args_hist.append(args)
+        com_hist.append(com)
+
+    for i in range(len(com_hist)):
+        if progressBar.stopClicked:
+            print('Interrupted')
+            ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+
+            return progressBar.stopClicked
+            # break
+        print(' ########## ' + str(i) + '/' + str(len(com_hist)) + ' ########## ')
+
+        progressBar.stopClicked = False
+        progressBar.total = len(com_hist)
+        progressBar.updateProgressLabel()
+        progressBar.show()
+
+        systate.args = args_hist[i]
+        systate.skip = commands[com_hist[i]][1]
 
         # GUI
-        progressBar.ui_script.commandLabel.setText(com)
+        progressBar.ui_script.commandLabel.setText(com_hist[i])
 
         # jump to a method(function)
-        eval(commands[com][0])(systate.args, scriptParams, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
-        args_hist.append(args)
+        eval(commands[com_hist[i]][0])(systate.args, scriptParams, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
 
         # GUI
         progressBar.done = i
