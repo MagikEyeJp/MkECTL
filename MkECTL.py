@@ -387,6 +387,9 @@ class Ui(QtWidgets.QMainWindow):
                 os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
             self.scriptParams.scriptName = fileName
 
+            commandNum = execute_script.countCommandNum(self.scriptParams, [], [])
+            self.ui.numOfCommands_label.setText(str(commandNum))
+
     def openBaseFolder(self):
         fileName = \
             QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder')
@@ -429,10 +432,12 @@ class Ui(QtWidgets.QMainWindow):
 
     def keyPressEvent(self, event):
         key = event.key()
-        # if key == QtCore.Qt.Key_Escape:
-        #     # self.close()
+        if key == QtCore.Qt.Key_Escape:
+            self.interrupt()
 
     def run_script(self, isContinue):
+        self.stopClicked = False
+
         if isContinue:
             self.scriptParams.isContinue = True
             if self.scriptParams.subFolderName == '':
@@ -481,7 +486,7 @@ class Ui(QtWidgets.QMainWindow):
         # GUI
         self.GUIwhenScripting(False)
 
-        stopped = execute_script.execute_script(self.scriptParams, self.devices, self.params)
+        stopped = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
         self.GUIwhenScripting(stopped)
 
@@ -612,6 +617,20 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.continueButton.setEnabled(bool)
         self.ui.executeScript_button.setEnabled(bool)
 
+# ----- Scripting-related functions -----
+    def updatePercentage(self):
+        self.percent = self.done / self.total * 100
+        # print(self.percent)
+        self.ui.progressBar.setValue(self.percent)
+        return self.percent
+
+    def updateProgressLabel(self):
+        self.ui.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
+
+    def interrupt(self):
+        self.stopClicked = True
+        # self.close()
+# ----------
 
 
 
