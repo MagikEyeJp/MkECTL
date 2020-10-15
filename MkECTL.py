@@ -34,6 +34,23 @@ class ScriptParams():
         self.now = datetime.datetime.now()
         self.subFolderName = self.now.strftime('%Y%m%d_%H%M%S')
 
+class MyMessageBox(QtWidgets.QMessageBox):
+    def __init__(self):
+        super(MyMessageBox, self).__init__()
+
+    def closeEvent(self, QCloseEvent):  # real signature unknown; restored from __doc__
+        """ closeEvent(self, QCloseEvent) """
+        answer = QtWidgets.QMessageBox.question(
+            self,
+            'Message',
+            'Are you sure you want to quit ?',
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+            QtWidgets.QMessageBox.No)
+        if answer == QtWidgets.QMessageBox.Yes:
+            QCloseEvent.accept()
+        else:
+            QCloseEvent.ignore()
+
 class Ui(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super(Ui, self).__init__(parent)
@@ -422,9 +439,12 @@ class Ui(QtWidgets.QMainWindow):
                 previouslyExecutedScript = ini.loadIni(
                     self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
 
+                qm = MyMessageBox()
+
                 if self.ui.scriptName_label.text() != previouslyExecutedScriptName:
-                    ret = QtWidgets.QMessageBox.question\
-                        (self, '', "The previously executed script is different from what you selected.\n"
+                    # ret = QtWidgets.QMessageBox.question \
+                    ret = qm.question \
+                                (self, 'Which script to execute?', "The previously executed script is different from what you selected.\n"
                                    "- The previous one: \"" + previouslyExecutedScriptName +"\"\n"
                                     "- The one you selected: \"" + self.ui.scriptName_label.text() + "\"\n"
                                     "Click [Yes] to continue the former, or [No] to execute the latter from the top.",
@@ -432,9 +452,11 @@ class Ui(QtWidgets.QMainWindow):
 
                     if ret == QtWidgets.QMessageBox.Yes:
                         self.scriptParams.scriptName = previouslyExecutedScript
-                    else:
+                    elif ret == QtWidgets.QMessageBox.No:
                         # self.scriptParams.scriptName = self.ui.scriptName_label.text()
                         pass
+                    else:
+                        return
                 self.ui.scriptName_label.setText(os.path.basename(self.scriptParams.scriptName))
         else:
             self.scriptParams.isContinue = False
