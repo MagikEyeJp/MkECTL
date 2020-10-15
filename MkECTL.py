@@ -66,11 +66,22 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.IRlightControlGroup.setEnabled(False)
         self.ui.continueButton.setEnabled(False)
         self.ui.executeScript_button.setEnabled(False)
+        self.ui.Scripting_groupBox.setEnabled(False)
 
         # IR light
         self.isPortOpen = True
         self.IRport = None
         # self.openIR('/dev/ttyACM0')
+
+        # scripting
+        self.done = 0
+        self.total = 100
+        self.percent = 0
+        self.stopClicked = False
+
+        self.ui.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
+        self.ui.progressBar.setValue(self.percent)
+        self.ui.stopButton.clicked.connect(self.interrupt)
 
         # 画面サイズを取得 (a.desktop()は QtWidgets.QDesktopWidget )  https://ja.stackoverflow.com/questions/44060/pyqt5%E3%81%A7%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AE%E4%B8%AD%E5%A4%AE%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%97%E3%81%9F%E3%81%84
         a = QtWidgets.qApp
@@ -420,8 +431,6 @@ class Ui(QtWidgets.QMainWindow):
         key = event.key()
         # if key == QtCore.Qt.Key_Escape:
         #     # self.close()
-        #     # QtWidgets.QUndoStack.undo()
-        #     self.undoValue()
 
     def run_script(self, isContinue):
         if isContinue:
@@ -590,6 +599,8 @@ class Ui(QtWidgets.QMainWindow):
         self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
 
     def GUIwhenScripting(self, bool):
+        self.ui.Scripting_groupBox.setEnabled(not bool)
+
         for m in self.motorSet:
             self.motorGUI['exe'][m].setEnabled(bool)
             self.motorGUI['posSpin'][m].setEnabled(bool)
@@ -601,9 +612,9 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.continueButton.setEnabled(bool)
         self.ui.executeScript_button.setEnabled(bool)
 
-    def undoValue(self):
-        # if self.state() != QtWidgets.QAbstractItemView.EditingState:
-        self.motorGUI['posSpin']['slider'].QUndoStack.undo()
+
+
+
 
 app = QtWidgets.QApplication(sys.argv)
 app.setWindowIcon(QtGui.QIcon(':/MkECTL.png'))
