@@ -2,7 +2,7 @@
 TODO & Ideas
 ・[maybe NEXT]プログレスバーはメインウィンドウの下部に組み込みでいいかも(フローティングウィンドウだと迷子になる問題)
 ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合？
-・Ops to execute:のあとにコマンド数が表示されるはず
+・[DONE]Ops to execute:のあとにコマンド数が表示されるはず
 ・センサーウィンドウがメインにドッキングするといいかも(Qtにあるかも)
 ・センサーウィンドウの画像表示にズーム機能
 ・センサーウィンドウの画像表示がウィンドウの拡大縮小にリアルタイムに追従
