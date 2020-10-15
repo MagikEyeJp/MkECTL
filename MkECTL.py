@@ -38,7 +38,7 @@ class MyMessageBox(QtWidgets.QMessageBox):
     def __init__(self):
         super(MyMessageBox, self).__init__()
 
-    def closeEvent(self, QCloseEvent):  # real signature unknown; restored from __doc__
+    def closeEvent(self, event: QtGui.QCloseEvent):  # real signature unknown; restored from __doc__
         """ closeEvent(self, QCloseEvent) """
         answer = QtWidgets.QMessageBox.question(
             self,
@@ -47,9 +47,9 @@ class MyMessageBox(QtWidgets.QMessageBox):
             QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
             QtWidgets.QMessageBox.No)
         if answer == QtWidgets.QMessageBox.Yes:
-            QCloseEvent.accept()
+            event.accept()
         else:
-            QCloseEvent.ignore()
+            event.ignore()
 
 class Ui(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
@@ -462,11 +462,11 @@ class Ui(QtWidgets.QMainWindow):
                                    "- The previous one: \"" + previouslyExecutedScriptName +"\"\n"
                                     "- The one you selected: \"" + self.ui.scriptName_label.text() + "\"\n"
                                     "Click [Yes] to continue the former, or [No] to execute the latter from the top.",
-                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                         qm.Yes | qm.No)
 
-                    if ret == QtWidgets.QMessageBox.Yes:
+                    if ret == qm.Yes:
                         self.scriptParams.scriptName = previouslyExecutedScript
-                    elif ret == QtWidgets.QMessageBox.No:
+                    elif ret == qm.No:
                         # self.scriptParams.scriptName = self.ui.scriptName_label.text()
                         pass
                     else:
@@ -604,8 +604,7 @@ class Ui(QtWidgets.QMainWindow):
         self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
 
     def GUIwhenScripting(self, bool):
-        self.ui.Scripting_groupBox.setEnabled(not bool)
-
+        # in Robot Control Group
         for m in self.motorSet:
             self.motorGUI['exe'][m].setEnabled(bool)
             self.motorGUI['posSpin'][m].setEnabled(bool)
@@ -614,8 +613,22 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.saveButton.setEnabled(bool)
         self.ui.goHomeButton.setEnabled(bool)
         self.ui.setAsHomeButton.setEnabled(bool)
+
+        # in IR light Control Group
+        self.ui.onL1Button.setEnabled(bool)
+        self.ui.offL1Button.setEnabled(bool)
+        self.ui.onL2Button.setEnabled(bool)
+        self.ui.offL2Button.setEnabled(bool)
+
+        # in Script Group
+        self.ui.Scripting_groupBox.setEnabled(not bool)
+
         self.ui.continueButton.setEnabled(bool)
         self.ui.executeScript_button.setEnabled(bool)
+        self.ui.selectScript_toolButton.setEnabled(bool)
+        self.ui.selectBaseFolder_toolButton.setEnabled(bool)
+        self.ui.renewSubFolder_toolButton.setEnabled(bool)
+        self.ui.selectSubFolder_toolButton.setEnabled(bool)
 
 # ----- Scripting-related functions -----
     def updatePercentage(self):
