@@ -30,7 +30,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.setupUi(self)
 
         # connection
-        self.conn = None    # not used
+        self.conn = False
         self.sensor = SensorDevice.SensorDevice()
 
         # Variables (initialized with default values)
@@ -193,6 +193,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.ui_s.cameraControlGroup.setEnabled(True)
             self.ui_s.laserControlGroup.setEnabled(True)
 
+            self.conn = True
+
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
             print(e)
@@ -200,6 +202,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.ui_s.laserControlGroup.setEnabled(False)
 
             self.ui_s.sensorImage.setScene(self.scene)
+
+            self.conn = False
 
     def laser_custom(self):
         if self.ui_s.hex4dCheckBox.isChecked():

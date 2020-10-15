@@ -10,8 +10,9 @@ import serial
 from functools import partial
 import datetime
 import pty
-import MyDoubleSpinBox
+import math
 
+import MyDoubleSpinBox
 import motordic
 import mainwindow_ui
 import execute_script
@@ -147,7 +148,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.onL2Button.clicked.connect(lambda: self.IRlightControl(2, True))
         self.ui.offL2Button.clicked.connect(lambda: self.IRlightControl(2, False))
         self.ui.setAsHomeButton.clicked.connect(self.setHome)
-        self.ui.goHomeButton.clicked.connect(self.goHome)
+        self.ui.goHomeButton.clicked.connect(self.goToHomePosition)
         self.ui.saveButton.clicked.connect(self.savePositions)
         self.ui.GoButton.clicked.connect(self.goToSavedPositions)
 
@@ -327,8 +328,19 @@ class Ui(QtWidgets.QMainWindow):
             motorPos = self.motorGUI['posSpin'][motorID].value()
             # m.speed(self.motorGUI['speedSpin'][motorID].value())
             m.moveTo(motorPos * scale)
+            while True:
+                error = 0.0
+                time.sleep(0.2)
+
+                (pos, vel, torque) = m.read_motor_measurement()
+                error += pos - (motorPos * scale)
+
+                if error < 0.1:
+                    break
 
             self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(motorPos))
+            if self.subWindow.conn:
+                self.subWindow.getImg(1)
 
         elif buttonName == 'presetExe':
             motorID = self.ui.presetMotorCombo.currentText()
@@ -498,7 +510,7 @@ class Ui(QtWidgets.QMainWindow):
             self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText(
                 '{:.2f}'.format(0.0))
 
-    def goHome(self):
+    def goToHomePosition(self):
         print('Going Home')
         self.ui.initializeProgressBar.setEnabled(True)
         self.ui.initializeProgressLabel.setEnabled(True)
@@ -553,10 +565,34 @@ class Ui(QtWidgets.QMainWindow):
         print(save_name)
 
     def goToSavedPositions(self):
-        pos = self.ui.savedPosCombo.currentText().split()  # list
+        targetPos = self.ui.savedPosCombo.currentText().split()  # list
+
+        scale = []
+        pos = [0.0, 0.0, 0.0]
+        vel = [0.0, 0.0, 0.0]
+        torque = [0.0, 0.0, 0.0]
+
         for i in range(len(self.motorSet)):
-            self.devices['motors'][self.motorSet[i]].moveTo_scaled(float(pos[i]))
-            self.motorGUI['currentPosLabel'][self.motorSet[i]].setText('{:.2f}'.format(float(pos[i])))
+            self.devices['motors'][self.motorSet[i]].moveTo_scaled(float(targetPos[i]))
+            scale.append(self.params[self.motorSet[i]]['scale'])
+            self.motorGUI['currentPosLabel'][self.motorSet[i]].setText('{:.2f}'.format(float(targetPos[i])))
+
+        while True:
+            errors = 0.0
+            for param_i in range(len(self.motorSet)):
+                time.sleep(0.2)
+
+                (pos[param_i], vel[param_i], torque[param_i]) = \
+                    self.devices['motors'][self.motorSet[param_i]].read_motor_measurement()
+                errors += pow(pos[param_i] - (float(targetPos[param_i]) * scale[param_i]), 2)
+
+            if math.sqrt(errors) < 0.1:
+                break
+
+        for i in range(len(self.motorSet)):
+            self.motorGUI['currentPosLabel'][self.motorSet[i]].setText('{:.2f}'.format(float(targetPos[i])))
+        if self.subWindow.conn:
+            self.subWindow.getImg(1)
 
     def showSubWindow(self, geometry, framesize):
         self.subWindow.show()
