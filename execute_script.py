@@ -10,6 +10,7 @@ import string
 import itertools
 
 from PyQt5 import QtWidgets, QtGui, QtCore
+import mainwindow_ui
 import scriptProgress_ui
 import ini
 
@@ -97,7 +98,6 @@ class ProgressWindow(QtWidgets.QWidget):
         # event.accept()
         self.interrupt()
 
-
 class Systate():
     def __init__(self):
         self.root = None
@@ -146,34 +146,11 @@ class Systate():
 
 systate = Systate()
 
-def execute_script(scriptParams, devices, params):
-    global systate
-    systate.seqn = 0
-    # devices: motors, lights, 3D sensors(sensor window)
-    # params: motorDic
+def countCommandNum(scriptParams, args_hist, com_hist):
 
     f = open(scriptParams.scriptName)
     lines = f.read().splitlines()
     f.close()
-
-    progressBar = ProgressWindow()  # make an instance
-
-    args_hist: list = []
-    com_hist: list = []
-
-    warm_lasers(scriptParams, devices, params)
-
-    # ---------- make ini file ----------
-    # if scriptParams.isContinue:
-    #     # ini.generateIni(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-    #     if not os.path.exists(scriptParams.baseFolderName + '/'
-    #                           + scriptParams.subFolderName + '/'
-    #                           + 'Log.ini'):
-    #         ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
-    # else:
-    #     ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
-    ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
-    # ------------------------------
 
     for i, line in enumerate(lines):
 
@@ -205,33 +182,55 @@ def execute_script(scriptParams, devices, params):
         args_hist.append(args)
         com_hist.append(com)
 
-    for i in range(len(com_hist)):
-        if progressBar.stopClicked:
+    return len(com_hist)
+
+def execute_script(scriptParams, devices, params, mainWindow):
+    global systate
+    systate.seqn = 0
+    # devices: motors, lights, 3D sensors(sensor window)
+    # params: motorDic
+
+    args_hist: list = []
+    com_hist: list = []
+
+    warm_lasers(scriptParams, devices, params)
+
+    # ---------- make ini file ----------
+    ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
+    # ------------------------------
+
+    commandNum = countCommandNum(scriptParams, args_hist, com_hist)
+    mainWindow.ui.numOfCommands_label.setText(str(commandNum))
+
+    for i in range(commandNum):
+        app.processEvents()
+
+        if mainWindow.stopClicked:
             print('Interrupted')
             ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
 
-            return progressBar.stopClicked
+            return mainWindow.stopClicked
             # break
         print(' ########## ' + str(i) + '/' + str(len(com_hist)) + ' ########## ')
 
-        progressBar.stopClicked = False
-        progressBar.total = len(com_hist)
-        progressBar.updateProgressLabel()
-        progressBar.show()
+        mainWindow.stopClicked = False
+        mainWindow.total = len(com_hist)
+        mainWindow.updateProgressLabel()
+        mainWindow.show()
 
         systate.args = args_hist[i]
         systate.skip = commands[com_hist[i]][1]
 
         # GUI
-        progressBar.ui_script.commandLabel.setText(com_hist[i])
+        mainWindow.ui.commandLabel.setText(com_hist[i])
 
         # jump to a method(function)
         eval(commands[com_hist[i]][0])(systate.args, scriptParams, devices, params)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
 
         # GUI
-        progressBar.done = i
-        progressBar.updateProgressLabel()
-        progressBar.updatePercentage()
+        mainWindow.done = i
+        mainWindow.updateProgressLabel()
+        mainWindow.updatePercentage()
 
     ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
     return True
