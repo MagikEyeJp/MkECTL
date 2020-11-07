@@ -11,6 +11,7 @@ from functools import partial
 import datetime
 import pty
 import math
+from pathlib import Path
 
 import MyDoubleSpinBox
 import motordic
@@ -18,6 +19,7 @@ import mainwindow_ui
 import execute_script
 import sensors
 import ini
+import read_machine_file
 
 class ScriptParams():
     def __init__(self):
@@ -132,6 +134,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.rebootButton.clicked.connect(self.rebootButtonClicked)
 
         # other buttons
+        self.ui.initializeButton.setEnabled(False)
         self.ui.initializeButton.clicked.connect(self.initializeMotors)
         self.ui.MagikEye.clicked.connect(self.demo)
         self.ui.selectScript_toolButton.clicked.connect(self.openScriptFile)
@@ -151,6 +154,7 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.goHomeButton.clicked.connect(self.goToHomePosition)
         self.ui.saveButton.clicked.connect(self.savePositions)
         self.ui.GoButton.clicked.connect(self.goToSavedPositions)
+        self.ui.selectMachineFileButton.clicked.connect(self.selectMachine)
 
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
@@ -167,6 +171,18 @@ class Ui(QtWidgets.QMainWindow):
         # label
         self.ui.baseFolderName_label.setText(os.path.abspath(self.scriptParams.baseFolderName))
         self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
+
+        # before Initialize
+        self.machineParams = {}
+        self.previousMachineIni = 'data/previousMachine.ini'
+        self.previousMachineFilePath = ''
+        if os.path.exists(self.previousMachineIni):
+            self.previousMachineFilePath = ini.getPreviousMachineFile(self.previousMachineIni)
+            if os.path.exists(self.previousMachineFilePath):
+                self.machineParams = read_machine_file.loadJson(self.previousMachineFilePath)
+                self.ui.initializeButton.setEnabled(True)
+            self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
+
 
     def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
@@ -219,7 +235,10 @@ class Ui(QtWidgets.QMainWindow):
         count += 10
         self.ui.initializeProgressBar.setValue(count)
 
-        self.params = motordic.getMotorDic()
+        if "motors" in self.machineParams:
+            self.params = motordic.getMotorDic(self.machineParams["motors"])
+        else:
+            self.params = motordic.getMotorDic()
 
         for p in self.params.values():  # https://note.nkmk.me/python-dict-in-values-items/
 
@@ -267,7 +286,10 @@ class Ui(QtWidgets.QMainWindow):
         m.maxTorque(5)
 
         # IR light
-        self.openIR('/dev/ttyACM0')
+#        self.openIR('/dev/ttyACM0')
+        self.make_u2d_table()
+        self.openIR(self.u2dTable['1-8.4'])
+        print(self.u2dTable['1-8.4'])
 
         # GUI
         print('--initialization completed--')
@@ -630,10 +652,34 @@ class Ui(QtWidgets.QMainWindow):
         #     self.IRport.write(bytes([cmd]))
         # else:
         #     print('could not send serial')
-        cmd = ord('A') if state else ord('a')
+        #cmd = ord('A') if state else ord('a')
         if 0 < ch < 3:
-            cmd = cmd + ch - 1
-        self.IRport.write(bytes([cmd]))
+ #            cmd = cmd + ch - 1
+            if state:
+                flag = 'H'
+            else:
+                flag = 'L'
+            cmd = "*B1OS" + str(ch) + flag + "\r"
+#            print(cmd, len(cmd), bytes(cmd, 'UTF-8'))
+            self.IRport.write(bytes(cmd, 'UTF-8'))
+
+    def make_u2d_table(self):
+        p = Path('/sys/class/tty/')
+        pfiles = list(p.glob("ttyUSB*"))
+        print(pfiles)
+        self.u2dTable = {}
+        try:
+            i = 1
+            for d in pfiles:
+                fulldir = os.path.realpath(d)
+                print(fulldir)
+                tksu = re.search(r"\d-\d\.\d[^/]*(?=:)", fulldir)
+                tksd = re.search(r"ttyUSB\d+", fulldir)
+                print(tksu, tksd)
+                self.u2dTable[tksu[0]] = '/dev/' + tksd[0]
+        except Exception as e:
+            print(e)
+        print(self.u2dTable)
 
     def setMultiplier(self):
         self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
@@ -681,8 +727,15 @@ class Ui(QtWidgets.QMainWindow):
         # self.close()
 # ----------
 
+# ----- Select machine -----
+    def selectMachine(self):
+        (fileName, selectedFilter) = \
+            QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', 'machineFiles', '*.json')
+        self.previousMachineFilePath = fileName
+        ini.updatePreviousMachineFile('data/previousMachine.ini', self.previousMachineFilePath)
 
-
+        self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
+        self.ui.initializeButton.setEnabled(True)
 
 app = QtWidgets.QApplication(sys.argv)
 app.setWindowIcon(QtGui.QIcon(':/MkECTL.png'))

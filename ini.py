@@ -104,6 +104,24 @@ def updatePreviousScriptPath(iniFile, scriptName):
     with open(iniFile, 'w') as configfile:
         config_ps.write(configfile)
 
+def getPreviousMachineFile(iniFile):
+    config = configparser.ConfigParser()
+    config.read(iniFile)
+    machineFilePath = config.get('previous_machine', 'machine_file')
+
+    return machineFilePath
+
+def updatePreviousMachineFile(iniFile, machineFile):
+    # update/generate previousMachine.ini
+    config_ps = configparser.RawConfigParser()
+
+    section = 'previous_machine'
+    config_ps.add_section(section)
+    config_ps.set(section, 'machine_file', machineFile)
+
+    with open(iniFile, 'w') as configfile:
+        config_ps.write(configfile)
+
 if __name__ == '__main__':
     generateIni('.', 'script/sampleScript1.txt')
     loadIni('.')

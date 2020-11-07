@@ -1,4 +1,3 @@
-
 import os
 import re  # https://qiita.com/luohao0404/items/7135b2b96f9b0b196bf3
 import numpy as np
@@ -572,17 +571,18 @@ def set_light(args, scriptParams, devices, params, mainWindow):
         if not systate.sentSig.light[ch - 1] or systate.light[ch - 1] != systate.past_parameters.light[ch - 1]:
             if 0 < ch < 3:
                 systate.light[ch - 1] = int(args[1])
-                cmd = ord('A') if int(args[1]) > 0 else ord('a')
-                cmd = cmd + ch - 1
-                devices['lights'].write(bytes([cmd]))
-                # if int(args[1]) > 0:
-                #     print('HIGH')
-                #     flag = 'H'
-                # else:
-                #     print('LOW')
-                #     flag = 'L'
-                # cmd = bytes("*B1OS" + str(ch) + flag + "\r", 'UTF-8')
-                # devices['lights'].write(cmd)
+                # cmd = ord('A') if int(args[1]) > 0 else ord('a')
+                # cmd = cmd + ch - 1
+                # devices['lights'].write(bytes([cmd]))
+                if int(args[1]) > 0:
+                    print('HIGH')
+                    flag = 'H'
+                else:
+                    print('LOW')
+                    flag = 'L'
+                cmd = bytes("*B1OS" + str(ch) + flag + "\r", 'UTF-8')
+                devices['lights'].write(cmd)
+
                 systate.past_parameters.light[ch - 1] = systate.light[ch - 1]
                 systate.sentSig.light[ch - 1] = True
 

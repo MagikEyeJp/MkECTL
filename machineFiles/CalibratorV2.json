@@ -1,0 +1,21 @@
+{
+  "motors": {
+    "slider": {
+      "serial": "KM-1S SW59#0E9",
+      "scale": -0.116355283
+    },
+    "pan": {
+      "serial": "KM-1S K1UK#E45",
+      "scale": 0.017453293
+    },
+    "tilt": {
+      "serial": "KM-1S CBG3#573",
+      "scale": 0.017453293
+    }
+  },
+  "IRlight": {
+    "type": "MkE",
+    "device": "/dev/ttyACM0"
+  }
+}
+
