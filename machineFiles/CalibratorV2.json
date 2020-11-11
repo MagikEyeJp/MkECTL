@@ -13,7 +13,7 @@
       "scale": 0.017453293
     }
   },
-  "IRlight": {
+  "IRLight": {
     "type": "MkE",
     "device": "/dev/ttyACM0"
   }
