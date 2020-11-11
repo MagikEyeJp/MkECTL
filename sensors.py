@@ -272,6 +272,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
 
     def getImg(self, frames):
+        print('getImg', frames)
         img = self.sensor.get_image(frames)
         # print(img)
         img.format = "PNG"
