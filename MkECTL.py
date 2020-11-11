@@ -9,9 +9,7 @@ import re
 import serial
 from functools import partial
 import datetime
-import pty
 import math
-from pathlib import Path
 
 import MyDoubleSpinBox
 import motordic
@@ -20,6 +18,10 @@ import execute_script
 import sensors
 import ini
 import read_machine_file
+
+import IRLightMkE
+import IRLightPapouch
+import IRLightDummy
 
 class ScriptParams():
     def __init__(self):
@@ -74,6 +76,7 @@ class Ui(QtWidgets.QMainWindow):
         # IR light
         self.isPortOpen = True
         self.IRport = None
+        self.IRLight = None
         # self.openIR('/dev/ttyACM0')
 
         # scripting
@@ -286,10 +289,17 @@ class Ui(QtWidgets.QMainWindow):
         m.maxTorque(5)
 
         # IR light
-#        self.openIR('/dev/ttyACM0')
-        self.make_u2d_table()
-        self.openIR(self.u2dTable['1-8.4'])
-        print(self.u2dTable['1-8.4'])
+        if "IRLight" in self.machineParams:
+            IRtype = self.machineParams["IRLight"].get("type")
+            IRdevice = self.machineParams["IRLight"].get("device")
+            if IRtype == "MkE":
+                self.IRLight = IRLightMkE.IRLightMkE(IRtype, IRdevice)
+            elif IRtype == "PAPOUCH":
+                self.IRLight = IRLightPapouch.IRLightPapouch(IRtype, IRdevice)
+            else:
+                self.IRLight = IRLightDummy.IRLightDummy()
+
+        self.openIR()
 
         # GUI
         print('--initialization completed--')
@@ -622,64 +632,17 @@ class Ui(QtWidgets.QMainWindow):
                             geometry.height() / 2 - framesize.height() / 3)
         self.subWindow_isOpen = True
 
-    def openIR(self, tty):
-        # https://qiita.com/macha1972/items/4869b71c14d25fa5b8f8
-        try:
-            self.IRport = serial.Serial(tty, 115200)
-            self.isPortOpen = True
-            self.devices['lights'] = self.IRport
+    def openIR(self):
 
-            self.ui.IRstateLabel.setText('IR lights are ready.')
-        except Exception as e:
-            # QtWidgets.QMessageBox.critical(self, 'IR port open', 'Could not open port of IR lights')
-            print(e)
-            self.isPortOpen = False
+        message = self.IRLight.open()
+        self.devices['lights'] = self.IRLight
 
-            # https://stackoverflow.com/questions/2291772/virtual-serial-device-in-python
-            master, slave = pty.openpty()
-            tty_dummy = os.ttyname(slave)
-            self.IRport = serial.Serial(tty_dummy)
-            self.devices['lights'] = self.IRport
-
-            self.ui.IRstateLabel.setText('Cannot open ' + tty + '. \n'
-                                         + 'Using dummy serial device instead(pty).')
+        self.ui.IRstateLabel.setText(message)
 
     def IRlightControl(self, ch, state):
-        # if self.isPortOpen:
-        #     cmd = ord('A') if state else ord('a')
-        #     if 0 < ch < 3:
-        #         cmd = cmd + ch - 1
-        #     self.IRport.write(bytes([cmd]))
-        # else:
-        #     print('could not send serial')
-        #cmd = ord('A') if state else ord('a')
-        if 0 < ch < 3:
- #            cmd = cmd + ch - 1
-            if state:
-                flag = 'H'
-            else:
-                flag = 'L'
-            cmd = "*B1OS" + str(ch) + flag + "\r"
-#            print(cmd, len(cmd), bytes(cmd, 'UTF-8'))
-            self.IRport.write(bytes(cmd, 'UTF-8'))
 
-    def make_u2d_table(self):
-        p = Path('/sys/class/tty/')
-        pfiles = list(p.glob("ttyUSB*"))
-        print(pfiles)
-        self.u2dTable = {}
-        try:
-            i = 1
-            for d in pfiles:
-                fulldir = os.path.realpath(d)
-                print(fulldir)
-                tksu = re.search(r"\d-\d\.\d[^/]*(?=:)", fulldir)
-                tksd = re.search(r"ttyUSB\d+", fulldir)
-                print(tksu, tksd)
-                self.u2dTable[tksu[0]] = '/dev/' + tksd[0]
-        except Exception as e:
-            print(e)
-        print(self.u2dTable)
+        self.IRLight.set(ch, state)
+
 
     def setMultiplier(self):
         self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
