@@ -12,6 +12,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import mainwindow_ui
 import scriptProgress_ui
 import ini
+import IRLight
 
 # import KMControllersS
 import motordic
@@ -571,18 +572,13 @@ def set_light(args, scriptParams, devices, params, mainWindow):
         if not systate.sentSig.light[ch - 1] or systate.light[ch - 1] != systate.past_parameters.light[ch - 1]:
             if 0 < ch < 3:
                 systate.light[ch - 1] = int(args[1])
-                # cmd = ord('A') if int(args[1]) > 0 else ord('a')
-                # cmd = cmd + ch - 1
-                # devices['lights'].write(bytes([cmd]))
                 if int(args[1]) > 0:
                     print('HIGH')
-                    flag = 'H'
+                    flag = True
                 else:
                     print('LOW')
-                    flag = 'L'
-                cmd = bytes("*B1OS" + str(ch) + flag + "\r", 'UTF-8')
-                devices['lights'].write(cmd)
-
+                    flag = False
+                devices["lights"].set(ch, flag)
                 systate.past_parameters.light[ch - 1] = systate.light[ch - 1]
                 systate.sentSig.light[ch - 1] = True
 
