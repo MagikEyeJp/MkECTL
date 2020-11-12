@@ -472,7 +472,7 @@ class Ui(QtWidgets.QMainWindow):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            execute_script.execute_script(self.scriptParams, self.devices, self.params)
+            execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
     def keyPressEvent(self, event):
         key = event.key()
