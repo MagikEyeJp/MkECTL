@@ -18,10 +18,12 @@ import execute_script
 import sensors
 import ini
 import read_machine_file
+from UIState import UIState
 
 import IRLightMkE
 import IRLightPapouch
 import IRLightDummy
+from IMainUI import IMainUI
 
 class ScriptParams():
     def __init__(self):
@@ -56,14 +58,14 @@ class MyMessageBox(QtWidgets.QMessageBox):
         else:
             event.ignore()
 
-class Ui(QtWidgets.QMainWindow):
+class Ui(QtWidgets.QMainWindow, IMainUI):
     def __init__(self, parent=None):
         super(Ui, self).__init__(parent)
         self.ui = mainwindow_ui.Ui_mainwindow()
         self.ui.setupUi(self)
         self.scriptParams = ScriptParams()
 
-        self.subWindow = sensors.SensorWindow()
+        self.subWindow = sensors.SensorWindow(mainUI=self)
 
         self.initializeProcessFlag = False
 
@@ -108,6 +110,7 @@ class Ui(QtWidgets.QMainWindow):
         self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
         self.subWindow_isOpen = False
+        self.states = set()
 
         if not os.path.exists(self.scriptParams.baseFolderName):
             os.makedirs(self.scriptParams.baseFolderName)
@@ -304,13 +307,16 @@ class Ui(QtWidgets.QMainWindow):
         # GUI
         print('--initialization completed--')
         self.ui.initializeProgressBar.setValue(100)
-        self.ui.initializeButton.setEnabled(False)
-        self.ui.initializeProgressBar.setEnabled(False)
+        # self.ui.initializeButton.setEnabled(False)
+        # self.ui.initializeProgressBar.setEnabled(False)
         self.ui.initializeProgressLabel.setText('Initialized all motors')
-        self.ui.manualOperation.setEnabled(True)
-        self.ui.IRlightControlGroup.setEnabled(True)
-        self.ui.continueButton.setEnabled(True)
-        self.ui.executeScript_button.setEnabled(True)
+        # self.ui.manualOperation.setEnabled(True)
+        # self.ui.IRlightControlGroup.setEnabled(True)
+        # self.ui.continueButton.setEnabled(True)
+        # self.ui.executeScript_button.setEnabled(True)
+
+        self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
+        self.setUIStatus(self.states)
 
     def setSliderOrigin(self):
         m = self.motors['slider']
@@ -472,7 +478,15 @@ class Ui(QtWidgets.QMainWindow):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
+            self.states = {UIState.SCRIPT_PROGRESS}
+            self.setUIStatus(self.states)
+            # self.GUIwhenScripting(False)
+
+            stopped = execute_script.execute_script(self.scriptParams, self.devices, self.params, self, True)
+
+            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+            self.setUIStatus(self.states)
+            # self.GUIwhenScripting(True)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -528,11 +542,15 @@ class Ui(QtWidgets.QMainWindow):
         self.showSubWindow(self.geometry, self.framesize)
 
         # GUI
-        self.GUIwhenScripting(False)
+        # self.GUIwhenScripting(False)
+        self.states = {UIState.SCRIPT_PROGRESS}
+        self.setUIStatus(self.states)
 
         stopped = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
-        self.GUIwhenScripting(stopped)
+        # self.GUIwhenScripting(stopped)
+        self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+        self.setUIStatus(self.states)
 
     def setHome(self):
         for m in self.devices['motors'].values():
@@ -648,6 +666,7 @@ class Ui(QtWidgets.QMainWindow):
         self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
         self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
 
+    # ----- UI-related functions -----
     def GUIwhenScripting(self, bool):
         # in Robot Control Group
         for m in self.motorSet:
@@ -675,6 +694,93 @@ class Ui(QtWidgets.QMainWindow):
         self.ui.renewSubFolder_toolButton.setEnabled(bool)
         self.ui.selectSubFolder_toolButton.setEnabled(bool)
 
+    def setUIStatus(self, status):
+        if UIState.MACHINEFILE in status:
+            self.ui.selectMachineFileButton.setEnabled(True)
+        else:
+            self.ui.selectMachineFileButton.setEnabled(False)
+
+        if UIState.INITIALIZE in status:
+            self.ui.initializeButton.setEnabled(True)
+            self.ui.initializeProgressBar.setEnabled(True)
+            # self.ui.initializeProgressLabel.setText('Initializing motors')
+        else:
+            self.ui.initializeButton.setEnabled(False)
+            # self.ui.initializeProgressBar.setEnabled(False)
+            # self.ui.initializeProgressLabel.setText('Initialized all motors')
+
+        if UIState.MOTOR in status:
+            # self.ui.robotControl.setEnabled(True)
+            self.ui.manualOperation.setEnabled(True)
+        else:
+            self.ui.manualOperation.setEnabled(False)
+
+        if UIState.IRLIGHT in status:
+            self.ui.IRlightControlGroup.setEnabled(True)
+        else:
+            self.ui.IRlightControlGroup.setEnabled(False)
+
+        if UIState.SENSOR_CONNECTED in status:
+            # self.ui.viewSensorWinButton.setEnabled(True)
+            self.subWindow.ui_s.setIPaddressButton.setEnabled(False)
+            self.subWindow.ui_s.reconnectButton.setEnabled(True)
+            self.subWindow.ui_s.disconnectButton.setEnabled(True)
+            self.subWindow.ui_s.cameraControlGroup.setEnabled(True)
+            self.subWindow.ui_s.laserControlGroup.setEnabled(True)
+        else:
+            self.subWindow.ui_s.setIPaddressButton.setEnabled(True)
+            self.subWindow.ui_s.reconnectButton.setEnabled(False)
+            self.subWindow.ui_s.disconnectButton.setEnabled(False)
+            self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
+            self.subWindow.ui_s.laserControlGroup.setEnabled(False)
+
+        if UIState.SCRIPT in status:
+            self.ui.selectScript_toolButton.setEnabled(True)
+            self.ui.selectBaseFolder_toolButton.setEnabled(True)
+            self.ui.selectSubFolder_toolButton.setEnabled(True)
+            self.ui.renewSubFolder_toolButton.setEnabled(True)
+            self.ui.continueButton.setEnabled(True)
+            self.ui.executeScript_button.setEnabled(True)
+        else:
+            self.ui.selectScript_toolButton.setEnabled(False)
+            self.ui.selectBaseFolder_toolButton.setEnabled(False)
+            self.ui.selectSubFolder_toolButton.setEnabled(False)
+            self.ui.renewSubFolder_toolButton.setEnabled(False)
+            self.ui.continueButton.setEnabled(False)
+            self.ui.executeScript_button.setEnabled(False)
+
+
+        if UIState.SCRIPT_PROGRESS in status:
+            # # in Robot Control Group
+            # for m in self.motorSet:
+            #     self.motorGUI['exe'][m].setEnabled(False)
+            #     self.motorGUI['posSpin'][m].setEnabled(False)
+            #     self.motorGUI['speedSpin'][m].setEnabled(False)
+            # self.ui.savedPosCombo.setEnabled(False)
+            # self.ui.saveButton.setEnabled(False)
+            # self.ui.goHomeButton.setEnabled(False)
+            # self.ui.setAsHomeButton.setEnabled(False)
+            #
+            # # in IR light Control Group
+            # self.ui.onL1Button.setEnabled(False)
+            # self.ui.offL1Button.setEnabled(False)
+            # self.ui.onL2Button.setEnabled(False)
+            # self.ui.offL2Button.setEnabled(False)
+            # # self.ui.IRlightControlGroup.setEnabled(False)
+            #
+            # # in Script Group
+            # self.ui.selectScript_toolButton.setEnabled(False)
+            # self.ui.selectBaseFolder_toolButton.setEnabled(False)
+            # self.ui.selectSubFolder_toolButton.setEnabled(False)
+            # self.ui.renewSubFolder_toolButton.setEnabled(False)
+            # self.ui.continueButton.setEnabled(False)
+            # self.ui.executeScript_button.setEnabled(False)
+
+            self.ui.Scripting_groupBox.setEnabled(True)
+        else:
+            self.ui.Scripting_groupBox.setEnabled(False)
+
+
 # ----- Scripting-related functions -----
     def updatePercentage(self):
         self.percent = self.done / self.total * 100
@@ -688,24 +794,39 @@ class Ui(QtWidgets.QMainWindow):
     def interrupt(self):
         self.stopClicked = True
         # self.close()
-# ----------
+# ==================================================================
 
 # ----- Select machine -----
     def selectMachine(self):
         (fileName, selectedFilter) = \
             QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', 'machineFiles', '*.json')
-        self.previousMachineFilePath = fileName
-        ini.updatePreviousMachineFile('data/previousMachine.ini', self.previousMachineFilePath)
 
-        self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
-        self.ui.initializeButton.setEnabled(True)
+        if fileName == '':  # when cancel pressed
+            pass
+        else:
+            self.previousMachineFilePath = fileName
+            ini.updatePreviousMachineFile('data/previousMachine.ini', self.previousMachineFilePath)
 
-app = QtWidgets.QApplication(sys.argv)
-app.setWindowIcon(QtGui.QIcon(':/MkECTL.png'))
-keiganWindow = Ui()
-keiganWindow.show()
-# sensorWindow = SensorWindow()
-app.exec_()
+            self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
+            self.ui.initializeButton.setEnabled(True)
+# ==================================================================
+    def sensorChanged(self, connected):
+        print('changed')
+        # if connected:
+        #     self.status = {UIState.SENSOR_CONNECTED}
+        #     self.setUIStatus(self.status)
+        # else:
+        #     self.setUIStatus(self.status)
+
+
+
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    app.setWindowIcon(QtGui.QIcon(':/MkECTL.png'))
+    keiganWindow = Ui()
+    keiganWindow.show()
+    # sensorWindow = SensorWindow()
+    app.exec_()
 
 # if keiganWindow.ui.dummyMode.isEnabled():
 #     keiganWindow.ui.sliderCurrentLabel.setText(keiganWindow.devices['motors']['slider'].m_posion)
