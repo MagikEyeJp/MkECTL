@@ -34,6 +34,7 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・モーターが動かないとき、エラーを出す＆プログレスバーを表示
 ・iconの色合いを全部黒くする
 ・(setUIstatus)の元請けクラスを作る
+・sensorのDisconnectを実装
 
 BUG?
 ・[DONE]センサーをオープンしたまま、センサーを再起動すると、センサーウィンドウでキャプチャできなくなる。MkECTLを立ち上げ直さないと復帰できない。
