@@ -9,10 +9,12 @@ import string
 import itertools
 
 from PyQt5 import QtWidgets, QtGui, QtCore
+
 import mainwindow_ui
 import scriptProgress_ui
 import ini
 import IRLight
+import UIState
 
 # import KMControllersS
 import motordic
@@ -46,6 +48,7 @@ dynvars = {
             }
 
 app = QtWidgets.qApp
+isDemo = False
 
 class ProgressWindow(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -184,8 +187,10 @@ def countCommandNum(scriptParams, args_hist, com_hist):
 
     return len(com_hist)
 
-def execute_script(scriptParams, devices, params, mainWindow):
+def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
     global systate
+    global isDemo
+    isDemo = isdemo
     systate.seqn = 0
     # devices: motors, lights, 3D sensors(sensor window)
     # params: motorDic
@@ -196,7 +201,8 @@ def execute_script(scriptParams, devices, params, mainWindow):
     warm_lasers(scriptParams, devices, params, mainWindow)
 
     # ---------- make ini file ----------
-    ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
+    if not isDemo:
+        ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
     # ------------------------------
 
     commandNum = countCommandNum(scriptParams, args_hist, com_hist)
@@ -207,12 +213,18 @@ def execute_script(scriptParams, devices, params, mainWindow):
     mainWindow.updateProgressLabel()
     # mainWindow.show()
 
+    if isDemo:
+        commands['mov'][1] = False
+    else:
+        commands['mov'][1] = True
+
     for i in range(commandNum):
         app.processEvents()
 
         if mainWindow.stopClicked:
             print('Interrupted')
-            ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+            if not isDemo:
+                ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
             return mainWindow.stopClicked
 
         print(' ########## ' + str(i) + '/' + str(len(com_hist)) + ' ########## ')
@@ -227,11 +239,14 @@ def execute_script(scriptParams, devices, params, mainWindow):
         isStop = eval(commands[com_hist[i]][0])(systate.args, scriptParams, devices, params, mainWindow)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
 
         # GUI
-        mainWindow.done = i
+        mainWindow.done = i + 1
         mainWindow.updateProgressLabel()
         mainWindow.updatePercentage()
 
-    ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+    # ---------- update ini file ----------
+    if not isDemo:
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+    # ------------------------------
     return True
 
 ##########
@@ -407,6 +422,7 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
     print('---move_robot---')
     print('move to ' + str(args))
     global systate
+    global isDemo
     motorSet = ['slider', 'pan', 'tilt']
 
     args = np.array(args)
@@ -438,7 +454,8 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                     app.processEvents()
                     if mainWindow.stopClicked:
                         print('Interrupted')
-                        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
+                        if not isDemo:
+                            ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
                                              scriptParams.scriptName)
                         return mainWindow.stopClicked
 
