@@ -1181,9 +1181,9 @@
         <colorrole role="Button">
          <brush brushstyle="SolidPattern">
           <color alpha="255">
-           <red>78</red>
-           <green>154</green>
-           <blue>6</blue>
+           <red>186</red>
+           <green>189</green>
+           <blue>182</blue>
           </color>
          </brush>
         </colorrole>
@@ -1631,7 +1631,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>Scripting</string>
+      <string>Script Progress</string>
      </property>
      <widget class="QLabel" name="progressLabel">
       <property name="geometry">
@@ -1994,9 +1994,9 @@
          <colorrole role="Button">
           <brush brushstyle="SolidPattern">
            <color alpha="255">
-            <red>239</red>
-            <green>41</green>
-            <blue>41</blue>
+            <red>186</red>
+            <green>189</green>
+            <blue>182</blue>
            </color>
           </brush>
          </colorrole>
@@ -2483,9 +2483,9 @@
        <colorrole role="Button">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>252</red>
-          <green>175</green>
-          <blue>62</blue>
+          <red>186</red>
+          <green>189</green>
+          <blue>182</blue>
          </color>
         </brush>
        </colorrole>
@@ -3091,9 +3091,9 @@
        <colorrole role="Button">
         <brush brushstyle="SolidPattern">
          <color alpha="255">
-          <red>78</red>
-          <green>154</green>
-          <blue>6</blue>
+          <red>186</red>
+          <green>189</green>
+          <blue>182</blue>
          </color>
         </brush>
        </colorrole>
