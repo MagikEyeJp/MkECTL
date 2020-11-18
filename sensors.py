@@ -12,6 +12,7 @@ import SensorDevice
 
 import sensorwindow_ui
 import ImageViewScene
+from IMainUI import IMainUI
 
 # xのあるbit位置が0か1か調べる
 def getbit(x, b):
@@ -23,8 +24,11 @@ def setbit(x, b, v):
 
 
 class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, mainUI:IMainUI=None):
         super(SensorWindow, self).__init__(parent)
+        # print(mainUI)
+        # mainUI.sensorChanged()
+        self.mainUI = mainUI
 
         self.ui_s = sensorwindow_ui.Ui_sensor()
         self.ui_s.setupUi(self)
@@ -190,6 +194,9 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             # self.ui_s.sensorImage.show()
             # self.getImg(self.frames)
 
+            self.ui_s.setIPaddressButton.setEnabled(False)
+            self.ui_s.reconnectButton.setEnabled(True)
+            self.ui_s.disconnectButton.setEnabled(True)
             self.ui_s.cameraControlGroup.setEnabled(True)
             self.ui_s.laserControlGroup.setEnabled(True)
 
@@ -198,12 +205,17 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
             print(e)
+            self.ui_s.setIPaddressButton.setEnabled(True)
+            self.ui_s.reconnectButton.setEnabled(False)
+            self.ui_s.disconnectButton.setEnabled(False)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
 
             self.ui_s.sensorImage.setScene(self.scene)
 
             self.conn = False
+
+        self.mainUI.sensorChanged(self.conn)
 
     def laser_custom(self):
         if self.ui_s.hex4dCheckBox.isChecked():
