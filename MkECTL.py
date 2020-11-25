@@ -734,14 +734,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         if UIState.SENSOR_CONNECTED in status:
             # self.ui.viewSensorWinButton.setEnabled(True)
-            self.subWindow.ui_s.setIPaddressButton.setEnabled(False)
-            self.subWindow.ui_s.reconnectButton.setEnabled(True)
+            # self.subWindow.ui_s.setIPaddressButton.setEnabled(False)
+            self.subWindow.ui_s.connectButton.setEnabled(False)
             self.subWindow.ui_s.disconnectButton.setEnabled(True)
             self.subWindow.ui_s.cameraControlGroup.setEnabled(True)
             self.subWindow.ui_s.laserControlGroup.setEnabled(True)
         else:
-            self.subWindow.ui_s.setIPaddressButton.setEnabled(True)
-            self.subWindow.ui_s.reconnectButton.setEnabled(False)
+            # self.subWindow.ui_s.setIPaddressButton.setEnabled(True)
+            self.subWindow.ui_s.connectButton.setEnabled(True)
             self.subWindow.ui_s.disconnectButton.setEnabled(False)
             self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
             self.subWindow.ui_s.laserControlGroup.setEnabled(False)
