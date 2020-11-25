@@ -189,6 +189,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.initializeButton.setEnabled(True)
             self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
 
+        if self.machineParams == {}:
+            self.states = {UIState.MACHINEFILE}
+            self.setUIStatus(self.states)
+        else:
+            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+            self.setUIStatus(self.states)
 
     def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
@@ -238,6 +244,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         print('Initialize Button was clicked')
         self.ui.initializeProgressBar.setEnabled(True)
         self.ui.initializeProgressLabel.setEnabled(True)
+        self.ui.initializeProgressLabel.setText('Initializing...')
         count += 10
         self.ui.initializeProgressBar.setValue(count)
 
@@ -299,8 +306,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.IRLight = IRLightMkE.IRLightMkE(IRtype, IRdevice)
             elif IRtype == "PAPOUCH":
                 self.IRLight = IRLightPapouch.IRLightPapouch(IRtype, IRdevice)
-            else:
-                self.IRLight = IRLightDummy.IRLightDummy()
+            else:   # dummy
+                self.IRLight = IRLightDummy.IRLightDummy(IRtype, IRdevice)
 
         self.openIR()
 
@@ -399,14 +406,16 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             m.close()
 
         # GUI
-        self.ui.initializeButton.setEnabled(True)
-        self.ui.initializeProgressBar.setValue(0)
-        self.ui.initializeProgressLabel.setText('Initializing motors...')
-        self.ui.manualOperation.setEnabled(False)
-        self.ui.IRlightControlGroup.setEnabled(False)
-        self.ui.continueButton.setEnabled(False)
-        self.ui.executeScript_button.setEnabled(False)
+        # self.ui.initializeButton.setEnabled(True)
+        # self.ui.initializeProgressBar.setValue(0)
+        # self.ui.initializeProgressLabel.setText('Initializing motors...')
+        # self.ui.manualOperation.setEnabled(False)
+        # self.ui.IRlightControlGroup.setEnabled(False)
+        # self.ui.continueButton.setEnabled(False)
+        # self.ui.executeScript_button.setEnabled(False)
 
+        self.states = {UIState.MACHINEFILE, UIState.INITIALIZE, UIState.IRLIGHT}
+        self.setUIStatus(self.states)
         QtWidgets.QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
                                                           "Please re-initialize motors to use again.")
 
@@ -703,10 +712,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         if UIState.INITIALIZE in status:
             self.ui.initializeButton.setEnabled(True)
             self.ui.initializeProgressBar.setEnabled(True)
-            # self.ui.initializeProgressLabel.setText('Initializing motors')
+            self.ui.initializeProgressBar.setValue(0)
+            self.ui.initializeProgressLabel.setEnabled(True)
+            self.ui.initializeProgressLabel.setText('Push \"Initialize\"')
         else:
             self.ui.initializeButton.setEnabled(False)
-            # self.ui.initializeProgressBar.setEnabled(False)
+            self.ui.initializeProgressBar.setEnabled(False)
+            self.ui.initializeProgressLabel.setEnabled(False)
             # self.ui.initializeProgressLabel.setText('Initialized all motors')
 
         if UIState.MOTOR in status:
@@ -806,17 +818,20 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.previousMachineFilePath = fileName
             ini.updatePreviousMachineFile('data/previousMachine.ini', self.previousMachineFilePath)
+            self.machineParams = read_machine_file.loadJson(self.previousMachineFilePath)
 
             self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
-            self.ui.initializeButton.setEnabled(True)
+            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+            self.setUIStatus(self.states)
+            # self.ui.initializeButton.setEnabled(True)
 # ==================================================================
     def sensorChanged(self, connected):
         print('changed')
         # if connected:
-        #     self.status = {UIState.SENSOR_CONNECTED}
-        #     self.setUIStatus(self.status)
+        #     self.states = {UIState.SENSOR_CONNECTED}
+        #     self.setUIStatus(self.states)
         # else:
-        #     self.setUIStatus(self.status)
+        #     self.setUIStatus(self.states)
 
 
 
