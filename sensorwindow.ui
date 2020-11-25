@@ -895,6 +895,12 @@
         <property name="text">
          <string>EVEN</string>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="QPushButton" name="oddLaserButton">
         <property name="geometry">
@@ -907,6 +913,12 @@
         </property>
         <property name="text">
          <string>ODD</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QPushButton" name="onAllLaserButton">
@@ -925,6 +937,12 @@
          <iconset resource="resources.qrc">
           <normaloff>:/GUI_icons/lightON.png</normaloff>:/GUI_icons/lightON.png</iconset>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
        </widget>
        <widget class="QPushButton" name="offAllLaserButton">
         <property name="geometry">
@@ -941,6 +959,12 @@
         <property name="icon">
          <iconset resource="resources.qrc">
           <normaloff>:/GUI_icons/lightOFF.png</normaloff>:/GUI_icons/lightOFF.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLineEdit" name="hex4dLineEdit">
@@ -970,6 +994,9 @@
         </property>
         <property name="text">
          <string>Custom[Hex 4d]</string>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QPushButton" name="setHex4dLaserButton">
