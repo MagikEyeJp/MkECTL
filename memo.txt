@@ -16,7 +16,7 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・PIDなどの設定機能(detailed settingsの追加)
 ・ソースファイルの整形、いらないコメント/処理の整理
 ・[DONE]センサーオープン時にシャッター速度/ゲインをUIの通りに設定
-・複数スクリプトを連続実行
+・[DOING]複数スクリプトを連続実行
 
 ・iniファイルの取り扱い、カメラ側とレーザー側のキャリブレーションをどう扱うか
 ・既にあるサブフォルダを選択した上で異なるスクリプトをこのときに指定してしまうと、
@@ -29,7 +29,7 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・Image Capture時にタイムアウト(10秒くらい)するようにする(MkeAPI変えないとだめか?) タイムアウト後はエラー終了するか再要求するかは未定
 ・UPnPでセンサー一覧を取得し、そこからIPアドレス選択
 ・シャッター速度と同じようにスクリプト実行時ISO倍率を変更したい
-・スクリプト実行ボタン/ContinueボタンをSTOPボタンの隣にする。
+・[DONE]スクリプト実行ボタン/ContinueボタンをSTOPボタンの隣にする。
 ・[DONE]色のついているボタンは無効時には色をなくす
 ・モーターが動かないとき、エラーを出す＆プログレスバーを表示
 ・iconの色合いを全部黒くする
