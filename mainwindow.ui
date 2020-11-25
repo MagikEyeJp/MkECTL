@@ -1573,7 +1573,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>IR light -- ON</string>
+      <string>IR light - ON</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_3">
@@ -1586,7 +1586,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>IR light -- OFF</string>
+      <string>IR light - OFF</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="IRonMultiplier">
@@ -2678,6 +2678,15 @@
          <iconset resource="resources.qrc">
           <normaloff>:/GUI_icons/lightON.png</normaloff>:/GUI_icons/lightON.png</iconset>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="0" column="2">
@@ -2694,6 +2703,15 @@
         <property name="icon">
          <iconset resource="resources.qrc">
           <normaloff>:/GUI_icons/lightOFF.png</normaloff>:/GUI_icons/lightOFF.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -2737,6 +2755,12 @@
          <iconset resource="resources.qrc">
           <normaloff>:/GUI_icons/lightON.png</normaloff>:/GUI_icons/lightON.png</iconset>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="0" column="2">
@@ -2753,6 +2777,12 @@
         <property name="icon">
          <iconset resource="resources.qrc">
           <normaloff>:/GUI_icons/lightOFF.png</normaloff>:/GUI_icons/lightOFF.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -3260,7 +3290,7 @@
      <x>0</x>
      <y>0</y>
      <width>552</width>
-     <height>28</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
