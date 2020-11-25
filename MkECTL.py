@@ -29,7 +29,12 @@ class ScriptParams():
     def __init__(self):
         self.now = datetime.datetime.now()
 
+        self.execTwoScr: bool = False
         self.scriptName: str = ''
+        self.scriptName_2: str = ''
+        self.commandNum_1: int = 0
+        self.commandNum_2: int = 0
+        self.commandNum_total: int = 0
         self.baseFolderName: str = 'data'
         self.subFolderName: str = self.now.strftime('%Y%m%d_%H%M%S')
         self.isContinue = False
@@ -143,12 +148,15 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeButton.setEnabled(False)
         self.ui.initializeButton.clicked.connect(self.initializeMotors)
         self.ui.MagikEye.clicked.connect(self.demo)
-        self.ui.selectScript_toolButton.clicked.connect(self.openScriptFile)
+        self.ui.selectScript_toolButton.clicked.connect(lambda: self.openScriptFile(1))
+        self.ui.selectScript_toolButton_2.clicked.connect(lambda: self.openScriptFile(2))
+        self.ui.delete2ndScriptButton.clicked.connect(lambda: self.delete2ndScript)
         self.ui.selectBaseFolder_toolButton.clicked.connect(self.openBaseFolder)
         self.ui.selectSubFolder_toolButton.clicked.connect(self.openSubFolder)
         self.ui.renewSubFolder_toolButton.clicked.connect(self.renewSubFolder)
-        self.ui.executeScript_button.clicked.connect(lambda: self.run_script(False))
-        self.ui.continueButton.clicked.connect(lambda: self.run_script(True))
+        self.ui.executeScript_button.clicked.connect(lambda: self.run_2scripts(False))
+        self.ui.continueButton.clicked.connect(lambda: self.run_2scripts(True))
+        self.ui.delete2ndScriptButton.clicked.connect(self.delete2ndScript)
         self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(self.geometry, self.framesize))
         self.ui.sliderOriginButton.clicked.connect(self.setSliderOrigin)
         self.ui.freeButton.clicked.connect(self.freeAllMotors)
@@ -426,7 +434,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         elif motorID == 'pan' or 'tilt':
             self.ui.unitLabel.setText('deg')
 
-    def openScriptFile(self):  # https://www.xsim.info/articles/PySide/special-dialogs.html#OpenFile
+    def openScriptFile(self, num):  # https://www.xsim.info/articles/PySide/special-dialogs.html#OpenFile
         previousScriptPath = ''
         previousScriptDir = './script/'
         previousScript_iniFile = 'data/previousScript.ini'
@@ -442,12 +450,26 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             pass
         else:
             ini.updatePreviousScriptPath(previousScript_iniFile, fileName)
-            self.ui.scriptName_label.setText(
-                os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
-            self.scriptParams.scriptName = fileName
 
-            commandNum = execute_script.countCommandNum(self.scriptParams, [], [])
-            self.ui.numOfCommands_label.setText(str(commandNum))
+            if num == 1:
+                self.ui.scriptName_label.setText(
+                    os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
+                self.scriptParams.scriptName = fileName
+                self.scriptParams.commandNum_1 = execute_script.countCommandNum(self.scriptParams, [], [])
+            else:
+                self.ui.scriptName_label_2.setText(os.path.basename(fileName))
+                self.scriptParams.scriptName_2 = fileName
+                self.scriptParams.commandNum_2 = execute_script.countCommandNum(self.scriptParams, [], [])
+                self.scriptParams.execTwoScr = True
+
+            self.scriptParams.commandNum_total = self.scriptParams.commandNum_1 + self.scriptParams.commandNum_2
+            self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
+
+    def delete2ndScript(self):
+        self.scriptParams.scriptName_2 = ''
+        self.scriptParams.commandNum_2 = 0
+        self.ui.scriptName_label_2.setText('')
+        self.scriptParams.execTwoScr = False
 
     def openBaseFolder(self):
         fileName = \
@@ -543,7 +565,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.scriptParams.isContinue = False
 
         if self.scriptParams.scriptName == '':
-            self.openScriptFile()
+            self.openScriptFile(1)
 
         if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
             os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
@@ -560,6 +582,34 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # self.GUIwhenScripting(stopped)
         self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
         self.setUIStatus(self.states)
+
+    def run_2scripts(self, isContinue):
+        if self.scriptParams.execTwoScr:
+            self.run_script(isContinue)    # exec 1st script
+
+            # -------- 2nd script -------
+            self.renewSubFolder()
+
+            if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
+                os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
+
+            # self.showSubWindow(self.geometry, self.framesize)
+
+            # GUI
+            # self.GUIwhenScripting(False)
+            self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+            self.setUIStatus(self.states)
+
+            stopped = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
+
+            # self.GUIwhenScripting(stopped)
+            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+            self.setUIStatus(self.states)
+
+            pass  # will be updated later
+
+        else:
+            self.run_script(isContinue)
 
     def setHome(self):
         for m in self.devices['motors'].values():
@@ -750,6 +800,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         if UIState.SCRIPT in status:
             self.ui.selectScript_toolButton.setEnabled(True)
+            self.ui.selectScript_toolButton_2.setEnabled(True)
+            self.ui.delete2ndScriptButton.setEnabled(True)
             self.ui.selectBaseFolder_toolButton.setEnabled(True)
             self.ui.selectSubFolder_toolButton.setEnabled(True)
             self.ui.renewSubFolder_toolButton.setEnabled(True)
@@ -757,6 +809,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.executeScript_button.setEnabled(True)
         else:
             self.ui.selectScript_toolButton.setEnabled(False)
+            self.ui.selectScript_toolButton_2.setEnabled(False)
+            self.ui.delete2ndScriptButton.setEnabled(False)
             self.ui.selectBaseFolder_toolButton.setEnabled(False)
             self.ui.selectSubFolder_toolButton.setEnabled(False)
             self.ui.renewSubFolder_toolButton.setEnabled(False)
@@ -765,31 +819,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
 
         if UIState.SCRIPT_PROGRESS in status:
-            # # in Robot Control Group
-            # for m in self.motorSet:
-            #     self.motorGUI['exe'][m].setEnabled(False)
-            #     self.motorGUI['posSpin'][m].setEnabled(False)
-            #     self.motorGUI['speedSpin'][m].setEnabled(False)
-            # self.ui.savedPosCombo.setEnabled(False)
-            # self.ui.saveButton.setEnabled(False)
-            # self.ui.goHomeButton.setEnabled(False)
-            # self.ui.setAsHomeButton.setEnabled(False)
-            #
-            # # in IR light Control Group
-            # self.ui.onL1Button.setEnabled(False)
-            # self.ui.offL1Button.setEnabled(False)
-            # self.ui.onL2Button.setEnabled(False)
-            # self.ui.offL2Button.setEnabled(False)
-            # # self.ui.IRlightControlGroup.setEnabled(False)
-            #
-            # # in Script Group
-            # self.ui.selectScript_toolButton.setEnabled(False)
-            # self.ui.selectBaseFolder_toolButton.setEnabled(False)
-            # self.ui.selectSubFolder_toolButton.setEnabled(False)
-            # self.ui.renewSubFolder_toolButton.setEnabled(False)
-            # self.ui.continueButton.setEnabled(False)
-            # self.ui.executeScript_button.setEnabled(False)
-
             self.ui.Scripting_groupBox.setEnabled(True)
             self.ui.stopButton.setEnabled(True)
         else:

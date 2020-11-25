@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>552</width>
-    <height>909</height>
+    <height>932</height>
    </rect>
   </property>
   <property name="font">
@@ -256,6 +256,19 @@
       </property>
       <property name="text">
        <string>Speed</string>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="detailedSettingsButton">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>0</y>
+        <width>26</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>...</string>
       </property>
      </widget>
     </widget>
@@ -1346,7 +1359,7 @@
       <x>20</x>
       <y>530</y>
       <width>511</width>
-      <height>321</height>
+      <height>351</height>
      </rect>
     </property>
     <property name="title">
@@ -1357,12 +1370,12 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>91</width>
+       <width>231</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>Script name:</string>
+      <string>Script name (2nd one is optional):</string>
      </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
@@ -1402,7 +1415,7 @@
      <property name="geometry">
       <rect>
        <x>370</x>
-       <y>170</y>
+       <y>190</y>
        <width>71</width>
        <height>24</height>
       </rect>
@@ -1428,7 +1441,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>80</y>
+       <y>110</y>
        <width>91</width>
        <height>17</height>
       </rect>
@@ -1441,7 +1454,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>130</y>
        <width>241</width>
        <height>26</height>
       </rect>
@@ -1477,7 +1490,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
+       <y>160</y>
        <width>91</width>
        <height>17</height>
       </rect>
@@ -1490,7 +1503,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>150</y>
+       <y>180</y>
        <width>241</width>
        <height>26</height>
       </rect>
@@ -1608,7 +1621,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>190</y>
+       <y>220</y>
        <width>471</width>
        <height>111</height>
       </rect>
@@ -1698,7 +1711,7 @@
      <property name="geometry">
       <rect>
        <x>340</x>
-       <y>170</y>
+       <y>190</y>
        <width>24</width>
        <height>24</height>
       </rect>
@@ -1715,7 +1728,7 @@
      <property name="geometry">
       <rect>
        <x>450</x>
-       <y>170</y>
+       <y>190</y>
        <width>41</width>
        <height>24</height>
       </rect>
@@ -2165,6 +2178,52 @@
      <property name="text">
       <string>Stop</string>
      </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>241</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
+      <item>
+       <widget class="QLabel" name="scriptName_label_2">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="delete2ndScriptButton">
+        <property name="maximumSize">
+         <size>
+          <width>25</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Del</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="selectScript_toolButton_2">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/GUI_icons/file_icon.png</normaloff>:/GUI_icons/file_icon.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
    <widget class="QPushButton" name="viewSensorWinButton">
