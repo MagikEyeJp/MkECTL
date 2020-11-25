@@ -10,6 +10,9 @@ import time
 from time import sleep
 from enum import Enum
 
+import pty
+import os
+
 def float2bytes(float_value):
     float_value=float(float_value)
     return struct.pack("!f", float_value)
@@ -743,7 +746,8 @@ class USBController(Controller):
     def __init__(self, port='/dev/ttyUSB0', serialnum='KM-1 CS9B#B12'):
         super().__init__()
         # print('init port')
-        self.port = port
+        # self.port = port
+
         # self.serial = serial.Serial(port, 115200, 8, 'N', 1, 0.5, False, True)
         # self.serial = serial.Serial(port, 115200, 8, 'N', 1, 0.5, False, True, None, False, None, None)
         # motor measurement value
@@ -783,8 +787,13 @@ class USBController(Controller):
 
         ########## dummy ##########
         self.id = port
-        self.serial = serialnum
+        # self.serial = serialnum
         self.goalPos = 0.0
+
+        master, slave = pty.openpty()
+        tty_dummy = os.ttyname(slave)
+        self.port = tty_dummy
+        self.serial = serial.Serial(tty_dummy)
 
 
     def __del__(self):

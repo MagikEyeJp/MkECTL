@@ -49,11 +49,16 @@ def idToDeviceChar(id):
     scale = 1.0
     dev = ''
 
-    if id in defaultSerials:
-        serialNum = defaultSerials[id]
+    # if id in defaultSerials:
+    #     serialNum = defaultSerials[id]
+    #     if serialNum in motordic:
+    #         dev = motordic[serialNum]
+    #         scale = defaultScales[id]
+    if id in defaultMotors:
+        serialNum = defaultMotors[id]["serial"]
         if serialNum in motordic:
             dev = motordic[serialNum]
-            scale = defaultScales[id]
+            scale = defaultMotors[id]["scale"]
 
     return dev, scale
 
@@ -84,8 +89,11 @@ def getMotorDic(motors=None):
             serialnum = motor.read_SN().decode()  # Serial Number
             print(d, serialnum)
         else:  # dummy
+            # serialnum = serials[d]
+            # motor = KMControllersS_dummy.USBController(d, serialnum)
+            motor = KMControllersS_dummy.USBController(d)
             serialnum = serials[d]
-            motor = KMControllersS_dummy.USBController(d, serialnum)
+            print(d, serialnum)
 
         if serialnum in serials.values():
             id = {v: k for k, v in serials.items()}[serialnum]  # https://note.nkmk.me/python-dict-swap-key-value/

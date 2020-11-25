@@ -1,0 +1,20 @@
+{
+  "motors": {
+    "slider": {
+      "serial": "slider_dummy",
+      "scale": -0.104772141
+    },
+    "pan": {
+      "serial": "pan_dummy",
+      "scale": -0.017453293
+    },
+    "tilt": {
+      "serial": "tilt_dummy",
+      "scale": -0.017453293
+    }
+  },
+  "IRLight": {
+    "type": "keigan_dummy",
+    "device": "tty_dummy"
+  }
+}
