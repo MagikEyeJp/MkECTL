@@ -11,8 +11,8 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・現在のモーターの位置を読み取ってSpinBoxに反映するポタン
 ・[DONE?]ファイル/フォルダ選択の前回の位置を覚えておく機能
 ・クラス関係の整理(かんたんなクラス図を作って考える)
-・新旧キャリブレータ両対応のソースにする
-・キャリブレータのモータIDやscaleなどを設定ファイルから読むようにする
+・[DONE]新旧キャリブレータ両対応のソースにする
+・[DONE]キャリブレータのモータIDやscaleなどを設定ファイルから読むようにする
 ・PIDなどの設定機能(detailed settingsの追加)
 ・ソースファイルの整形、いらないコメント/処理の整理
 ・[DONE]センサーオープン時にシャッター速度/ゲインをUIの通りに設定
@@ -34,7 +34,7 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・モーターが動かないとき、エラーを出す＆プログレスバーを表示
 ・iconの色合いを全部黒くする
 ・(setUIstatus)の元請けクラスを作る
-・sensorのDisconnectを実装
+・[DONE]sensorのDisconnectを実装
 
 BUG?
 ・[DONE]センサーをオープンしたまま、センサーを再起動すると、センサーウィンドウでキャプチャできなくなる。MkECTLを立ち上げ直さないと復帰できない。
