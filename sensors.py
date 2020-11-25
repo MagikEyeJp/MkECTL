@@ -81,8 +81,9 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.framesLineEdit.setValidator(QtGui.QIntValidator(self))
 
         # Push buttons
-        self.ui_s.reconnectButton.clicked.connect(self.connectToSensor)
-        self.ui_s.setIPaddressButton.clicked.connect(self.changeIPaddress)
+        self.ui_s.connectButton.clicked.connect(self.connectToSensor)
+        self.ui_s.disconnectButton.clicked.connect(self.disconnectSensor)
+        # self.ui_s.setIPaddressButton.clicked.connect(self.changeIPaddress)
         self.ui_s.evenLaserButton.clicked.connect(lambda: self.setLaser('0xAAAA'))
         self.ui_s.oddLaserButton.clicked.connect(lambda: self.setLaser('0x5555'))
         self.ui_s.onAllLaserButton.clicked.connect(lambda: self.setLaser('0xFFFF'))
@@ -194,8 +195,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             # self.ui_s.sensorImage.show()
             # self.getImg(self.frames)
 
-            self.ui_s.setIPaddressButton.setEnabled(False)
-            self.ui_s.reconnectButton.setEnabled(True)
+            # self.ui_s.setIPaddressButton.setEnabled(False)
+            self.ui_s.connectButton.setEnabled(False)
             self.ui_s.disconnectButton.setEnabled(True)
             self.ui_s.cameraControlGroup.setEnabled(True)
             self.ui_s.laserControlGroup.setEnabled(True)
@@ -205,8 +206,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
             print(e)
-            self.ui_s.setIPaddressButton.setEnabled(True)
-            self.ui_s.reconnectButton.setEnabled(False)
+            # self.ui_s.setIPaddressButton.setEnabled(True)
+            self.ui_s.connectButton.setEnabled(True)
             self.ui_s.disconnectButton.setEnabled(False)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
@@ -216,6 +217,27 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.conn = False
 
         self.mainUI.sensorChanged(self.conn)
+
+    def disconnectSensor(self):
+        try:
+            self.sensor.close()
+
+            self.ui_s.connectButton.setEnabled(True)
+            self.ui_s.disconnectButton.setEnabled(False)
+            self.ui_s.cameraControlGroup.setEnabled(False)
+            self.ui_s.laserControlGroup.setEnabled(False)
+
+            self.ui_s.cameraStatusLabel.setText('The sensor was disconnected.')
+
+        except Exception as e:
+
+            self.ui_s.connectButton.setEnabled(False)
+            self.ui_s.disconnectButton.setEnabled(True)
+            self.ui_s.cameraControlGroup.setEnabled(True)
+            self.ui_s.laserControlGroup.setEnabled(True)
+
+            self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor')
+
 
     def laser_custom(self):
         if self.ui_s.hex4dCheckBox.isChecked():
