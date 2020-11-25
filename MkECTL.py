@@ -487,7 +487,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            self.states = {UIState.SCRIPT_PROGRESS}
+            self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
             self.setUIStatus(self.states)
             # self.GUIwhenScripting(False)
 
@@ -552,7 +552,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # GUI
         # self.GUIwhenScripting(False)
-        self.states = {UIState.SCRIPT_PROGRESS}
+        self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
         self.setUIStatus(self.states)
 
         stopped = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
