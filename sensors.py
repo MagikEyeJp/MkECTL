@@ -197,6 +197,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
             # self.ui_s.setIPaddressButton.setEnabled(False)
             self.ui_s.connectButton.setEnabled(False)
+            self.ui_s.IPlineEdit.setEnabled(False)
             self.ui_s.disconnectButton.setEnabled(True)
             self.ui_s.cameraControlGroup.setEnabled(True)
             self.ui_s.laserControlGroup.setEnabled(True)
@@ -208,6 +209,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             print(e)
             # self.ui_s.setIPaddressButton.setEnabled(True)
             self.ui_s.connectButton.setEnabled(True)
+            self.ui_s.IPlineEdit.setEnabled(True)
             self.ui_s.disconnectButton.setEnabled(False)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
@@ -223,6 +225,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.sensor.close()
 
             self.ui_s.connectButton.setEnabled(True)
+            self.ui_s.IPlineEdit.setEnabled(True)
             self.ui_s.disconnectButton.setEnabled(False)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
@@ -232,6 +235,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         except Exception as e:
 
             self.ui_s.connectButton.setEnabled(False)
+            self.ui_s.IPlineEdit.setEnabled(False)
             self.ui_s.disconnectButton.setEnabled(True)
             self.ui_s.cameraControlGroup.setEnabled(True)
             self.ui_s.laserControlGroup.setEnabled(True)

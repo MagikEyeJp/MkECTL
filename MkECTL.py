@@ -736,12 +736,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # self.ui.viewSensorWinButton.setEnabled(True)
             # self.subWindow.ui_s.setIPaddressButton.setEnabled(False)
             self.subWindow.ui_s.connectButton.setEnabled(False)
+            self.subWindow.ui_s.IPlineEdit.setEnabled(False)
             self.subWindow.ui_s.disconnectButton.setEnabled(True)
             self.subWindow.ui_s.cameraControlGroup.setEnabled(True)
             self.subWindow.ui_s.laserControlGroup.setEnabled(True)
         else:
             # self.subWindow.ui_s.setIPaddressButton.setEnabled(True)
             self.subWindow.ui_s.connectButton.setEnabled(True)
+            self.subWindow.ui_s.IPlineEdit.setEnabled(True)
             self.subWindow.ui_s.disconnectButton.setEnabled(False)
             self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
             self.subWindow.ui_s.laserControlGroup.setEnabled(False)
@@ -789,8 +791,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # self.ui.executeScript_button.setEnabled(False)
 
             self.ui.Scripting_groupBox.setEnabled(True)
+            self.ui.stopButton.setEnabled(True)
         else:
             self.ui.Scripting_groupBox.setEnabled(False)
+            self.ui.stopButton.setEnabled(False)
 
 
 # ----- Scripting-related functions -----
