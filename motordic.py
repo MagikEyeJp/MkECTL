@@ -3,6 +3,8 @@ import KMControllersS, KMControllersS_dummy
 import os
 import glob
 from time import sleep
+import re
+import random
 
 #serials = {'pan': 'KM-1S K1UK#E45', 'tilt': 'KM-1S CBG3#573', 'slider': 'KM-1S SW59#0E9', 'test': 'KM-1 CS9B#B12'}
 #defaultSerials = {'pan': 'KM-1S 20BV#3A2', 'tilt': 'KM-1S 0D69#13A', 'slider': 'KM-1U 9PIG#CD1', 'test': 'KM-1 CS9B#B12'}
@@ -74,13 +76,19 @@ def getMotorDic(motors=None):
     calib_flag: bool = True
 
     devices = glob.glob(os.path.join('/dev', 'ttyUSB*'))
-    if 1 <= len(devices) <= 4:  # real calibration or test one
-        print("real device mode.")
-        pass
-    else:  # dummy  devices: dictionary
+    if re.search('.+_dummy', random.choice(list(serials.values()))):  # dummy  devices: dictionary
         devices = ['slider', 'pan', 'tilt']  # pseudo port name = id
         calib_flag = False
         print("dummy mode.")
+    else:   # real calibration
+        pass
+    # if 1 <= len(devices) <= 4:  # real calibration or test one
+    #     print("real device mode.")
+    #     pass
+    # else:  # dummy  devices: dictionary
+    #     devices = ['slider', 'pan', 'tilt']  # pseudo port name = id
+    #     calib_flag = False
+    #     print("dummy mode.")
 
     for d in devices:
         if calib_flag == True:  # real calibration or test one
