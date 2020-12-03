@@ -4,10 +4,13 @@
 # Other page: https://gist.github.com/mieki256/1b73aae707cee97fffab544af9bc0637
 #            https://mfumi.hatenadiary.org/entry/20141112/1415806010
 import sys
+from math import pow
 from PyQt5 import QtWidgets, QtGui, QtCore
 
-imagepath = 'GUI_icons/keigan_icon.png'
+ZOOMSCALE_MAX = 50.0
+ZOOMSCALE_MIN = 0.05
 
+imagepath = 'GUI_icons/keigan_icon.png'
 
 canvasSize = (640, 480)
 padding = 48
@@ -19,6 +22,7 @@ status = None
 zoomDisp = None
 gView = None
 myApp = None
+
 
 # /////////////////////////////////////////////////////////////////////////////
 # ビューを表示するためのシーン。                                             //
@@ -195,7 +199,7 @@ class ImageViewScene(QtWidgets.QGraphicsScene):
 
     def changeZoomRatio(self, d):
         """ 外部から与えられた値でズーム変更 """
-        v = self.changeZoomValue(pow(1.2, d)) / 100.0
+        v = self.changeZoomValue(math.pow(1.2, d)) / 100.0
         self.resetMatrix()
         self.scale(v, v)
         # self.setSceneNewRect()
@@ -251,6 +255,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
 
         # QGraphicsViewの設定。------------------------------------------------
         self.setCacheMode(QtWidgets.QGraphicsView.CacheBackground)
+        self.setViewportUpdateMode(QtWidgets.QGraphicsView.SmartViewportUpdate)
         self.setRenderHints(QtGui.QPainter.Antialiasing |
                             QtGui.QPainter.SmoothPixmapTransform |
                             QtGui.QPainter.TextAntialiasing
@@ -259,12 +264,14 @@ class ImageViewer(QtWidgets.QGraphicsView):
 
         # QGraphicsSceneの作成・および設定。------------------------------------
         # self.m_scene = ImageViewScene(self)
-        self.m_scene = QtWidgets.QGraphicsScene(self)
-        self.m_scene.setSceneRect(QtCore.QRectF(self.rect()))
+        self.m_scene = QtWidgets.QGraphicsScene()
         self.setScene(self.m_scene)
         self.m_pixmapitem = QtWidgets.QGraphicsPixmapItem()
+        self.m_pixmapitem.setTransformationMode(QtCore.Qt.SmoothTransformation)
+        self.m_pixmaprect = QtCore.QRectF(0.0, 0.0, 0.0, 0.0)
         self.m_scene.addItem(self.m_pixmapitem)
         # scene.setFile( imagepath )
+        self.m_wheelzoom = False
         self.m_fitmode = True
         self.m_scale = 1.0
         # ---------------------------------------------------------------------
@@ -274,10 +281,31 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorViewCenter)
 
+    def setPixMap(self, pixmap):
+        self.m_pixmapitem.setPixmap(pixmap)
+        if self.m_pixmapitem.boundingRect() != self.m_pixmaprect:
+            self.m_pixmaprect = self.m_pixmapitem.boundingRect()
+            # self.pixSizeChanged.emit(self.m_pixmaprect)
+        if self.m_fitmode:
+            self.scaleFit()
+
+    def setScale(self, scale, innter=False):
+        self.resetTransform()
+        self.scale(scale, scale)
+        self.m_scale = scale
+        # self.scaleChanged.emit (m_scale, m_wheelzoom)
+        if not innter:
+            self.m_wheelzoom = False
+            self.m_fitmode = False
+
     def scaleFit(self):
         self.fitInView(self.m_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
-        # m_scale = self.width() / self.m_scene.itemsBoundingRect().width()
+        if self.m_scene.itemsBoundingRect().width != 0:
+            m_scale = self.width() / self.m_scene.itemsBoundingRect().width()
         self.m_fitmode = True
+
+    def sizeHint(self) -> QtCore.QSize:
+        return QtCore.QSize(256, 256)
 
     def setFile(self, filepath):
         # ビューが持つシーンにファイルパスを渡して初期化処理を
@@ -291,12 +319,21 @@ class ImageViewer(QtWidgets.QGraphicsView):
             self.scaleFit()
 
         super(ImageViewer, self).resizeEvent(event)
-        self.scene().setSceneRect(QtCore.QRectF(self.rect()))
+        # self.scene().setSceneRect(QtCore.QRectF(self.rect()))
 
-    def setPixMap(self, pixmap):
-        self.m_pixmapitem.setPixmap(pixmap)
-        if self.m_fitmode:
-            self.scaleFit()
+    def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
+        self.m_wheelzoom = True
+        scenepos = self.mapToScene(event.pos())
+        if event.angleDelta() != 0:
+            newscale = self.m_scale * pow(1.5, (event.angleDelta().y() / 120.0))
+            if event.angleDelta().y() > 0:
+                self.setScale(newscale if newscale < ZOOMSCALE_MAX else ZOOMSCALE_MAX)
+            else:
+                self.setScale(newscale if ZOOMSCALE_MIN < newscale else ZOOMSCALE_MIN)
+            viewpos = self.mapFromScene(scenepos)
+            move = viewpos - event.pos()
+            self.horizontalScrollBar().setValue(move.x() + self.horizontalScrollBar().value())
+            self.verticalScrollBar().setValue(move.y() + self.verticalScrollBar().value())
 
 
 # /////////////////////////////////////////////////////////////////////////////

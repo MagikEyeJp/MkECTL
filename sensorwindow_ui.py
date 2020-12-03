@@ -20,6 +20,7 @@ class Ui_sensor(object):
         self.verticalLayout_5 = QtWidgets.QVBoxLayout()
         self.verticalLayout_5.setObjectName("verticalLayout_5")
         self.sensorImage = ImageViewer(sensor)
+        self.sensorImage.setInteractive(False)
         self.sensorImage.setObjectName("sensorImage")
         self.verticalLayout_5.addWidget(self.sensorImage)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()

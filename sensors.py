@@ -214,7 +214,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
 
-            self.ui_s.sensorImage.setScene(self.scene)
+            # self.ui_s.sensorImage.setScene(self.scene)
 
             self.conn = False
 
