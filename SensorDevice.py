@@ -16,12 +16,13 @@ class SensorDevice:
         self.port = port
         if self.client:
             self.close()
+            sleep(0.1)
         bus = pymkeapi.TcpBus(addr, port)
         self.client = pymkeapi.ReservedSyncClient(bus)
         self.clientDepth = pymkeapi.SyncClient(bus)
         if self.client.get_state() != pymkeapi.STATE_IDLE:
             self.client.set_state(pymkeapi.STATE_IDLE)
-            sleep(0.5)
+            sleep(0.1)
         self.client.set_state(pymkeapi.STATE_SERVICE)
         sleep(0.5)
 
