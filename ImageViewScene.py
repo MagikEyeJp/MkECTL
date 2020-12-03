@@ -246,7 +246,7 @@ class ImageViewScene(QtWidgets.QGraphicsScene):
 # メインとなるビュー。                                                       //
 # /////////////////////////////////////////////////////////////////////////////
 class ImageViewer(QtWidgets.QGraphicsView):
-    def __init__(self):
+    def __init__(self, widget):
         super(ImageViewer, self).__init__()
 
         # QGraphicsViewの設定。------------------------------------------------
@@ -258,11 +258,26 @@ class ImageViewer(QtWidgets.QGraphicsView):
         # ---------------------------------------------------------------------
 
         # QGraphicsSceneの作成・および設定。------------------------------------
-        scene = ImageViewScene(self)
-        scene.setSceneRect(QtCore.QRectF(self.rect()))
-        self.setScene(scene)
+        # self.m_scene = ImageViewScene(self)
+        self.m_scene = QtWidgets.QGraphicsScene(self)
+        self.m_scene.setSceneRect(QtCore.QRectF(self.rect()))
+        self.setScene(self.m_scene)
+        self.m_pixmapitem = QtWidgets.QGraphicsPixmapItem()
+        self.m_scene.addItem(self.m_pixmapitem)
         # scene.setFile( imagepath )
+        self.m_fitmode = True
+        self.m_scale = 1.0
         # ---------------------------------------------------------------------
+        self.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorViewCenter)
+
+    def scaleFit(self):
+        self.fitInView(self.m_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+        # m_scale = self.width() / self.m_scene.itemsBoundingRect().width()
+        self.m_fitmode = True
 
     def setFile(self, filepath):
         # ビューが持つシーンにファイルパスを渡して初期化処理を
@@ -271,8 +286,17 @@ class ImageViewer(QtWidgets.QGraphicsView):
 
     def resizeEvent(self, event):
         # ビューをリサイズ時にシーンの矩形を更新する。
+        print("resize")
+        if self.m_fitmode:
+            self.scaleFit()
+
         super(ImageViewer, self).resizeEvent(event)
         self.scene().setSceneRect(QtCore.QRectF(self.rect()))
+
+    def setPixMap(self, pixmap):
+        self.m_pixmapitem.setPixmap(pixmap)
+        if self.m_fitmode:
+            self.scaleFit()
 
 
 # /////////////////////////////////////////////////////////////////////////////

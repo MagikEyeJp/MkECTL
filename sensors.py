@@ -185,10 +185,9 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
             self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor and set parameter values')
 
-            # temp
-            self.scene = ImageViewScene.ImageViewScene()
+            # self.scene = ImageViewScene.ImageViewScene()
             # self.scene.setSceneRect(QtCore.QRectF(self.rect()))
-            self.ui_s.sensorImage.setScene(self.scene)
+            # self.ui_s.sensorImage.setScene(self.scene)
 
             # self.ui_s.sensorImage = ImageViewScene.ImageViewer()
             # self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
@@ -323,13 +322,14 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # img3 = Image.new('L', (len(img2[0]), len(img2)))
         # img3.show()
 
-        self.scene.setPixMap(pixmap)
+        # self.scene.setPixMap(pixmap)
+        self.ui_s.sensorImage.setPixMap(pixmap)
 
         # self.ui_s.sensorImage.setFixedSize(len(img2[0]), len(img2))
         # self.ui_s.sensorImage.resize(pixmap.size())
-        self.ui_s.sensorImage.setBaseSize(len(img2[0]), len(img2))
-        self.ui_s.sensorImage.setSceneRect(0, 0, len(img2[0]), len(img2))
-        self.ui_s.sensorImage.fitInView(self.scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
+        # self.ui_s.sensorImage.setBaseSize(len(img2[0]), len(img2))
+        # self.ui_s.sensorImage.setSceneRect(0, 0, len(img2[0]), len(img2))
+        # self.ui_s.sensorImage.fitInView(self.scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
         # self.scene.fitImage()
 
         self.ui_s.sensorImage.show()

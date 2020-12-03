@@ -709,10 +709,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.subWindow.getImg(1)
 
     def showSubWindow(self, geometry, framesize):
-        self.subWindow.show()
-        self.subWindow.move(geometry.width() / 2 - framesize.width() / 16,
-                            geometry.height() / 2 - framesize.height() / 3)
-        self.subWindow_isOpen = True
+        if self.subWindow_isOpen:
+            self.subWindow.activateWindow()
+            self.subWindow.show()
+        else:
+            self.subWindow.show()
+            self.subWindow.move(geometry.width() / 2 - framesize.width() / 16,
+                                geometry.height() / 2 - framesize.height() / 3)
+            self.subWindow_isOpen = True
 
     def openIR(self):
 
