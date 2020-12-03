@@ -588,7 +588,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.run_script(isContinue)    # exec 1st script
 
             # -------- 2nd script -------
-            self.renewSubFolder()
+            # self.renewSubFolder()
+
+            self.scriptParams.isContinue = False
+
+            if self.scriptParams.scriptName_2 == '':
+                self.openScriptFile(2)
 
             if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
                 os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
