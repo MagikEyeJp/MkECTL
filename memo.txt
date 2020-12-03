@@ -32,7 +32,7 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・[DONE]スクリプト実行ボタン/ContinueボタンをSTOPボタンの隣にする。
 ・[DONE]色のついているボタンは無効時には色をなくす
 ・モーターが動かないとき、エラーを出す＆プログレスバーを表示
-・iconの色合いを全部黒くする
+・[DONE]iconの色合いを全部黒くする
 ・(setUIstatus)の元請けクラスを作る
 ・[DONE]sensorのDisconnectを実装
 
