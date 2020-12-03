@@ -206,6 +206,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
+            QtWidgets.QMessageBox.warning(self, "Connection Failed", str(e))
             print(e)
             # self.ui_s.setIPaddressButton.setEnabled(True)
             self.ui_s.connectButton.setEnabled(True)
