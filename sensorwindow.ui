@@ -17,7 +17,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0">
      <item>
-      <widget class="QGraphicsView" name="sensorImage"/>
+      <widget class="ImageViewer" name="sensorImage"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
@@ -1070,6 +1070,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ImageViewer</class>
+   <extends>QGraphicsView</extends>
+   <header>ImageViewScene</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>

@@ -19,7 +19,7 @@ class Ui_sensor(object):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout()
         self.verticalLayout_5.setObjectName("verticalLayout_5")
-        self.sensorImage = QtWidgets.QGraphicsView(sensor)
+        self.sensorImage = ImageViewer(sensor)
         self.sensorImage.setObjectName("sensorImage")
         self.verticalLayout_5.addWidget(self.sensorImage)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
@@ -406,4 +406,5 @@ class Ui_sensor(object):
         self.oddLaserButton.setText(_translate("sensor", "ODD"))
         self.hex4dCheckBox.setText(_translate("sensor", "Custom[Hex 4d]"))
         self.CurrentLaserPattern_label.setText(_translate("sensor", "Current Laser Pattern(No.1-16):"))
+from ImageViewScene import ImageViewer
 import resources_rc
