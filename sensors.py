@@ -38,7 +38,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.sensor = SensorDevice.SensorDevice()
 
         # Variables (initialized with default values)
-        self.IPaddress = '192.168.10.38'  # default
+        self.IPaddress = '127.0.0.1'  # default
         self.portNum: int = 8888
         self.RPiaddress = self.IPaddress + ':' + str(self.portNum)
         self.shutterSpeed: int = 30000
