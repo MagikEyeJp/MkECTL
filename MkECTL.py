@@ -653,7 +653,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 currentErrors[self.motorSet[param_i]] = pos
 
                 percentToGoal += currentErrors[self.motorSet[param_i]]
-            percentToGoal /= totalInitialErrors
+            percentToGoal /= totalInitialErrors if not totalInitialErrors == 0 else 0.0
             percentToGoal *= 100
             percentToGoal = 100 - percentToGoal
             self.ui.initializeProgressBar.setValue(percentToGoal)
