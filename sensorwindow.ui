@@ -18,6 +18,12 @@
     <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,0">
      <item>
       <widget class="ImageViewer" name="sensorImage">
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOn</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOn</enum>
+       </property>
        <property name="interactive">
         <bool>false</bool>
        </property>
