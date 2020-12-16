@@ -35,7 +35,7 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・[DONE]iconの色合いを全部黒くする
 ・(setUIstatus)の元請けクラスを作る
 ・[DONE]sensorのDisconnectを実装
-・logにExposure multiplierの値も記録する
+・[DONE]logにExposure multiplierの値も記録する
 
 BUG?
 ・[DONE]センサーをオープンしたまま、センサーを再起動すると、センサーウィンドウでキャプチャできなくなる。MkECTLを立ち上げ直さないと復帰できない。
