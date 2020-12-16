@@ -315,8 +315,10 @@ class ImageViewer(QtWidgets.QGraphicsView):
     def resizeEvent(self, event):
         # ビューをリサイズ時にシーンの矩形を更新する。
         print("resize")
+        self.m_fitmode = True
         if self.m_fitmode:
             self.scaleFit()
+            print('scaleFit')
 
         super(ImageViewer, self).resizeEvent(event)
         # self.scene().setSceneRect(QtCore.QRectF(self.rect()))
