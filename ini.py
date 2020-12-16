@@ -36,27 +36,29 @@ def generateIni(dirname, scriptName):
     with open(dirname + '/Log.ini', 'w') as configfile:
         config.write(configfile)
 
-def updateIni_start(baseFolder, subFolder, scriptName, isContinue):
-    if os.path.exists(baseFolder + '/' + subFolder + '/Log.ini'):
+def updateIni_start(scriptParams):
+    if os.path.exists(scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/Log.ini'):
         config = configparser.ConfigParser()
-        config.read(baseFolder + '/' + subFolder + '/Log.ini')
+        config.read(scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/Log.ini')
 
         newSectionNum = len(config.sections()) + 1
         newSection = 'script' + str(newSectionNum)
         config.add_section(newSection)
         config.set(newSection, 'section_no', str(newSectionNum))
-        config.set(newSection, 'scriptpath', scriptName)
+        config.set(newSection, 'scriptpath', scriptParams.scriptName)
 
         lastExecutedScript = config.get('script' + str(newSectionNum - 1),
                                         'scriptpath')
 
         dt_start = datetime.datetime.now()
+        config.set(newSection, 'ir_on_multiplier', str(scriptParams.IRonMultiplier))
+        config.set(newSection, 'ir_off_multiplier', str(scriptParams.IRoffMultiplier))
         config.set(newSection, 'start_time', str(dt_start))
 
-        if isContinue and lastExecutedScript == scriptName:
+        if scriptParams.isContinue and lastExecutedScript == scriptParams.scriptName:
             pass
         else:
-            with open(baseFolder + '/' + subFolder + '/Log.ini', 'w') as configfile:
+            with open(scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/Log.ini', 'w') as configfile:
                 config.write(configfile)
 
     else:
@@ -65,12 +67,14 @@ def updateIni_start(baseFolder, subFolder, scriptName, isContinue):
         section1 = 'script1'
         config.add_section(section1)
         config.set(section1, 'section_no', '1')
-        config.set(section1, 'scriptpath', scriptName)
+        config.set(section1, 'scriptpath', scriptParams.scriptName)
 
         dt_start = datetime.datetime.now()
+        config.set(section1, 'ir_on_multiplier', str(scriptParams.IRonMultiplier))
+        config.set(section1, 'ir_off_multiplier', str(scriptParams.IRoffMultiplier))
         config.set(section1, 'start_time', str(dt_start))
 
-        with open(baseFolder + '/' + subFolder + '/Log.ini', 'w') as configfile:
+        with open(scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/Log.ini', 'w') as configfile:
             config.write(configfile)
 
 def updateIni_finish(dirname, scriptName):

@@ -202,7 +202,7 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
 
     # ---------- make ini file ----------
     if not isDemo:
-        ini.updateIni_start(scriptParams.baseFolderName, scriptParams.subFolderName, scriptParams.scriptName, scriptParams.isContinue)
+        ini.updateIni_start(scriptParams)
     # ------------------------------
 
     commandNum = countCommandNum(scriptParams, args_hist, com_hist)
