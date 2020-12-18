@@ -8,5 +8,9 @@ class IRLight(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def isvalid(self) -> bool:
+        pass
+
+    @abstractmethod
     def set(self, ch, state):
         pass

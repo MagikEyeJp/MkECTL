@@ -13,7 +13,6 @@ class IRLightDummy(IRLight):
         self.device = IRdevice
     # https://stackoverflow.com/questions/2291772/virtual-serial-device-in-python
 
-
     def open(self):
         master, slave = pty.openpty()
         tty_dummy = os.ttyname(slave)
@@ -21,6 +20,9 @@ class IRLightDummy(IRLight):
         self.IRport = serial.Serial(tty_dummy)
 
         return 'Using Dummy Lights'
+
+    def isvalid(self) -> bool:
+        return True
 
     def set(self, ch, state):
         pass

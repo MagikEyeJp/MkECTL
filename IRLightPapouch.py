@@ -10,6 +10,7 @@ class IRLightPapouch(IRLight):
 
     def __init__(self, IRtype, IRdevice):
         self.IRport = None
+        self.valid = False
         self.u2dTable = {}
 
         self.type = IRtype
@@ -17,21 +18,31 @@ class IRLightPapouch(IRLight):
 
     def open(self):
         self.make_u2d_table()
-        self.IRport = serial.Serial(self.u2dTable[self.device], 115200)
+        try:
+            self.IRport = serial.Serial(self.u2dTable[self.device], 115200)
+            self.valid = True
+            msg = 'Using ' + self.type
 
-        return 'Using ' + self.type
+        except serial.serialutil.SerialException:
+            self.IRport = None
+            self.valid = False
+            msg = 'Open error ' + self.type
+        return msg
 
+    def isvalid(self) -> bool:
+        return self.valid
 
     def set(self, ch, state):
-        if 0 < ch < 3:
-            # cmd = cmd + ch - 1
-            if state:
-                flag = 'H'
-            else:
-                flag = 'L'
-            cmd = "*B1OS" + str(ch) + flag + "\r"
-            # print(cmd, len(cmd), bytes(cmd, 'UTF-8'))
-            self.IRport.write(bytes(cmd, 'UTF-8'))
+        if self.valid:
+            if 0 < ch < 3:
+                # cmd = cmd + ch - 1
+                if state:
+                    flag = 'H'
+                else:
+                    flag = 'L'
+                cmd = "*B1OS" + str(ch) + flag + "\r"
+                # print(cmd, len(cmd), bytes(cmd, 'UTF-8'))
+                self.IRport.write(bytes(cmd, 'UTF-8'))
 
     def make_u2d_table(self):
         p = Path('/sys/class/tty/')

@@ -786,7 +786,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.ui.manualOperation.setEnabled(False)
 
-        if UIState.IRLIGHT in status:
+        if UIState.IRLIGHT in status and self.IRLight.isvalid():
             self.ui.IRlightControlGroup.setEnabled(True)
         else:
             self.ui.IRlightControlGroup.setEnabled(False)
