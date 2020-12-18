@@ -18,15 +18,20 @@ class IRLightPapouch(IRLight):
 
     def open(self):
         self.make_u2d_table()
-        try:
-            self.IRport = serial.Serial(self.u2dTable[self.device], 115200)
-            self.valid = True
-            msg = 'Using ' + self.type
+        if self.device in self.u2dTable:
+            try:
+                self.IRport = serial.Serial(self.u2dTable[self.device], 115200)
+                self.valid = True
+                msg = 'Using ' + self.type
 
-        except serial.serialutil.SerialException:
+            except serial.serialutil.SerialException:
+                self.IRport = None
+                self.valid = False
+                msg = 'Open error ' + self.type
+        else:
             self.IRport = None
             self.valid = False
-            msg = 'Open error ' + self.type
+            msg = 'Not exist device' + self.device
         return msg
 
     def isvalid(self) -> bool:
