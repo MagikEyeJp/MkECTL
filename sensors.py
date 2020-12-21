@@ -99,6 +99,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
         self.ui_s.selectDirectoryButton.clicked.connect(self.selectDirectory)
         self.ui_s.resetButton.clicked.connect(self.resetCounter)
+        self.ui_s.gridButton.clicked.connect(self.showGrid)
 
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
@@ -194,12 +195,14 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             # self.ui_s.sensorImage.show()
             # self.getImg(self.frames)
 
+            # どうにかする
             # self.ui_s.setIPaddressButton.setEnabled(False)
             self.ui_s.connectButton.setEnabled(False)
             self.ui_s.IPlineEdit.setEnabled(False)
             self.ui_s.disconnectButton.setEnabled(True)
             self.ui_s.cameraControlGroup.setEnabled(True)
             self.ui_s.laserControlGroup.setEnabled(True)
+            self.ui_s.gridButton.setEnabled(True)
 
             self.conn = True
 
@@ -353,6 +356,10 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         writer.writerow(['uid', 'x', 'y', 'z'])
         writer.writerows(data)
         f.close()
+
+    def showGrid(self):
+        self.ui_s.sensorImage.setGridParameter(self.ui_s.sensorImage.gridParam)
+        self.ui_s.sensorImage.setGridVisible(self.ui_s.gridButton.isChecked())
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

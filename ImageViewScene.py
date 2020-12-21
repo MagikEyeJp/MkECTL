@@ -270,6 +270,10 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self.m_pixmapitem.setTransformationMode(QtCore.Qt.SmoothTransformation)
         self.m_pixmaprect = QtCore.QRectF(0.0, 0.0, 0.0, 0.0)
         self.m_scene.addItem(self.m_pixmapitem)
+
+        self.m_gridItem = GridItem()
+        self.gridParam = GridItem.GridParameter()
+
         # scene.setFile( imagepath )
         self.m_wheelzoom = False
         self.m_fitmode = True
@@ -280,6 +284,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorViewCenter)
+        self.m_scene.addItem(self.m_gridItem)
 
     def setPixMap(self, pixmap):
         self.m_pixmapitem.setPixmap(pixmap)
@@ -337,10 +342,59 @@ class ImageViewer(QtWidgets.QGraphicsView):
             self.horizontalScrollBar().setValue(move.x() + self.horizontalScrollBar().value())
             self.verticalScrollBar().setValue(move.y() + self.verticalScrollBar().value())
 
+    def setGridVisible(self, visible: bool):
+        m_gridvisible = visible
+        self.m_gridItem.setVisible(m_gridvisible)
+
+    def setGridParameter(self, p):
+        print("setGridParameter")
+        self.m_gridItem.makeGrid(self.m_pixmapitem.boundingRect(), p)
 
 # /////////////////////////////////////////////////////////////////////////////
 #                                                                            //
 # /////////////////////////////////////////////////////////////////////////////
+
+class GridItem(QtWidgets.QGraphicsPathItem):
+    def __init__(self):
+        super(GridItem, self).__init__()
+
+        self.path = QtGui.QPainterPath()
+        self.painter = QtGui.QPainter()
+        # self.painter.begin(self)
+
+    def makeGrid(self, rect: QtCore.QRectF, param):
+
+        self.resetTransform()
+
+        # qDebug("GridItem::makeGrid %d x %d %f deg.\n", p.lines_x, p.lines_y, p.angle);
+        path = self.path    # path - path ?
+        self.painter.setPen(param.pen)
+        # self.painter.setPen(QtCore.Qt.black)
+        rect.translate(param.offset_x, param.offset_y)
+        path.addRect(rect)
+        step_x = rect.width() / (param.lines_x + 1)
+        step_y = rect.height() / (param.lines_y + 1)
+
+        for x in range(1, param.lines_x):
+            path.moveTo(x * step_x + param.offset_x, rect.top())
+            path.lineTo(x * step_x + param.offset_x, rect.bottom())
+
+        for y in range(1, param.lines_y):
+            path.moveTo(rect.left(), y * step_y + param.offset_y)
+            path.lineTo(rect.right(), y * step_y + param.offset_y)
+
+        self.setTransformOriginPoint(rect.center())
+        self.setRotation(param.angle)
+        self.setPath(path)
+
+    class GridParameter():
+        def __init__(self):
+            self.lines_x: int = 3
+            self.lines_y: int = 3
+            self.offset_x: float = 0.0
+            self.offset_y: float = 0.0
+            self.angle: float = 0.0
+            self.pen = QtGui.QPen(QtGui.QColor('black'))
 
 
 if __name__ == '__main__':
