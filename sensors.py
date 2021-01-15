@@ -226,24 +226,15 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
     def disconnectSensor(self):
         try:
             self.sensor.close()
-
+            self.ui_s.cameraStatusLabel.setText('The sensor was disconnected.')
+        except Exception as e:
+            self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor correctly.')
+        finally:
             self.ui_s.connectButton.setEnabled(True)
             self.ui_s.IPlineEdit.setEnabled(True)
             self.ui_s.disconnectButton.setEnabled(False)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
-
-            self.ui_s.cameraStatusLabel.setText('The sensor was disconnected.')
-
-        except Exception as e:
-
-            self.ui_s.connectButton.setEnabled(False)
-            self.ui_s.IPlineEdit.setEnabled(False)
-            self.ui_s.disconnectButton.setEnabled(True)
-            self.ui_s.cameraControlGroup.setEnabled(True)
-            self.ui_s.laserControlGroup.setEnabled(True)
-
-            self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor')
 
 
     def laser_custom(self):
