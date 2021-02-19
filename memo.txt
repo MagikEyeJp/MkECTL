@@ -22,7 +22,6 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・シャッター速度と同じようにスクリプト実行時ISO倍率を変更したい
 ・モーターが動かないとき、エラーを出す＆プログレスバーを表示
 ・(setUIstatus)の元請けクラスを作る
-・[DOING]スクリプト終了時に音を鳴らすなどしたい(終わったことを知らせたい)
 
 
 BUG?
@@ -49,6 +48,7 @@ Done
 ・[DONE]iconの色合いを全部黒くする
 ・[DONE]sensorのDisconnectを実装
 ・[DONE]logにExposure multiplierの値も記録する
+・[DONE]スクリプト終了時に音を鳴らすなどしたい(終わったことを知らせたい)
 
 ・[DONE]センサーをオープンしたまま、センサーを再起動すると、センサーウィンドウでキャプチャできなくなる。MkECTLを立ち上げ直さないと復帰できない。
 ・[DONE]モータ移動進捗表示のためのtotalInitialErrorsが0だと0割りエラーになる
