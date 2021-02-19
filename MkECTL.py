@@ -10,6 +10,8 @@ import serial
 from functools import partial
 import datetime
 import math
+# from pygame import mixer
+from playsound import playsound
 
 import MyDoubleSpinBox
 import motordic
@@ -91,6 +93,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.total = 100
         self.percent = 0
         self.stopClicked = False
+
+        # pygame.mixer
+        # mixer.init()
+        # mixer.music.load("SE/finish_chime.mp3")  # pygame.error: Unrecognized audio format
 
         self.ui.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
         self.ui.progressBar.setValue(self.percent)
@@ -519,6 +525,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.setUIStatus(self.states)
             # self.GUIwhenScripting(True)
 
+            QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
+                                                                         "the demo file \nhave been completed.")
+
     def keyPressEvent(self, event):
         key = event.key()
         if key == QtCore.Qt.Key_Escape:
@@ -583,6 +592,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
         self.setUIStatus(self.states)
 
+        # mixer.music.play(1)
+        playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
+        QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
+                                                                     "\"%s\" \nhave been completed."
+                                                                        % os.path.basename(self.scriptParams.scriptName))
+
+
     def run_2scripts(self, isContinue):
         if self.scriptParams.execTwoScr:
             self.run_script(isContinue)    # exec 1st script
@@ -610,6 +626,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # self.GUIwhenScripting(stopped)
             self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
             self.setUIStatus(self.states)
+
+            QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
+                                                                         "\"%s\" \nhave been completed."
+                                              % os.path.basename(self.scriptParams.scriptName_2))
 
             pass  # will be updated later
 
