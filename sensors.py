@@ -6,6 +6,7 @@ import os
 from PIL import Image
 import csv
 import numpy as np
+from timeout_decorator import TimeoutError
 
 import socket
 import SensorDevice
@@ -220,6 +221,10 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             # self.ui_s.sensorImage.setScene(self.scene)
 
             self.conn = False
+
+        except TimeoutError:
+            QtWidgets.QMessageBox.critical(self, "Connection Error", "Cannot connect to sensor (timeout)")
+
 
         self.mainUI.sensorChanged(self.conn)
 

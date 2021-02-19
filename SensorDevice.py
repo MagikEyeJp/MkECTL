@@ -2,6 +2,7 @@
 
 import sys
 from time import sleep
+from timeout_decorator import timeout
 import pymkeapi
 
 class SensorDevice:
@@ -11,6 +12,7 @@ class SensorDevice:
         self.client = None
         self.clientDepth = None
 
+    @timeout(10)  # https://qiita.com/toshitanian/items/133b42355b7867f5c458
     def open(self, addr='localhost', port=8888):
         self.addr = addr
         self.port = port
