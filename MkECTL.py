@@ -519,13 +519,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.setUIStatus(self.states)
             # self.GUIwhenScripting(False)
 
-            stopped = execute_script.execute_script(self.scriptParams, self.devices, self.params, self, True)
+            interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self, True)
 
             self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
             self.setUIStatus(self.states)
             # self.GUIwhenScripting(True)
 
-            QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
+            if not interrupted:
+                QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "the demo file \nhave been completed.")
 
     def keyPressEvent(self, event):
@@ -586,17 +587,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
         self.setUIStatus(self.states)
 
-        stopped = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
+        interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
-        # self.GUIwhenScripting(stopped)
-        self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
-        self.setUIStatus(self.states)
+        if not self.scriptParams.execTwoScr:
+            # self.GUIwhenScripting(interrupted)
+            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+            self.setUIStatus(self.states)
 
-        # mixer.music.play(1)
-        playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
-        QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
-                                                                     "\"%s\" \nhave been completed."
-                                                                        % os.path.basename(self.scriptParams.scriptName))
+            if not interrupted:
+                # mixer.music.play(1)
+                playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
+                QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
+                                                                             "\"%s\" \nhave been completed."
+                                                                                % os.path.basename(self.scriptParams.scriptName))
 
 
     def run_2scripts(self, isContinue):
@@ -621,15 +624,17 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
             self.setUIStatus(self.states)
 
-            stopped = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
+            interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
-            # self.GUIwhenScripting(stopped)
+            # self.GUIwhenScripting(interrupted)
             self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
             self.setUIStatus(self.states)
 
-            QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
+            if not interrupted:
+                playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
+                QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "\"%s\" \nhave been completed."
-                                              % os.path.basename(self.scriptParams.scriptName_2))
+                                                % os.path.basename(self.scriptParams.scriptName_2))
 
             pass  # will be updated later
 
@@ -803,8 +808,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         if UIState.MOTOR in status:
             # self.ui.robotControl.setEnabled(True)
             self.ui.manualOperation.setEnabled(True)
+            self.ui.MagikEye.setEnabled(True)
         else:
             self.ui.manualOperation.setEnabled(False)
+            self.ui.MagikEye.setEnabled(False)
 
         if UIState.IRLIGHT in status and self.IRLight.isvalid():
             self.ui.IRlightControlGroup.setEnabled(True)
