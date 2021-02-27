@@ -7,6 +7,8 @@ import math
 import struct
 import string
 import itertools
+from playsound import playsound
+from timeout_decorator import timeout, TimeoutError
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 
@@ -129,6 +131,8 @@ class Systate():
         self.past_parameters = Systate.PastParameters()
         self.sentSig = Systate.SentSig()
 
+        self.timeout = False
+
     class SentSig():
         def __init__(self):
             self.shutter = False
@@ -148,6 +152,10 @@ class Systate():
 
 
 systate = Systate()
+
+def timeoutCallback():
+    systate.timeout = True
+    playsound('SE/error2.wav')
 
 def countCommandNum(scriptParams, args_hist, com_hist):
 
@@ -226,6 +234,9 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
             if not isDemo:
                 ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
             return mainWindow.stopClicked
+        # if systate.timeout:
+        #     systate.timeout = False     # for the next run
+        #     return False
 
         print(' ########## ' + str(i) + '/' + str(len(com_hist)) + ' ########## ')
 
@@ -236,7 +247,12 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
         mainWindow.ui.commandLabel.setText(com_hist[i])
 
         # jump to a method(function)
-        isStop = eval(commands[com_hist[i]][0])(systate.args, scriptParams, devices, params, mainWindow)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
+        try:
+            isStop = eval(commands[com_hist[i]][0])(systate.args, scriptParams, devices, params, mainWindow)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
+        except TimeoutError:
+            timeoutCallback()
+            QtWidgets.QMessageBox.critical(mainWindow, "Timeout Error", "Not responded")
+            return True
 
         # GUI
         mainWindow.done = i + 1
@@ -247,7 +263,7 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
     if not isDemo:
         ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
     # ------------------------------
-    return True
+    return False
 
 ##########
 def expand_dynvars(args, devices):
@@ -330,13 +346,14 @@ def expand_dynvars(args, devices):
 
 ##########
 
+@timeout(5)
 def set_root(args, scriptParams, devices, params, mainWindow):
     print('---set_root---')
     app.processEvents()
     global systate
     systate.root = args[0]
 
-
+@timeout(5)
 def set_filename(args, scriptParams, devices, params, mainWindow):
     print('---set_filename---')
 
@@ -356,6 +373,7 @@ def set_filename(args, scriptParams, devices, params, mainWindow):
     systate.folderCreated = True
 
 
+@timeout(15)
 def snap_image(args, scriptParams, devices, params, mainWindow):
     print('---snap_image---')
 
@@ -391,6 +409,7 @@ def snap_image(args, scriptParams, devices, params, mainWindow):
     systate.seqn += 1
     warm_lasers(scriptParams, devices, params, mainWindow)
 
+@timeout(15)
 def snap_3D_frame(args, scriptParams, devices, params, mainWindow):
     print('---snap_3D_frame---')
 
@@ -418,12 +437,15 @@ def snap_3D_frame(args, scriptParams, devices, params, mainWindow):
 
     systate.seqn += 1
 
+@timeout(15)
 def move_robot(args, scriptParams, devices, params, mainWindow):
     print('---move_robot---')
     print('move to ' + str(args))
     global systate
     global isDemo
     motorSet = ['slider', 'pan', 'tilt']
+
+    # time.sleep(2)
 
     args = np.array(args)
 
@@ -486,6 +508,7 @@ def home_robot(args, scriptParams, devices, params, mainWindow):
     move_robot(args, scriptParams, devices, params, mainWindow)
 
 
+@timeout(5)
 def set_shutter(args, scriptParams, devices, params, mainWindow):
     print('---set_shutter---')
 
@@ -519,6 +542,7 @@ def set_shutter(args, scriptParams, devices, params, mainWindow):
             systate.sentSig.shutter = True
 
 
+@timeout(5)
 def set_gainiso(args, scriptParams, devices, params, mainWindow):
     print('---set_gainiso---')
 
@@ -543,6 +567,7 @@ def set_gainiso(args, scriptParams, devices, params, mainWindow):
             systate.past_parameters.gainiso = systate.gainiso
             systate.sentSig.gainiso = True
 
+@timeout(5)
 def set_lasers(args, scriptParams, devices, params, mainWindow):
     print('---set_lasers---')
 
@@ -569,6 +594,7 @@ def set_lasers(args, scriptParams, devices, params, mainWindow):
             systate.sentSig.lasers = True
 
 
+@timeout(5)
 def set_light(args, scriptParams, devices, params, mainWindow):
     print('---set_light---')
 
@@ -600,6 +626,7 @@ def set_light(args, scriptParams, devices, params, mainWindow):
                 systate.sentSig.light[ch - 1] = True
 
 
+@timeout(5)
 def warm_lasers(scriptParams, devices, params, mainWindow):
     app.processEvents()
     if mainWindow.stopClicked:
