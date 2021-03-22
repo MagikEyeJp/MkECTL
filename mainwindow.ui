@@ -276,7 +276,7 @@
      <property name="geometry">
       <rect>
        <x>370</x>
-       <y>40</y>
+       <y>50</y>
        <width>131</width>
        <height>101</height>
       </rect>
@@ -1334,6 +1334,19 @@
      </property>
      <property name="autoDefault">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="getCurrentPosButton">
+     <property name="geometry">
+      <rect>
+       <x>380</x>
+       <y>30</y>
+       <width>121</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Get Current Pos.</string>
      </property>
     </widget>
    </widget>
@@ -3352,7 +3365,7 @@
      <x>0</x>
      <y>0</y>
      <width>552</width>
-     <height>28</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
