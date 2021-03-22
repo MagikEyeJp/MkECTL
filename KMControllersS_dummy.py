@@ -842,7 +842,7 @@ class USBController(Controller):
 
         ########## dummy ##########
         # position = self.goalPos
-        return (self.goalPos, velocity, torque)
+        return (position, velocity, torque)
 
 
     def start_log(self, nums):

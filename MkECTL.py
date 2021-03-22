@@ -154,6 +154,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeButton.setEnabled(False)
         self.ui.initializeButton.clicked.connect(self.initializeMotors)
         self.ui.MagikEye.clicked.connect(self.demo)
+        self.ui.getCurrentPosButton.setEnabled(False)
+        self.ui.getCurrentPosButton.clicked.connect(self.getCurrentPos)
         self.ui.selectScript_toolButton.clicked.connect(lambda: self.openScriptFile(1))
         self.ui.selectScript_toolButton_2.clicked.connect(lambda: self.openScriptFile(2))
         self.ui.delete2ndScriptButton.clicked.connect(lambda: self.delete2ndScript)
@@ -339,6 +341,17 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
         self.setUIStatus(self.states)
 
+    def getCurrentPos(self):
+        for motorname in self.motorSet:
+            m = self.motors[motorname]
+            (pos, vec, tor) = m.read_motor_measurement()
+            # exeCode = 'self.ui.%sCurrentPos.setText(str(pos))' % motorname
+            # exec(exeCode)
+            scale = self.params[motorname]['scale']
+            pos /= scale
+            self.motorGUI['currentPosLabel'][motorname].setText('{:.2f}'.format(pos))
+
+
     def setSliderOrigin(self):
         m = self.motors['slider']
         # m = self.params['slider']['cont']
@@ -387,6 +400,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             motorPos = self.motorGUI['posSpin'][motorID].value()
             # m.speed(self.motorGUI['speedSpin'][motorID].value())
             m.moveTo(motorPos * scale)
+
             while True:
                 error = 0.0
                 time.sleep(0.2)
@@ -397,7 +411,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 if error < 0.1:
                     break
 
-            self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(motorPos))
+            (pos, vel, torque) = m.read_motor_measurement()
+            pos /= scale
+            self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(pos))
+
             if self.subWindow.conn:
                 self.subWindow.getImg(1)
 
@@ -822,9 +839,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # self.ui.robotControl.setEnabled(True)
             self.ui.manualOperation.setEnabled(True)
             self.ui.MagikEye.setEnabled(True)
+            self.ui.getCurrentPosButton.setEnabled(True)
         else:
             self.ui.manualOperation.setEnabled(False)
             self.ui.MagikEye.setEnabled(False)
+            self.ui.getCurrentPosButton.setEnabled(False)
 
         if UIState.IRLIGHT in status and self.IRLight.isvalid():
             self.ui.IRlightControlGroup.setEnabled(True)
