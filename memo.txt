@@ -4,7 +4,6 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・センサーウィンドウがメインにドッキングするといいかも(Qtにあるかも)
 ・センサーウィンドウの画像表示にズーム機能
 ・センサーウィンドウに十字とか入るといい。MkEManagerのグリッド機能参照
-・現在のモーターの位置を読み取ってSpinBoxに反映するポタン
 ・クラス関係の整理(かんたんなクラス図を作って考える)
 ・PIDなどの設定機能(detailed settingsの追加)
 ・ソースファイルの整形、いらないコメント/処理の整理
@@ -22,7 +21,6 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・シャッター速度と同じようにスクリプト実行時ISO倍率を変更したい(ISO Override機能)
 ・モーターが動かないとき、エラーを出す＆プログレスバーを表示
 ・(setUIstatus)の元請けクラスを作る
-・スクリプト開始時に、キャプチャが含まれているスクリプトならば、センサーの接続がない場合は警告をだして、スタートしないようにする。
 
 
 BUG?
@@ -50,6 +48,8 @@ Done
 ・[DONE]sensorのDisconnectを実装
 ・[DONE]logにExposure multiplierの値も記録する
 ・[DONE]スクリプト終了時に音を鳴らすなどしたい(終わったことを知らせたい)
+・[DONE]スクリプト開始時に、キャプチャが含まれているスクリプトならば、センサーの接続がない場合は警告をだして、スタートしないようにする。
+・[DONE]現在のモーターの位置を読み取ってSpinBoxに反映するポタン
 
 ・[DONE]センサーをオープンしたまま、センサーを再起動すると、センサーウィンドウでキャプチャできなくなる。MkECTLを立ち上げ直さないと復帰できない。
 ・[DONE]モータ移動進捗表示のためのtotalInitialErrorsが0だと0割りエラーになる
