@@ -584,14 +584,21 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # GUI
         # self.GUIwhenScripting(False)
-        self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+        if self.devices['3Dsensors'].conn:
+            self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+        else:
+            self.states = {UIState.SCRIPT_PROGRESS}
+
         self.setUIStatus(self.states)
 
         interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
         if not self.scriptParams.execTwoScr:
             # self.GUIwhenScripting(interrupted)
-            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+            if self.devices['3Dsensors'].conn:
+                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+            else:
+                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
             self.setUIStatus(self.states)
 
             if not interrupted:
@@ -621,13 +628,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             # GUI
             # self.GUIwhenScripting(False)
-            self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+            if self.devices['3Dsensors'].conn:
+                self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+            else:
+                self.states = {UIState.SCRIPT_PROGRESS}
             self.setUIStatus(self.states)
 
             interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
             # self.GUIwhenScripting(interrupted)
-            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+            if self.devices['3Dsensors'].conn:
+                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+            else:
+                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
             self.setUIStatus(self.states)
 
             if not interrupted:

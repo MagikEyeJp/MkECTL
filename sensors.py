@@ -187,15 +187,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
             self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor and set parameter values')
 
-            # self.scene = ImageViewScene.ImageViewScene()
-            # self.scene.setSceneRect(QtCore.QRectF(self.rect()))
-            # self.ui_s.sensorImage.setScene(self.scene)
-
-            # self.ui_s.sensorImage = ImageViewScene.ImageViewer()
-            # self.ui_s.sensorImage.setFile('GUI_icons/keigan_icon.png')
-            # self.ui_s.sensorImage.show()
-            # self.getImg(self.frames)
-
             # どうにかする
             # self.ui_s.setIPaddressButton.setEnabled(False)
             self.ui_s.connectButton.setEnabled(False)
@@ -232,6 +223,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         try:
             self.sensor.close()
             self.ui_s.cameraStatusLabel.setText('The sensor was disconnected.')
+            self.conn = False
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor correctly.')
         finally:

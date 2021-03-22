@@ -221,6 +221,14 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
     mainWindow.updateProgressLabel()
     # mainWindow.show()
 
+    if 'snap' in com_hist:
+        if devices['3Dsensors'].conn:
+            pass
+        else:
+            QtWidgets.QMessageBox.critical(mainWindow, 'Sensor connection error',
+                                           'Please connect to the sensor before executing script.')
+            return True
+
     if isDemo:
         commands['mov'][1] = False
     else:
