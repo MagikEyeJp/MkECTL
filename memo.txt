@@ -21,6 +21,9 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 ・シャッター速度と同じようにスクリプト実行時ISO倍率を変更したい(ISO Override機能)
 ・モーターが動かないとき、エラーを出す＆プログレスバーを表示
 ・(setUIstatus)の元請けクラスを作る
+・スクリプト正常終了時に指定のシェルスクリプトなどを実行できるようにしたい(キャリブレーション自動化)
+　例 : success_script: [xxxx.sh] arg [ILT001_017]  background : ✓ と設定UIがある
+　　　　スクリプト正常終了時、xxxx.sh ILT001_017 & が実行される
 
 
 BUG?
