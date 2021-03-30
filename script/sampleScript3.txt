@@ -9,6 +9,8 @@ gainiso 100
 
 mov 100, 10, 20
 
+message "ready to start"
+
 ######################
 lasers 0 
 light 2, 1
@@ -21,6 +23,9 @@ snap ${pattern1_laser_image},3
 lasers 0 
 ######################
 
+message "pause 5sec"
+pause 5
+message "OK!"
 
 
 home

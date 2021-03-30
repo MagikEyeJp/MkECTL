@@ -26,6 +26,7 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 　例 : success_script: [xxxx.sh] arg [ILT001_017]  background : ✓ と設定UIがある
 　　　　スクリプト正常終了時、xxxx.sh ILT001_017 & が実行される
 　実際にはもうひと工夫いるかも
+・エラー時の不協和音が不吉な感じがするのでもうすこし可愛いのにしてほしい(願)
 
 
 BUG?
@@ -37,6 +38,7 @@ BUG?
 
 ---
 Done
+・[DONE]スクリプト命令にmessage(メッセージ表示)とpause(秒数待ち)を追加
 ・[DONE]センサーとの接続が失われるとセンサーをdisconnectできない
 ・[DONE]プログレスバーはメインウィンドウの下部に組み込みでいいかも(フローティングウィンドウだと迷子になる問題)
 ・[DONE]Ops to execute:のあとにコマンド数が表示されるはず

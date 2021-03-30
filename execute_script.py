@@ -35,7 +35,9 @@ commands = {'root': ['set_root', False],
             'shutter': ['set_shutter', True],
             'gainiso': ['set_gainiso', True],
             'lasers': ['set_lasers', True],
-            'light': ['set_light', True]
+            'light': ['set_light', True],
+            'pause': ['wait_pause', False],
+            'message': ['show_message', False]
             }
 dynvars = {
             'seqn': 'd',
@@ -179,10 +181,12 @@ def countCommandNum(scriptParams, args_hist, com_hist):
             com_args[1] = com_args[1].replace(" ", "")  # del space
             com_args[1] = com_args[1].replace("\"", "")  # del double-quotation
             com_args[1] = com_args[1].split(",")
-            if com_args[0] == 'set' or com_args[0] == 'root' or com_args[0] == 'snap3d':
+            if com_args[0] == 'set' or com_args[0] == 'root' or com_args[0] == 'snap3d' or com_args[0] == 'message':
                 pass
             elif com_args[0] == 'snap':
                 com_args[1][1] = int(com_args[1][1])
+            elif com_args[0] == 'pause':
+                com_args[1][0] = int(com_args[1][0])
             else:
                 com_args[1] = np.array(com_args[1], dtype=float)
             # print(type(com_args[1]))
@@ -632,6 +636,24 @@ def set_light(args, scriptParams, devices, params, mainWindow):
                 devices["lights"].set(ch, flag)
                 systate.past_parameters.light[ch - 1] = systate.light[ch - 1]
                 systate.sentSig.light[ch - 1] = True
+
+
+def wait_pause(args, scriptParams, devices, params, mainWindow):
+    print('---wait_pause---')
+    sec = int(args[0])
+    for i in range(sec):
+        app.processEvents()
+        if mainWindow.stopClicked:
+            print('Interrupted')
+            ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
+                                 scriptParams.scriptName)
+            return mainWindow.stopClicked
+        time.sleep(1)
+
+
+def show_message(args, scriptParams, devices, params, mainWindow):
+    print('---show_message---')
+    QtWidgets.QMessageBox.information(mainWindow, 'MkECTL script', args[0], QtWidgets.QMessageBox.Ok)
 
 
 @timeout(5)
