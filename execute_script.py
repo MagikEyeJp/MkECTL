@@ -485,7 +485,8 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                 minerr = 1.0
 
                 @timeout(5)
-                def waitmove(minerr):
+                def waitmove():
+                    nonlocal minerr
                     while True:
                         time.sleep(0.2)
                         errors = 0.0
@@ -497,20 +498,21 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                             errors += pow(pos[param_i] - (motorPos[param_i] * scale[param_i]), 2)
                             err = math.sqrt(errors)
 
-                        if err < minerr or err < 0.1:
+                        if err < minerr:
                             minerr = err  # 最小値更新
                             break
-                    return minerr
-
-                try:
-                    err = waitmove(minerr)
-                    if err < 0.1:
-                        cnt += 1
-                        if cnt > 4:
-                            cnt = 0
+                        if err < 0.1:
                             break
-                except TimeoutError:
-                    timeoutCallback(mainWindow)
+                    return err
+
+                err = waitmove()
+                if err < 0.1:
+                    cnt += 1
+                    if cnt > 4:
+                        cnt = 0
+                        break
+                else:
+                    cnt = 0
 
             systate.past_parameters.pos = systate.pos
             systate.sentSig.pos = True
