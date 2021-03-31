@@ -447,7 +447,6 @@ def snap_3D_frame(args, scriptParams, devices, params, mainWindow):
 
     systate.seqn += 1
 
-@timeout(15)
 def move_robot(args, scriptParams, devices, params, mainWindow):
     print('---move_robot---')
     print('move to ' + str(args))
@@ -486,8 +485,7 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                     if isAborted(scriptParams, mainWindow):
                         return mainWindow.stopClicked
 
-                    (pos[param_i], vel[param_i], torque[param_i]) = m[param_i].read_motor_measurement()
-                    errors += pow(pos[param_i] - (motorPos[param_i] * scale[param_i]), 2)
+                    errors += calc_motorError(pos, vel, torque, m, motorPos, scale, param_i)
 
                 if math.sqrt(errors) < 0.1:
                     break
@@ -496,6 +494,10 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
             systate.sentSig.pos = True
             time.sleep(1.0)
 
+@timeout(15)
+def calc_motorError(pos, vel, torque, m, motorPos, scale, param_i):
+    (pos[param_i], vel[param_i], torque[param_i]) = m[param_i].read_motor_measurement()
+    return pow(pos[param_i] - (motorPos[param_i] * scale[param_i]), 2)
 
 def home_robot(args, scriptParams, devices, params, mainWindow):
     print('---home_robot---')
