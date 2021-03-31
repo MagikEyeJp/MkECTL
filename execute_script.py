@@ -478,19 +478,18 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
             for param_i in range(args.size):
                 m[param_i].moveTo(motorPos[param_i] * scale[param_i])
 
+            minerr = 1.0
             while True:
                 if isAborted(scriptParams, mainWindow):
                     return mainWindow.stopClicked
 
-                minerr = 1.0
-
                 @timeout(5)
                 def waitmove():
                     nonlocal minerr
+                    err = 0.0
                     while True:
                         time.sleep(0.2)
                         errors = 0.0
-                        err = 0.0
 
                         for param_i in range(args.size):
 
@@ -506,6 +505,7 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                     return err
 
                 err = waitmove()
+                print("err=", err, " minerr=", minerr)
                 if err < 0.1:
                     cnt += 1
                     if cnt > 4:
