@@ -157,7 +157,18 @@ systate = Systate()
 
 def timeoutCallback():
     systate.timeout = True
-    playsound('SE/error2.wav')
+    playsound('SE/zannense.mp3')
+
+def isAborted(scriptParams, mainWindow):
+    global systate
+    global isDemo
+    app.processEvents()
+    if mainWindow.stopClicked:
+        print('Interrupted')
+        if not isDemo:
+            ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
+                                 scriptParams.scriptName)
+        return mainWindow.stopClicked
 
 def countCommandNum(scriptParams, args_hist, com_hist):
 
@@ -239,16 +250,9 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
         commands['mov'][1] = True
 
     for i in range(commandNum):
-        app.processEvents()
 
-        if mainWindow.stopClicked:
-            print('Interrupted')
-            if not isDemo:
-                ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        if isAborted(scriptParams, mainWindow):
             return mainWindow.stopClicked
-        # if systate.timeout:
-        #     systate.timeout = False     # for the next run
-        #     return False
 
         print(' ########## ' + str(i) + '/' + str(len(com_hist)) + ' ########## ')
 
@@ -389,10 +393,7 @@ def set_filename(args, scriptParams, devices, params, mainWindow):
 def snap_image(args, scriptParams, devices, params, mainWindow):
     print('---snap_image---')
 
-    app.processEvents()
-    if mainWindow.stopClicked:
-        print('Interrupted')
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+    if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
 
     global systate
@@ -425,13 +426,10 @@ def snap_image(args, scriptParams, devices, params, mainWindow):
 def snap_3D_frame(args, scriptParams, devices, params, mainWindow):
     print('---snap_3D_frame---')
 
-    app.processEvents()
-    if mainWindow.stopClicked:
-        print('Interrupted')
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-        return mainWindow.stopClicked
-
     global systate
+
+    if isAborted(scriptParams, mainWindow):
+        return mainWindow.stopClicked
 
     ### Save 3D frame
     fileName = []
@@ -457,7 +455,7 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
     global isDemo
     motorSet = ['slider', 'pan', 'tilt']
 
-    # time.sleep(2)
+    # time.sleep(20)
 
     args = np.array(args)
 
@@ -485,12 +483,7 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                 for param_i in range(args.size):
                     time.sleep(0.2)
 
-                    app.processEvents()
-                    if mainWindow.stopClicked:
-                        print('Interrupted')
-                        if not isDemo:
-                            ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
-                                             scriptParams.scriptName)
+                    if isAborted(scriptParams, mainWindow):
                         return mainWindow.stopClicked
 
                     (pos[param_i], vel[param_i], torque[param_i]) = m[param_i].read_motor_measurement()
@@ -506,14 +499,10 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
 
 def home_robot(args, scriptParams, devices, params, mainWindow):
     print('---home_robot---')
-
-    app.processEvents()
-    if mainWindow.stopClicked:
-        print('Interrupted')
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-        return mainWindow.stopClicked
-
     global systate
+
+    if isAborted(scriptParams, mainWindow):
+        return mainWindow.stopClicked
 
     # if not systate.skip:
     print('move to ' + str(args))
@@ -523,14 +512,10 @@ def home_robot(args, scriptParams, devices, params, mainWindow):
 @timeout(5)
 def set_shutter(args, scriptParams, devices, params, mainWindow):
     print('---set_shutter---')
-
-    app.processEvents()
-    if mainWindow.stopClicked:
-        print('Interrupted')
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-        return mainWindow.stopClicked
-
     global systate
+
+    if isAborted(scriptParams, mainWindow):
+        return mainWindow.stopClicked
 
     systate.shutter = int(args[0])
 
@@ -557,14 +542,10 @@ def set_shutter(args, scriptParams, devices, params, mainWindow):
 @timeout(5)
 def set_gainiso(args, scriptParams, devices, params, mainWindow):
     print('---set_gainiso---')
-
-    app.processEvents()
-    if mainWindow.stopClicked:
-        print('Interrupted')
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-        return mainWindow.stopClicked
-
     global systate
+
+    if isAborted(scriptParams, mainWindow):
+        return mainWindow.stopClicked
 
     systate.gainiso = int(args[0])
 
@@ -582,14 +563,10 @@ def set_gainiso(args, scriptParams, devices, params, mainWindow):
 @timeout(5)
 def set_lasers(args, scriptParams, devices, params, mainWindow):
     print('---set_lasers---')
-
-    app.processEvents()
-    if mainWindow.stopClicked:
-        print('Interrupted')
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-        return mainWindow.stopClicked
-
     global systate
+
+    if isAborted(scriptParams, mainWindow):
+        return mainWindow.stopClicked
 
     systate.lasers = int(args[0])
     print('args=', args)
@@ -609,14 +586,10 @@ def set_lasers(args, scriptParams, devices, params, mainWindow):
 @timeout(5)
 def set_light(args, scriptParams, devices, params, mainWindow):
     print('---set_light---')
-
-    app.processEvents()
-    if mainWindow.stopClicked:
-        print('Interrupted')
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-        return mainWindow.stopClicked
-
     global systate
+
+    if isAborted(scriptParams, mainWindow):
+        return mainWindow.stopClicked
 
     ch = int(args[0])
     print('ch=', ch, 'args=', args)
@@ -642,11 +615,7 @@ def wait_pause(args, scriptParams, devices, params, mainWindow):
     print('---wait_pause---')
     sec = int(args[0])
     for i in range(sec):
-        app.processEvents()
-        if mainWindow.stopClicked:
-            print('Interrupted')
-            ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
-                                 scriptParams.scriptName)
+        if isAborted(scriptParams, mainWindow):
             return mainWindow.stopClicked
         time.sleep(1)
 
@@ -658,13 +627,11 @@ def show_message(args, scriptParams, devices, params, mainWindow):
 
 @timeout(5)
 def warm_lasers(scriptParams, devices, params, mainWindow):
-    app.processEvents()
-    if mainWindow.stopClicked:
-        print('Interrupted')
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+    global systate
+
+    if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
 
-    global systate
     current_skip = systate.skip
     current_lasers = systate.lasers
     current_shutter = systate.shutter
@@ -683,13 +650,11 @@ def warm_lasers(scriptParams, devices, params, mainWindow):
 
 
 def resume_state(scriptParams, devices, params, mainWindow):
-    app.processEvents()
-    if mainWindow.stopClicked:
-        print('Interrupted')
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+    global systate
+
+    if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
 
-    global systate
     systate.skip = False
 
     for i in range(len(systate.light)):
