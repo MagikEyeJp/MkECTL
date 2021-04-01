@@ -500,10 +500,6 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                             errors += pow(pos[param_i] - (motorPos[param_i] * scale[param_i]), 2)
                             err = math.sqrt(errors)
 
-                        if err < minerr:
-                            print("err=", err)
-                            minerr = err  # 最小値更新
-                            break
                         if err < GOAL_EPS:
                             print("err=", err)
                             cnt += 1
@@ -511,6 +507,11 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                                 break
                         else:
                             cnt = 0
+
+                        if err < minerr:
+                            print("err=", err)
+                            minerr = err  # 最小値更新
+                            break
                     return err
 
                 err = waitmove()
