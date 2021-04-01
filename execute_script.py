@@ -464,7 +464,10 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
     pos = [0.0, 0.0, 0.0]
     vel = [0.0, 0.0, 0.0]
     torque = [0.0, 0.0, 0.0]
+    minerr = 999999.0 # とりあえず大きい数
     cnt = 0
+    GOAL_EPS = 0.1   # 目標位置到達誤差しきい値
+    GOAL_CNT = 4     # 目標位置到達判定回数
 
     for param_i in range(args.size):
         m.append(devices['motors'][motorSet[param_i]])
@@ -478,7 +481,6 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
             for param_i in range(args.size):
                 m[param_i].moveTo(motorPos[param_i] * scale[param_i])
 
-            minerr = 1.0
             while True:
                 if isAborted(scriptParams, mainWindow):
                     return mainWindow.stopClicked
@@ -486,6 +488,7 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                 @timeout(5)
                 def waitmove():
                     nonlocal minerr
+                    nonlocal cnt
                     err = 0.0
                     while True:
                         time.sleep(0.2)
@@ -498,25 +501,24 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                             err = math.sqrt(errors)
 
                         if err < minerr:
+                            print("err=", err)
                             minerr = err  # 最小値更新
                             break
-                        if err < 0.1:
-                            break
+                        if err < GOAL_EPS:
+                            print("err=", err)
+                            cnt += 1
+                            if cnt > GOAL_CNT:
+                                break
+                        else:
+                            cnt = 0
                     return err
 
                 err = waitmove()
-                print("err=", err, " minerr=", minerr)
-                if err < 0.1:
-                    cnt += 1
-                    if cnt > 4:
-                        cnt = 0
-                        break
-                else:
-                    cnt = 0
+                if cnt > GOAL_CNT:
+                    break
 
             systate.past_parameters.pos = systate.pos
             systate.sentSig.pos = True
-            time.sleep(1.0)
 
 
 def home_robot(args, scriptParams, devices, params, mainWindow):
