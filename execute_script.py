@@ -558,8 +558,9 @@ def set_shutter(args, scriptParams, devices, params, mainWindow):
                 isOn = True
                 break
 
-        m = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
-        shutter = int(m * float(systate.shutter) + 0.5)
+        mlt = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
+        shutter = int(mlt * float(systate.shutter) + 0.5)
+
         if not systate.sentSig.shutter or shutter != systate.past_parameters.shutter:
             devices['3Dsensors'].shutterSpeed = shutter
             print('shutter speed: ' + str(shutter))
@@ -582,14 +583,19 @@ def set_gainiso(args, scriptParams, devices, params, mainWindow):
     systate.gainiso = int(args[0])
 
     if not systate.skip:
-        if not systate.sentSig.gainiso or systate.gainiso != systate.past_parameters.gainiso:
-            devices['3Dsensors'].gainiso = args[0]
-            print('gainiso: ' + str(args[0]))
+
+        mlt = scriptParams.isoMultiplier
+        iso = int(mlt * float(systate.gainiso) + 0.5)
+        print(str(systate.gainiso) + ' -(multiply)-> ' + str(iso))
+
+        if not systate.sentSig.gainiso or iso != systate.past_parameters.gainiso:
+            devices['3Dsensors'].gainiso = iso
+            print('gainiso: ' + str(iso))
 
             ### Request to set gainiso (args[0])
-            devices['3Dsensors'].sensor.set_gainiso(int(args[0]))
+            devices['3Dsensors'].sensor.set_gainiso(iso)
 
-            systate.past_parameters.gainiso = systate.gainiso
+            systate.past_parameters.gainiso = iso
             systate.sentSig.gainiso = True
 
 @timeout(5)
