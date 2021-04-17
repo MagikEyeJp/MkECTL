@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>552</width>
-    <height>875</height>
+    <height>893</height>
    </rect>
   </property>
   <property name="font">
@@ -1372,7 +1372,7 @@
       <x>20</x>
       <y>530</y>
       <width>511</width>
-      <height>291</height>
+      <height>301</height>
      </rect>
     </property>
     <property name="title">
@@ -1428,7 +1428,7 @@
      <property name="geometry">
       <rect>
        <x>300</x>
-       <y>180</y>
+       <y>190</y>
        <width>71</width>
        <height>24</height>
       </rect>
@@ -1454,7 +1454,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>110</y>
+       <y>120</y>
        <width>91</width>
        <height>17</height>
       </rect>
@@ -1467,7 +1467,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
+       <y>140</y>
        <width>241</width>
        <height>26</height>
       </rect>
@@ -1503,7 +1503,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>160</y>
+       <y>170</y>
        <width>91</width>
        <height>17</height>
       </rect>
@@ -1516,7 +1516,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>180</y>
+       <y>190</y>
        <width>241</width>
        <height>26</height>
       </rect>
@@ -1559,7 +1559,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="expMultLabel">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -1568,11 +1568,14 @@
        <height>17</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(32, 74, 135);</string>
+     </property>
      <property name="text">
       <string>Exposure multiplier</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="expMult_IRonLabel">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -1585,7 +1588,7 @@
       <string>IR light - ON</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="expMult_IRoffLabel">
      <property name="geometry">
       <rect>
        <x>390</x>
@@ -1647,7 +1650,7 @@
      <property name="geometry">
       <rect>
        <x>270</x>
-       <y>180</y>
+       <y>190</y>
        <width>24</width>
        <height>24</height>
       </rect>
@@ -1664,7 +1667,7 @@
      <property name="geometry">
       <rect>
        <x>430</x>
-       <y>180</y>
+       <y>190</y>
        <width>71</width>
        <height>24</height>
       </rect>
@@ -2165,7 +2168,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>210</y>
+       <y>220</y>
        <width>511</width>
        <height>80</height>
       </rect>
@@ -2240,6 +2243,38 @@
        <number>0</number>
       </property>
      </widget>
+    </widget>
+    <widget class="QLabel" name="isoMultLabel">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>154</y>
+       <width>111</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(32, 74, 135);</string>
+     </property>
+     <property name="text">
+      <string>ISO multiplier</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="isoMultiplier">
+     <property name="geometry">
+      <rect>
+       <x>390</x>
+       <y>150</y>
+       <width>111</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1.00</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
     </widget>
    </widget>
    <widget class="QPushButton" name="viewSensorWinButton">
