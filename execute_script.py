@@ -584,9 +584,8 @@ def set_gainiso(args, scriptParams, devices, params, mainWindow):
 
     if not systate.skip:
 
-        mlt = scriptParams.isoMultiplier
-        iso = int(mlt * float(systate.gainiso) + 0.5)
-        print(str(systate.gainiso) + ' -(multiply)-> ' + str(iso))
+        iso = systate.gainiso if scriptParams.isoValue == '(DEFAULT)' else int(scriptParams.isoValue)
+        print('script: ' + str(systate.gainiso) + ', MkECTL GUI: ' + str(iso))
 
         if not systate.sentSig.gainiso or iso != systate.past_parameters.gainiso:
             devices['3Dsensors'].gainiso = iso

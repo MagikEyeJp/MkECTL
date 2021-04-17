@@ -2260,21 +2260,53 @@
       <string>ISO multiplier</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="isoMultiplier">
+    <widget class="QComboBox" name="isoMultiplier">
      <property name="geometry">
       <rect>
-       <x>390</x>
+       <x>392</x>
        <y>150</y>
        <width>111</width>
        <height>25</height>
       </rect>
      </property>
-     <property name="text">
-      <string>1.00</string>
+     <property name="editable">
+      <bool>true</bool>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
+     <item>
+      <property name="text">
+       <string>(DEFAULT)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>100</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>200</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>400</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>800</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>1600</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>3200</string>
+      </property>
+     </item>
     </widget>
    </widget>
    <widget class="QPushButton" name="viewSensorWinButton">
