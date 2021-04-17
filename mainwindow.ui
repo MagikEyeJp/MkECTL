@@ -2042,9 +2042,9 @@
         <colorrole role="ButtonText">
          <brush brushstyle="SolidPattern">
           <color alpha="255">
-           <red>119</red>
-           <green>20</green>
-           <blue>20</blue>
+           <red>85</red>
+           <green>87</green>
+           <blue>83</blue>
           </color>
          </brush>
         </colorrole>
