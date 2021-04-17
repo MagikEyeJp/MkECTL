@@ -808,7 +808,7 @@ class Ui_mainwindow(object):
         self.isoMultLabel.setObjectName("isoMultLabel")
         self.isoValue = QtWidgets.QComboBox(self.Script_groupBox)
         self.isoValue.setGeometry(QtCore.QRect(392, 150, 111, 25))
-        self.isoValue.setEditable(True)
+        self.isoValue.setEditable(False)
         self.isoValue.setObjectName("isoValue")
         self.isoValue.addItem("")
         self.isoValue.addItem("")

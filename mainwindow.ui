@@ -2270,7 +2270,7 @@
       </rect>
      </property>
      <property name="editable">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <item>
       <property name="text">
