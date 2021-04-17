@@ -43,6 +43,7 @@ class ScriptParams():
 
         self.IRonMultiplier = 1.0
         self.IRoffMultiplier = 1.0
+        self.isoMultiplier = 1.0
 
     def renewSubFolderName(self):
         self.now = datetime.datetime.now()
@@ -185,10 +186,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.presetValue.setValidator(QtGui.QDoubleValidator(-100.0, 2100.0, 2, self.ui.presetValue))
         self.ui.IRonMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRonMultiplier))
         self.ui.IRoffMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRoffMultiplier))
+        self.ui.isoMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.isoMultiplier))
 
         # line edit
         self.ui.IRonMultiplier.textChanged.connect(self.setMultiplier)
         self.ui.IRoffMultiplier.textChanged.connect(self.setMultiplier)
+        self.ui.isoMultiplier.textChanged.connect(self.setMultiplier)
 
         # label
         self.ui.baseFolderName_label.setText(os.path.abspath(self.scriptParams.baseFolderName))
@@ -788,6 +791,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def setMultiplier(self):
         self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
         self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
+        self.scriptParams.isoMultiplier = float(self.ui.isoMultiplier.text())
 
     # ----- UI-related functions -----
     def GUIwhenScripting(self, bool):

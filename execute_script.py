@@ -464,7 +464,7 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
     pos = [0.0, 0.0, 0.0]
     vel = [0.0, 0.0, 0.0]
     torque = [0.0, 0.0, 0.0]
-    minerr = 999999.0 # とりあえず大きい数
+    minerr = 999999.0   # とりあえず大きい数
     cnt = 0
     GOAL_EPS = 0.1   # 目標位置到達誤差しきい値
     GOAL_CNT = 4     # 目標位置到達判定回数
@@ -500,6 +500,11 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                             errors += pow(pos[param_i] - (motorPos[param_i] * scale[param_i]), 2)
                             err = math.sqrt(errors)
 
+                            # display Current Pos
+                            mainWindow.motorGUI['currentPosLabel'][mainWindow.get_key_from_value(
+                                mainWindow.devices['motors'], m[param_i])].setText('{:.2f}'.format(
+                                pos[param_i] / scale[param_i]))
+
                         if err < GOAL_EPS:
                             print("err=", err)
                             cnt += 1
@@ -532,7 +537,7 @@ def home_robot(args, scriptParams, devices, params, mainWindow):
     pos = np.array([0, 0, 0], dtype=int)
 
     # if not systate.skip:
-    print('move to ' + str(pos))
+    # print('move to ' + str(pos))
     move_robot(pos, scriptParams, devices, params, mainWindow)
 
 
