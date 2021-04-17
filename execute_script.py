@@ -204,7 +204,7 @@ def countCommandNum(scriptParams, args_hist, com_hist):
             # print(type(com_args[1]))
             args = com_args[1]
         else:  # home only
-            args = np.array([0, 0, 0], dtype=int)
+            args = None
 
         args_hist.append(args)
         com_hist.append(com)
@@ -529,9 +529,11 @@ def home_robot(args, scriptParams, devices, params, mainWindow):
     if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
 
+    pos = np.array([0, 0, 0], dtype=int)
+
     # if not systate.skip:
-    print('move to ' + str(args))
-    move_robot(args, scriptParams, devices, params, mainWindow)
+    print('move to ' + str(pos))
+    move_robot(pos, scriptParams, devices, params, mainWindow)
 
 
 @timeout(5)
