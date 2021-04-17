@@ -2257,10 +2257,10 @@
       <string notr="true">color: rgb(32, 74, 135);</string>
      </property>
      <property name="text">
-      <string>ISO multiplier</string>
+      <string>ISO value</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="isoMultiplier">
+    <widget class="QComboBox" name="isoValue">
      <property name="geometry">
       <rect>
        <x>392</x>
