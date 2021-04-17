@@ -880,6 +880,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.renewSubFolder_toolButton.setEnabled(True)
             self.ui.continueButton.setEnabled(True)
             self.ui.executeScript_button.setEnabled(True)
+            self.subWindow.ui_s.cameraControlGroup.setEnabled(True)
+            self.subWindow.ui_s.laserControlGroup.setEnabled(True)
         else:
             self.ui.selectScript_toolButton.setEnabled(False)
             self.ui.selectScript_toolButton_2.setEnabled(False)
@@ -889,7 +891,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.renewSubFolder_toolButton.setEnabled(False)
             self.ui.continueButton.setEnabled(False)
             self.ui.executeScript_button.setEnabled(False)
-
+            self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
+            self.subWindow.ui_s.laserControlGroup.setEnabled(False)
 
         if UIState.SCRIPT_PROGRESS in status:
             self.ui.Scripting_groupBox.setEnabled(True)
