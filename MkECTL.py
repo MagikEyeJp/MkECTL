@@ -186,12 +186,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.presetValue.setValidator(QtGui.QDoubleValidator(-100.0, 2100.0, 2, self.ui.presetValue))
         self.ui.IRonMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRonMultiplier))
         self.ui.IRoffMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRoffMultiplier))
-        # self.ui.isoMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.isoMultiplier))
 
         # line edit
         self.ui.IRonMultiplier.textChanged.connect(self.setMultiplier)
         self.ui.IRoffMultiplier.textChanged.connect(self.setMultiplier)
-        self.ui.isoMultiplier.currentTextChanged.connect(self.setMultiplier)
+        self.ui.isoValue.currentTextChanged.connect(self.setMultiplier)
 
         # label
         self.ui.baseFolderName_label.setText(os.path.abspath(self.scriptParams.baseFolderName))
@@ -791,7 +790,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def setMultiplier(self):
         self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
         self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
-        self.scriptParams.isoValue = self.ui.isoMultiplier.currentText()
+        self.scriptParams.isoValue = self.ui.isoValue.currentText()
 
     # ----- UI-related functions -----
     def GUIwhenScripting(self, bool):
