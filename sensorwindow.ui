@@ -674,6 +674,26 @@
            <normaloff>:/GUI_icons/015-images.png</normaloff>:/GUI_icons/015-images.png</iconset>
          </property>
         </widget>
+        <widget class="QPushButton" name="consectiveModeButton">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>0</y>
+           <width>20</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/GUI_icons/133-spinner11.png</normaloff>:/GUI_icons/133-spinner11.png</iconset>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
        </widget>
        <widget class="QGroupBox" name="preview_save_Group">
         <property name="geometry">
@@ -728,7 +748,7 @@
           <x>10</x>
           <y>30</y>
           <width>211</width>
-          <height>120</height>
+          <height>91</height>
          </rect>
         </property>
         <layout class="QFormLayout" name="formLayout">
