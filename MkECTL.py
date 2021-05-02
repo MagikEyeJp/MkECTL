@@ -418,7 +418,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(pos))
 
             if self.subWindow.conn:
-                self.subWindow.getImg(1)
+                self.subWindow.prevImg(1)
 
         elif buttonName == 'presetExe':
             motorID = self.ui.presetMotorCombo.currentText()
@@ -763,7 +763,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         for i in range(len(self.motorSet)):
             self.motorGUI['currentPosLabel'][self.motorSet[i]].setText('{:.2f}'.format(float(targetPos[i])))
         if self.subWindow.conn:
-            self.subWindow.getImg(1)
+            self.subWindow.prevImg(1)
 
     def showSubWindow(self, geometry, framesize):
         if self.subWindow_isOpen:

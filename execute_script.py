@@ -416,7 +416,10 @@ def snap_image(args, scriptParams, devices, params, mainWindow):
         resume_state(scriptParams, devices, params, mainWindow)
         time.sleep(0.2)
 
-        image = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
+        image, pixmap = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
+        devices['3Dsensors'].ui_s.sensorImage.setPixMap(pixmap)
+        devices['3Dsensors'].ui_s.sensorImage.show()
+
         image.save(devices['3Dsensors'].imgPath)
 
     systate.seqn += 1

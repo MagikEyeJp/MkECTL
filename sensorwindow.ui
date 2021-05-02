@@ -674,7 +674,7 @@
            <normaloff>:/GUI_icons/015-images.png</normaloff>:/GUI_icons/015-images.png</iconset>
          </property>
         </widget>
-        <widget class="QPushButton" name="consectiveModeButton">
+        <widget class="QPushButton" name="consecutiveModeButton">
          <property name="geometry">
           <rect>
            <x>60</x>

@@ -3,10 +3,12 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import sys
 import re
 import os
+import time
 from PIL import Image
 import csv
 import numpy as np
 from timeout_decorator import TimeoutError
+import threading
 
 import socket
 import SensorDevice
@@ -23,6 +25,51 @@ def getbit(x, b):
 def setbit(x, b, v):
     return x & ~(1 << b) | (v << b)
 
+class GetImageThread(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.started = threading.Event()
+        self.alive = True
+        self.daemon = True  # https://teratail.com/questions/76909
+        self.start()
+        # self.mainThread = SensorWindow()
+        self.sensor = SensorDevice.SensorDevice()
+        self.image = None
+        self.pixmap = None
+        print("thread created")
+
+    # https://qiita.com/BlueSilverCat/items/44a0a2a3c45fc3e88b19
+    def __del__(self):
+        self.kill()
+
+    def begin(self):
+        print("begin")
+        self.started.set()
+
+    def end(self):
+        self.started.clear()
+        print("\nend")
+
+    def kill(self):
+        self.started.set()
+        self.alive = False
+        self.join()
+        print("thread killed")
+
+    def run(self):
+        # i = 0
+        self.started.wait()
+        while self.alive:
+            # i += 1
+            # print("{}\r".format(i), end="")
+
+            img = self.sensor.get_image(1)
+            img.format = "PNG"
+            img2 = img.get_image()
+            self.image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
+            self.pixmap = QtGui.QPixmap(self.image)
+
+            self.started.wait()
 
 class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
     def __init__(self, parent=None, mainUI:IMainUI=None):
@@ -37,6 +84,12 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # connection
         self.conn = False
         self.sensor = SensorDevice.SensorDevice()
+
+        # thread
+        self.getImg_thread = GetImageThread()
+        # self.getImg_thread = threading.Thread(target=lambda: self.prevImg(1))
+        # self.consecutive_thread = threading.Thread(target=lambda: self.prevImg(1))
+        # self.consecutiveMode = False
 
         # Variables (initialized with default values)
         self.IPaddress = '127.0.0.1'  # default
@@ -92,6 +145,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.setHex4dLaserButton.clicked.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
 
+        self.ui_s.consecutiveModeButton.clicked.connect(self.setConsecutiveMode)
         self.ui_s.prev1Button.clicked.connect(lambda: self.prevImg(1))
         self.ui_s.prevAveButton.clicked.connect(lambda: self.prevImg(self.frames))
         self.ui_s.save1Button.clicked.connect(lambda: self.saveImg(1))
@@ -266,15 +320,52 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             #     print(getbit(self.decLaserPattern, i))
             #     print(setbit(self.decLaserPattern, i, int(laserpattern_print[15-i])))
 
+### do not use !!
+    def setConsecutiveMode(self):
+        # print(self.consecutive_thread.isDaemon())
+
+        # if self.ui_s.consecutiveModeButton.isChecked():
+        #     if not self.consecutive_thread.is_alive():
+        #         self.ui_s.cameraStatusLabel.setText("Consecutive Mode: ON")
+        #         self.consecutive_thread.start()
+        #         print(self.consecutive_thread.is_alive())
+        #
+        #     # self.ui_s.prev1Button.click()
+        #
+        # else:
+        #     if self.consecutive_thread.is_alive():
+        #         self.ui_s.cameraStatusLabel.setText("Consecutive Mode: OFF")
+        #         self.consecutive_thread.join()
+
+        if self.ui_s.consecutiveModeButton.isChecked():
+            self.getImg_thread.begin()
+            self.getImgCallback(self.getImg_thread.pixmap)
+        else:
+            self.getImg_thread.end()
+
+
+    def getImgCallback(self, pixmap):
+        # pixmap = self.getImg(1)[1]
+        self.ui_s.sensorImage.setPixMap(pixmap)
+        self.ui_s.sensorImage.show()
+
+        if self.ui_s.consecutiveModeButton.isChecked() and self.ui_s.consecutiveModeButton.isEnabled():
+            self.ui_s.prev1Button.click()
+
+
     def prevImg(self, frames):
-        self.getImg(frames)
+        image, pixmap = self.getImg(frames)
+        self.ui_s.sensorImage.setPixMap(pixmap)
+        self.ui_s.sensorImage.show()
 
     def saveImg(self, frames):
         if self.captureDirPath == '':
             QtWidgets.QMessageBox.critical(self, "Folder not found",
                                            "Please specify a folder where captured imaged to be saved.")
         else:
-            pixmap = self.getImg(frames)
+            image, pixmap = self.getImg(frames)
+            self.ui_s.sensorImage.setPixMap(pixmap)
+            self.ui_s.sensorImage.show()
 
             saveName = self.captureDirPath + '/img_' + str(self.imgCounter).zfill(4) + '.png'
             self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
@@ -285,12 +376,12 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
                                                      QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Yes,
                                                      defaultButton=QtWidgets.QMessageBox.Yes)
                 if ans == QtWidgets.QMessageBox.Yes:
-                    pixmap.save(saveName)
+                    image.save(saveName)
                     self.imgCounter += 1
                 else:
                     pass
             else:
-                pixmap.save(saveName)
+                image.save(saveName)
                 self.imgCounter += 1
 
 
@@ -312,9 +403,10 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # print(type(img2))
         # img3 = Image.new('L', (len(img2[0]), len(img2)))
         # img3.show()
+        return image, pixmap
+
 
         # self.scene.setPixMap(pixmap)
-        self.ui_s.sensorImage.setPixMap(pixmap)
 
         # self.ui_s.sensorImage.setFixedSize(len(img2[0]), len(img2))
         # self.ui_s.sensorImage.resize(pixmap.size())
@@ -323,9 +415,10 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # self.ui_s.sensorImage.fitInView(self.scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
         # self.scene.fitImage()
 
-        self.ui_s.sensorImage.show()
+    #######
+        # self.ui_s.sensorImage.setPixMap(pixmap)
+        # self.ui_s.sensorImage.show()
 
-        return image
 
     def resetCounter(self):
         self.imgCounter = 0
