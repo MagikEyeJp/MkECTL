@@ -17,6 +17,10 @@ import sensorwindow_ui
 import ImageViewScene
 from IMainUI import IMainUI
 
+from PyQt5 import QtWidgets
+app = QtWidgets.qApp
+
+
 # xのあるbit位置が0か1か調べる
 def getbit(x, b):
     return (x >> b) & 1
@@ -26,29 +30,35 @@ def setbit(x, b, v):
     return x & ~(1 << b) | (v << b)
 
 class GetImageThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, sensor):
         super().__init__()
         self.started = threading.Event()
+        self.ended = True
         self.alive = True
         self.daemon = True  # https://teratail.com/questions/76909
         self.start()
         # self.mainThread = SensorWindow()
-        self.sensor = SensorDevice.SensorDevice()
+        # self.sensor = SensorDevice.SensorDevice()
+        self.sensor = sensor
         self.image = None
         self.pixmap = None
+        self.frame = 1
         print("thread created")
 
     # https://qiita.com/BlueSilverCat/items/44a0a2a3c45fc3e88b19
     def __del__(self):
         self.kill()
 
-    def begin(self):
+    def begin(self, frame):
         print("begin")
+        self.frame = frame
         self.started.set()
+        self.ended = False
 
     def end(self):
         self.started.clear()
-        print("\nend")
+        print("end")
+        self.ended = True
 
     def kill(self):
         self.started.set()
@@ -63,7 +73,9 @@ class GetImageThread(threading.Thread):
             # i += 1
             # print("{}\r".format(i), end="")
 
-            img = self.sensor.get_image(1)
+            img = self.sensor.get_image(self.frame)
+            # print(self.sensor)
+            # print(img)
             img.format = "PNG"
             img2 = img.get_image()
             self.image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
@@ -84,9 +96,10 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # connection
         self.conn = False
         self.sensor = SensorDevice.SensorDevice()
+        # print(self.sensor)
 
         # thread
-        self.getImg_thread = GetImageThread()
+        self.getImg_thread = None
         # self.getImg_thread = threading.Thread(target=lambda: self.prevImg(1))
         # self.consecutive_thread = threading.Thread(target=lambda: self.prevImg(1))
         # self.consecutiveMode = False
@@ -145,9 +158,9 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.setHex4dLaserButton.clicked.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
 
-        self.ui_s.consecutiveModeButton.clicked.connect(self.setConsecutiveMode)
-        self.ui_s.prev1Button.clicked.connect(lambda: self.prevImg(1))
-        self.ui_s.prevAveButton.clicked.connect(lambda: self.prevImg(self.frames))
+        self.ui_s.consecutiveModeButton.clicked.connect(lambda: self.startGetImageThread(1))
+        self.ui_s.prev1Button.clicked.connect(lambda: self.startGetImageThread(1))
+        self.ui_s.prevAveButton.clicked.connect(lambda: self.startGetImageThread(self.frames))
         self.ui_s.save1Button.clicked.connect(lambda: self.saveImg(1))
         self.ui_s.saveAveButton.clicked.connect(lambda: self.saveImg(self.frames))
         self.ui_s.frameButton.clicked.connect(lambda: self.snap3D('sample.csv'))
@@ -251,6 +264,9 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.ui_s.gridButton.setEnabled(True)
 
             self.conn = True
+            # print(self.sensor)
+            self.getImg_thread = GetImageThread(self.sensor)
+
 
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
@@ -320,8 +336,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             #     print(getbit(self.decLaserPattern, i))
             #     print(setbit(self.decLaserPattern, i, int(laserpattern_print[15-i])))
 
-### do not use !!
-    def setConsecutiveMode(self):
+
+    def startGetImageThread(self, frames):
         # print(self.consecutive_thread.isDaemon())
 
         # if self.ui_s.consecutiveModeButton.isChecked():
@@ -337,21 +353,32 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         #         self.ui_s.cameraStatusLabel.setText("Consecutive Mode: OFF")
         #         self.consecutive_thread.join()
 
-        if self.ui_s.consecutiveModeButton.isChecked():
-            self.getImg_thread.begin()
-            self.getImgCallback(self.getImg_thread.pixmap)
-        else:
-            self.getImg_thread.end()
+        self.frames = frames
+
+        if self.getImg_thread.ended:
+            self.getImg_thread.begin(frames)
+        self.getImgCallback(self.getImg_thread.pixmap)
 
 
     def getImgCallback(self, pixmap):
         # pixmap = self.getImg(1)[1]
-        self.ui_s.sensorImage.setPixMap(pixmap)
-        self.ui_s.sensorImage.show()
+        if pixmap != None:
+            self.ui_s.sensorImage.setPixMap(pixmap)
+            self.ui_s.sensorImage.show()
+            app.processEvents()
 
-        if self.ui_s.consecutiveModeButton.isChecked() and self.ui_s.consecutiveModeButton.isEnabled():
-            self.ui_s.prev1Button.click()
-
+            if self.ui_s.consecutiveModeButton.isChecked() and self.ui_s.consecutiveModeButton.isEnabled():
+                if self.frames == 1:
+                    self.ui_s.prev1Button.click()
+                else:
+                    self.ui_s.prevAveButton.click()
+            else:
+                self.getImg_thread.end()
+        else:
+            app.processEvents()
+            self.getImg_thread.end()
+            time.sleep(0.5)
+            self.startGetImageThread(self.frames)
 
     def prevImg(self, frames):
         image, pixmap = self.getImg(frames)
