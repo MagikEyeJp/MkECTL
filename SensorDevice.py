@@ -3,7 +3,11 @@
 import sys
 from time import sleep
 from timeout_decorator import timeout
+from threading import Thread, Lock
+
 import pymkeapi
+
+mutex = Lock()
 
 class SensorDevice:
     def __init__(self):
@@ -66,10 +70,18 @@ class SensorDevice:
             self.client.set_laser(pattern)
 
     def get_image(self, avgcount):
+        mutex.acquire()
+        # print('get_image Locked')
+
         image = None
-        if self.client:
-            image = self.client.get_image(avgcount, image_format="PNG")
-        return image
+
+        try:
+            if self.client:
+                image = self.client.get_image(avgcount, image_format="PNG")
+            return image
+        finally:
+            # print('get_image released')
+            mutex.release()
 
     def get_frame(self):
         frame = None
