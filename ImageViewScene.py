@@ -271,8 +271,8 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self.m_pixmaprect = QtCore.QRectF(0.0, 0.0, 0.0, 0.0)
         self.m_scene.addItem(self.m_pixmapitem)
 
-        self.m_gridItem = GridItem()
-        self.gridParam = GridItem.GridParameter()
+        self.m_gridItem = GridItem(widget)
+        self.gridParam = self.m_gridItem.GridParameter()
 
         # scene.setFile( imagepath )
         self.m_wheelzoom = False
@@ -355,12 +355,18 @@ class ImageViewer(QtWidgets.QGraphicsView):
 # /////////////////////////////////////////////////////////////////////////////
 
 class GridItem(QtWidgets.QGraphicsPathItem):
-    def __init__(self):
+    def __init__(self, widget):
         super(GridItem, self).__init__()
+        self.sensorWindow = widget
 
         self.path = QtGui.QPainterPath()
-        self.painter = QtGui.QPainter()
+        # self.painter = QtGui.QPainter(self.sensorWindow)
+
         # self.painter.begin(self)
+
+    # def paintEvent(self, event):
+    #     self.painter = QtGui.QPainter(self.sensorWindow)
+    #     self.painter.begin(self.sensorWindow)
 
     def makeGrid(self, rect: QtCore.QRectF, param):
 
@@ -368,7 +374,8 @@ class GridItem(QtWidgets.QGraphicsPathItem):
 
         # qDebug("GridItem::makeGrid %d x %d %f deg.\n", p.lines_x, p.lines_y, p.angle);
         path = self.path    # path - path ?
-        self.painter.setPen(param.pen)
+        # self.painter.setPen(param.pen)
+        self.setPen(param.pen)
         # self.painter.setPen(QtCore.Qt.black)
         rect.translate(param.offset_x, param.offset_y)
         path.addRect(rect)
@@ -386,6 +393,8 @@ class GridItem(QtWidgets.QGraphicsPathItem):
         self.setTransformOriginPoint(rect.center())
         self.setRotation(param.angle)
         self.setPath(path)
+
+        # self.painter.end()
 
     class GridParameter():
         def __init__(self):
