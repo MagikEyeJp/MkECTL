@@ -4,3 +4,4 @@ pyserial
 imageio
 timeout-decorator
 playsound
+qtutils

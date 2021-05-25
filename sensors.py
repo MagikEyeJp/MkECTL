@@ -21,6 +21,7 @@ from IMainUI import IMainUI
 from PyQt5 import QtWidgets
 app = QtWidgets.qApp
 
+from qtutils import inmain
 
 # xのあるbit位置が0か1か調べる
 def getbit(x, b):
@@ -31,7 +32,7 @@ def setbit(x, b, v):
     return x & ~(1 << b) | (v << b)
 
 class GetImageThread(threading.Thread):
-    def __init__(self, sensor):
+    def __init__(self, sensor, callback):
         super().__init__()
         self.started = threading.Event()
         self.ended = True
@@ -41,6 +42,7 @@ class GetImageThread(threading.Thread):
         # self.mainThread = SensorWindow()
         # self.sensor = SensorDevice.SensorDevice()
         self.sensor = sensor
+        self.callback = callback
         self.image = None
         self.pixmap = None
         self.frame = 1
@@ -51,17 +53,18 @@ class GetImageThread(threading.Thread):
         self.kill()
 
     def begin(self, frame):
-        print("begin")
+        # print("begin")
         self.frame = frame
         self.started.set()
         self.ended = False
 
     def end(self):
         self.started.clear()
-        print("end")
+        # print("end")
         self.ended = True
 
     def kill(self):
+        # print("kill")
         self.started.set()
         self.alive = False
         self.join()
@@ -69,11 +72,10 @@ class GetImageThread(threading.Thread):
 
     def run(self):
         # i = 0
-        self.started.wait()
         while self.alive:
+            self.started.wait()
             # i += 1
             # print("{}\r".format(i), end="")
-
             img = self.sensor.get_image(self.frame)
             # print(self.sensor)
             # print(img)
@@ -81,8 +83,7 @@ class GetImageThread(threading.Thread):
             img2 = img.get_image()
             self.image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
             self.pixmap = QtGui.QPixmap(self.image)
-
-            self.started.wait()
+            inmain(self.callback, self.pixmap)
 
 class SensorWindowDock(QtWidgets.QDockWidget):  # https://teratail.com/questions/118024
     def __init__(self, parent=None, mainUI:IMainUI=None):
@@ -276,7 +277,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
             self.conn = True
             # print(self.sensor)
-            self.getImg_thread = GetImageThread(self.sensor)
+            self.getImg_thread = GetImageThread(self.sensor, self.getImgCallback)
 
 
         except Exception as e:
@@ -368,8 +369,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
         if self.getImg_thread.ended:
             self.getImg_thread.begin(frames)
-        self.getImgCallback(self.getImg_thread.pixmap)
-
 
     def getImgCallback(self, pixmap):
         # pixmap = self.getImg(1)[1]
@@ -385,11 +384,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
                     self.ui_s.prevAveButton.click()
             else:
                 self.getImg_thread.end()
-        else:
-            app.processEvents()
-            self.getImg_thread.end()
-            time.sleep(0.5)
-            self.startGetImageThread(self.frames)
 
     def prevImg(self, frames):
         image, pixmap = self.getImg(frames)
