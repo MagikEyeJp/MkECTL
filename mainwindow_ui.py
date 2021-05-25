@@ -17,6 +17,8 @@ class Ui_mainwindow(object):
         font = QtGui.QFont()
         font.setFamily("Ubuntu")
         mainwindow.setFont(font)
+        mainwindow.setDockNestingEnabled(False)
+        mainwindow.setDockOptions(QtWidgets.QMainWindow.AllowTabbedDocks|QtWidgets.QMainWindow.AnimatedDocks)
         self.centralwidget = QtWidgets.QWidget(mainwindow)
         self.centralwidget.setObjectName("centralwidget")
         self.robotControl = QtWidgets.QGroupBox(self.centralwidget)

@@ -18,6 +18,12 @@
   <property name="windowTitle">
    <string>MkECTL</string>
   </property>
+  <property name="dockNestingEnabled">
+   <bool>false</bool>
+  </property>
+  <property name="dockOptions">
+   <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="robotControl">
     <property name="enabled">
