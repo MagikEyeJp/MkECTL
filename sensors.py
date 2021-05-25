@@ -14,6 +14,7 @@ import socket
 import SensorDevice
 
 import sensorwindow_ui
+import sensorwindow_dock_ui
 import ImageViewScene
 from IMainUI import IMainUI
 
@@ -82,6 +83,16 @@ class GetImageThread(threading.Thread):
             self.pixmap = QtGui.QPixmap(self.image)
 
             self.started.wait()
+
+class SensorWindowDock(QtWidgets.QDockWidget):  # https://teratail.com/questions/118024
+    def __init__(self, parent=None, mainUI:IMainUI=None):
+        super(SensorWindowDock, self).__init__(parent)
+        # print(mainUI)
+        # mainUI.sensorChanged()
+        self.mainUI = mainUI
+
+        self.ui_s = sensorwindow_dock_ui.Ui_sensorwindow_dock()
+        self.ui_s.setupUi(self)
 
 class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
     def __init__(self, parent=None, mainUI:IMainUI=None):

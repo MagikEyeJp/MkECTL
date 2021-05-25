@@ -75,6 +75,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         self.subWindow = sensors.SensorWindow(mainUI=self)
 
+        ### docking test https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
+        # self.subWindow_dock = sensors.SensorWindowDock(mainUI=self)
+        # self.subWindow_dock.setFloating(True)
+        # self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.subWindow_dock)
+
         self.initializeProcessFlag = False
 
         self.ui.manualOperation.setEnabled(False)
