@@ -382,11 +382,11 @@ class GridItem(QtWidgets.QGraphicsPathItem):
         step_x = rect.width() / (param.lines_x + 1)
         step_y = rect.height() / (param.lines_y + 1)
 
-        for x in range(1, param.lines_x):
+        for x in range(1, param.lines_x + 1):
             path.moveTo(x * step_x + param.offset_x, rect.top())
             path.lineTo(x * step_x + param.offset_x, rect.bottom())
 
-        for y in range(1, param.lines_y):
+        for y in range(1, param.lines_y + 1):
             path.moveTo(rect.left(), y * step_y + param.offset_y)
             path.lineTo(rect.right(), y * step_y + param.offset_y)
 
@@ -403,7 +403,7 @@ class GridItem(QtWidgets.QGraphicsPathItem):
             self.offset_x: float = 0.0
             self.offset_y: float = 0.0
             self.angle: float = 0.0
-            self.pen = QtGui.QPen(QtGui.QColor('black'))
+            self.pen = QtGui.QPen(QtGui.QColor('white'))
 
 
 if __name__ == '__main__':
