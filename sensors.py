@@ -130,6 +130,15 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.captureDirPath = os.getcwd() + '/savedPictures'
         self.imgCounter = 0
 
+        self.gridType = 'Solid'
+        self.glidX: int = 3
+        self.glidY: int = 3
+        self.gridRot: float = 0.0
+        self.gridColor = 'Bright'
+        self.gridOffsetX: float = 0.0
+        self.gridOffsetY: float = 0.0
+        self.gridAlpha: int = 0
+
         if not os.path.exists(self.captureDirPath):
             os.makedirs(self.captureDirPath)
 
