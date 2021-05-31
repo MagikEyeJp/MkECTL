@@ -495,7 +495,6 @@ class Ui_sensor(object):
         self.horizontalLayout_14 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_14.setObjectName("horizontalLayout_14")
         self.alphaLineEdit = QtWidgets.QLineEdit(self.layoutWidget_2)
-        self.alphaLineEdit.setText("")
         self.alphaLineEdit.setObjectName("alphaLineEdit")
         self.horizontalLayout_14.addWidget(self.alphaLineEdit)
         self.percentLabel = QtWidgets.QLabel(self.layoutWidget_2)
@@ -567,6 +566,7 @@ class Ui_sensor(object):
         self.ylabel_2.setText(_translate("sensor", "y:"))
         self.yOffsetLineEdit.setText(_translate("sensor", "0.0"))
         self.alpha.setText(_translate("sensor", "alpha"))
+        self.alphaLineEdit.setText(_translate("sensor", "50"))
         self.percentLabel.setText(_translate("sensor", "%"))
 from ImageViewScene import ImageViewer
 import resources_rc

@@ -137,7 +137,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.gridColor = 'Bright'
         self.gridOffsetX: float = 0.0
         self.gridOffsetY: float = 0.0
-        self.gridAlpha: int = 0
+        self.gridAlpha: int = 50
 
         if not os.path.exists(self.captureDirPath):
             os.makedirs(self.captureDirPath)

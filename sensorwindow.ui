@@ -1360,7 +1360,7 @@
                 <item>
                  <widget class="QLineEdit" name="alphaLineEdit">
                   <property name="text">
-                   <string/>
+                   <string>50</string>
                   </property>
                  </widget>
                 </item>
