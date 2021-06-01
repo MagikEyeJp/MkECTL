@@ -30,7 +30,7 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
        <item>
         <widget class="QLabel" name="cameraStatusLabel">
          <property name="text">
@@ -51,25 +51,6 @@
          </property>
         </spacer>
        </item>
-       <item>
-        <widget class="QPushButton" name="gridButton">
-         <property name="maximumSize">
-          <size>
-           <width>50</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Grid</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
     </layout>
@@ -81,6 +62,9 @@
        <width>250</width>
        <height>16777215</height>
       </size>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOn</enum>
@@ -95,7 +79,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-234</y>
+        <y>-202</y>
         <width>234</width>
         <height>830</height>
        </rect>
@@ -1149,6 +1133,9 @@
           </property>
           <property name="checkable">
            <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
           </property>
           <widget class="QWidget" name="layoutWidget_2">
            <property name="geometry">
