@@ -270,8 +270,9 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self.m_pixmapitem.setTransformationMode(QtCore.Qt.SmoothTransformation)
         self.m_pixmaprect = QtCore.QRectF(0.0, 0.0, 0.0, 0.0)
         self.m_scene.addItem(self.m_pixmapitem)
+        self.isPixmapSet = False
 
-        self.m_gridItem = GridItem(widget)
+        self.m_gridItem = GridItem()
         self.gridParam = self.m_gridItem.GridParameter()
 
         # scene.setFile( imagepath )
@@ -293,6 +294,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
             # self.pixSizeChanged.emit(self.m_pixmaprect)
         if self.m_fitmode:
             self.scaleFit()
+        self.isPixmapSet = True
 
     def setScale(self, scale, innter=False):
         self.resetTransform()
@@ -355,18 +357,14 @@ class ImageViewer(QtWidgets.QGraphicsView):
 # /////////////////////////////////////////////////////////////////////////////
 
 class GridItem(QtWidgets.QGraphicsPathItem):
-    def __init__(self, widget):
+    def __init__(self):
         super(GridItem, self).__init__()
-        self.sensorWindow = widget
 
         self.path = QtGui.QPainterPath()
         # self.painter = QtGui.QPainter(self.sensorWindow)
 
         # self.painter.begin(self)
 
-    # def paintEvent(self, event):
-    #     self.painter = QtGui.QPainter(self.sensorWindow)
-    #     self.painter.begin(self.sensorWindow)
 
     def makeGrid(self, rect: QtCore.QRectF, param):
 
@@ -391,19 +389,41 @@ class GridItem(QtWidgets.QGraphicsPathItem):
             path.lineTo(rect.right(), y * step_y + param.offset_y)
 
         self.setTransformOriginPoint(rect.center())
-        self.setRotation(param.angle)
+        self.setRotation(param.rot)
         self.setPath(path)
-
-        # self.painter.end()
+        path.clear()
 
     class GridParameter():
         def __init__(self):
+            self.gridType = 'Solid'
             self.lines_x: int = 3
             self.lines_y: int = 3
+            self.rot: float = 0.0
+
+            self.color = 'Bright'
+            self.alpha: float = 0.5
+            self.colorDict: dict = {'Bright': (255, 255, 255),
+                                    'Dark': (0, 0, 0),
+                                    'Red': (255, 0, 0),
+                                    'Blue': (0, 0, 255),
+                                    'Green': (0, 255, 0),
+                                    'Yellow': (255, 255, 0)}
+            self.qcolor = QtGui.QColor(*self.colorDict[self.color])  # unpack: https://note.nkmk.me/python-argument-expand/
+            self.qcolor.setAlphaF(self.alpha)
+
             self.offset_x: float = 0.0
             self.offset_y: float = 0.0
-            self.angle: float = 0.0
-            self.pen = QtGui.QPen(QtGui.QColor('white'))
+
+            # pen styles: https://doc.qt.io/archives/qtjambi-4.5.2_01/com/trolltech/qt/core/Qt.PenStyle.html
+            self.pen_styles: dict = {'Solid': QtCore.Qt.SolidLine,
+                                     'Dot': QtCore.Qt.DotLine,
+                                     'Dash': QtCore.Qt.DashLine,
+                                     'DashDot': QtCore.Qt.DashDotLine}
+
+            # self.pen = QtGui.QPen(QtGui.QColor(*self.colorDict[self.color]).setAlphaF(self.alpha))
+            self.pen = QtGui.QPen(self.qcolor)
+            self.pen.setStyle(self.pen_styles[self.gridType])
+            # self.pen = QtGui.QPen(QtGui.QColor('#0a64c8'))
 
 
 if __name__ == '__main__':

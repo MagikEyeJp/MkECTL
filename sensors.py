@@ -18,7 +18,6 @@ import sensorwindow_dock_ui
 import ImageViewScene
 from IMainUI import IMainUI
 
-from PyQt5 import QtWidgets
 app = QtWidgets.qApp
 
 from qtutils import inmain
@@ -130,15 +129,6 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.captureDirPath = os.getcwd() + '/savedPictures'
         self.imgCounter = 0
 
-        self.gridType = 'Solid'
-        self.glidX: int = 3
-        self.glidY: int = 3
-        self.gridRot: float = 0.0
-        self.gridColor = 'Bright'
-        self.gridOffsetX: float = 0.0
-        self.gridOffsetY: float = 0.0
-        self.gridAlpha: int = 50
-
         if not os.path.exists(self.captureDirPath):
             os.makedirs(self.captureDirPath)
 
@@ -147,9 +137,23 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         # self.ui_s.ISOcombo.currentTextChanged.connect(lambda: self.changeISO('comboBox'))
         self.ui_s.ISOcombo.currentTextChanged.connect(self.changeISO)
         self.ui_s.ISOcombo.setValidator(QtGui.QIntValidator(self))
+        self.ui_s.gridTypeCombo.setCurrentText(self.ui_s.sensorImage.gridParam.gridType)
+        self.ui_s.gridTypeCombo.currentTextChanged.connect(self.showGrid)
+        self.ui_s.gridColorCombo.setCurrentText(self.ui_s.sensorImage.gridParam.color)
+        self.ui_s.gridColorCombo.currentTextChanged.connect(self.showGrid)
 
         # Check Box
         self.ui_s.hex4dCheckBox.stateChanged.connect(self.laser_custom)
+
+        # set validator of line edit
+        self.ui_s.shutterLineEdit.setValidator(QtGui.QIntValidator(self))
+        self.ui_s.framesLineEdit.setValidator(QtGui.QIntValidator(self))
+        self.ui_s.xLineEdit.setValidator(QtGui.QIntValidator(self))
+        self.ui_s.yLineEdit.setValidator(QtGui.QIntValidator(self))
+        self.ui_s.xOffsetLineEdit.setValidator(QtGui.QDoubleValidator(self))
+        self.ui_s.yOffsetLineEdit.setValidator(QtGui.QDoubleValidator(self))
+        self.ui_s.rotLineEdit.setValidator(QtGui.QDoubleValidator(self))
+        self.ui_s.alphaLineEdit.setValidator(QtGui.QIntValidator(0, 100, self))
 
         # Line edit textChanged
         self.ui_s.IPlineEdit.setText(self.RPiaddress)
@@ -158,15 +162,23 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         self.ui_s.shutterLineEdit.textChanged.connect(self.changeShutter)
         self.ui_s.framesLineEdit.setText(str(self.frames))
         self.ui_s.framesLineEdit.textChanged.connect(self.changeFrames)
+        self.ui_s.xLineEdit.setText(str(self.ui_s.sensorImage.gridParam.lines_x))
+        self.ui_s.xLineEdit.textChanged.connect(self.showGrid)
+        self.ui_s.yLineEdit.setText(str(self.ui_s.sensorImage.gridParam.lines_y))
+        self.ui_s.yLineEdit.textChanged.connect(self.showGrid)
+        self.ui_s.xOffsetLineEdit.setText(str(self.ui_s.sensorImage.gridParam.offset_x))
+        self.ui_s.xOffsetLineEdit.textChanged.connect(self.showGrid)
+        self.ui_s.yOffsetLineEdit.setText(str(self.ui_s.sensorImage.gridParam.offset_y))
+        self.ui_s.yOffsetLineEdit.textChanged.connect(self.showGrid)
+        self.ui_s.rotLineEdit.setText(str(self.ui_s.sensorImage.gridParam.rot))
+        self.ui_s.rotLineEdit.textChanged.connect(self.showGrid)
+        self.ui_s.alphaLineEdit.setText(str(int(self.ui_s.sensorImage.gridParam.alpha*100)))
+        self.ui_s.alphaLineEdit.textChanged.connect(self.showGrid)
 
         # Line edit returnPressed
         self.ui_s.IPlineEdit.returnPressed.connect(self.changeIPaddress)
         self.ui_s.hex4dLineEdit.returnPressed.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
-
-        # set validator of line edit
-        self.ui_s.shutterLineEdit.setValidator(QtGui.QIntValidator(self))
-        self.ui_s.framesLineEdit.setValidator(QtGui.QIntValidator(self))
 
         # Push buttons
         self.ui_s.connectButton.clicked.connect(self.connectToSensor)
@@ -188,7 +200,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
 
         self.ui_s.selectDirectoryButton.clicked.connect(self.selectDirectory)
         self.ui_s.resetButton.clicked.connect(self.resetCounter)
-        self.ui_s.gridButton.clicked.connect(self.showGrid)
+        # self.ui_s.gridButton.clicked.connect(self.showGrid)
+        self.ui_s.gridGroup.clicked.connect(self.showGrid)
 
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
@@ -282,7 +295,8 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.ui_s.disconnectButton.setEnabled(True)
             self.ui_s.cameraControlGroup.setEnabled(True)
             self.ui_s.laserControlGroup.setEnabled(True)
-            self.ui_s.gridButton.setEnabled(True)
+            # self.ui_s.gridButton.setEnabled(True)
+            self.ui_s.gridGroup.setEnabled(True)
 
             self.conn = True
             # print(self.sensor)
@@ -480,8 +494,32 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
         f.close()
 
     def showGrid(self):
+        print('--- show grid ---')
+
+        if not self.ui_s.sensorImage.isPixmapSet:
+            QtWidgets.QMessageBox.critical(self, "No image",
+                                           "There is no image in the Image Viewer. \nPlease capture first.")
+            self.ui_s.gridGroup.setChecked(False)
+            pass
+
+        self.ui_s.sensorImage.m_gridItem.resetTransform()
+        #-- set parameters
+        gp = self.ui_s.sensorImage.gridParam
+        gp.gridType = self.ui_s.gridTypeCombo.currentText()
+        gp.lines_x = int(self.ui_s.xLineEdit.text()) if self.ui_s.xLineEdit.text() != '' else 0
+        gp.lines_y = int(self.ui_s.yLineEdit.text()) if self.ui_s.yLineEdit.text() != '' else 0
+        gp.rot = float(self.ui_s.rotLineEdit.text()) if self.ui_s.rotLineEdit.text() != '' else 0.0
+        gp.color = self.ui_s.gridColorCombo.currentText()
+        gp.alpha = float(self.ui_s.alphaLineEdit.text())/100 if self.ui_s.alphaLineEdit.text() != '' else 0.0
+        gp.qcolor = QtGui.QColor(*gp.colorDict[gp.color])
+        gp.qcolor.setAlphaF(gp.alpha)
+        gp.offset_x = float(self.ui_s.xOffsetLineEdit.text()) if self.ui_s.xOffsetLineEdit.text() != '' else 0.0
+        gp.offset_y = float(self.ui_s.yOffsetLineEdit.text()) if self.ui_s.yOffsetLineEdit.text() != '' else 0.0
+        gp.pen = QtGui.QPen(gp.qcolor)
+        gp.pen.setStyle(gp.pen_styles[gp.gridType])
+
         self.ui_s.sensorImage.setGridParameter(self.ui_s.sensorImage.gridParam)
-        self.ui_s.sensorImage.setGridVisible(self.ui_s.gridButton.isChecked())
+        self.ui_s.sensorImage.setGridVisible(self.ui_s.gridGroup.isChecked())
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
