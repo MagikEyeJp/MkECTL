@@ -27,6 +27,7 @@ ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合
 
 
 BUG?
+・SensorWindowの撮影枚数の数値が、単発撮影ボタンが押された後反映されなくなる。1回しか撮影されない。数値を編集するとまた反映される。
 ・[almost DONE]Continue開始されない
 ・原点復帰の際にスライダの挙動がおかしい(原点通り過ぎてぎこちなく戻る)。0位置への移動だと問題なし
 ・スクリプト実行時のISOがスクリプトの指定ではなくセンサウィンドウのISO設定値になっていることがある
