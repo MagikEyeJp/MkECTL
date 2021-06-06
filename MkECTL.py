@@ -413,8 +413,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 time.sleep(0.2)
 
                 (pos, vel, torque) = m.read_motor_measurement()
-                error += pos - (motorPos * scale)
-
+                error = abs(pos - (motorPos * scale))
+                print(error)
                 if error < 0.1:
                     break
 
