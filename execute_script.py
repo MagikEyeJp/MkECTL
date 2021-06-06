@@ -469,8 +469,8 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
     torque = [0.0, 0.0, 0.0]
     minerr = 999999.0   # とりあえず大きい数
     cnt = 0
-    GOAL_EPS = 0.1   # 目標位置到達誤差しきい値
-    GOAL_CNT = 4     # 目標位置到達判定回数
+    GOAL_EPS = 0.002   # 目標位置到達誤差しきい値
+    GOAL_CNT = 5     # 目標位置到達判定回数
 
     for param_i in range(args.size):
         m.append(devices['motors'][motorSet[param_i]])
