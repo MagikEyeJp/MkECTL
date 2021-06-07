@@ -307,18 +307,18 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         m.enable()
         m.curveType(1)
         m.maxSpeed(250)
-        m.acc(2)
+        m.acc(3)
         m.dec(2)
-        m.speed(7)
+        m.speed(40)
         m.maxTorque(5)
 
         m = self.motors['tilt']
         m.enable()
         m.curveType(1)
         m.maxSpeed(250)
-        m.acc(2)
-        m.dec(2)
-        m.speed(7)
+        m.acc(12)
+        m.dec(4)
+        m.speed(40)
         m.maxTorque(5)
 
         # IR light
@@ -413,8 +413,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 time.sleep(0.2)
 
                 (pos, vel, torque) = m.read_motor_measurement()
-                error += pos - (motorPos * scale)
-
+                error = abs(pos - (motorPos * scale))
+                print(error)
                 if error < 0.1:
                     break
 
