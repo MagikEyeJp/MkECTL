@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>909</width>
+    <width>840</width>
     <height>616</height>
    </rect>
   </property>
@@ -58,15 +58,24 @@
     </item>
     <item>
      <widget class="QScrollArea" name="scrollArea">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="minimumSize">
        <size>
-        <width>240</width>
+        <width>260</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>250</width>
+        <width>260</width>
         <height>16777215</height>
        </size>
       </property>
@@ -87,17 +96,23 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>234</width>
+         <width>260</width>
          <height>830</height>
         </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-5</y>
-          <width>242</width>
-          <height>851</height>
+          <y>0</y>
+          <width>251</width>
+          <height>1191</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,1">
@@ -106,7 +121,7 @@
            <property name="minimumSize">
             <size>
              <width>240</width>
-             <height>110</height>
+             <height>100</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -121,17 +136,29 @@
            <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
-              <x>13</x>
+              <x>10</x>
               <y>30</y>
               <width>211</width>
-              <height>74</height>
+              <height>60</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout">
+               <property name="sizeConstraint">
+                <enum>QLayout::SetDefaultConstraint</enum>
+               </property>
                <item>
                 <widget class="QPushButton" name="connectButton">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <horstretch>5</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="palette">
                   <palette>
                    <active>
@@ -581,6 +608,12 @@
                </item>
                <item>
                 <widget class="QPushButton" name="disconnectButton">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <horstretch>5</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="palette">
                   <palette>
                    <active>
@@ -623,14 +656,46 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QPushButton" name="searchButton">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <horstretch>1</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="baseSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="resources.qrc">
+                   <normaloff>:/GUI_icons/135-search.png</normaloff>:/GUI_icons/135-search.png</iconset>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <item>
-                <widget class="QLineEdit" name="IPlineEdit"/>
-               </item>
-              </layout>
+              <widget class="QComboBox" name="IPComboBox">
+               <property name="editable">
+                <bool>true</bool>
+               </property>
+               <property name="currentText">
+                <string>127.0.0.1</string>
+               </property>
+               <property name="maxCount">
+                <number>10</number>
+               </property>
+               <property name="insertPolicy">
+                <enum>QComboBox::InsertAtTop</enum>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -891,7 +956,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>226</y>
+              <y>230</y>
               <width>171</width>
               <height>20</height>
              </rect>
@@ -910,19 +975,29 @@
             <property name="geometry">
              <rect>
               <x>190</x>
-              <y>225</y>
-              <width>41</width>
-              <height>20</height>
+              <y>226</y>
+              <width>26</width>
+              <height>24</height>
              </rect>
             </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
-             <string>Reset</string>
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/GUI_icons/133-spinner11.png</normaloff>:/GUI_icons/133-spinner11.png</iconset>
             </property>
            </widget>
            <widget class="QPushButton" name="frameButton">
             <property name="geometry">
              <rect>
-              <x>185</x>
+              <x>190</x>
               <y>250</y>
               <width>50</width>
               <height>25</height>
@@ -1149,7 +1224,7 @@
              <rect>
               <x>10</x>
               <y>30</y>
-              <width>211</width>
+              <width>219</width>
               <height>201</height>
              </rect>
             </property>
