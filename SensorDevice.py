@@ -100,5 +100,12 @@ class SensorDevice:
             sleep(0.5)
             print(frame.lut3d, frame.uid)
 
+    def get_stats(self):
+        stats = ""
+        if self.client:
+            stats = self.client.get_stats()
+        return stats
+
+
         return frame
 

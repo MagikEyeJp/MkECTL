@@ -287,6 +287,7 @@ class SensorWindow(QtWidgets.QWidget):  # https://teratail.com/questions/118024
             self.setLaser('0x0000')
 
             self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor and set parameter values')
+            print("stats:", self.sensor.get_stats())
 
             # どうにかする
             # self.ui_s.setIPaddressButton.setEnabled(False)
