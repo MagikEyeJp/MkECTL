@@ -73,12 +73,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.setupUi(self)
         self.scriptParams = ScriptParams()
 
-        self.subWindow = sensors.SensorWindow(mainUI=self)
+        # self.subWindow = sensors.SensorWindow(mainUI=self)
 
         ### docking test https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
-        # self.subWindow_dock = sensors.SensorWindowDock(mainUI=self)
-        # self.subWindow_dock.setFloating(True)
-        # self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.subWindow_dock)
+        self.subWindow = sensors.SensorWindow(mainUI=self)
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.subWindow)
+        self.subWindow.setFloating(False)
 
         self.initializeProcessFlag = False
 
@@ -771,6 +771,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.subWindow.prevImg(1)
 
     def showSubWindow(self, geometry, framesize):
+
         if self.subWindow_isOpen:
             self.subWindow.activateWindow()
             self.subWindow.show()
@@ -779,6 +780,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.subWindow.move(geometry.width() / 2 - framesize.width() / 16,
                                 geometry.height() / 2 - framesize.height() / 3)
             self.subWindow_isOpen = True
+        self.restoreDockWidget(self.subWindow)
+        self.subWindow.resize(QtCore.QSize(909, 616))   # windowがfloatingしてるときはworkする。。
 
     def openIR(self):
 
