@@ -85,16 +85,6 @@ class GetImageThread(threading.Thread):
             self.pixmap = QtGui.QPixmap(self.image)
             inmain(self.callback, self.pixmap)
 
-class SensorWindowDock(QtWidgets.QDockWidget):  # https://teratail.com/questions/118024
-    def __init__(self, parent=None, mainUI:IMainUI=None):
-        super(SensorWindowDock, self).__init__(parent)
-        # print(mainUI)
-        # mainUI.sensorChanged()
-        self.mainUI = mainUI
-
-        self.ui_s = sensorwindow_dock_ui.Ui_sensor()
-        self.ui_s.setupUi(self)
-
 class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118024
     def __init__(self, parent=None, mainUI:IMainUI=None):
         super(SensorWindow, self).__init__(parent)
@@ -113,9 +103,6 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
         # thread
         self.getImg_thread = None
-        # self.getImg_thread = threading.Thread(target=lambda: self.prevImg(1))
-        # self.consecutive_thread = threading.Thread(target=lambda: self.prevImg(1))
-        # self.consecutiveMode = False
 
         # Variables (initialized with default values)
         self.IPaddress = '127.0.0.1'  # default
@@ -274,7 +261,6 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
     def connectToSensor(self):
         # connect to sensors and display again
-        # self.sensor = SensorDevice.SensorDevice()
 
         try:
             self.changeIPaddress()
@@ -409,28 +395,12 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
 
     def startGetImageThread(self, frames):
-        # print(self.consecutive_thread.isDaemon())
-
-        # if self.ui_s.consecutiveModeButton.isChecked():
-        #     if not self.consecutive_thread.is_alive():
-        #         self.ui_s.cameraStatusLabel.setText("Consecutive Mode: ON")
-        #         self.consecutive_thread.start()
-        #         print(self.consecutive_thread.is_alive())
-        #
-        #     # self.ui_s.prev1Button.click()
-        #
-        # else:
-        #     if self.consecutive_thread.is_alive():
-        #         self.ui_s.cameraStatusLabel.setText("Consecutive Mode: OFF")
-        #         self.consecutive_thread.join()
-
         self.frames = frames
 
         if self.getImg_thread.ended:
             self.getImg_thread.begin(frames)
 
     def getImgCallback(self, pixmap):
-        # pixmap = self.getImg(1)[1]
         if pixmap != None:
             self.ui_s.sensorImage.setPixMap(pixmap)
             self.ui_s.sensorImage.show()
@@ -490,26 +460,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         img2 = img.get_image()
         image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
         pixmap = QtGui.QPixmap(image)
-        # print(type(image))
-        # print(type(img2))
         # img3 = Image.new('L', (len(img2[0]), len(img2)))
         # img3.show()
         return image, pixmap
-
-
-        # self.scene.setPixMap(pixmap)
-
-        # self.ui_s.sensorImage.setFixedSize(len(img2[0]), len(img2))
-        # self.ui_s.sensorImage.resize(pixmap.size())
-        # self.ui_s.sensorImage.setBaseSize(len(img2[0]), len(img2))
-        # self.ui_s.sensorImage.setSceneRect(0, 0, len(img2[0]), len(img2))
-        # self.ui_s.sensorImage.fitInView(self.scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
-        # self.scene.fitImage()
-
-    #######
-        # self.ui_s.sensorImage.setPixMap(pixmap)
-        # self.ui_s.sensorImage.show()
-
 
     def resetCounter(self):
         self.imgCounter = 0

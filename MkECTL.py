@@ -339,13 +339,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # GUI
         print('--initialization completed--')
         self.ui.initializeProgressBar.setValue(100)
-        # self.ui.initializeButton.setEnabled(False)
-        # self.ui.initializeProgressBar.setEnabled(False)
         self.ui.initializeProgressLabel.setText('Initialized all motors')
-        # self.ui.manualOperation.setEnabled(True)
-        # self.ui.IRlightControlGroup.setEnabled(True)
-        # self.ui.continueButton.setEnabled(True)
-        # self.ui.executeScript_button.setEnabled(True)
 
         self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
         self.setUIStatus(self.states)
@@ -363,8 +357,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def setSliderOrigin(self):
         m = self.motors['slider']
-        # m = self.params['slider']['cont']
-        # scale = self.params['slider']['scale']
         m.speed(10.0)
         m.maxTorque(1.0)
         m.runForward()
@@ -430,7 +422,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         elif buttonName == 'presetExe':
             motorID = self.ui.presetMotorCombo.currentText()
             m = self.motors[motorID]
-            # m = self.params[motorID]['cont']
 
             scale = self.params[motorID]['scale']
             pos = float(self.ui.presetValue.text())
@@ -444,15 +435,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         for m in self.motors.values():
             m.reboot()
             m.close()
-
-        # GUI
-        # self.ui.initializeButton.setEnabled(True)
-        # self.ui.initializeProgressBar.setValue(0)
-        # self.ui.initializeProgressLabel.setText('Initializing motors...')
-        # self.ui.manualOperation.setEnabled(False)
-        # self.ui.IRlightControlGroup.setEnabled(False)
-        # self.ui.continueButton.setEnabled(False)
-        # self.ui.executeScript_button.setEnabled(False)
 
         self.states = {UIState.MACHINEFILE, UIState.INITIALIZE, UIState.IRLIGHT}
         self.setUIStatus(self.states)
