@@ -1,5 +1,8 @@
 # coding: utf-8
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets, QtGui
+from PyQt5.QtCore import Qt, QRect, QPoint, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtGui import QCursor
 import sys
 import re
 import os
@@ -9,14 +12,12 @@ import csv
 import numpy as np
 from timeout_decorator import TimeoutError
 import threading
-
-import socket
+import discoverdevices
 import SensorDevice
-
 import sensorwindow_ui
 import sensorwindow_dock_ui
-import ImageViewScene
 from IMainUI import IMainUI
+import PopupList
 
 app = QtWidgets.qApp
 
@@ -119,7 +120,6 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         # Variables (initialized with default values)
         self.IPaddress = '127.0.0.1'  # default
         self.portNum: int = 8888
-        self.RPiaddress = self.IPaddress + ':' + str(self.portNum)
         self.shutterSpeed: int = 30000
         self.frames: int = 5
         self.gainiso: int = 400    # value in the list of combo box
@@ -157,8 +157,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.alphaLineEdit.setValidator(QtGui.QIntValidator(0, 100, self))
 
         # Line edit textChanged
-        self.ui_s.IPlineEdit.setText(self.RPiaddress)
-        # self.ui_s.IPlineEdit.textChanged.connect(self.changeIPaddress)
+        # self.ui_s.IPComboBox.textChanged.connect(self.changeIPaddress)
         self.ui_s.shutterLineEdit.setText(str(self.shutterSpeed))
         self.ui_s.shutterLineEdit.textChanged.connect(self.changeShutter)
         self.ui_s.framesLineEdit.setText(str(self.frames))
@@ -177,13 +176,14 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.alphaLineEdit.textChanged.connect(self.showGrid)
 
         # Line edit returnPressed
-        self.ui_s.IPlineEdit.returnPressed.connect(self.changeIPaddress)
+        # self.ui_s.IPComboBox.change　.connect(self.changeIPaddress)
         self.ui_s.hex4dLineEdit.returnPressed.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
 
         # Push buttons
         self.ui_s.connectButton.clicked.connect(self.connectToSensor)
         self.ui_s.disconnectButton.clicked.connect(self.disconnectSensor)
+        self.ui_s.searchButton.clicked.connect(self.searchSensor)
         # self.ui_s.setIPaddressButton.clicked.connect(self.changeIPaddress)
         self.ui_s.evenLaserButton.clicked.connect(lambda: self.setLaser('0xAAAA'))
         self.ui_s.oddLaserButton.clicked.connect(lambda: self.setLaser('0x5555'))
@@ -224,7 +224,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
 
     def changeIPaddress(self):
-        self.RPiaddress = self.ui_s.IPlineEdit.text()
+        self.RPiaddress = self.ui_s.IPComboBox.currentText()
         if ':' in self.RPiaddress:
             # https://teratail.com/questions/61914
             pattern = "(.*):(.*)"
@@ -234,7 +234,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         else:
             self.IPaddress = self.RPiaddress
 
-        self.connectToSensor()
+        # self.connectToSensor()
 
 
     def changeShutter(self):
@@ -277,9 +277,15 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         # self.sensor = SensorDevice.SensorDevice()
 
         try:
+            self.changeIPaddress()
             self.sensor = SensorDevice.SensorDevice()
-
             self.sensor.open(self.IPaddress, self.portNum)
+            i = self.ui_s.IPComboBox.findText(self.RPiaddress, Qt.MatchExactly)
+            while i >= 0:
+                self.ui_s.IPComboBox.removeItem(i)
+                i = self.ui_s.IPComboBox.findText(self.RPiaddress, Qt.MatchExactly)
+            self.ui_s.IPComboBox.insertItem(0, self.RPiaddress)
+            self.ui_s.IPComboBox.setCurrentIndex(0)
 
             # initialize values
             self.changeShutter()
@@ -288,13 +294,18 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.setLaser('0x0000')
 
             self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor and set parameter values')
-            print("stats:", self.sensor.get_stats())
+            stats = self.sensor.get_stats()
+            print(stats)
+            smid = stats.get("runtime_info").get("sensor_discovery").get("configured").get("smid")
+            print(smid)
+            self.ui_s.textSerial.setText(smid)
 
             # どうにかする
             # self.ui_s.setIPaddressButton.setEnabled(False)
             self.ui_s.connectButton.setEnabled(False)
-            self.ui_s.IPlineEdit.setEnabled(False)
+            self.ui_s.IPComboBox.setEnabled(False)
             self.ui_s.disconnectButton.setEnabled(True)
+            self.ui_s.searchButton.setEnabled(False)
             self.ui_s.cameraControlGroup.setEnabled(True)
             self.ui_s.laserControlGroup.setEnabled(True)
             # self.ui_s.gridButton.setEnabled(True)
@@ -311,8 +322,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             print(e)
             # self.ui_s.setIPaddressButton.setEnabled(True)
             self.ui_s.connectButton.setEnabled(True)
-            self.ui_s.IPlineEdit.setEnabled(True)
+            self.ui_s.IPComboBox.setEnabled(True)
             self.ui_s.disconnectButton.setEnabled(False)
+            self.ui_s.searchButton.setEnabled(True)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
 
@@ -335,10 +347,32 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor correctly.')
         finally:
             self.ui_s.connectButton.setEnabled(True)
-            self.ui_s.IPlineEdit.setEnabled(True)
+            self.ui_s.IPComboBox.setEnabled(True)
             self.ui_s.disconnectButton.setEnabled(False)
+            self.ui_s.searchButton.setEnabled(True)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
+
+    def searchSensor(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        list = discoverdevices.discover_devices()
+        QApplication.restoreOverrideCursor()
+        print(list)
+
+        sensorListWindow = PopupList.PopupList()
+        pos = self.ui_s.searchButton.mapToGlobal(QPoint(32, 24))
+        width = 240
+        height = 200
+        rect = QRect(pos.x() - width, pos.y(), width, height)
+        sensorListWindow.setGeometry(rect)
+        strlist = [list[key] + ":" + key for key in list]
+        sensorListWindow.setDic(list)
+        sensorListWindow.selected.connect(self.sensorListSelected)
+        sensorListWindow.show()
+
+    def sensorListSelected(self, name, adr):
+        print(name, adr)
+        self.ui_s.IPComboBox.setCurrentText(adr)
 
 
     def laser_custom(self):

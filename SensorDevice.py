@@ -151,5 +151,7 @@ class SensorDevice:
     def get_stats(self):
         stats = ""
         if self.client:
+            mutex.acquire()
             stats = self.client.get_stats()
+            mutex.release()
         return stats
