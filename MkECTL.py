@@ -32,11 +32,12 @@ class ScriptParams():
         self.now = datetime.datetime.now()
 
         self.execTwoScr: bool = False
-        self.scriptName: str = ''
-        self.scriptName_2: str = ''
-        self.commandNum_1: int = 0
-        self.commandNum_2: int = 0
+        self.scriptName: list = []
+        # self.scriptName_2: str = ''
+        self.commandNum: list = []
+        # self.commandNum_2: int = 0
         self.commandNum_total: int = 0
+        self.currentScript: int = 1
         self.baseFolderName: str = 'data'
         self.subFolderName: str = self.now.strftime('%Y%m%d_%H%M%S')
         self.isContinue = False
@@ -480,26 +481,35 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             pass
         else:
             ini.updatePreviousScriptPath(previousScript_iniFile, fileName)
+            self.scriptParams.currentScript = num
 
             if num == 1:
                 self.ui.scriptName_label.setText(
                     os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
-                self.scriptParams.scriptName = fileName
-                self.scriptParams.commandNum_1 = execute_script.countCommandNum(self.scriptParams, [], [])
             else:
                 self.ui.scriptName_label_2.setText(os.path.basename(fileName))
-                self.scriptParams.scriptName_2 = fileName
-                self.scriptParams.commandNum_2 = execute_script.countCommandNum(self.scriptParams, [], [])
                 self.scriptParams.execTwoScr = True
 
-            self.scriptParams.commandNum_total = self.scriptParams.commandNum_1 + self.scriptParams.commandNum_2
+            if len(self.scriptParams.scriptName) < num:
+                self.scriptParams.scriptName.append(fileName)
+                self.scriptParams.commandNum.append(execute_script.countCommandNum(self.scriptParams, [], []))
+            else:
+                self.scriptParams.scriptName[num-1] = fileName
+                self.scriptParams.commandNum[num-1] = execute_script.countCommandNum(self.scriptParams, [], [])
+
+            self.scriptParams.commandNum_total = sum(self.scriptParams.commandNum)
             self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
 
     def delete2ndScript(self):
         self.scriptParams.scriptName_2 = ''
         self.scriptParams.commandNum_2 = 0
+        if len(self.scriptParams.commandNum) >= 2:
+            self.scriptParams.commandNum[1] = 0
         self.ui.scriptName_label_2.setText('')
         self.scriptParams.execTwoScr = False
+
+        self.scriptParams.commandNum_total = sum(self.scriptParams.commandNum)
+        self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
 
     def openBaseFolder(self):
         fileName = \
@@ -527,7 +537,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def demo(self):
         demo_script = 'script/demo.txt'
-        self.scriptParams.scriptName = demo_script
+        self.scriptParams.scriptName.append(demo_script)
         self.ui.scriptName_label.setText(demo_script)
 
         if not os.path.exists(demo_script):
@@ -552,6 +562,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             if not interrupted:
                 QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "the demo file \nhave been completed.")
+
+        self.scriptParams.scriptName.clear()
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -588,17 +600,17 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                          qm.Yes | qm.No)
 
                     if ret == qm.Yes:
-                        self.scriptParams.scriptName = previouslyExecutedScript
+                        self.scriptParams.scriptName[0] = previouslyExecutedScript
                     elif ret == qm.No:
                         # self.scriptParams.scriptName = self.ui.scriptName_label.text()
                         pass
                     else:
                         return
-                self.ui.scriptName_label.setText(os.path.basename(self.scriptParams.scriptName))
+                self.ui.scriptName_label.setText(os.path.basename(self.scriptParams.scriptName[0]))
         else:
             self.scriptParams.isContinue = False
 
-        if self.scriptParams.scriptName == '':
+        if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
             self.openScriptFile(1)
 
         if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
@@ -615,6 +627,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         self.setUIStatus(self.states)
 
+        ### EXECUTE
         interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
         if not self.scriptParams.execTwoScr:
@@ -630,19 +643,22 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
                 QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                              "\"%s\" \nhave been completed."
-                                                                                % os.path.basename(self.scriptParams.scriptName))
+                                                                                % os.path.basename(self.scriptParams.scriptName[self.scriptParams.currentScript - 1]))
 
 
     def run_2scripts(self, isContinue):
         if self.scriptParams.execTwoScr:
+            self.scriptParams.currentScript = 1
             self.run_script(isContinue)    # exec 1st script
 
             # -------- 2nd script -------
             # self.renewSubFolder()
+            print('***********************************************')
+            self.scriptParams.currentScript += 1
 
             self.scriptParams.isContinue = False
 
-            if self.scriptParams.scriptName_2 == '':
+            if self.scriptParams.scriptName[0] == '':
                 self.openScriptFile(2)
 
             if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
@@ -658,6 +674,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.states = {UIState.SCRIPT_PROGRESS}
             self.setUIStatus(self.states)
 
+            ### EXECUTE
             interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
             # self.GUIwhenScripting(interrupted)
@@ -671,12 +688,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
                 QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "\"%s\" \nhave been completed."
-                                                % os.path.basename(self.scriptParams.scriptName_2))
+                                                % os.path.basename(self.scriptParams.scriptName[self.scriptParams.currentScript - 1]))
 
+            self.scriptParams.scriptName.clear()
             pass  # will be updated later
 
         else:
             self.run_script(isContinue)
+            self.scriptParams.scriptName.clear()
 
     def setHome(self):
         for m in self.devices['motors'].values():

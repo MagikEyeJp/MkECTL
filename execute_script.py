@@ -168,12 +168,12 @@ def isAborted(scriptParams, mainWindow):
         print('Interrupted')
         if not isDemo:
             ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
-                                 scriptParams.scriptName)
+                                 scriptParams.scriptName[scriptParams.currentScript - 1])
         return mainWindow.stopClicked
 
 def countCommandNum(scriptParams, args_hist, com_hist):
 
-    f = open(scriptParams.scriptName)
+    f = open(scriptParams.scriptName[scriptParams.currentScript - 1])
     lines = f.read().splitlines()
     f.close()
 
@@ -277,7 +277,7 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
 
     # ---------- update ini file ----------
     if not isDemo:
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName[scriptParams.currentScript - 1])
     # ------------------------------
     return False
 
