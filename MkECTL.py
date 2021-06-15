@@ -32,9 +32,10 @@ class ScriptParams():
         self.now = datetime.datetime.now()
 
         self.execTwoScr: bool = False
-        self.scriptName: list = []
+        self.maxScriptNum = 10
+        self.scriptName: list = [''] * self.maxScriptNum
         # self.scriptName_2: str = ''
-        self.commandNum: list = []
+        self.commandNum: list = [0] * self.maxScriptNum
         # self.commandNum_2: int = 0
         self.commandNum_total: int = 0
         self.currentScript: int = 1
@@ -490,19 +491,15 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.scriptName_label_2.setText(os.path.basename(fileName))
                 self.scriptParams.execTwoScr = True
 
-            if len(self.scriptParams.scriptName) < num:
-                self.scriptParams.scriptName.append(fileName)
-                self.scriptParams.commandNum.append(execute_script.countCommandNum(self.scriptParams, [], []))
-            else:
-                self.scriptParams.scriptName[num-1] = fileName
-                self.scriptParams.commandNum[num-1] = execute_script.countCommandNum(self.scriptParams, [], [])
+            self.scriptParams.scriptName[num-1] = fileName
+            self.scriptParams.commandNum[num-1] = execute_script.countCommandNum(self.scriptParams, [], [])
 
             self.scriptParams.commandNum_total = sum(self.scriptParams.commandNum)
             self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
 
     def delete2ndScript(self):
-        self.scriptParams.scriptName_2 = ''
-        self.scriptParams.commandNum_2 = 0
+        self.scriptParams.scriptName[1] = ''
+        self.scriptParams.commandNum[1] = 0
         if len(self.scriptParams.commandNum) >= 2:
             self.scriptParams.commandNum[1] = 0
         self.ui.scriptName_label_2.setText('')
@@ -537,7 +534,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def demo(self):
         demo_script = 'script/demo.txt'
-        self.scriptParams.scriptName.append(demo_script)
+        self.scriptParams.scriptName[0] = demo_script
         self.ui.scriptName_label.setText(demo_script)
 
         if not os.path.exists(demo_script):
@@ -563,7 +560,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "the demo file \nhave been completed.")
 
-        self.scriptParams.scriptName.clear()
+        self.scriptParams.scriptName[0] = self.ui.scriptName_label.text()
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -658,7 +655,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             self.scriptParams.isContinue = False
 
-            if self.scriptParams.scriptName[0] == '':
+            if self.scriptParams.scriptName[1] == '':
                 self.openScriptFile(2)
 
             if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
@@ -690,12 +687,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                                                                          "\"%s\" \nhave been completed."
                                                 % os.path.basename(self.scriptParams.scriptName[self.scriptParams.currentScript - 1]))
 
-            self.scriptParams.scriptName.clear()
+            # self.scriptParams.scriptName = [''] * self.scriptParams.maxScriptNum
             pass  # will be updated later
 
         else:
             self.run_script(isContinue)
-            self.scriptParams.scriptName.clear()
+            # self.scriptParams.scriptName = [''] * self.scriptParams.maxScriptNum
 
     def setHome(self):
         for m in self.devices['motors'].values():
