@@ -18,6 +18,7 @@ import sensorwindow_ui
 import sensorwindow_dock_ui
 from IMainUI import IMainUI
 import PopupList
+import csv
 
 app = QtWidgets.qApp
 
@@ -222,6 +223,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.cameraControlGroup.setEnabled(False)
         self.ui_s.laserControlGroup.setEnabled(False)
 
+        # smid dictionary
+        self.smidDic = None
+
 
     def changeIPaddress(self):
         self.RPiaddress = self.ui_s.IPComboBox.currentText()
@@ -301,6 +305,15 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             print(smid)
             self.ui_s.textSerial.setText(smid)
 
+            self.smidDictionary()
+            lblid = self.smidDic.get(smid)
+            self.ui_s.textLabelID.setText(lblid)
+            if lblid != None and len(lblid) > 0:
+                self.ui_s.textLabelID.setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}")
+            else:
+                self.ui_s.textLabelID.setStyleSheet("QLineEdit { background: rgb(255, 255, 0);}")
+
+
             # どうにかする
             # self.ui_s.setIPaddressButton.setEnabled(False)
             self.ui_s.connectButton.setEnabled(False)
@@ -315,6 +328,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.conn = True
             # print(self.sensor)
             self.getImg_thread = GetImageThread(self.sensor, self.getImgCallback)
+
 
 
         except Exception as e:
@@ -557,6 +571,19 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
         self.ui_s.sensorImage.setGridParameter(self.ui_s.sensorImage.gridParam)
         self.ui_s.sensorImage.setGridVisible(self.ui_s.gridGroup.isChecked())
+
+
+    def smidDictionary(self):
+        DicFile = "smid_dictionary.csv"
+        if type(self.smidDic) != dict or len(self.smidDic) == 0:
+            # read smid dictionary
+            self.smidDic = {}
+            with open(DicFile, newline='') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    self.smidDic[row['smid']] = row['lblid']
+        print(self.smidDic)
+
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
