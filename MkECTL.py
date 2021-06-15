@@ -395,12 +395,26 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def exeButtonClicked(self, buttonName):
         # print(buttonName)  # type->str
         if re.search('.+MoveExe', buttonName):
+            self.ui.initializeProgressBar.setEnabled(True)
+            self.ui.initializeProgressLabel.setEnabled(True)
+            self.ui.initializeProgressLabel.setText('Moving...')
+            self.ui.initializeProgressBar.setValue(0.0)
+
+            initialError = 0.0
+            totalInitialErrors: float = 0.0
+            currentError = 0.0
+            percentToGoal: float = 0.0
+
             motorID = buttonName.replace('MoveExe', '')
             m = self.motors[motorID]
             scale = self.params[motorID]['scale']
             motorPos = self.motorGUI['posSpin'][motorID].value()
+            (pos, vel, torque) = m.read_motor_measurement()
             # m.speed(self.motorGUI['speedSpin'][motorID].value())
             m.moveTo(motorPos * scale)
+
+            initialError = pos
+            totalInitialErrors += initialError
 
             while True:
                 error = 0.0
@@ -409,8 +423,18 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 (pos, vel, torque) = m.read_motor_measurement()
                 error = abs(pos - (motorPos * scale))
                 print(error)
+
+                currentError = pos
+                percentToGoal += currentError
+                percentToGoal /= totalInitialErrors if not totalInitialErrors == 0 else 1.0
+                percentToGoal *= 100
+                percentToGoal = 100 - percentToGoal
+                self.ui.initializeProgressBar.setValue(percentToGoal)
                 if error < 0.1:
+                    self.ui.initializeProgressBar.setValue(100.0)
+                    self.ui.initializeProgressLabel.setText('Goal')
                     break
+                percentToGoal = 0.0
 
             (pos, vel, torque) = m.read_motor_measurement()
             pos /= scale
@@ -713,7 +737,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 currentErrors[self.motorSet[param_i]] = pos
 
                 percentToGoal += currentErrors[self.motorSet[param_i]]
-            percentToGoal /= totalInitialErrors if not totalInitialErrors == 0 else 0.0
+            percentToGoal /= totalInitialErrors if not totalInitialErrors == 0 else 1.0
             percentToGoal *= 100
             percentToGoal = 100 - percentToGoal
             self.ui.initializeProgressBar.setValue(percentToGoal)
