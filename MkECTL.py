@@ -73,6 +73,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         super(Ui, self).__init__(parent)
         self.ui = mainwindow_ui.Ui_mainwindow()
         self.ui.setupUi(self)
+        self.setStyleSheet("QMainWindow::separator{ background: darkgray; width: 1px; height: 1px; }")
         self.scriptParams = ScriptParams()
 
         # self.subWindow = sensors.SensorWindow(mainUI=self)

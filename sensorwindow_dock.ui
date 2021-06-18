@@ -10,6 +10,9 @@
     <height>616</height>
    </rect>
   </property>
+  <property name="floating">
+   <bool>false</bool>
+  </property>
   <property name="windowTitle">
    <string>Sensor Window</string>
   </property>
@@ -80,10 +83,10 @@
        </size>
       </property>
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::StyledPanel</enum>
       </property>
       <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAlwaysOn</enum>
+       <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::AdjustIgnored</enum>
@@ -95,9 +98,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-347</y>
          <width>260</width>
-         <height>830</height>
+         <height>910</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1388,6 +1391,12 @@
             <size>
              <width>240</width>
              <height>235</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>240</width>
+             <height>16777215</height>
             </size>
            </property>
            <property name="title">
