@@ -76,4 +76,4 @@ def discover_devices(timeout=2) -> dict:
 
 
 if __name__ == "__main__":
-    discover_devices()
+    print(discover_devices())
