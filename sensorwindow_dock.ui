@@ -13,6 +13,9 @@
   <property name="floating">
    <bool>false</bool>
   </property>
+  <property name="allowedAreas">
+   <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+  </property>
   <property name="windowTitle">
    <string>Sensor Window</string>
   </property>
@@ -98,7 +101,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-347</y>
+         <y>0</y>
          <width>260</width>
          <height>910</height>
         </rect>
