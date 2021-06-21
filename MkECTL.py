@@ -82,6 +82,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.subWindow = sensors.SensorWindow(mainUI=self)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.subWindow)
         self.subWindow.setFloating(False)
+        self.sensorWinWidth = self.subWindow.frameGeometry().width()
+        self.sensorWinHeight = self.subWindow.frameGeometry().height()
 
         self.initializeProcessFlag = False
 
@@ -186,6 +188,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.saveButton.clicked.connect(self.savePositions)
         self.ui.GoButton.clicked.connect(self.goToSavedPositions)
         self.ui.selectMachineFileButton.clicked.connect(self.selectMachine)
+
+        # Sensor window detached
+        self.subWindow.topLevelChanged.connect(self.changeMainWinSize)
 
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
@@ -817,11 +822,30 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         self.IRLight.set(ch, state)
 
-
     def setMultiplier(self):
         self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
         self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
         self.scriptParams.isoValue = self.ui.isoValue.currentText()
+
+    def changeMainWinSize(self):
+        posX = self.pos().x()
+        posY = self.pos().y()
+        mainWidth = self.frameGeometry().width()
+        mainHeight = self.frameGeometry().height()
+
+        # print(self.ui.centralwidget.geometry())
+        # print(self.pos().x())
+        if self.subWindow.isFloating():
+
+            # self.sensorWinWidth = self.subWindow.frameGeometry().width()
+            # self.sensorWinHeight = self.subWindow.frameGeometry().height()
+            self.setGeometry(posX, posY, 580, 756)
+            print('floating')
+            print('sensorWinWidth' + str(self.sensorWinWidth) + ', sensorWinHeight' + str(self.sensorWinHeight))
+        else:
+            self.setGeometry(posX, posY, 580+550, max(mainHeight, self.sensorWinHeight))
+            print('not floating')
+            print('sensorWinWidth' + str(self.sensorWinWidth) + ', sensorWinHeight' + str(self.sensorWinHeight))
 
     # ----- UI-related functions -----
     def GUIwhenScripting(self, bool):
