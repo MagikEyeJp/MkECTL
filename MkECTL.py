@@ -191,6 +191,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # Sensor window detached
         self.subWindow.topLevelChanged.connect(self.changeMainWinSize)
+        self.subWindow.visibilityChanged.connect(self.changeMainWinSize)
 
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
@@ -835,7 +836,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # print(self.ui.centralwidget.geometry())
         # print(self.pos().x())
-        if self.subWindow.isFloating():
+        if self.subWindow.isFloating() or self.subWindow.isHidden():
 
             # self.sensorWinWidth = self.subWindow.frameGeometry().width()
             # self.sensorWinHeight = self.subWindow.frameGeometry().height()
