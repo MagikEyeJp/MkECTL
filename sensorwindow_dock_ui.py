@@ -15,7 +15,7 @@ class Ui_sensor(object):
         sensor.setObjectName("sensor")
         sensor.resize(840, 616)
         sensor.setFloating(False)
-        sensor.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea|QtCore.Qt.RightDockWidgetArea)
+        sensor.setAllowedAreas(QtCore.Qt.RightDockWidgetArea)
         self.dockWidgetContents = QtWidgets.QWidget()
         self.dockWidgetContents.setObjectName("dockWidgetContents")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.dockWidgetContents)

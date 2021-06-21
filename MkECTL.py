@@ -834,19 +834,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         mainWidth = self.frameGeometry().width()
         mainHeight = self.frameGeometry().height()
 
-        # print(self.ui.centralwidget.geometry())
-        # print(self.pos().x())
         if self.subWindow.isFloating() or self.subWindow.isHidden():
-
-            # self.sensorWinWidth = self.subWindow.frameGeometry().width()
-            # self.sensorWinHeight = self.subWindow.frameGeometry().height()
-            self.setGeometry(posX, posY, 580, 756)
-            print('floating')
-            print('sensorWinWidth' + str(self.sensorWinWidth) + ', sensorWinHeight' + str(self.sensorWinHeight))
+            self.setGeometry(posX, posY, self.minimumWidth(), 756)
         else:
-            self.setGeometry(posX, posY, 580+550, max(mainHeight, self.sensorWinHeight))
-            print('not floating')
-            print('sensorWinWidth' + str(self.sensorWinWidth) + ', sensorWinHeight' + str(self.sensorWinHeight))
+            self.setGeometry(posX, posY, self.minimumWidth()+550, max(mainHeight, self.sensorWinHeight))
 
     # ----- UI-related functions -----
     def GUIwhenScripting(self, bool):

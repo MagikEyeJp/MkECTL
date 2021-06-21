@@ -14,7 +14,7 @@
    <bool>false</bool>
   </property>
   <property name="allowedAreas">
-   <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   <set>Qt::RightDockWidgetArea</set>
   </property>
   <property name="windowTitle">
    <string>Sensor Window</string>
