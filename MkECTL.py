@@ -836,9 +836,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         mainHeight = self.frameGeometry().height()
 
         if self.subWindow.isFloating() or self.subWindow.isHidden():
+            self.setMinimumWidth(540)
             self.setGeometry(posX, posY, self.minimumWidth(), 756)
         else:
-            self.setGeometry(posX, posY, self.minimumWidth()+550, max(mainHeight, self.sensorWinHeight))
+            self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
+            self.setGeometry(posX, posY, self.minimumWidth(), max(mainHeight, self.sensorWinHeight))
 
     # ----- UI-related functions -----
     def GUIwhenScripting(self, bool):
