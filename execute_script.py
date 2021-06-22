@@ -146,11 +146,14 @@ class Systate():
 
     class PastParameters():
         def __init__(self):
-            self.pos = [0, 0, 0]
-            self.shutter = 0
-            self.gainiso = 0
-            self.lasers = 0
-            self.light = [0, 0]
+            self.reset()
+
+        def reset(self):
+            self.pos = [-1, -1, -1]
+            self.shutter = -1
+            self.gainiso = -1
+            self.lasers = -1
+            self.light = [-1, -1]
 
 
 systate = Systate()
@@ -218,6 +221,9 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
     systate.seqn = 0
     # devices: motors, lights, 3D sensors(sensor window)
     # params: motorDic
+
+    systate.past_parameters.reset()
+    print(vars(systate.past_parameters))
 
     args_hist: list = []
     com_hist: list = []
