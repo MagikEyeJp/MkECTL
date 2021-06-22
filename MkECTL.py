@@ -379,9 +379,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             else:
                 startTime = time.time()
 
-        m.free()
         m.presetPosition(0)
+        m.free()
         m.maxTorque(5.0)
+        self.ui.sliderPosSpin.setValue(0.0)
         print('preset current position as 0 mm')
         print('-- slider origin has been set --')
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
