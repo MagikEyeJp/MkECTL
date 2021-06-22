@@ -1321,7 +1321,7 @@ class Ui_mainwindow(object):
         self.statusbar.setObjectName("statusbar")
         mainwindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(mainwindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1000, 28))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1000, 22))
         self.menubar.setObjectName("menubar")
         mainwindow.setMenuBar(self.menubar)
 

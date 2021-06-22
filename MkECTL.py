@@ -81,7 +81,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         ### docking test https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
         self.subWindow = sensors.SensorWindow(mainUI=self)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.subWindow)
-        self.subWindow.setFloating(False)
         self.sensorWinWidth = self.subWindow.frameGeometry().width()
         self.sensorWinHeight = self.subWindow.frameGeometry().height()
 
@@ -190,8 +189,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.selectMachineFileButton.clicked.connect(self.selectMachine)
 
         # Sensor window detached
-        self.subWindow.topLevelChanged.connect(self.changeMainWinSize)
-        self.subWindow.visibilityChanged.connect(self.changeMainWinSize)
+        self.subWindow.topLevelChanged.connect(lambda: self.changeMainWinSize(self.geometry))
+        self.subWindow.visibilityChanged.connect(lambda: self.changeMainWinSize(self.geometry))
 
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
@@ -227,6 +226,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
+
+    def resizeEvent(self, QResizeEvent):
+        if self.isMaximized():
+            self.subWindow.show()
+            self.subWindow.setFloating(False)
 
     def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
@@ -829,18 +833,41 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
         self.scriptParams.isoValue = self.ui.isoValue.currentText()
 
-    def changeMainWinSize(self):
+    def changeMainWinSize(self, geometry):
         posX = self.pos().x()
         posY = self.pos().y()
         mainWidth = self.frameGeometry().width()
         mainHeight = self.frameGeometry().height()
 
-        if self.subWindow.isFloating() or self.subWindow.isHidden():
+
+        if self.subWindow.isFloating():
+            if self.isMaximized():
+                print('isMaximized: ' + str(self.isMaximized()))
+            # self.showNormal()
             self.setMinimumWidth(540)
+            self.setMaximumWidth(self.minimumWidth())
             self.setGeometry(posX, posY, self.minimumWidth(), 756)
+            print('isFloating: ' + str(self.subWindow.isFloating()))
+            print('isMaximized: ' + str(self.isMaximized()))
+            print('-----')
+        elif self.subWindow.isHidden():
+            # self.showNormal()
+            self.setMinimumWidth(540)
+            self.setMaximumWidth(self.minimumWidth())
+            self.setGeometry(posX, posY, self.minimumWidth(), 756)
+            print('isHidden: ' + str(self.subWindow.isHidden()))
+            print('-----')
         else:
+            # self.showNormal()
             self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
+            self.setMaximumWidth(geometry.width())
             self.setGeometry(posX, posY, self.minimumWidth(), max(mainHeight, self.sensorWinHeight))
+            print('isFloating: ' + str(self.subWindow.isFloating()))
+            print('isHidden: ' + str(self.subWindow.isHidden()))
+            print('isMaximized: ' + str(self.isMaximized()))
+            print('-----')
+
+
 
     # ----- UI-related functions -----
     def GUIwhenScripting(self, bool):
