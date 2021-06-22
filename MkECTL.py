@@ -230,7 +230,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def resizeEvent(self, QResizeEvent):
         if self.isMaximized():
             self.subWindow.show()
+            # self.restoreDockWidget(self.subWindow)
+            # self.subWindow.resize(QtCore.QSize(909, 616))  # windowがfloatingしてるときはworkする。。
             self.subWindow.setFloating(False)
+            print('MAXIMIZED')
+        else:
+            print('not MAXIMIZED')
+
+        # print('isMaximized in resize: ' + str(self.isMaximized()))
 
     def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
@@ -679,8 +686,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
                 os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
 
-            # self.showSubWindow(self.geometry, self.framesize)
-
             # GUI
             # self.GUIwhenScripting(False)
             if self.devices['3Dsensors'].conn:
@@ -839,26 +844,28 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         mainWidth = self.frameGeometry().width()
         mainHeight = self.frameGeometry().height()
 
-
-        if self.subWindow.isFloating():
-            if self.isMaximized():
-                print('isMaximized: ' + str(self.isMaximized()))
-            # self.showNormal()
+        # if self.isMaximized():
+        #     if self.subWindow.isFloating() or self.subWindow.isHidden():
+        #         self.showNormal()
+        #         self.setMinimumWidth(540)
+        #         self.setMaximumWidth(self.minimumWidth())
+        #         self.setGeometry(posX, posY, self.minimumWidth(), 756)
+        #         print('isFloating: ' + str(self.subWindow.isFloating()))
+        #         print('isHidden: ' + str(self.subWindow.isHidden()))
+        #         print('isMaximized: ' + str(self.isMaximized()))
+        #         print('-----')
+        # else:
+        if self.subWindow.isFloating() or self.subWindow.isHidden():
+            self.showNormal()
             self.setMinimumWidth(540)
             self.setMaximumWidth(self.minimumWidth())
             self.setGeometry(posX, posY, self.minimumWidth(), 756)
             print('isFloating: ' + str(self.subWindow.isFloating()))
+            print('isHidden: ' + str(self.subWindow.isHidden()))
             print('isMaximized: ' + str(self.isMaximized()))
             print('-----')
-        elif self.subWindow.isHidden():
-            # self.showNormal()
-            self.setMinimumWidth(540)
-            self.setMaximumWidth(self.minimumWidth())
-            self.setGeometry(posX, posY, self.minimumWidth(), 756)
-            print('isHidden: ' + str(self.subWindow.isHidden()))
-            print('-----')
         else:
-            # self.showNormal()
+            self.showNormal()
             self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
             self.setMaximumWidth(geometry.width())
             self.setGeometry(posX, posY, self.minimumWidth(), max(mainHeight, self.sensorWinHeight))
