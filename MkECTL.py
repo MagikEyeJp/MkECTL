@@ -122,6 +122,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # self.move(geometry.width() / 2 - framesize.width() / 2, geometry.height() / 2 - framesize.height() / 2)
         self.move(self.geometry.width() / 2 - self.framesize.width(),
                   self.geometry.height() / 2 - self.framesize.height() / 2)
+        self.maxWinWidth = self.size().width()
+        self.maxWinHeight = self.size().height()
+        self.isMaxWinSize = False
 
         # variables
         self.params = {}  # motorDic
@@ -228,13 +231,22 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.setUIStatus(self.states)
 
     def resizeEvent(self, QResizeEvent):
-        if self.isMaximized():
+        if self.isMaximized() and self.size().width() >= self.maxWinWidth \
+                and self.size().height() >= self.maxWinHeight:
             self.subWindow.show()
             # self.restoreDockWidget(self.subWindow)
             # self.subWindow.resize(QtCore.QSize(909, 616))  # windowがfloatingしてるときはworkする。。
-            self.subWindow.setFloating(False)
+            # self.subWindow.setFloating(False)
+            self.subWindow.setFeatures(QtWidgets.QDockWidget.NoDockWidgetFeatures)
+
+            self.maxWinWidth = self.size().width()
+            self.maxWinHeight = self.size().height()
+            self.isMaxWinSize = True
             print('MAXIMIZED')
         else:
+            self.subWindow.setFeatures(QtWidgets.QDockWidget.DockWidgetClosable | QtWidgets.QDockWidget.DockWidgetFloatable)
+
+            self.isMaxWinSize = False
             print('not MAXIMIZED')
 
         # print('isMaximized in resize: ' + str(self.isMaximized()))
@@ -820,7 +832,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                                 geometry.height() / 2 - framesize.height() / 3)
             self.subWindow_isOpen = True
         self.restoreDockWidget(self.subWindow)
-        self.subWindow.resize(QtCore.QSize(909, 616))   # windowがfloatingしてるときはworkする。。
+        # self.subWindow.resize(QtCore.QSize(909, 616))   # windowがfloatingしてるときはworkする。。
 
     def openIR(self):
 
@@ -844,17 +856,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         mainWidth = self.frameGeometry().width()
         mainHeight = self.frameGeometry().height()
 
-        # if self.isMaximized():
-        #     if self.subWindow.isFloating() or self.subWindow.isHidden():
-        #         self.showNormal()
-        #         self.setMinimumWidth(540)
-        #         self.setMaximumWidth(self.minimumWidth())
-        #         self.setGeometry(posX, posY, self.minimumWidth(), 756)
-        #         print('isFloating: ' + str(self.subWindow.isFloating()))
-        #         print('isHidden: ' + str(self.subWindow.isHidden()))
-        #         print('isMaximized: ' + str(self.isMaximized()))
-        #         print('-----')
-        # else:
         if self.subWindow.isFloating() or self.subWindow.isHidden():
             self.showNormal()
             self.setMinimumWidth(540)
@@ -863,15 +864,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             print('isFloating: ' + str(self.subWindow.isFloating()))
             print('isHidden: ' + str(self.subWindow.isHidden()))
             print('isMaximized: ' + str(self.isMaximized()))
+            print('isMaxWinSize: ' + str(self.isMaxWinSize))
+            print('minimumWidth: ' + str(self.minimumWidth()))
             print('-----')
         else:
             self.showNormal()
-            self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
+            # self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
+            self.setMinimumWidth(1040)
             self.setMaximumWidth(geometry.width())
             self.setGeometry(posX, posY, self.minimumWidth(), max(mainHeight, self.sensorWinHeight))
             print('isFloating: ' + str(self.subWindow.isFloating()))
             print('isHidden: ' + str(self.subWindow.isHidden()))
             print('isMaximized: ' + str(self.isMaximized()))
+            print('minimumWidth: ' + str(self.minimumWidth()))
             print('-----')
 
 
@@ -1025,10 +1030,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def sensorChanged(self, connected):
         print('changed')
         # if connected:
-        #     self.states = {UIState.SENSOR_CONNECTED}
-        #     self.setUIStatus(self.states)
+        #     # self.states = {UIState.SENSOR_CONNECTED}
+        #     # self.setUIStatus(self.states)
         # else:
-        #     self.setUIStatus(self.states)
+        #     # self.setUIStatus(self.states)
 
 
 

@@ -235,8 +235,6 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         else:
             self.IPaddress = self.RPiaddress
 
-        # self.connectToSensor()
-
 
     def changeShutter(self):
         if self.ui_s.shutterLineEdit.text() == '':
@@ -293,7 +291,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.changeISO()
             self.setLaser('0x0000')
 
-            self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor and set parameter values')
+            self.ui_s.cameraStatusLabel.setText('Successfully connected to sensor and set parameter values')
             # get smid
             stats = self.sensor.get_stats()
             print(stats)

@@ -13,6 +13,9 @@
   <property name="floating">
    <bool>false</bool>
   </property>
+  <property name="features">
+   <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetFloatable</set>
+  </property>
   <property name="allowedAreas">
    <set>Qt::RightDockWidgetArea</set>
   </property>
@@ -42,6 +45,9 @@
          <widget class="QLabel" name="cameraStatusLabel">
           <property name="text">
            <string>CAMERA STATE</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
