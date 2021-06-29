@@ -494,7 +494,7 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                 if isAborted(scriptParams, mainWindow):
                     return mainWindow.stopClicked
 
-                @timeout(5)
+                @timeout(8)
                 def waitmove():
                     nonlocal minerr
                     nonlocal cnt
