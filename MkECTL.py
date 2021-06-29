@@ -549,7 +549,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', previousScriptDir, '*.txt')
 
         if fileName == '':  # when cancel pressed
-            pass
+            self.scriptParams.scriptName[num-1] = fileName
+            self.scriptParams.commandNum[num - 1] = 0
+            self.scriptParams.commandNum_total = 0
         else:
             ini.updatePreviousScriptPath(previousScript_iniFile, fileName)
             self.scriptParams.currentScript = num
@@ -565,7 +567,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.scriptParams.commandNum[num-1] = execute_script.countCommandNum(self.scriptParams, [], [])
 
             self.scriptParams.commandNum_total = sum(self.scriptParams.commandNum)
-            self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
+        self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
 
     def delete2ndScript(self):
         self.scriptParams.scriptName[1] = ''
@@ -679,6 +681,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
             self.openScriptFile(1)
+        if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
+            return
 
         if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
             os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
