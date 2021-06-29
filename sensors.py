@@ -471,8 +471,16 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
 
     def selectDirectory(self):
-        self.captureDirPath = QtWidgets.QFileDialog.getExistingDirectory(self)
-        self.ui_s.saveDirecoryName.setText(self.captureDirPath)
+        foldername = QtWidgets.QFileDialog.getExistingDirectory(self)
+        if foldername == '':  # when cancel pressed
+            if self.captureDirPath == '':
+                self.captureDirPath = foldername
+                self.ui_s.saveDirecoryName.setText(self.captureDirPath)
+            else:
+                pass
+        else:
+            self.captureDirPath = foldername
+            self.ui_s.saveDirecoryName.setText(self.captureDirPath)
 
 
     def getImg(self, frames):
