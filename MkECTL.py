@@ -549,9 +549,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', previousScriptDir, '*.txt')
 
         if fileName == '':  # when cancel pressed
-            self.scriptParams.scriptName[num-1] = fileName
-            self.scriptParams.commandNum[num - 1] = 0
-            self.scriptParams.commandNum_total = 0
+            if self.scriptParams.scriptName[num-1] == '':
+                self.ui.scriptName_label.setText('')
+                self.scriptParams.scriptName[num-1] = fileName
+                self.scriptParams.commandNum[num - 1] = 0
+                self.scriptParams.commandNum_total = 0
+            else:
+                pass
         else:
             ini.updatePreviousScriptPath(previousScript_iniFile, fileName)
             self.scriptParams.currentScript = num
