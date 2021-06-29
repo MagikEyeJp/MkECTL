@@ -12,6 +12,7 @@ import datetime
 import math
 # from pygame import mixer
 from playsound import playsound
+from timeout_decorator import timeout, TimeoutError
 
 import MyDoubleSpinBox
 import motordic
@@ -81,7 +82,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         ### docking test https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
         self.subWindow = sensors.SensorWindow(mainUI=self)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.subWindow)
-        self.subWindow.setFloating(False)
         self.sensorWinWidth = self.subWindow.frameGeometry().width()
         self.sensorWinHeight = self.subWindow.frameGeometry().height()
 
@@ -123,6 +123,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # self.move(geometry.width() / 2 - framesize.width() / 2, geometry.height() / 2 - framesize.height() / 2)
         self.move(self.geometry.width() / 2 - self.framesize.width(),
                   self.geometry.height() / 2 - self.framesize.height() / 2)
+        self.maxWinWidth = self.size().width()
+        self.maxWinHeight = self.size().height()
+        self.isMaxWinSize = False
 
         # variables
         self.params = {}  # motorDic
@@ -190,8 +193,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.selectMachineFileButton.clicked.connect(self.selectMachine)
 
         # Sensor window detached
-        self.subWindow.topLevelChanged.connect(self.changeMainWinSize)
-        self.subWindow.visibilityChanged.connect(self.changeMainWinSize)
+        self.subWindow.topLevelChanged.connect(lambda: self.changeMainWinSize(self.geometry))
+        self.subWindow.visibilityChanged.connect(lambda: self.changeMainWinSize(self.geometry))
 
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
@@ -227,6 +230,41 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
+
+    def resizeEvent(self, QResizeEvent):
+        if self.isMaximized() and (self.size().width() >= self.maxWinWidth \
+                or self.size().height() >= self.maxWinHeight):
+            self.isMaxWinSize = True
+            if self.subWindow.isHidden():
+                self.showSubWindow(self.geometry, self.framesize)
+            if self.subWindow.isFloating():
+                self.subWindow.setFloating(False)
+            self.subWindow.setFeatures(QtWidgets.QDockWidget.NoDockWidgetFeatures)
+
+            self.maxWinWidth = self.size().width()
+            self.maxWinHeight = self.size().height()
+            # print(self.size())
+            # print(self.maxWinWidth)
+            # print(self.maxWinHeight)
+            # print(self.isMaximized())
+            # print('MAXIMIZED')
+        else:
+            self.isMaxWinSize = False
+            self.subWindow.setFeatures(QtWidgets.QDockWidget.DockWidgetClosable | QtWidgets.QDockWidget.DockWidgetFloatable)
+            if self.isMaximized():
+                self.showNormal()
+                self.setMinimumWidth(1040)
+                self.setMaximumWidth(self.geometry.width())
+            # print(self.size())
+            # print(self.maxWinWidth)
+            # print(self.maxWinHeight)
+            # print(self.isMaximized())
+            # print('isFloating: ' + str(self.subWindow.isFloating()))
+            # print('isHidden: ' + str(self.subWindow.isHidden()))
+            # print('isMaximized: ' + str(self.isMaximized()))
+            # print('not MAXIMIZED')
+
+        # print('isMaximized in resize: ' + str(self.isMaximized()))
 
     def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
@@ -409,9 +447,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.initializeProgressBar.setValue(0.0)
 
             initialError = 0.0
-            totalInitialErrors: float = 0.0
-            currentError = 0.0
             percentToGoal: float = 0.0
+            prevPercentToGoal: float = 0.0
 
             motorID = buttonName.replace('MoveExe', '')
             m = self.motors[motorID]
@@ -421,27 +458,46 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # m.speed(self.motorGUI['speedSpin'][motorID].value())
             m.moveTo(motorPos * scale)
 
-            initialError = pos
-            totalInitialErrors += initialError
+            initialError = pos - (motorPos * scale)
 
             while True:
                 error = 0.0
                 time.sleep(0.2)
 
-                (pos, vel, torque) = m.read_motor_measurement()
-                error = abs(pos - (motorPos * scale))
-                print(error)
 
-                currentError = pos
-                percentToGoal += currentError
-                percentToGoal /= totalInitialErrors if not totalInitialErrors == 0 else 1.0
-                percentToGoal *= 100
-                percentToGoal = 100 - percentToGoal
-                self.ui.initializeProgressBar.setValue(percentToGoal)
+                @timeout(5)
+                def comp_percent():
+                    nonlocal percentToGoal
+                    nonlocal initialError
+
+                    while True:
+                        time.sleep(7)
+                        (pos, vel, torque) = m.read_motor_measurement()
+                        error = abs(pos - (motorPos * scale))
+                        print(error)
+
+                        percentToGoal += error
+                        percentToGoal /= initialError if not initialError == 0 else 1.0
+                        percentToGoal *= 100
+                        percentToGoal = 100 - percentToGoal
+                        self.ui.initializeProgressBar.setValue(percentToGoal)
+
+                        if round(percentToGoal, 2) >= round(prevPercentToGoal, 2):
+                            break
+
+                try:
+                    comp_percent()
+                except TimeoutError:
+                    QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+                    self.ui.initializeProgressLabel.setText('Couldn\'t reach goal')
+                    break
+
                 if error < 0.1:
                     self.ui.initializeProgressBar.setValue(100.0)
                     self.ui.initializeProgressLabel.setText('Goal')
                     break
+
+                prevPercentToGoal = percentToGoal
                 percentToGoal = 0.0
 
             (pos, vel, torque) = m.read_motor_measurement()
@@ -493,7 +549,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', previousScriptDir, '*.txt')
 
         if fileName == '':  # when cancel pressed
-            pass
+            if self.scriptParams.scriptName[num-1] == '':
+                self.ui.scriptName_label.setText('')
+                self.scriptParams.scriptName[num-1] = fileName
+                self.scriptParams.commandNum[num - 1] = 0
+                self.scriptParams.commandNum_total = 0
+            else:
+                pass
         else:
             ini.updatePreviousScriptPath(previousScript_iniFile, fileName)
             self.scriptParams.currentScript = num
@@ -509,7 +571,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.scriptParams.commandNum[num-1] = execute_script.countCommandNum(self.scriptParams, [], [])
 
             self.scriptParams.commandNum_total = sum(self.scriptParams.commandNum)
-            self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
+        self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
 
     def delete2ndScript(self):
         self.scriptParams.scriptName[1] = ''
@@ -623,6 +685,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
             self.openScriptFile(1)
+        if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
+            return
 
         if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
             os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
@@ -674,8 +738,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
                 os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
-
-            # self.showSubWindow(self.geometry, self.framesize)
 
             # GUI
             # self.GUIwhenScripting(False)
@@ -811,7 +873,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                                 geometry.height() / 2 - framesize.height() / 3)
             self.subWindow_isOpen = True
         self.restoreDockWidget(self.subWindow)
-        self.subWindow.resize(QtCore.QSize(909, 616))   # windowがfloatingしてるときはworkする。。
+        # self.subWindow.resize(QtCore.QSize(909, 616))   # windowがfloatingしてるときはworkする。。
 
     def openIR(self):
 
@@ -829,16 +891,38 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
         self.scriptParams.isoValue = self.ui.isoValue.currentText()
 
-    def changeMainWinSize(self):
+    def changeMainWinSize(self, geometry):
         posX = self.pos().x()
         posY = self.pos().y()
         mainWidth = self.frameGeometry().width()
         mainHeight = self.frameGeometry().height()
+        # print('changeMainWinSize')
 
-        if self.subWindow.isFloating() or self.subWindow.isHidden():
-            self.setGeometry(posX, posY, self.minimumWidth(), 756)
-        else:
-            self.setGeometry(posX, posY, self.minimumWidth()+550, max(mainHeight, self.sensorWinHeight))
+        if not self.isMaxWinSize:
+            if self.subWindow.isFloating() or self.subWindow.isHidden():
+                self.showNormal()
+                self.setMinimumWidth(540)
+                self.setMaximumWidth(self.minimumWidth())
+                self.setGeometry(posX, posY, self.minimumWidth(), 756)
+                # print('isFloating: ' + str(self.subWindow.isFloating()))
+                # print('isHidden: ' + str(self.subWindow.isHidden()))
+                # print('isMaximized: ' + str(self.isMaximized()))
+                # print('isMaxWinSize: ' + str(self.isMaxWinSize))
+                # print('minimumWidth: ' + str(self.minimumWidth()))
+                # print('-----')
+            else:
+                self.showNormal()
+                # self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
+                self.setMinimumWidth(1040)
+                self.setMaximumWidth(geometry.width())
+                self.setGeometry(posX, posY, self.minimumWidth(), max(mainHeight, self.sensorWinHeight))
+                # print('isFloating: ' + str(self.subWindow.isFloating()))
+                # print('isHidden: ' + str(self.subWindow.isHidden()))
+                # print('isMaximized: ' + str(self.isMaximized()))
+                # print('minimumWidth: ' + str(self.minimumWidth()))
+                # print('-----')
+
+
 
     # ----- UI-related functions -----
     def GUIwhenScripting(self, bool):
@@ -989,10 +1073,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def sensorChanged(self, connected):
         print('changed')
         # if connected:
-        #     self.states = {UIState.SENSOR_CONNECTED}
-        #     self.setUIStatus(self.states)
+        #     # self.states = {UIState.SENSOR_CONNECTED}
+        #     # self.setUIStatus(self.states)
         # else:
-        #     self.setUIStatus(self.states)
+        #     # self.setUIStatus(self.states)
 
 
 
