@@ -71,6 +71,9 @@ class GetImageThread(threading.Thread):
         self.join()
         print("thread killed")
 
+    def change_frame(self, frame):
+        self.frame = frame
+
     def run(self):
         # i = 0
         while self.alive:
@@ -84,7 +87,7 @@ class GetImageThread(threading.Thread):
             img2 = img.get_image()
             self.image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
             self.pixmap = QtGui.QPixmap(self.image)
-            inmain(self.callback, self.pixmap)
+            inmain(self.callback, self.pixmap, self.image)
 
 class SensorWindowDock(QtWidgets.QDockWidget):  # https://teratail.com/questions/118024
     def __init__(self, parent=None, mainUI:IMainUI=None):
@@ -190,11 +193,11 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.setHex4dLaserButton.clicked.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
 
-        self.ui_s.consecutiveModeButton.clicked.connect(lambda: self.startGetImageThread(1))
-        self.ui_s.prev1Button.clicked.connect(lambda: self.startGetImageThread(1))
-        self.ui_s.prevAveButton.clicked.connect(lambda: self.startGetImageThread(self.frames))
-        self.ui_s.save1Button.clicked.connect(lambda: self.saveImg(1))
-        self.ui_s.saveAveButton.clicked.connect(lambda: self.saveImg(self.frames))
+        self.ui_s.consecutiveModeButton.clicked.connect(lambda: self.startGetImageThread(1, False))
+        self.ui_s.prev1Button.clicked.connect(lambda: self.startGetImageThread(1, False))
+        self.ui_s.prevAveButton.clicked.connect(lambda: self.startGetImageThread(self.frames, False))
+        self.ui_s.save1Button.clicked.connect(lambda: self.startGetImageThread(1, True))
+        self.ui_s.saveAveButton.clicked.connect(lambda: self.startGetImageThread(self.frames, True))
         self.ui_s.frameButton.clicked.connect(lambda: self.snap3D('sample.csv'))
 
         self.ui_s.selectDirectoryButton.clicked.connect(self.selectDirectory)
@@ -212,6 +215,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         # image
         self.img: QtGui.QPixmap() = None
         self.imgPath = ''
+        self.saveImgBool = False
 
         # 3D frame data
         self.csvPath = ''
@@ -256,6 +260,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         else:
             self.frames = int(self.ui_s.framesLineEdit.text())
             # print(self.frames)
+            print(self.getImg_thread)
+            if self.getImg_thread is not None:
+                if self.getImg_thread.alive:
+                    self.getImg_thread.change_frame(self.frames)
 
     def changeISO(self):
         if self.ui_s.ISOcombo.currentText() == "":
@@ -417,13 +425,14 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             #     print(setbit(self.decLaserPattern, i, int(laserpattern_print[15-i])))
 
 
-    def startGetImageThread(self, frames):
+    def startGetImageThread(self, frames, saveImgBool):
         self.frames = frames
+        self.saveImgBool = saveImgBool
 
         if self.getImg_thread.ended:
             self.getImg_thread.begin(frames)
 
-    def getImgCallback(self, pixmap):
+    def getImgCallback(self, pixmap, image):
         if pixmap != None:
             self.ui_s.sensorImage.setPixMap(pixmap)
             self.ui_s.sensorImage.show()
@@ -437,22 +446,21 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             else:
                 self.getImg_thread.end()
 
+                if self.saveImgBool:
+                    self.saveImg(image)
+
+
     def prevImg(self, frames):
         image, pixmap = self.getImg(frames)
         self.ui_s.sensorImage.setPixMap(pixmap)
         self.ui_s.sensorImage.show()
 
-    def saveImg(self, frames):
+    def saveImg(self, image):
         if self.captureDirPath == '':
             QtWidgets.QMessageBox.critical(self, "Folder not found",
                                            "Please specify a folder where captured imaged to be saved.")
         else:
-            image, pixmap = self.getImg(frames)
-            self.ui_s.sensorImage.setPixMap(pixmap)
-            self.ui_s.sensorImage.show()
-
             saveName = self.captureDirPath + '/img_' + str(self.imgCounter).zfill(4) + '.png'
-            self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
 
             if os.path.exists(saveName):
                 ans = QtWidgets.QMessageBox.question(self,'The file already exists',
@@ -467,6 +475,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             else:
                 image.save(saveName)
                 self.imgCounter += 1
+            self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
 
 
 
