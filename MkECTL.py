@@ -12,6 +12,7 @@ import datetime
 import math
 # from pygame import mixer
 from playsound import playsound
+from timeout_decorator import timeout, TimeoutError
 
 import MyDoubleSpinBox
 import motordic
@@ -32,11 +33,13 @@ class ScriptParams():
         self.now = datetime.datetime.now()
 
         self.execTwoScr: bool = False
-        self.scriptName: str = ''
-        self.scriptName_2: str = ''
-        self.commandNum_1: int = 0
-        self.commandNum_2: int = 0
+        self.maxScriptNum = 10
+        self.scriptName: list = [''] * self.maxScriptNum
+        # self.scriptName_2: str = ''
+        self.commandNum: list = [0] * self.maxScriptNum
+        # self.commandNum_2: int = 0
         self.commandNum_total: int = 0
+        self.currentScript: int = 1
         self.baseFolderName: str = 'data'
         self.subFolderName: str = self.now.strftime('%Y%m%d_%H%M%S')
         self.isContinue = False
@@ -71,6 +74,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         super(Ui, self).__init__(parent)
         self.ui = mainwindow_ui.Ui_mainwindow()
         self.ui.setupUi(self)
+        self.setStyleSheet("QMainWindow::separator{ background: darkgray; width: 1px; height: 1px; }")
         self.scriptParams = ScriptParams()
 
         # self.subWindow = sensors.SensorWindow(mainUI=self)
@@ -78,7 +82,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         ### docking test https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
         self.subWindow = sensors.SensorWindow(mainUI=self)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.subWindow)
-        self.subWindow.setFloating(False)
+        self.sensorWinWidth = self.subWindow.frameGeometry().width()
+        self.sensorWinHeight = self.subWindow.frameGeometry().height()
 
         self.initializeProcessFlag = False
 
@@ -118,6 +123,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # self.move(geometry.width() / 2 - framesize.width() / 2, geometry.height() / 2 - framesize.height() / 2)
         self.move(self.geometry.width() / 2 - self.framesize.width(),
                   self.geometry.height() / 2 - self.framesize.height() / 2)
+        self.maxWinWidth = self.size().width()
+        self.maxWinHeight = self.size().height()
+        self.isMaxWinSize = False
 
         # variables
         self.params = {}  # motorDic
@@ -184,6 +192,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.GoButton.clicked.connect(self.goToSavedPositions)
         self.ui.selectMachineFileButton.clicked.connect(self.selectMachine)
 
+        # Sensor window detached
+        self.subWindow.topLevelChanged.connect(lambda: self.changeMainWinSize(self.geometry))
+        self.subWindow.visibilityChanged.connect(lambda: self.changeMainWinSize(self.geometry))
+
         # Combo box event
         self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
 
@@ -218,6 +230,41 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
+
+    def resizeEvent(self, QResizeEvent):
+        if self.isMaximized() and (self.size().width() >= self.maxWinWidth \
+                or self.size().height() >= self.maxWinHeight):
+            self.isMaxWinSize = True
+            if self.subWindow.isHidden():
+                self.showSubWindow(self.geometry, self.framesize)
+            if self.subWindow.isFloating():
+                self.subWindow.setFloating(False)
+            self.subWindow.setFeatures(QtWidgets.QDockWidget.NoDockWidgetFeatures)
+
+            self.maxWinWidth = self.size().width()
+            self.maxWinHeight = self.size().height()
+            # print(self.size())
+            # print(self.maxWinWidth)
+            # print(self.maxWinHeight)
+            # print(self.isMaximized())
+            # print('MAXIMIZED')
+        else:
+            self.isMaxWinSize = False
+            self.subWindow.setFeatures(QtWidgets.QDockWidget.DockWidgetClosable | QtWidgets.QDockWidget.DockWidgetFloatable)
+            if self.isMaximized():
+                self.showNormal()
+                self.setMinimumWidth(1040)
+                self.setMaximumWidth(self.geometry.width())
+            # print(self.size())
+            # print(self.maxWinWidth)
+            # print(self.maxWinHeight)
+            # print(self.isMaximized())
+            # print('isFloating: ' + str(self.subWindow.isFloating()))
+            # print('isHidden: ' + str(self.subWindow.isHidden()))
+            # print('isMaximized: ' + str(self.isMaximized()))
+            # print('not MAXIMIZED')
+
+        # print('isMaximized in resize: ' + str(self.isMaximized()))
 
     def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
@@ -337,13 +384,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # GUI
         print('--initialization completed--')
         self.ui.initializeProgressBar.setValue(100)
-        # self.ui.initializeButton.setEnabled(False)
-        # self.ui.initializeProgressBar.setEnabled(False)
         self.ui.initializeProgressLabel.setText('Initialized all motors')
-        # self.ui.manualOperation.setEnabled(True)
-        # self.ui.IRlightControlGroup.setEnabled(True)
-        # self.ui.continueButton.setEnabled(True)
-        # self.ui.executeScript_button.setEnabled(True)
 
         self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
         self.setUIStatus(self.states)
@@ -361,8 +402,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def setSliderOrigin(self):
         m = self.motors['slider']
-        # m = self.params['slider']['cont']
-        # scale = self.params['slider']['scale']
         m.speed(10.0)
         m.maxTorque(1.0)
         m.runForward()
@@ -378,9 +417,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             else:
                 startTime = time.time()
 
-        m.free()
         m.presetPosition(0)
+        m.free()
         m.maxTorque(5.0)
+        self.ui.sliderPosSpin.setValue(0.0)
         print('preset current position as 0 mm')
         print('-- slider origin has been set --')
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
@@ -401,22 +441,64 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def exeButtonClicked(self, buttonName):
         # print(buttonName)  # type->str
         if re.search('.+MoveExe', buttonName):
+            self.ui.initializeProgressBar.setEnabled(True)
+            self.ui.initializeProgressLabel.setEnabled(True)
+            self.ui.initializeProgressLabel.setText('Moving...')
+            self.ui.initializeProgressBar.setValue(0.0)
+
+            initialError = 0.0
+            percentToGoal: float = 0.0
+            prevPercentToGoal: float = 0.0
+
             motorID = buttonName.replace('MoveExe', '')
             m = self.motors[motorID]
             scale = self.params[motorID]['scale']
             motorPos = self.motorGUI['posSpin'][motorID].value()
+            (pos, vel, torque) = m.read_motor_measurement()
             # m.speed(self.motorGUI['speedSpin'][motorID].value())
             m.moveTo(motorPos * scale)
+
+            initialError = pos - (motorPos * scale)
 
             while True:
                 error = 0.0
                 time.sleep(0.2)
 
-                (pos, vel, torque) = m.read_motor_measurement()
-                error = abs(pos - (motorPos * scale))
-                print(error)
-                if error < 0.1:
+
+                @timeout(5)
+                def comp_percent():
+                    nonlocal percentToGoal
+                    nonlocal initialError
+
+                    while True:
+                        time.sleep(7)
+                        (pos, vel, torque) = m.read_motor_measurement()
+                        error = abs(pos - (motorPos * scale))
+                        print(error)
+
+                        percentToGoal += error
+                        percentToGoal /= initialError if not initialError == 0 else 1.0
+                        percentToGoal *= 100
+                        percentToGoal = 100 - percentToGoal
+                        self.ui.initializeProgressBar.setValue(percentToGoal)
+
+                        if round(percentToGoal, 2) >= round(prevPercentToGoal, 2):
+                            break
+
+                try:
+                    comp_percent()
+                except TimeoutError:
+                    QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+                    self.ui.initializeProgressLabel.setText('Couldn\'t reach goal')
                     break
+
+                if error < 0.1:
+                    self.ui.initializeProgressBar.setValue(100.0)
+                    self.ui.initializeProgressLabel.setText('Goal')
+                    break
+
+                prevPercentToGoal = percentToGoal
+                percentToGoal = 0.0
 
             (pos, vel, torque) = m.read_motor_measurement()
             pos /= scale
@@ -428,7 +510,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         elif buttonName == 'presetExe':
             motorID = self.ui.presetMotorCombo.currentText()
             m = self.motors[motorID]
-            # m = self.params[motorID]['cont']
 
             scale = self.params[motorID]['scale']
             pos = float(self.ui.presetValue.text())
@@ -442,15 +523,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         for m in self.motors.values():
             m.reboot()
             m.close()
-
-        # GUI
-        # self.ui.initializeButton.setEnabled(True)
-        # self.ui.initializeProgressBar.setValue(0)
-        # self.ui.initializeProgressLabel.setText('Initializing motors...')
-        # self.ui.manualOperation.setEnabled(False)
-        # self.ui.IRlightControlGroup.setEnabled(False)
-        # self.ui.continueButton.setEnabled(False)
-        # self.ui.executeScript_button.setEnabled(False)
 
         self.states = {UIState.MACHINEFILE, UIState.INITIALIZE, UIState.IRLIGHT}
         self.setUIStatus(self.states)
@@ -477,29 +549,40 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', previousScriptDir, '*.txt')
 
         if fileName == '':  # when cancel pressed
-            pass
+            if self.scriptParams.scriptName[num-1] == '':
+                self.ui.scriptName_label.setText('')
+                self.scriptParams.scriptName[num-1] = fileName
+                self.scriptParams.commandNum[num - 1] = 0
+                self.scriptParams.commandNum_total = 0
+            else:
+                pass
         else:
             ini.updatePreviousScriptPath(previousScript_iniFile, fileName)
+            self.scriptParams.currentScript = num
 
             if num == 1:
                 self.ui.scriptName_label.setText(
                     os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
-                self.scriptParams.scriptName = fileName
-                self.scriptParams.commandNum_1 = execute_script.countCommandNum(self.scriptParams, [], [])
             else:
                 self.ui.scriptName_label_2.setText(os.path.basename(fileName))
-                self.scriptParams.scriptName_2 = fileName
-                self.scriptParams.commandNum_2 = execute_script.countCommandNum(self.scriptParams, [], [])
                 self.scriptParams.execTwoScr = True
 
-            self.scriptParams.commandNum_total = self.scriptParams.commandNum_1 + self.scriptParams.commandNum_2
-            self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
+            self.scriptParams.scriptName[num-1] = fileName
+            self.scriptParams.commandNum[num-1] = execute_script.countCommandNum(self.scriptParams, [], [])
+
+            self.scriptParams.commandNum_total = sum(self.scriptParams.commandNum)
+        self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
 
     def delete2ndScript(self):
-        self.scriptParams.scriptName_2 = ''
-        self.scriptParams.commandNum_2 = 0
+        self.scriptParams.scriptName[1] = ''
+        self.scriptParams.commandNum[1] = 0
+        if len(self.scriptParams.commandNum) >= 2:
+            self.scriptParams.commandNum[1] = 0
         self.ui.scriptName_label_2.setText('')
         self.scriptParams.execTwoScr = False
+
+        self.scriptParams.commandNum_total = sum(self.scriptParams.commandNum)
+        self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
 
     def openBaseFolder(self):
         fileName = \
@@ -527,7 +610,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def demo(self):
         demo_script = 'script/demo.txt'
-        self.scriptParams.scriptName = demo_script
+        self.scriptParams.scriptName[0] = demo_script
         self.ui.scriptName_label.setText(demo_script)
 
         if not os.path.exists(demo_script):
@@ -552,6 +635,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             if not interrupted:
                 QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "the demo file \nhave been completed.")
+
+        self.scriptParams.scriptName[0] = self.ui.scriptName_label.text()
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -588,18 +673,20 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                          qm.Yes | qm.No)
 
                     if ret == qm.Yes:
-                        self.scriptParams.scriptName = previouslyExecutedScript
+                        self.scriptParams.scriptName[0] = previouslyExecutedScript
                     elif ret == qm.No:
                         # self.scriptParams.scriptName = self.ui.scriptName_label.text()
                         pass
                     else:
                         return
-                self.ui.scriptName_label.setText(os.path.basename(self.scriptParams.scriptName))
+                self.ui.scriptName_label.setText(os.path.basename(self.scriptParams.scriptName[0]))
         else:
             self.scriptParams.isContinue = False
 
-        if self.scriptParams.scriptName == '':
+        if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
             self.openScriptFile(1)
+        if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
+            return
 
         if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
             os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
@@ -615,6 +702,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         self.setUIStatus(self.states)
 
+        ### EXECUTE
         interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
         if not self.scriptParams.execTwoScr:
@@ -630,25 +718,26 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
                 QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                              "\"%s\" \nhave been completed."
-                                                                                % os.path.basename(self.scriptParams.scriptName))
+                                                                                % os.path.basename(self.scriptParams.scriptName[self.scriptParams.currentScript - 1]))
 
 
     def run_2scripts(self, isContinue):
         if self.scriptParams.execTwoScr:
+            self.scriptParams.currentScript = 1
             self.run_script(isContinue)    # exec 1st script
 
             # -------- 2nd script -------
             # self.renewSubFolder()
+            print('***********************************************')
+            self.scriptParams.currentScript += 1
 
             self.scriptParams.isContinue = False
 
-            if self.scriptParams.scriptName_2 == '':
+            if self.scriptParams.scriptName[1] == '':
                 self.openScriptFile(2)
 
             if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
                 os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
-
-            # self.showSubWindow(self.geometry, self.framesize)
 
             # GUI
             # self.GUIwhenScripting(False)
@@ -658,6 +747,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.states = {UIState.SCRIPT_PROGRESS}
             self.setUIStatus(self.states)
 
+            ### EXECUTE
             interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
             # self.GUIwhenScripting(interrupted)
@@ -671,12 +761,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
                 QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "\"%s\" \nhave been completed."
-                                                % os.path.basename(self.scriptParams.scriptName_2))
+                                                % os.path.basename(self.scriptParams.scriptName[self.scriptParams.currentScript - 1]))
 
+            # self.scriptParams.scriptName = [''] * self.scriptParams.maxScriptNum
             pass  # will be updated later
 
         else:
             self.run_script(isContinue)
+            # self.scriptParams.scriptName = [''] * self.scriptParams.maxScriptNum
 
     def setHome(self):
         for m in self.devices['motors'].values():
@@ -715,7 +807,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 currentErrors[self.motorSet[param_i]] = pos
 
                 percentToGoal += currentErrors[self.motorSet[param_i]]
-            percentToGoal /= totalInitialErrors if not totalInitialErrors == 0 else 0.0
+            percentToGoal /= totalInitialErrors if not totalInitialErrors == 0 else 1.0
             percentToGoal *= 100
             percentToGoal = 100 - percentToGoal
             self.ui.initializeProgressBar.setValue(percentToGoal)
@@ -781,7 +873,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                                 geometry.height() / 2 - framesize.height() / 3)
             self.subWindow_isOpen = True
         self.restoreDockWidget(self.subWindow)
-        self.subWindow.resize(QtCore.QSize(909, 616))   # windowがfloatingしてるときはworkする。。
+        # self.subWindow.resize(QtCore.QSize(909, 616))   # windowがfloatingしてるときはworkする。。
 
     def openIR(self):
 
@@ -794,11 +886,43 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         self.IRLight.set(ch, state)
 
-
     def setMultiplier(self):
         self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
         self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
         self.scriptParams.isoValue = self.ui.isoValue.currentText()
+
+    def changeMainWinSize(self, geometry):
+        posX = self.pos().x()
+        posY = self.pos().y()
+        mainWidth = self.frameGeometry().width()
+        mainHeight = self.frameGeometry().height()
+        # print('changeMainWinSize')
+
+        if not self.isMaxWinSize:
+            if self.subWindow.isFloating() or self.subWindow.isHidden():
+                self.showNormal()
+                self.setMinimumWidth(540)
+                self.setMaximumWidth(self.minimumWidth())
+                self.setGeometry(posX, posY, self.minimumWidth(), 756)
+                # print('isFloating: ' + str(self.subWindow.isFloating()))
+                # print('isHidden: ' + str(self.subWindow.isHidden()))
+                # print('isMaximized: ' + str(self.isMaximized()))
+                # print('isMaxWinSize: ' + str(self.isMaxWinSize))
+                # print('minimumWidth: ' + str(self.minimumWidth()))
+                # print('-----')
+            else:
+                self.showNormal()
+                # self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
+                self.setMinimumWidth(1040)
+                self.setMaximumWidth(geometry.width())
+                self.setGeometry(posX, posY, self.minimumWidth(), max(mainHeight, self.sensorWinHeight))
+                # print('isFloating: ' + str(self.subWindow.isFloating()))
+                # print('isHidden: ' + str(self.subWindow.isHidden()))
+                # print('isMaximized: ' + str(self.isMaximized()))
+                # print('minimumWidth: ' + str(self.minimumWidth()))
+                # print('-----')
+
+
 
     # ----- UI-related functions -----
     def GUIwhenScripting(self, bool):
@@ -865,8 +989,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # self.ui.viewSensorWinButton.setEnabled(True)
             # self.subWindow.ui_s.setIPaddressButton.setEnabled(False)
             self.subWindow.ui_s.connectButton.setEnabled(False)
-            self.subWindow.ui_s.IPlineEdit.setEnabled(False)
+            self.subWindow.ui_s.IPComboBox.setEnabled(False)
             self.subWindow.ui_s.disconnectButton.setEnabled(True)
+            self.subWindow.ui_s.searchButton.setEnabled(False)
             self.subWindow.ui_s.cameraControlGroup.setEnabled(True)
             self.subWindow.ui_s.laserControlGroup.setEnabled(True)
             # self.subWindow.ui_s.gridButton.setEnabled(True)
@@ -874,8 +999,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             # self.subWindow.ui_s.setIPaddressButton.setEnabled(True)
             self.subWindow.ui_s.connectButton.setEnabled(True)
-            self.subWindow.ui_s.IPlineEdit.setEnabled(True)
+            self.subWindow.ui_s.IPComboBox.setEnabled(True)
             self.subWindow.ui_s.disconnectButton.setEnabled(False)
+            self.subWindow.ui_s.searchButton.setEnabled(True)
             self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
             self.subWindow.ui_s.laserControlGroup.setEnabled(False)
             # self.subWindow.ui_s.gridButton.setEnabled(False)
@@ -947,10 +1073,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def sensorChanged(self, connected):
         print('changed')
         # if connected:
-        #     self.states = {UIState.SENSOR_CONNECTED}
-        #     self.setUIStatus(self.states)
+        #     # self.states = {UIState.SENSOR_CONNECTED}
+        #     # self.setUIStatus(self.states)
         # else:
-        #     self.setUIStatus(self.states)
+        #     # self.setUIStatus(self.states)
 
 
 

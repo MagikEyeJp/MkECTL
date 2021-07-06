@@ -146,3 +146,12 @@ class SensorDevice:
                 return frame
         finally:
             mutex.release()
+
+
+    def get_stats(self):
+        stats = ""
+        if self.client:
+            mutex.acquire()
+            stats = self.client.get_stats()
+            mutex.release()
+        return stats

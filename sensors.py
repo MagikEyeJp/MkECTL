@@ -1,5 +1,8 @@
 # coding: utf-8
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets, QtGui
+from PyQt5.QtCore import Qt, QRect, QPoint, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtGui import QCursor
 import sys
 import re
 import os
@@ -9,14 +12,13 @@ import csv
 import numpy as np
 from timeout_decorator import TimeoutError
 import threading
-
-import socket
+import discoverdevices
 import SensorDevice
-
 import sensorwindow_ui
 import sensorwindow_dock_ui
-import ImageViewScene
 from IMainUI import IMainUI
+import PopupList
+import csv
 
 app = QtWidgets.qApp
 
@@ -69,6 +71,9 @@ class GetImageThread(threading.Thread):
         self.join()
         print("thread killed")
 
+    def change_frame(self, frame):
+        self.frame = frame
+
     def run(self):
         # i = 0
         while self.alive:
@@ -82,7 +87,7 @@ class GetImageThread(threading.Thread):
             img2 = img.get_image()
             self.image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
             self.pixmap = QtGui.QPixmap(self.image)
-            inmain(self.callback, self.pixmap)
+            inmain(self.callback, self.pixmap, self.image)
 
 class SensorWindowDock(QtWidgets.QDockWidget):  # https://teratail.com/questions/118024
     def __init__(self, parent=None, mainUI:IMainUI=None):
@@ -112,14 +117,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
         # thread
         self.getImg_thread = None
-        # self.getImg_thread = threading.Thread(target=lambda: self.prevImg(1))
-        # self.consecutive_thread = threading.Thread(target=lambda: self.prevImg(1))
-        # self.consecutiveMode = False
 
         # Variables (initialized with default values)
         self.IPaddress = '127.0.0.1'  # default
         self.portNum: int = 8888
-        self.RPiaddress = self.IPaddress + ':' + str(self.portNum)
         self.shutterSpeed: int = 30000
         self.frames: int = 5
         self.gainiso: int = 400    # value in the list of combo box
@@ -157,8 +158,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.alphaLineEdit.setValidator(QtGui.QIntValidator(0, 100, self))
 
         # Line edit textChanged
-        self.ui_s.IPlineEdit.setText(self.RPiaddress)
-        # self.ui_s.IPlineEdit.textChanged.connect(self.changeIPaddress)
+        # self.ui_s.IPComboBox.textChanged.connect(self.changeIPaddress)
         self.ui_s.shutterLineEdit.setText(str(self.shutterSpeed))
         self.ui_s.shutterLineEdit.textChanged.connect(self.changeShutter)
         self.ui_s.framesLineEdit.setText(str(self.frames))
@@ -177,13 +177,14 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.alphaLineEdit.textChanged.connect(self.showGrid)
 
         # Line edit returnPressed
-        self.ui_s.IPlineEdit.returnPressed.connect(self.changeIPaddress)
+        # self.ui_s.IPComboBox.change　.connect(self.changeIPaddress)
         self.ui_s.hex4dLineEdit.returnPressed.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
 
         # Push buttons
         self.ui_s.connectButton.clicked.connect(self.connectToSensor)
         self.ui_s.disconnectButton.clicked.connect(self.disconnectSensor)
+        self.ui_s.searchButton.clicked.connect(self.searchSensor)
         # self.ui_s.setIPaddressButton.clicked.connect(self.changeIPaddress)
         self.ui_s.evenLaserButton.clicked.connect(lambda: self.setLaser('0xAAAA'))
         self.ui_s.oddLaserButton.clicked.connect(lambda: self.setLaser('0x5555'))
@@ -192,11 +193,11 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.setHex4dLaserButton.clicked.connect\
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
 
-        self.ui_s.consecutiveModeButton.clicked.connect(lambda: self.startGetImageThread(1))
-        self.ui_s.prev1Button.clicked.connect(lambda: self.startGetImageThread(1))
-        self.ui_s.prevAveButton.clicked.connect(lambda: self.startGetImageThread(self.frames))
-        self.ui_s.save1Button.clicked.connect(lambda: self.saveImg(1))
-        self.ui_s.saveAveButton.clicked.connect(lambda: self.saveImg(self.frames))
+        self.ui_s.consecutiveModeButton.clicked.connect(lambda: self.startGetImageThread(1, False))
+        self.ui_s.prev1Button.clicked.connect(lambda: self.startGetImageThread(1, False))
+        self.ui_s.prevAveButton.clicked.connect(lambda: self.startGetImageThread(self.frames, False))
+        self.ui_s.save1Button.clicked.connect(lambda: self.startGetImageThread(1, True))
+        self.ui_s.saveAveButton.clicked.connect(lambda: self.startGetImageThread(self.frames, True))
         self.ui_s.frameButton.clicked.connect(lambda: self.snap3D('sample.csv'))
 
         self.ui_s.selectDirectoryButton.clicked.connect(self.selectDirectory)
@@ -214,6 +215,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         # image
         self.img: QtGui.QPixmap() = None
         self.imgPath = ''
+        self.saveImgBool = False
 
         # 3D frame data
         self.csvPath = ''
@@ -222,9 +224,12 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.cameraControlGroup.setEnabled(False)
         self.ui_s.laserControlGroup.setEnabled(False)
 
+        # smid dictionary
+        self.smidDic = None
+
 
     def changeIPaddress(self):
-        self.RPiaddress = self.ui_s.IPlineEdit.text()
+        self.RPiaddress = self.ui_s.IPComboBox.currentText()
         if ':' in self.RPiaddress:
             # https://teratail.com/questions/61914
             pattern = "(.*):(.*)"
@@ -233,8 +238,6 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.portNum = int(d.group(2))
         else:
             self.IPaddress = self.RPiaddress
-
-        self.connectToSensor()
 
 
     def changeShutter(self):
@@ -257,6 +260,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         else:
             self.frames = int(self.ui_s.framesLineEdit.text())
             # print(self.frames)
+            print(self.getImg_thread)
+            if self.getImg_thread is not None:
+                if self.getImg_thread.alive:
+                    self.getImg_thread.change_frame(self.frames)
 
     def changeISO(self):
         if self.ui_s.ISOcombo.currentText() == "":
@@ -274,12 +281,17 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
     def connectToSensor(self):
         # connect to sensors and display again
-        # self.sensor = SensorDevice.SensorDevice()
 
         try:
+            self.changeIPaddress()
             self.sensor = SensorDevice.SensorDevice()
-
             self.sensor.open(self.IPaddress, self.portNum)
+            i = self.ui_s.IPComboBox.findText(self.RPiaddress, Qt.MatchExactly)
+            while i >= 0:
+                self.ui_s.IPComboBox.removeItem(i)
+                i = self.ui_s.IPComboBox.findText(self.RPiaddress, Qt.MatchExactly)
+            self.ui_s.IPComboBox.insertItem(0, self.RPiaddress)
+            self.ui_s.IPComboBox.setCurrentIndex(0)
 
             # initialize values
             self.changeShutter()
@@ -287,13 +299,29 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.changeISO()
             self.setLaser('0x0000')
 
-            self.ui_s.cameraStatusLabel.setText('Successfully connected to a sensor and set parameter values')
+            self.ui_s.cameraStatusLabel.setText('Successfully connected to sensor and set parameter values')
+            # get smid
+            stats = self.sensor.get_stats()
+            print(stats)
+            smid = stats.get("runtime_info", {}).get("sensor_discovery", {}).get("configured", {}).get("smid") if type(stats) == dict else None
+            print(smid)
+            self.ui_s.textSerial.setText(smid)
+
+            self.smidDictionary()
+            lblid = self.smidDic.get(smid)
+            self.ui_s.textLabelID.setText(lblid)
+            if lblid != None and len(lblid) > 0:
+                self.ui_s.textLabelID.setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}")
+            else:
+                self.ui_s.textLabelID.setStyleSheet("QLineEdit { background: rgb(255, 255, 0);}")
+
 
             # どうにかする
             # self.ui_s.setIPaddressButton.setEnabled(False)
             self.ui_s.connectButton.setEnabled(False)
-            self.ui_s.IPlineEdit.setEnabled(False)
+            self.ui_s.IPComboBox.setEnabled(False)
             self.ui_s.disconnectButton.setEnabled(True)
+            self.ui_s.searchButton.setEnabled(False)
             self.ui_s.cameraControlGroup.setEnabled(True)
             self.ui_s.laserControlGroup.setEnabled(True)
             # self.ui_s.gridButton.setEnabled(True)
@@ -304,14 +332,16 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.getImg_thread = GetImageThread(self.sensor, self.getImgCallback)
 
 
+
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
             QtWidgets.QMessageBox.warning(self, "Connection Failed", str(e))
             print(e)
             # self.ui_s.setIPaddressButton.setEnabled(True)
             self.ui_s.connectButton.setEnabled(True)
-            self.ui_s.IPlineEdit.setEnabled(True)
+            self.ui_s.IPComboBox.setEnabled(True)
             self.ui_s.disconnectButton.setEnabled(False)
+            self.ui_s.searchButton.setEnabled(True)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
 
@@ -334,10 +364,32 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor correctly.')
         finally:
             self.ui_s.connectButton.setEnabled(True)
-            self.ui_s.IPlineEdit.setEnabled(True)
+            self.ui_s.IPComboBox.setEnabled(True)
             self.ui_s.disconnectButton.setEnabled(False)
+            self.ui_s.searchButton.setEnabled(True)
             self.ui_s.cameraControlGroup.setEnabled(False)
             self.ui_s.laserControlGroup.setEnabled(False)
+
+    def searchSensor(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        list = discoverdevices.discover_devices()
+        QApplication.restoreOverrideCursor()
+        print(list)
+
+        sensorListWindow = PopupList.PopupList()
+        pos = self.ui_s.searchButton.mapToGlobal(QPoint(32, 24))
+        width = 240
+        height = 200
+        rect = QRect(pos.x() - width, pos.y(), width, height)
+        sensorListWindow.setGeometry(rect)
+        strlist = [list[key] + ":" + key for key in list]
+        sensorListWindow.setDic(list)
+        sensorListWindow.selected.connect(self.sensorListSelected)
+        sensorListWindow.show()
+
+    def sensorListSelected(self, name, adr):
+        print(name, adr)
+        self.ui_s.IPComboBox.setCurrentText(adr)
 
 
     def laser_custom(self):
@@ -373,29 +425,14 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             #     print(setbit(self.decLaserPattern, i, int(laserpattern_print[15-i])))
 
 
-    def startGetImageThread(self, frames):
-        # print(self.consecutive_thread.isDaemon())
-
-        # if self.ui_s.consecutiveModeButton.isChecked():
-        #     if not self.consecutive_thread.is_alive():
-        #         self.ui_s.cameraStatusLabel.setText("Consecutive Mode: ON")
-        #         self.consecutive_thread.start()
-        #         print(self.consecutive_thread.is_alive())
-        #
-        #     # self.ui_s.prev1Button.click()
-        #
-        # else:
-        #     if self.consecutive_thread.is_alive():
-        #         self.ui_s.cameraStatusLabel.setText("Consecutive Mode: OFF")
-        #         self.consecutive_thread.join()
-
+    def startGetImageThread(self, frames, saveImgBool):
         self.frames = frames
+        self.saveImgBool = saveImgBool
 
         if self.getImg_thread.ended:
             self.getImg_thread.begin(frames)
 
-    def getImgCallback(self, pixmap):
-        # pixmap = self.getImg(1)[1]
+    def getImgCallback(self, pixmap, image):
         if pixmap != None:
             self.ui_s.sensorImage.setPixMap(pixmap)
             self.ui_s.sensorImage.show()
@@ -409,22 +446,21 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             else:
                 self.getImg_thread.end()
 
+                if self.saveImgBool:
+                    self.saveImg(image)
+
+
     def prevImg(self, frames):
         image, pixmap = self.getImg(frames)
         self.ui_s.sensorImage.setPixMap(pixmap)
         self.ui_s.sensorImage.show()
 
-    def saveImg(self, frames):
+    def saveImg(self, image):
         if self.captureDirPath == '':
             QtWidgets.QMessageBox.critical(self, "Folder not found",
                                            "Please specify a folder where captured imaged to be saved.")
         else:
-            image, pixmap = self.getImg(frames)
-            self.ui_s.sensorImage.setPixMap(pixmap)
-            self.ui_s.sensorImage.show()
-
             saveName = self.captureDirPath + '/img_' + str(self.imgCounter).zfill(4) + '.png'
-            self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
 
             if os.path.exists(saveName):
                 ans = QtWidgets.QMessageBox.question(self,'The file already exists',
@@ -439,12 +475,21 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             else:
                 image.save(saveName)
                 self.imgCounter += 1
+            self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
 
 
 
     def selectDirectory(self):
-        self.captureDirPath = QtWidgets.QFileDialog.getExistingDirectory(self)
-        self.ui_s.saveDirecoryName.setText(self.captureDirPath)
+        foldername = QtWidgets.QFileDialog.getExistingDirectory(self)
+        if foldername == '':  # when cancel pressed
+            if self.captureDirPath == '':
+                self.captureDirPath = foldername
+                self.ui_s.saveDirecoryName.setText(self.captureDirPath)
+            else:
+                pass
+        else:
+            self.captureDirPath = foldername
+            self.ui_s.saveDirecoryName.setText(self.captureDirPath)
 
 
     def getImg(self, frames):
@@ -455,26 +500,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         img2 = img.get_image()
         image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
         pixmap = QtGui.QPixmap(image)
-        # print(type(image))
-        # print(type(img2))
         # img3 = Image.new('L', (len(img2[0]), len(img2)))
         # img3.show()
         return image, pixmap
-
-
-        # self.scene.setPixMap(pixmap)
-
-        # self.ui_s.sensorImage.setFixedSize(len(img2[0]), len(img2))
-        # self.ui_s.sensorImage.resize(pixmap.size())
-        # self.ui_s.sensorImage.setBaseSize(len(img2[0]), len(img2))
-        # self.ui_s.sensorImage.setSceneRect(0, 0, len(img2[0]), len(img2))
-        # self.ui_s.sensorImage.fitInView(self.scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
-        # self.scene.fitImage()
-
-    #######
-        # self.ui_s.sensorImage.setPixMap(pixmap)
-        # self.ui_s.sensorImage.show()
-
 
     def resetCounter(self):
         self.imgCounter = 0
@@ -521,6 +549,19 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
         self.ui_s.sensorImage.setGridParameter(self.ui_s.sensorImage.gridParam)
         self.ui_s.sensorImage.setGridVisible(self.ui_s.gridGroup.isChecked())
+
+
+    def smidDictionary(self):
+        DicFile = "smid_dictionary.csv"
+        if type(self.smidDic) != dict or len(self.smidDic) == 0:
+            # read smid dictionary
+            self.smidDic = {}
+            with open(DicFile, newline='') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    self.smidDic[row['smid']] = row['lblid']
+        print(self.smidDic)
+
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

@@ -146,11 +146,14 @@ class Systate():
 
     class PastParameters():
         def __init__(self):
-            self.pos = [0, 0, 0]
-            self.shutter = 0
-            self.gainiso = 0
-            self.lasers = 0
-            self.light = [0, 0]
+            self.reset()
+
+        def reset(self):
+            self.pos = [-1, -1, -1]
+            self.shutter = -1
+            self.gainiso = -1
+            self.lasers = -1
+            self.light = [-1, -1]
 
 
 systate = Systate()
@@ -168,12 +171,12 @@ def isAborted(scriptParams, mainWindow):
         print('Interrupted')
         if not isDemo:
             ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
-                                 scriptParams.scriptName)
+                                 scriptParams.scriptName[scriptParams.currentScript - 1])
         return mainWindow.stopClicked
 
 def countCommandNum(scriptParams, args_hist, com_hist):
 
-    f = open(scriptParams.scriptName)
+    f = open(scriptParams.scriptName[scriptParams.currentScript - 1])
     lines = f.read().splitlines()
     f.close()
 
@@ -218,6 +221,9 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
     systate.seqn = 0
     # devices: motors, lights, 3D sensors(sensor window)
     # params: motorDic
+
+    systate.past_parameters.reset()
+    print(vars(systate.past_parameters))
 
     args_hist: list = []
     com_hist: list = []
@@ -277,7 +283,7 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
 
     # ---------- update ini file ----------
     if not isDemo:
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName[scriptParams.currentScript - 1])
     # ------------------------------
     return False
 
@@ -488,7 +494,7 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
                 if isAborted(scriptParams, mainWindow):
                     return mainWindow.stopClicked
 
-                @timeout(5)
+                @timeout(8)
                 def waitmove():
                     nonlocal minerr
                     nonlocal cnt
