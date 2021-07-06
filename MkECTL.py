@@ -15,6 +15,7 @@ from playsound import playsound
 from timeout_decorator import timeout, TimeoutError
 
 import MyDoubleSpinBox
+from M_Keigan import KeiganMotor
 import motordic
 import mainwindow_ui
 import execute_script
@@ -127,8 +128,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.maxWinHeight = self.size().height()
         self.isMaxWinSize = False
 
-        # variables
+        # motor
         self.params = {}  # motorDic
+
+        self.motor = None
 
         self.motorSet = ['slider', 'pan', 'tilt']
         self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
@@ -319,9 +322,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeProgressBar.setValue(count)
 
         if "motors" in self.machineParams:
-            self.params = motordic.getMotorDic(self.machineParams["motors"])
+            self.motor = KeiganMotor()
+            self.params = self.motor.getMotorDic(self.machineParams["motors"])
         else:
-            self.params = motordic.getMotorDic()
+            self.params = KeiganMotor.getMotorDic()
 
         for p in self.params.values():  # https://note.nkmk.me/python-dict-in-values-items/
 
