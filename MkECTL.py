@@ -133,7 +133,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         self.motorSet = ['slider', 'pan', 'tilt']
         self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
-        self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
+        # self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
+        self.motors = None  # instance of M_KeiganRobot
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
         self.subWindow_isOpen = False
         self.states = set()
