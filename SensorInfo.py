@@ -5,18 +5,21 @@ import csv
 # SensorInfo Class
 class SensorInfo:
     def __init__(self):
-        self.cameraType = ""
-        self.serialNumber = ""
-        self.moduleType = ""
-        self.labelNumber = ""
         self._smidDic = None
+        self.clear()
 
     def __del__(self):
         pass
 
+    def clear(self):
+        self.cameraType = ""
+        self.serialNumber = ""
+        self.moduleType = ""
+        self.labelNumber = ""
+
     @property
     def smid(self):
-        return self.cameraType + ":" + self.serialNumber
+        return self.cameraType + ":" + self.serialNumber if len(self.cameraType) > 0 or len(self.serialNumber) > 0 else ""
     
     @smid.setter
     def smid(self, value):
@@ -28,7 +31,7 @@ class SensorInfo:
 
     @property
     def labelid(self):
-        return self.moduleType + "_" + self.labelNumber
+        return self.moduleType + "_" + self.labelNumber if len(self.moduleType) > 0 or len(self.labelNumber) > 0 else ""
 
     @labelid.setter
     def labelid(self, value):
