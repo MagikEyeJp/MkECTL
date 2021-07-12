@@ -471,7 +471,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                     nonlocal initialError
 
                     while True:
-                        time.sleep(7)
+                        # time.sleep(7)
                         (pos, vel, torque) = m.read_motor_measurement()
                         error = abs(pos - (motorPos * scale))
                         print(error)
