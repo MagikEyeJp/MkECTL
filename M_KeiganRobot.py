@@ -1,4 +1,4 @@
-from IMotor import IMotor
+from IMotorRobot import IMotorRobot
 
 import KMControllersS, KMControllersS_dummy
 
@@ -22,7 +22,7 @@ defaultMotors = {
     }
 }
 
-class KeiganMotor(IMotor):
+class KeiganMotorRobot(IMotorRobot):
     def __init__(self):
         # super(KeiganMotor, self).__init__(parent)
         self.slider = None

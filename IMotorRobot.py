@@ -1,5 +1,5 @@
 
-class IMotor:
+class IMotorRobot:
 
     def getMotorDic(self, motors):
         pass

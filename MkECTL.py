@@ -15,7 +15,7 @@ from playsound import playsound
 from timeout_decorator import timeout, TimeoutError
 
 import MyDoubleSpinBox
-from M_Keigan import KeiganMotor
+from M_KeiganRobot import KeiganMotorRobot
 import motordic
 import mainwindow_ui
 import execute_script
@@ -322,10 +322,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeProgressBar.setValue(count)
 
         if "motors" in self.machineParams:
-            self.motor = KeiganMotor()
+            self.motor = KeiganMotorRobot()
             self.params = self.motor.getMotorDic(self.machineParams["motors"])
         else:
-            self.params = KeiganMotor.getMotorDic()
+            self.params = KeiganMotorRobot.getMotorDic()
 
         for p in self.params.values():  # https://note.nkmk.me/python-dict-in-values-items/
 
