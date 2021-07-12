@@ -131,8 +131,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # motor
         self.params = {}  # motorDic
 
-        self.motor = None
-
         self.motorSet = ['slider', 'pan', 'tilt']
         self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
         self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
@@ -314,6 +312,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def initializeMotors(self):
         count = 0
 
+        # GUI
         print('Initialize Button was clicked')
         self.ui.initializeProgressBar.setEnabled(True)
         self.ui.initializeProgressLabel.setEnabled(True)
@@ -321,56 +320,18 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         count += 10
         self.ui.initializeProgressBar.setValue(count)
 
+        # Motor
         if "motors" in self.machineParams:
-            self.motor = KeiganMotorRobot()
-            self.params = self.motor.getMotorDic(self.machineParams["motors"])
+            self.motors = KeiganMotorRobot(self.machineParams["motors"])
         else:
-            self.params = KeiganMotorRobot.getMotorDic()
+            self.motors = KeiganMotorRobot()
 
-        for p in self.params.values():  # https://note.nkmk.me/python-dict-in-values-items/
-
-            m = p['cont']
-            m.enable()
-            m.interface(8)  # USB
-
-            m.speed(self.motorGUI['speedSpin'][p['id']].value())
-            print(p['id'] + 'speed  = ' + str(self.motorGUI['speedSpin'][p['id']].value()) + 'rad/s')
-
-            self.motors[p['id']] = m  # member valuable of class
-
-            count += 30
-            time.sleep(0.2)
-            self.ui.initializeProgressBar.setValue(count)
+        self.motors.getMotorDic()
+        self.ui.initializeProgressBar.setValue(40)
+        self.motors.initializeMotors()
+        self.ui.initializeProgressBar.setValue(80)
 
         self.devices['motors'] = self.motors
-
-        # set motor initial parametors
-        m = self.motors['slider']
-        m.enable()
-        m.curveType(1)
-        m.maxSpeed(250)
-        m.acc(8)
-        m.dec(8)
-        m.speed(20)
-        m.maxTorque(5)
-
-        m = self.motors['pan']
-        m.enable()
-        m.curveType(1)
-        m.maxSpeed(250)
-        m.acc(3)
-        m.dec(2)
-        m.speed(40)
-        m.maxTorque(5)
-
-        m = self.motors['tilt']
-        m.enable()
-        m.curveType(1)
-        m.maxSpeed(250)
-        m.acc(12)
-        m.dec(4)
-        m.speed(40)
-        m.maxTorque(5)
 
         # IR light
         if "IRLight" in self.machineParams:
@@ -475,7 +436,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                     nonlocal initialError
 
                     while True:
-                        time.sleep(7)
+                        # time.sleep(7)
                         (pos, vel, torque) = m.read_motor_measurement()
                         error = abs(pos - (motorPos * scale))
                         print(error)
