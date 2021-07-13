@@ -592,7 +592,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.setUIStatus(self.states)
             # self.GUIwhenScripting(False)
 
-            interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self, True)
+            interrupted = execute_script.execute_script(self.scriptParams, self.devices, self, True)
 
             self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
             self.setUIStatus(self.states)
@@ -667,7 +667,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.setUIStatus(self.states)
 
         ### EXECUTE
-        interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
+        interrupted = execute_script.execute_script(self.scriptParams, self.devices, self)
 
         if not self.scriptParams.execTwoScr:
             if self.devices['3Dsensors'].conn:
@@ -710,7 +710,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.setUIStatus(self.states)
 
             ### EXECUTE
-            interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
+            interrupted = execute_script.execute_script(self.scriptParams, self.devices, self)
 
             if self.devices['3Dsensors'].conn:
                 self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
