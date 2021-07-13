@@ -85,6 +85,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.subWindow)
         self.sensorWinWidth = self.subWindow.frameGeometry().width()
         self.sensorWinHeight = self.subWindow.frameGeometry().height()
+        self.subWindow_isOpen = False
 
         self.initializeProcessFlag = False
 
@@ -129,15 +130,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.isMaxWinSize = False
 
         # motor
-        self.params = {}  # motorDic
-
         self.motorSet = ['slider', 'pan', 'tilt']
-        self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
-        # self.motors: dict = {}  # 'slider', 'pan', 'tilt' (may not have to be a member val)
-        self.motors = None  # instance of M_KeiganRobot
+        self.motorRobot = None  # instance of M_KeiganRobot
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
-        self.subWindow_isOpen = False
+
         self.states = set()
+
+        self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
 
         if not os.path.exists(self.scriptParams.baseFolderName):
             os.makedirs(self.scriptParams.baseFolderName)
@@ -323,16 +322,17 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # Motor
         if "motors" in self.machineParams:
-            self.motors = KeiganMotorRobot(self.machineParams["motors"])
+            self.motorRobot = KeiganMotorRobot(self.machineParams["motors"])
         else:
-            self.motors = KeiganMotorRobot()
+            self.motorRobot = KeiganMotorRobot()
 
-        self.motors.getMotorDic()
+        self.motorRobot.getMotorDic()
         self.ui.initializeProgressBar.setValue(40)
-        self.motors.initializeMotors()
+
+        self.motorRobot.initializeMotors()
         self.ui.initializeProgressBar.setValue(80)
 
-        self.devices['motors'] = self.motors
+        self.devices['motors'] = self.motorRobot.params
 
         # IR light
         if "IRLight" in self.machineParams:
@@ -356,18 +356,15 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.setUIStatus(self.states)
 
     def getCurrentPos(self):
-        for motorname in self.motorSet:
-            m = self.motors[motorname]
+        for id, p in self.motorRobot.params.items():
+            m = p['cont']
             (pos, vec, tor) = m.read_motor_measurement()
-            # exeCode = 'self.ui.%sCurrentPos.setText(str(pos))' % motorname
-            # exec(exeCode)
-            scale = self.params[motorname]['scale']
+            scale = p['scale']
             pos /= scale
-            self.motorGUI['currentPosLabel'][motorname].setText('{:.2f}'.format(pos))
-
+            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
 
     def setSliderOrigin(self):
-        m = self.motors['slider']
+        m = self.motorRobot.slider
         m.speed(10.0)
         m.maxTorque(1.0)
         m.runForward()
@@ -375,8 +372,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         startTime = time.time()
         while True:
             (pos, vel, torque) = m.read_motor_measurement()
-            # print(torque)
-            # print(vel)
             if vel < 0.1:
                 if time.time() - startTime > 2.0:
                     break
@@ -387,25 +382,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         m.free()
         m.maxTorque(5.0)
         self.ui.sliderPosSpin.setValue(0.0)
-        print('preset current position as 0 mm')
-        print('-- slider origin has been set --')
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
 
     def freeAllMotors(self):
-        for m in self.motors.values():
-            m.free()
+        for p in self.motorRobot.params.values():
+            p['cont'].free()
         QtWidgets.QMessageBox.information(self, "free", "All motors have been freed.")
 
-        # print('--free completed--')
-
     def updateSpeed(self, speedSpinName):
-        # print(speedSpinName)
         motorID = speedSpinName.replace('SpeedSpin', '')
-        m = self.motors[motorID]
+        m = self.motorRobot.params[motorID]['cont']
         m.speed(self.motorGUI['speedSpin'][motorID].value())
 
     def exeButtonClicked(self, buttonName):
-        # print(buttonName)  # type->str
         if re.search('.+MoveExe', buttonName):
             self.ui.initializeProgressBar.setEnabled(True)
             self.ui.initializeProgressLabel.setEnabled(True)
@@ -417,8 +406,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             prevPercentToGoal: float = 0.0
 
             motorID = buttonName.replace('MoveExe', '')
-            m = self.motors[motorID]
-            scale = self.params[motorID]['scale']
+            p = self.motorRobot.params[motorID]
+            m = p['cont']
+            scale = p['scale']
             motorPos = self.motorGUI['posSpin'][motorID].value()
             (pos, vel, torque) = m.read_motor_measurement()
             # m.speed(self.motorGUI['speedSpin'][motorID].value())
@@ -475,18 +465,18 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         elif buttonName == 'presetExe':
             motorID = self.ui.presetMotorCombo.currentText()
-            m = self.motors[motorID]
+            m = self.motorRobot.params[motorID]['cont']
 
-            scale = self.params[motorID]['scale']
+            scale = self.motorRobot.params[motorID]['scale']
             pos = float(self.ui.presetValue.text())
             m.presetPosition(pos * scale)
 
             self.motorGUI['posSpin'][motorID].setValue(pos)
-
             self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(pos))
 
     def rebootButtonClicked(self):
-        for m in self.motors.values():
+        for p in self.motorRobot.params.values():
+            m = p['cont']
             m.reboot()
             m.close()
 
@@ -590,7 +580,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
             self.setUIStatus(self.states)
-            # self.GUIwhenScripting(False)
 
             interrupted = execute_script.execute_script(self.scriptParams, self.devices, self, True)
 
@@ -732,12 +721,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # self.scriptParams.scriptName = [''] * self.scriptParams.maxScriptNum
 
     def setHome(self):
-        for m in self.devices['motors'].values():
+        for id, p in self.motorRobot.params.items():
+            m = p['cont']
             m.presetPosition(0.0)
-            self.motorGUI['posSpin'][self.get_key_from_value(self.devices['motors'], m)].setValue(0.0)
 
-            self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText(
-                '{:.2f}'.format(0.0))
+            self.motorGUI['posSpin'][id].setValue(0.0)
+            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(0.0))
 
     def goToHomePosition(self):
         print('Going Home')
@@ -751,15 +740,15 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         currentErrors: dict = {}
         percentToGoal: float = 0.0
 
-        for mname in self.motorSet:
-            m = self.motors[mname]
+        for id, p in self.motorRobot.params.items():
+            m = p['cont']
             (pos, vel, torque) = m.read_motor_measurement()
-            initialErrors[mname] = pos
-            totalInitialErrors += initialErrors[mname]
+            initialErrors[id] = pos
+            totalInitialErrors += initialErrors[id]
 
         while True:
-            for param_i in range(len(self.motors)):
-                m = self.motors[self.motorSet[param_i]]
+            for param_i in range(len(self.motorRobot.params)):
+                m = self.motorRobot.params[self.motorSet[param_i]]['cont']
                 m.moveTo(0.0)
                 time.sleep(0.2)
                 app.processEvents()
@@ -779,9 +768,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 break
             percentToGoal = 0.0
 
-        for m in self.devices['motors'].values():
-            self.motorGUI['currentPosLabel'][self.get_key_from_value(self.devices['motors'], m)].setText(
-                '{:.2f}'.format(0.0))
+        for id in self.motorRobot.params.keys():
+            self.motorGUI['posSpin'][id].setValue(0.0)
+            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(0.0))
 
     def savePositions(self):
         save_name = ''
@@ -795,6 +784,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def goToSavedPositions(self):
         targetPos = self.ui.savedPosCombo.currentText().split()  # list
+        targetPos_d = {'slider': float(targetPos[0]), 'pan': float(targetPos[1]), 'tilt': float(targetPos[2])}
 
         scale = []
         pos = [0.0, 0.0, 0.0]
@@ -802,8 +792,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         torque = [0.0, 0.0, 0.0]
 
         for i in range(len(self.motorSet)):
-            self.devices['motors'][self.motorSet[i]].moveTo_scaled(float(targetPos[i]))
-            scale.append(self.params[self.motorSet[i]]['scale'])
+            self.motorRobot.params[self.motorSet[i]]['cont'].moveTo_scaled(float(targetPos[i]))
+            scale.append(self.motorRobot.params[self.motorSet[i]]['scale'])
             self.motorGUI['currentPosLabel'][self.motorSet[i]].setText('{:.2f}'.format(float(targetPos[i])))
 
         while True:
@@ -812,19 +802,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 time.sleep(0.2)
 
                 (pos[param_i], vel[param_i], torque[param_i]) = \
-                    self.devices['motors'][self.motorSet[param_i]].read_motor_measurement()
+                    self.motorRobot.params[self.motorSet[param_i]]['cont'].read_motor_measurement()
                 errors += pow(pos[param_i] - (float(targetPos[param_i]) * scale[param_i]), 2)
 
             if math.sqrt(errors) < 0.1:
                 break
 
-        for i in range(len(self.motorSet)):
-            self.motorGUI['currentPosLabel'][self.motorSet[i]].setText('{:.2f}'.format(float(targetPos[i])))
+        for id in self.motorRobot.params.keys():
+            self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
+            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
         if self.subWindow.conn:
             self.subWindow.prevImg(1)
 
     def showSubWindow(self, geometry, framesize):
-
         if self.subWindow_isOpen:
             self.subWindow.activateWindow()
             self.subWindow.show()
@@ -837,14 +827,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # self.subWindow.resize(QtCore.QSize(909, 616))   # windowがfloatingしてるときはworkする。。
 
     def openIR(self):
-
         message = self.IRLight.open()
         self.devices['lights'] = self.IRLight
 
         self.ui.IRstateLabel.setText(message)
 
     def IRlightControl(self, ch, state):
-
         self.IRLight.set(ch, state)
 
     def setMultiplier(self):
@@ -865,12 +853,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.setMinimumWidth(540)
                 self.setMaximumWidth(self.minimumWidth())
                 self.setGeometry(posX, posY, self.minimumWidth(), 756)
-                # print('isFloating: ' + str(self.subWindow.isFloating()))
-                # print('isHidden: ' + str(self.subWindow.isHidden()))
-                # print('isMaximized: ' + str(self.isMaximized()))
-                # print('isMaxWinSize: ' + str(self.isMaxWinSize))
-                # print('minimumWidth: ' + str(self.minimumWidth()))
-                # print('-----')
             else:
                 self.showNormal()
                 # self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
@@ -880,6 +862,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 # print('isFloating: ' + str(self.subWindow.isFloating()))
                 # print('isHidden: ' + str(self.subWindow.isHidden()))
                 # print('isMaximized: ' + str(self.isMaximized()))
+                # print('isMaxWinSize: ' + str(self.isMaxWinSize))
                 # print('minimumWidth: ' + str(self.minimumWidth()))
                 # print('-----')
 
@@ -982,7 +965,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def interrupt(self):
         self.stopClicked = True
-        # self.close()
 # ==================================================================
 
 # ----- Select machine -----
@@ -1001,6 +983,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
             # self.ui.initializeButton.setEnabled(True)
+
 # ==================================================================
     def sensorChanged(self, connected):
         print('changed')
@@ -1009,8 +992,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         #     # self.setUIStatus(self.states)
         # else:
         #     # self.setUIStatus(self.states)
-
-
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

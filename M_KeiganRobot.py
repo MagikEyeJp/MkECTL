@@ -55,6 +55,7 @@ class KeiganMotorRobot(IMotorRobot):
         # super(KeiganMotor, self).__init__(parent)
         self.machineParams_m = machineParams_m
 
+        # cont
         self.slider = None
         self.pan = None
         self.tilt = None
@@ -116,7 +117,7 @@ class KeiganMotorRobot(IMotorRobot):
             exec('self.%s = p[\'cont\']' % id)
             exec('self.%s.enable()' % id)
             exec('self.%s.interface(8)' % id)
-            print(self.slider)
+            # print(self.slider)
 
             for initKey, initPar in initialParameters[id].items():
                 execCode: str = 'self.%s.%s(%d)' % (id, initKey, initPar)
