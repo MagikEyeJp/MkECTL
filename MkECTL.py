@@ -596,7 +596,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
             self.setUIStatus(self.states)
-            # self.GUIwhenScripting(True)
 
             if not interrupted:
                 QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
@@ -660,7 +659,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.showSubWindow(self.geometry, self.framesize)
 
         # GUI
-        # self.GUIwhenScripting(False)
         if self.devices['3Dsensors'].conn:
             self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
         else:
@@ -672,7 +670,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
         if not self.scriptParams.execTwoScr:
-            # self.GUIwhenScripting(interrupted)
             if self.devices['3Dsensors'].conn:
                 self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
             else:
@@ -706,7 +703,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
 
             # GUI
-            # self.GUIwhenScripting(False)
             if self.devices['3Dsensors'].conn:
                 self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
             else:
@@ -716,7 +712,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             ### EXECUTE
             interrupted = execute_script.execute_script(self.scriptParams, self.devices, self.params, self)
 
-            # self.GUIwhenScripting(interrupted)
             if self.devices['3Dsensors'].conn:
                 self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
             else:
@@ -888,36 +883,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 # print('minimumWidth: ' + str(self.minimumWidth()))
                 # print('-----')
 
-
-
     # ----- UI-related functions -----
-    def GUIwhenScripting(self, bool):
-        # in Robot Control Group
-        for m in self.motorSet:
-            self.motorGUI['exe'][m].setEnabled(bool)
-            self.motorGUI['posSpin'][m].setEnabled(bool)
-            self.motorGUI['speedSpin'][m].setEnabled(bool)
-        self.ui.savedPosCombo.setEnabled(bool)
-        self.ui.saveButton.setEnabled(bool)
-        self.ui.goHomeButton.setEnabled(bool)
-        self.ui.setAsHomeButton.setEnabled(bool)
-
-        # in IR light Control Group
-        self.ui.onL1Button.setEnabled(bool)
-        self.ui.offL1Button.setEnabled(bool)
-        self.ui.onL2Button.setEnabled(bool)
-        self.ui.offL2Button.setEnabled(bool)
-
-        # in Script Group
-        self.ui.Scripting_groupBox.setEnabled(not bool)
-
-        self.ui.continueButton.setEnabled(bool)
-        self.ui.executeScript_button.setEnabled(bool)
-        self.ui.selectScript_toolButton.setEnabled(bool)
-        self.ui.selectBaseFolder_toolButton.setEnabled(bool)
-        self.ui.renewSubFolder_toolButton.setEnabled(bool)
-        self.ui.selectSubFolder_toolButton.setEnabled(bool)
-
     def setUIStatus(self, status):
         if UIState.MACHINEFILE in status:
             self.ui.selectMachineFileButton.setEnabled(True)
