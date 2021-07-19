@@ -405,13 +405,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             percentToGoal: float = 0.0
             prevPercentToGoal: float = 0.0
 
-            motorID = buttonName.replace('MoveExe', '')
-            p = self.motorRobot.params[motorID]
+            motor_id = buttonName.replace('MoveExe', '')
+            p = self.motorRobot.params[motor_id]
             m = p['cont']
             scale = p['scale']
-            motorPos = self.motorGUI['posSpin'][motorID].value()
+            motorPos = self.motorGUI['posSpin'][motor_id].value()
             (pos, vel, torque) = m.read_motor_measurement()
-            # m.speed(self.motorGUI['speedSpin'][motorID].value())
+            # m.speed(self.motorGUI['speedSpin'][motor_id].value())
             m.moveTo(motorPos * scale)
 
             initialError = pos - (motorPos * scale)
@@ -458,21 +458,21 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             (pos, vel, torque) = m.read_motor_measurement()
             pos /= scale
-            self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(pos))
+            self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(pos))
 
             if self.subWindow.conn:
                 self.subWindow.prevImg(1)
 
         elif buttonName == 'presetExe':
-            motorID = self.ui.presetMotorCombo.currentText()
-            m = self.motorRobot.params[motorID]['cont']
+            motor_id = self.ui.presetMotorCombo.currentText()
+            m = self.motorRobot.params[motor_id]['cont']
 
-            scale = self.motorRobot.params[motorID]['scale']
+            scale = self.motorRobot.params[motor_id]['scale']
             pos = float(self.ui.presetValue.text())
             m.presetPosition(pos * scale)
 
-            self.motorGUI['posSpin'][motorID].setValue(pos)
-            self.motorGUI['currentPosLabel'][motorID].setText('{:.2f}'.format(pos))
+            self.motorGUI['posSpin'][motor_id].setValue(pos)
+            self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(pos))
 
     def rebootButtonClicked(self):
         for p in self.motorRobot.params.values():
@@ -748,16 +748,17 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             totalInitialErrors += initialErrors[id]
 
         while True:
-            for param_i in range(len(self.motorRobot.params)):
-                m = self.motorRobot.params[self.motorSet[param_i]]['cont']
+            for id, p in self.motorRobot.params.items():
+                m = p['cont']
                 m.moveTo(0.0)
                 time.sleep(0.2)
                 app.processEvents()
 
                 (pos, vel, torque) = m.read_motor_measurement()
-                currentErrors[self.motorSet[param_i]] = pos
+                currentErrors[id] = pos
 
-                percentToGoal += currentErrors[self.motorSet[param_i]]
+                percentToGoal += currentErrors[id]
+
             percentToGoal /= totalInitialErrors if not totalInitialErrors == 0 else 1.0
             percentToGoal *= 100
             percentToGoal = 100 - percentToGoal
@@ -787,31 +788,39 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         targetPos = self.ui.savedPosCombo.currentText().split()  # list
         targetPos_d = {'slider': float(targetPos[0]), 'pan': float(targetPos[1]), 'tilt': float(targetPos[2])}
 
-        scale = []
-        pos = [0.0, 0.0, 0.0]
-        vel = [0.0, 0.0, 0.0]
-        torque = [0.0, 0.0, 0.0]
+        # # scale = []
+        # # pos = [0.0, 0.0, 0.0]
+        # pos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        # # vel = [0.0, 0.0, 0.0]
+        # vel_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        # # torque = [0.0, 0.0, 0.0]
+        # torque_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        #
+        # for id, p in self.motorRobot.params.items():
+        #     p['cont'].moveTo_scaled(targetPos_d[id])
+        #
+        # while True:
+        #     errors = 0.0
+        #     for id, p in self.motorRobot.params.items():
+        #         time.sleep(0.2)
+        #
+        #         (pos_d[id], vel_d[id], torque_d[id]) = p['cont'].read_motor_measurement()
+        #         errors += pow(pos_d[id] - (float(targetPos_d[id]) * p['scale']), 2)
+        #
+        #         self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(float(pos_d[id] / p['scale'])))
+        #
+        #     if math.sqrt(errors) < 0.1:
+        #         break
 
-        for i in range(len(self.motorSet)):
-            self.motorRobot.params[self.motorSet[i]]['cont'].moveTo_scaled(float(targetPos[i]))
-            scale.append(self.motorRobot.params[self.motorSet[i]]['scale'])
-            self.motorGUI['currentPosLabel'][self.motorSet[i]].setText('{:.2f}'.format(float(targetPos[i])))
-
-        while True:
-            errors = 0.0
-            for param_i in range(len(self.motorSet)):
-                time.sleep(0.2)
-
-                (pos[param_i], vel[param_i], torque[param_i]) = \
-                    self.motorRobot.params[self.motorSet[param_i]]['cont'].read_motor_measurement()
-                errors += pow(pos[param_i] - (float(targetPos[param_i]) * scale[param_i]), 2)
-
-            if math.sqrt(errors) < 0.1:
-                break
+        pos_d = self.motorRobot.goToTargetPos(targetPos_d)
+        # pos_d_next = next(pos_d)
+        for id in targetPos_d.keys():
+            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(next(pos_d)[id]))
+        # self.motorRobot.goToTargetPos(targetPos_d)
 
         for id in self.motorRobot.params.keys():
             self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
-            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
+            # self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
         if self.subWindow.conn:
             self.subWindow.prevImg(1)
 

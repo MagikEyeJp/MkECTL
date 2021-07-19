@@ -6,3 +6,6 @@ class IMotorRobot:
 
     def initializeMotors(self):
         pass
+
+    def goToTargetPos(self, targetPos, callback):
+        pass

@@ -7,6 +7,11 @@ import glob
 import re
 import random
 import time
+import math
+from timeout_decorator import timeout, TimeoutError
+import numpy as np
+from qtutils import inmain
+
 
 defaultMotors = {
     "slider": {
@@ -124,6 +129,70 @@ class KeiganMotorRobot(IMotorRobot):
                 exec(execCode)
 
             time.sleep(0.2)
+
+    def goToTargetPos(self, targetPos, callback):
+        # pos: dict ('slider', 'pan', 'tilt')
+
+        pos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        vel_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        torque_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+
+        minerr = 999999.0  # とりあえず大きい数
+        cnt = 0
+        GOAL_EPS = 0.002  # 目標位置到達誤差しきい値
+        GOAL_CNT = 5  # 目標位置到達判定回数
+
+        for id, p in self.params.items():
+            p['cont'].moveTo_scaled(targetPos[id])
+
+        # systate.pos = motorPos
+
+        while True:
+            # if isAborted(scriptParams, mainWindow):
+            #     return mainWindow.stopClicked
+
+            @timeout(8)
+            def waitmove():
+                nonlocal minerr
+                nonlocal cnt
+                err = 0.0
+                while True:
+                    time.sleep(0.2)
+                    errors = 0.0
+
+                    for id, p in self.params.items():
+                        (pos_d[id], vel_d[id], torque_d[id]) = p['cont'].read_motor_measurement()
+                        errors += pow(pos_d[id] - (targetPos[id] * p['scale']), 2)
+                        err = math.sqrt(errors)
+                        pos_d[id] /= p['scale']
+
+                        # display Current Pos
+                        # mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
+                        #     pos[param_i] / scale[param_i]))
+                    # yield pos_d
+
+                    if err < GOAL_EPS:
+                        print("err=", err)
+                        cnt += 1
+                        if cnt > GOAL_CNT:
+                            break
+                    else:
+                        cnt = 0
+
+                    if err < minerr:
+                        # print("err=", err)
+                        minerr = err  # 最小値更新
+                        break
+                return err, pos_d
+
+            err, pos_d = waitmove()
+            print("err=", err)
+            yield pos_d
+
+            if cnt > GOAL_CNT:
+                # raise StopIteration()
+                break
+                # return
 
 # class KeiganMotor(KMControllersS.USBController):
 #     def __init__(self, parent=None):
