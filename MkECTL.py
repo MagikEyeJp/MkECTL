@@ -650,6 +650,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # GUI
         if self.devices['3Dsensors'].conn:
             self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+            self.devices['3Dsensors'].sensorInfo.save_to_file(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName + "/sensorinfo.json")
         else:
             self.states = {UIState.SCRIPT_PROGRESS}
 

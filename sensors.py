@@ -19,6 +19,7 @@ import sensorwindow_dock_ui
 from IMainUI import IMainUI
 import PopupList
 import csv
+from SensorInfo import SensorInfo
 
 app = QtWidgets.qApp
 
@@ -113,6 +114,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         # connection
         self.conn = False
         self.sensor = SensorDevice.SensorDevice()
+        self.sensorInfo = SensorInfo()
         # print(self.sensor)
 
         # thread
@@ -224,9 +226,6 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.cameraControlGroup.setEnabled(False)
         self.ui_s.laserControlGroup.setEnabled(False)
 
-        # smid dictionary
-        self.smidDic = None
-
 
     def changeIPaddress(self):
         self.RPiaddress = self.ui_s.IPComboBox.currentText()
@@ -307,8 +306,11 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             print(smid)
             self.ui_s.textSerial.setText(smid)
 
-            self.smidDictionary()
-            lblid = self.smidDic.get(smid)
+            self.sensorInfo.clear()
+            self.sensorInfo.smid = smid
+            self.sensorInfo.labelid_from_smid()
+
+            lblid = self.sensorInfo.labelid
             self.ui_s.textLabelID.setText(lblid)
             if lblid != None and len(lblid) > 0:
                 self.ui_s.textLabelID.setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}")
