@@ -3,6 +3,7 @@ numpy
 pyserial
 imageio
 timeout-decorator
+PyGObject
 playsound
 qtutils
 ssdpy

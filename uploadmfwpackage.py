@@ -40,6 +40,8 @@ def execCmdline():
 
     # upload
     manifest = {"camera_type": s.cameraType, "serial_number": s.serialNumber, "module_type": s.moduleType, "version": version}
+    # cmd = f"pymkess_storage -d remove_package -m '{json.dumps(manifest)}'"
+    # print(cmd, subprocess.call(cmd, shell=True))
     cmd = f"pymkess_storage -d add_package -i {packagefile} -m '{json.dumps(manifest)}'"
     print(cmd, subprocess.call(cmd, shell=True))
 

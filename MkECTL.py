@@ -13,6 +13,9 @@ import math
 # from pygame import mixer
 from playsound import playsound
 from timeout_decorator import timeout, TimeoutError
+import json
+import subprocess
+import shutil
 
 import MyDoubleSpinBox
 import motordic
@@ -92,6 +95,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.continueButton.setEnabled(False)
         self.ui.executeScript_button.setEnabled(False)
         self.ui.Scripting_groupBox.setEnabled(False)
+
+        # config file
+        self.configIniFile = 'data/MkECTL.ini'
 
         # IR light
         self.isPortOpen = True
@@ -191,6 +197,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.saveButton.clicked.connect(self.savePositions)
         self.ui.GoButton.clicked.connect(self.goToSavedPositions)
         self.ui.selectMachineFileButton.clicked.connect(self.selectMachine)
+        self.ui.postProcFileBtn.clicked.connect(self.openPostProcFile)
+        self.ui.postProcEditBtn.clicked.connect(self.editPostProcParam)
+        self.ui.postProcClearLogBtn.clicked.connect(self.clearPostProcLog)
 
         # Sensor window detached
         self.subWindow.topLevelChanged.connect(lambda: self.changeMainWinSize(self.geometry))
@@ -214,9 +223,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
 
         # before Initialize
+        self.restoreConfig()
+
         self.machineParams = {}
         self.previousMachineIni = 'data/previousMachine.ini'
-        self.previousMachineFilePath = ''
         if os.path.exists(self.previousMachineIni):
             self.previousMachineFilePath = ini.getPreviousMachineFile(self.previousMachineIni)
             if os.path.exists(self.previousMachineFilePath):
@@ -230,6 +240,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
+
+    def restoreConfig(self):
+        if os.path.exists(self.configIniFile):
+            # postproc file
+            self.previousPostProcFilePath = ini.getPreviousPostProcFile(self.configIniFile)
+            self.readPostProcFile()
+
 
     def resizeEvent(self, QResizeEvent):
         if self.isMaximized() and (self.size().width() >= self.maxWinWidth \
@@ -424,6 +441,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         print('preset current position as 0 mm')
         print('-- slider origin has been set --')
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
+        m.moveTo(10.0)
+        self.ui.sliderPosSpin.setValue(10.0)
+
 
     def freeAllMotors(self):
         for m in self.motors.values():
@@ -536,6 +556,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         elif motorID == 'pan' or 'tilt':
             self.ui.unitLabel.setText('deg')
 
+# --- Scripting
+
     def openScriptFile(self, num):  # https://www.xsim.info/articles/PySide/special-dialogs.html#OpenFile
         previousScriptPath = ''
         previousScriptDir = './script/'
@@ -604,6 +626,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.subFolderName_label.setText(os.path.basename(fileName))
             self.scriptParams.subFolderName = os.path.basename(fileName)
 
+    def dataOutFolder(self):
+        return self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName
+
     def renewSubFolder(self):
         self.scriptParams.renewSubFolderName()
         self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
@@ -655,11 +680,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                               + 'Log.ini'):
 
                 previouslyExecutedScriptName = os.path.basename(ini.loadIni(
-                    self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName))
+                    self.dataOutFolder()))
                 # previouslyExecutedScriptDir = os.path.dirname(ini.loadIni(
-                #     self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName))
+                #     self.dataOutFolder()))
                 previouslyExecutedScript = ini.loadIni(
-                    self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
+                    self.dataOutFolder())
 
                 qm = MyMessageBox()
 
@@ -688,8 +713,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
             return
 
-        if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
-            os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
+        if not os.path.exists(self.dataOutFolder()):
+            os.makedirs(self.dataOutFolder())
 
         self.showSubWindow(self.geometry, self.framesize)
 
@@ -697,7 +722,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # self.GUIwhenScripting(False)
         if self.devices['3Dsensors'].conn:
             self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
-            self.devices['3Dsensors'].sensorInfo.save_to_file(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName + "/sensorinfo.json")
+            self.devices['3Dsensors'].sensorInfo.save_to_file(self.dataOutFolder() + "/sensorinfo.json")
         else:
             self.states = {UIState.SCRIPT_PROGRESS}
 
@@ -717,6 +742,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             if not interrupted:
                 # mixer.music.play(1)
                 playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
+                if self.ui.PostProc_groupBox.isChecked():
+                    self.doPostProc()
                 QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                              "\"%s\" \nhave been completed."
                                                                                 % os.path.basename(self.scriptParams.scriptName[self.scriptParams.currentScript - 1]))
@@ -737,8 +764,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             if self.scriptParams.scriptName[1] == '':
                 self.openScriptFile(2)
 
-            if not os.path.exists(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName):
-                os.makedirs(self.scriptParams.baseFolderName + '/' + self.scriptParams.subFolderName)
+            if not os.path.exists(self.dataOutFolder()):
+                os.makedirs(self.dataOutFolder())
 
             # GUI
             # self.GUIwhenScripting(False)
@@ -923,6 +950,51 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 # print('minimumWidth: ' + str(self.minimumWidth()))
                 # print('-----')
 
+    # ----- Post Process -----
+
+    def readPostProcFile(self):
+        if os.path.exists(self.previousPostProcFilePath):
+            self.ui.postProcFilelabel.setText(os.path.basename(self.previousPostProcFilePath))
+            with open(self.previousPostProcFilePath) as f:
+                self.postproc = json.load(f)
+
+    def openPostProcFile(self):
+        (fileName, selectedFilter) = \
+            QtWidgets.QFileDialog.getOpenFileName(self, 'Select Post Process File', 'postproc', '*.json')
+
+        if fileName == '':  # when cancel pressed
+            pass
+        else:
+            self.previousPostProcFilePath = fileName
+            ini.updatePreviousPostProcFile(self.configIniFile, self.previousPostProcFilePath)
+            self.readPostProcFile()
+
+    def editPostProcParam(self):
+        subprocess.Popen(['xdg-open ' + self.previousPostProcFilePath], shell=True)
+
+    def clearPostProcLog(self):
+        self.ui.postProcLogTextEdit.clear()
+
+    def doPostProc(self):
+        self.ui.postProcLogTextEdit.append("exec postproc: " + self.dataOutFolder())
+
+        proc = subprocess.Popen(
+            'gnome-terminal --  bash -c "' +
+            self.postproc['program'] + ' ' + self.dataOutFolder() + ' ' + self.previousPostProcFilePath + ' ;exec bash"', shell=True)
+
+        # with subprocess.Popen(self.postproc['program'] + ' ' + self.dataOutFolder() + ' ' + self.previousPostProcFilePath,
+        #                       shell=True, encoding='UTF-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
+        # while True:
+        #         # バッファから1行読み込む.
+        #         line = proc.stdout.readline()
+        #         self.ui.postProcLogTextEdit.append(line)
+        #         proc.stdout.flush()
+        #         app.processEvents()
+        #
+        #
+        #         # バッファが空 + プロセス終了.
+        #         if not line and proc.poll() is not None:
+        #             break
 
 
     # ----- UI-related functions -----
