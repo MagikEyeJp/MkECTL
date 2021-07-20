@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -1103,9 +1103,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-431</y>
          <width>510</width>
-         <height>890</height>
+         <height>1120</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1120,17 +1120,23 @@
           <x>0</x>
           <y>0</y>
           <width>511</width>
-          <height>881</height>
+          <height>1101</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
          <item>
           <widget class="QGroupBox" name="robotControl">
            <property name="enabled">
             <bool>true</bool>
            </property>
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -2476,7 +2482,7 @@
          <item>
           <widget class="QGroupBox" name="IRlightControlGroup">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -2671,7 +2677,7 @@
          <item>
           <widget class="QGroupBox" name="Script_groupBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -3624,9 +3630,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox">
+          <widget class="QGroupBox" name="PostProc_groupBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -3634,7 +3640,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>100</height>
+             <height>300</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -3652,54 +3658,99 @@
            <property name="checked">
             <bool>false</bool>
            </property>
-           <widget class="QWidget" name="horizontalLayoutWidget">
+           <widget class="QWidget" name="verticalLayoutWidget">
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>50</y>
-              <width>481</width>
-              <height>31</height>
+              <y>20</y>
+              <width>491</width>
+              <height>381</height>
              </rect>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
-              <widget class="QLabel" name="label">
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Plain</enum>
-               </property>
+              <widget class="QLabel" name="PostProcFileLabel">
                <property name="text">
-                <string/>
+                <string>PostProcess Definition</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QToolButton" name="toolButton">
-               <property name="text">
-                <string/>
+              <layout class="QHBoxLayout" name="horizontalLayout_12">
+               <item>
+                <widget class="QLabel" name="postProcFilelabel">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Plain</enum>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="postProcFileBtn">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="resources.qrc">
+                   <normaloff>:/GUI_icons/049-folder-open.png</normaloff>:/GUI_icons/049-folder-open.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="postProcEditBtn">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="resources.qrc">
+                   <normaloff>:/GUI_icons/pen.png</normaloff>:/GUI_icons/pen.png</iconset>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QTextEdit" name="postProcLogTextEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/GUI_icons/049-folder-open.png</normaloff>:/GUI_icons/049-folder-open.png</iconset>
+               <property name="verticalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOn</enum>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
                </property>
               </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="postProcClearLogBtn">
+               <property name="text">
+                <string>Clear Log</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
-           </widget>
-           <widget class="QLabel" name="label_2">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>30</y>
-              <width>67</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Script</string>
-            </property>
            </widget>
           </widget>
          </item>
@@ -3717,7 +3768,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>22</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>

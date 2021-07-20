@@ -115,6 +115,13 @@ def getPreviousMachineFile(iniFile):
 
     return machineFilePath
 
+def getPreviousPostProcFile(iniFile):
+    config = configparser.ConfigParser()
+    config.read(iniFile)
+    machineFilePath = config.get('previous_postproc', 'postproc_file')
+
+    return machineFilePath
+
 def updatePreviousMachineFile(iniFile, machineFile):
     # update/generate previousMachine.ini
     config_ps = configparser.RawConfigParser()
@@ -122,6 +129,17 @@ def updatePreviousMachineFile(iniFile, machineFile):
     section = 'previous_machine'
     config_ps.add_section(section)
     config_ps.set(section, 'machine_file', machineFile)
+
+    with open(iniFile, 'w') as configfile:
+        config_ps.write(configfile)
+
+def updatePreviousPostProcFile(iniFile, postprocFile):
+    # update/generate previousMachine.ini
+    config_ps = configparser.RawConfigParser()
+
+    section = 'previous_postproc'
+    config_ps.add_section(section)
+    config_ps.set(section, 'postproc_file', postprocFile)
 
     with open(iniFile, 'w') as configfile:
         config_ps.write(configfile)
