@@ -136,7 +136,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         self.states = set()
 
-        self.devices: dict = {}  # 'motors', 'lights', '3Dsensors' etc.  # Dict of dictionaries
+        self.devices: dict = {}  # 'motors', 'robot', 'lights', '3Dsensors' etc.  # Dict of dictionaries
 
         if not os.path.exists(self.scriptParams.baseFolderName):
             os.makedirs(self.scriptParams.baseFolderName)
@@ -333,6 +333,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeProgressBar.setValue(80)
 
         self.devices['motors'] = self.motorRobot.params
+        self.devices['robot'] = self.motorRobot
 
         # IR light
         if "IRLight" in self.machineParams:
@@ -362,6 +363,15 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             scale = p['scale']
             pos /= scale
             self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
+
+    def changeMovRoboStatus(self, pos_d, initial_err, err):
+        for id, pos in pos_d.items():
+            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
+
+        if initial_err != 0:
+            progress = (1-(err / initial_err))*100
+            self.ui.initializeProgressBar.setValue(progress)
+
 
     def setSliderOrigin(self):
         m = self.motorRobot.slider
@@ -396,69 +406,36 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def exeButtonClicked(self, buttonName):
         if re.search('.+MoveExe', buttonName):
+            motor_id = buttonName.replace('MoveExe', '')
+            targetPos = self.motorGUI['posSpin'][motor_id].value()
+            targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+
+            for id, p in self.motorRobot.params.items():
+                if id == motor_id:
+                    targetPos_d[id] = targetPos
+                else:
+                    (pos, vel, torque) = p['cont'].read_motor_measurement()
+                    targetPos_d[id] = pos / p['scale']
+
             self.ui.initializeProgressBar.setEnabled(True)
             self.ui.initializeProgressLabel.setEnabled(True)
             self.ui.initializeProgressLabel.setText('Moving...')
             self.ui.initializeProgressBar.setValue(0.0)
 
-            initialError = 0.0
-            percentToGoal: float = 0.0
-            prevPercentToGoal: float = 0.0
+            isFinished = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
-            motor_id = buttonName.replace('MoveExe', '')
-            p = self.motorRobot.params[motor_id]
-            m = p['cont']
-            scale = p['scale']
-            motorPos = self.motorGUI['posSpin'][motor_id].value()
-            (pos, vel, torque) = m.read_motor_measurement()
-            # m.speed(self.motorGUI['speedSpin'][motor_id].value())
-            m.moveTo(motorPos * scale)
+            if isFinished:
+                for id in self.motorRobot.params.keys():
+                    self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
 
-            initialError = pos - (motorPos * scale)
-
-            while True:
-                error = 0.0
-                time.sleep(0.2)
-
-
-                @timeout(5)
-                def comp_percent():
-                    nonlocal percentToGoal
-                    nonlocal initialError
-
-                    while True:
-                        # time.sleep(7)
-                        (pos, vel, torque) = m.read_motor_measurement()
-                        error = abs(pos - (motorPos * scale))
-                        print(error)
-
-                        percentToGoal += error
-                        percentToGoal /= initialError if not initialError == 0 else 1.0
-                        percentToGoal *= 100
-                        percentToGoal = 100 - percentToGoal
-                        self.ui.initializeProgressBar.setValue(percentToGoal)
-
-                        if round(percentToGoal, 2) >= round(prevPercentToGoal, 2):
-                            break
-
-                try:
-                    comp_percent()
-                except TimeoutError:
-                    QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
-                    self.ui.initializeProgressLabel.setText('Couldn\'t reach goal')
-                    break
-
-                if error < 0.1:
-                    self.ui.initializeProgressBar.setValue(100.0)
+                    self.ui.initializeProgressBar.setValue(100)
                     self.ui.initializeProgressLabel.setText('Goal')
-                    break
-
-                prevPercentToGoal = percentToGoal
-                percentToGoal = 0.0
-
-            (pos, vel, torque) = m.read_motor_measurement()
-            pos /= scale
-            self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(pos))
+                    self.ui.initializeProgressBar.setEnabled(False)
+                    self.ui.initializeProgressLabel.setEnabled(False)
+                if self.subWindow.conn:
+                    self.subWindow.prevImg(1)
+            else:
+                QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
 
             if self.subWindow.conn:
                 self.subWindow.prevImg(1)
@@ -730,49 +707,28 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(0.0))
 
     def goToHomePosition(self):
-        print('Going Home')
+        targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+
         self.ui.initializeProgressBar.setEnabled(True)
         self.ui.initializeProgressLabel.setEnabled(True)
-        self.ui.initializeProgressLabel.setText('Moving motors to Home position...')
+        self.ui.initializeProgressLabel.setText('Going to origin...')
         self.ui.initializeProgressBar.setValue(0.0)
 
-        initialErrors: dict = {}
-        totalInitialErrors: float = 0.0
-        currentErrors: dict = {}
-        percentToGoal: float = 0.0
+        isFinished = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
-        for id, p in self.motorRobot.params.items():
-            m = p['cont']
-            (pos, vel, torque) = m.read_motor_measurement()
-            initialErrors[id] = pos
-            totalInitialErrors += initialErrors[id]
+        if isFinished:
+            for id in self.motorRobot.params.keys():
+                self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
+                # self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
 
-        while True:
-            for id, p in self.motorRobot.params.items():
-                m = p['cont']
-                m.moveTo(0.0)
-                time.sleep(0.2)
-                app.processEvents()
-
-                (pos, vel, torque) = m.read_motor_measurement()
-                currentErrors[id] = pos
-
-                percentToGoal += currentErrors[id]
-
-            percentToGoal /= totalInitialErrors if not totalInitialErrors == 0 else 1.0
-            percentToGoal *= 100
-            percentToGoal = 100 - percentToGoal
-            self.ui.initializeProgressBar.setValue(percentToGoal)
-
-            if percentToGoal > 99.0:
-                self.ui.initializeProgressBar.setValue(100.0)
-                self.ui.initializeProgressLabel.setText('All motors are at the origin now')
-                break
-            percentToGoal = 0.0
-
-        for id in self.motorRobot.params.keys():
-            self.motorGUI['posSpin'][id].setValue(0.0)
-            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(0.0))
+                self.ui.initializeProgressBar.setValue(100)
+                self.ui.initializeProgressLabel.setText('Goal')
+                self.ui.initializeProgressBar.setEnabled(False)
+                self.ui.initializeProgressLabel.setEnabled(False)
+            if self.subWindow.conn:
+                self.subWindow.prevImg(1)
+        else:
+            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
 
     def savePositions(self):
         save_name = ''
@@ -788,41 +744,27 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         targetPos = self.ui.savedPosCombo.currentText().split()  # list
         targetPos_d = {'slider': float(targetPos[0]), 'pan': float(targetPos[1]), 'tilt': float(targetPos[2])}
 
-        # # scale = []
-        # # pos = [0.0, 0.0, 0.0]
-        # pos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
-        # # vel = [0.0, 0.0, 0.0]
-        # vel_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
-        # # torque = [0.0, 0.0, 0.0]
-        # torque_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
-        #
-        # for id, p in self.motorRobot.params.items():
-        #     p['cont'].moveTo_scaled(targetPos_d[id])
-        #
-        # while True:
-        #     errors = 0.0
-        #     for id, p in self.motorRobot.params.items():
-        #         time.sleep(0.2)
-        #
-        #         (pos_d[id], vel_d[id], torque_d[id]) = p['cont'].read_motor_measurement()
-        #         errors += pow(pos_d[id] - (float(targetPos_d[id]) * p['scale']), 2)
-        #
-        #         self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(float(pos_d[id] / p['scale'])))
-        #
-        #     if math.sqrt(errors) < 0.1:
-        #         break
+        self.ui.initializeProgressBar.setEnabled(True)
+        self.ui.initializeProgressLabel.setEnabled(True)
+        self.ui.initializeProgressLabel.setText('Moving...')
+        self.ui.initializeProgressBar.setValue(0.0)
 
-        pos_d = self.motorRobot.goToTargetPos(targetPos_d)
-        # pos_d_next = next(pos_d)
-        for id in targetPos_d.keys():
-            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(next(pos_d)[id]))
-        # self.motorRobot.goToTargetPos(targetPos_d)
+        isFinished = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
-        for id in self.motorRobot.params.keys():
-            self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
-            # self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
-        if self.subWindow.conn:
-            self.subWindow.prevImg(1)
+        if isFinished:
+            for id in self.motorRobot.params.keys():
+                self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
+                # self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
+
+                self.ui.initializeProgressBar.setValue(100)
+                self.ui.initializeProgressLabel.setText('Goal')
+                self.ui.initializeProgressBar.setEnabled(False)
+                self.ui.initializeProgressLabel.setEnabled(False)
+            if self.subWindow.conn:
+                self.subWindow.prevImg(1)
+        else:
+            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+
 
     def showSubWindow(self, geometry, framesize):
         if self.subWindow_isOpen:

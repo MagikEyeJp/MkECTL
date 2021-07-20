@@ -130,46 +130,65 @@ class KeiganMotorRobot(IMotorRobot):
 
             time.sleep(0.2)
 
-    def goToTargetPos(self, targetPos, callback):
+    def goToTargetPos(self, targetPos, callback, isAborted=None, scriptParams=None, mainWindow=None):
         # pos: dict ('slider', 'pan', 'tilt')
 
         pos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
         vel_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
         torque_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
 
+        initial_err = 0.0
         minerr = 999999.0  # とりあえず大きい数
         cnt = 0
         GOAL_EPS = 0.002  # 目標位置到達誤差しきい値
         GOAL_CNT = 5  # 目標位置到達判定回数
 
         for id, p in self.params.items():
+            (init_pos, init_vel, init_torque) = p['cont'].read_motor_measurement()
+            initial_err += pow(init_pos - (targetPos[id] * p['scale']), 2)
+
             p['cont'].moveTo_scaled(targetPos[id])
+
+        initial_err = math.sqrt(initial_err)
+        if initial_err == 0.0:
+            return True
 
         # systate.pos = motorPos
 
         while True:
             # if isAborted(scriptParams, mainWindow):
             #     return mainWindow.stopClicked
+            if isAborted is not None:
+                stopClicked = inmain(isAborted, scriptParams, mainWindow)
+                if stopClicked:
+                    return stopClicked
 
             @timeout(8)
             def waitmove():
+                nonlocal initial_err
                 nonlocal minerr
                 nonlocal cnt
+                nonlocal GOAL_EPS
+                nonlocal GOAL_CNT
+
                 err = 0.0
                 while True:
+
+
                     time.sleep(0.2)
                     errors = 0.0
 
                     for id, p in self.params.items():
                         (pos_d[id], vel_d[id], torque_d[id]) = p['cont'].read_motor_measurement()
                         errors += pow(pos_d[id] - (targetPos[id] * p['scale']), 2)
-                        err = math.sqrt(errors)
                         pos_d[id] /= p['scale']
+                    err = math.sqrt(errors)
 
                         # display Current Pos
                         # mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
                         #     pos[param_i] / scale[param_i]))
                     # yield pos_d
+                    inmain(callback, pos_d, initial_err, err)
 
                     if err < GOAL_EPS:
                         print("err=", err)
@@ -185,14 +204,25 @@ class KeiganMotorRobot(IMotorRobot):
                         break
                 return err, pos_d
 
-            err, pos_d = waitmove()
-            print("err=", err)
-            yield pos_d
+            try:
+                err, pos_d = waitmove()
+                print("err=", err)
+                # yield pos_d
 
-            if cnt > GOAL_CNT:
-                # raise StopIteration()
-                break
-                # return
+                if cnt > GOAL_CNT:
+                    # raise StopIteration()
+                    break
+
+                if isAborted is None:   # main window event
+                    return True # isFinished
+                else:   # script event
+                    return False    # isStopped
+
+            except TimeoutError:
+                if isAborted is None:   # main window event
+                    return False # isFinished
+                else:   # script event
+                    return True    # isStopped
 
 # class KeiganMotor(KMControllersS.USBController):
 #     def __init__(self, parent=None):

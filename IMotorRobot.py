@@ -7,5 +7,5 @@ class IMotorRobot:
     def initializeMotors(self):
         pass
 
-    def goToTargetPos(self, targetPos, callback):
+    def goToTargetPos(self, targetPos, callback, isAborted=None, scriptParams=None, mainWindow=None):
         pass

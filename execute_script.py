@@ -477,58 +477,17 @@ def move_robot(args, scriptParams, devices, mainWindow):
     GOAL_EPS = 0.002   # 目標位置到達誤差しきい値
     GOAL_CNT = 5     # 目標位置到達判定回数
 
-    for param_i in range(args.size):
-        m.append(devices['motors'][motorSet[param_i]]['cont'])
-        scale.append(devices['motors'][motorSet[param_i]]['scale'])
-        motorPos.append(args[param_i])
-
-    systate.pos = motorPos
+    # systate.pos = motorPos
+    systate.pos = list(args)
+    targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2]}
 
     if not systate.skip:
         if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
-            for param_i in range(args.size):
-                m[param_i].moveTo(motorPos[param_i] * scale[param_i])
+            app.processEvents()
 
-            while True:
-                if isAborted(scriptParams, mainWindow):
-                    return mainWindow.stopClicked
-
-                @timeout(8)
-                def waitmove():
-                    nonlocal minerr
-                    nonlocal cnt
-                    err = 0.0
-                    while True:
-                        time.sleep(0.2)
-                        errors = 0.0
-
-                        for param_i in range(args.size):
-
-                            (pos[param_i], vel[param_i], torque[param_i]) = m[param_i].read_motor_measurement()
-                            errors += pow(pos[param_i] - (motorPos[param_i] * scale[param_i]), 2)
-                            err = math.sqrt(errors)
-
-                            # display Current Pos
-                            mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
-                                pos[param_i] / scale[param_i]))
-
-                        if err < GOAL_EPS:
-                            print("err=", err)
-                            cnt += 1
-                            if cnt > GOAL_CNT:
-                                break
-                        else:
-                            cnt = 0
-
-                        if err < minerr:
-                            print("err=", err)
-                            minerr = err  # 最小値更新
-                            break
-                    return err
-
-                err = waitmove()
-                if cnt > GOAL_CNT:
-                    break
+            isStopped = devices['robot'].goToTargetPos(targetPos_d, mainWindow.changeMovRoboStatus, isAborted, scriptParams, mainWindow)
+            if isStopped:
+                return mainWindow.stopClicked
 
             systate.past_parameters.pos = systate.pos
             systate.sentSig.pos = True
