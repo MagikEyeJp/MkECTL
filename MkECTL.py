@@ -16,6 +16,7 @@ from timeout_decorator import timeout, TimeoutError
 import json
 import subprocess
 import shutil
+from SensorInfo import SensorInfo
 
 import MyDoubleSpinBox
 import motordic
@@ -976,7 +977,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.postProcLogTextEdit.clear()
 
     def doPostProc(self):
-        self.ui.postProcLogTextEdit.append("exec postproc: " + self.dataOutFolder())
+        info = SensorInfo()
+        info.clear()
+        info.load_from_file(self.dataOutFolder() + "/sensorinfo.json")
+        self.ui.postProcLogTextEdit.append("exec postproc: " + info.labelid + "_" + self.scriptParams.subFolderName)
+        self.ui.postProcLogTextEdit.ensureCursorVisible()
 
         proc = subprocess.Popen(
             'gnome-terminal --  bash -c "' +
