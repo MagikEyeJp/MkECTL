@@ -16,17 +16,19 @@ from timeout_decorator import timeout, TimeoutError
 import json
 import subprocess
 import shutil
-from SensorInfo import SensorInfo
 
 import MyDoubleSpinBox
 from M_KeiganRobot import KeiganMotorRobot
 import motordic
 import mainwindow_ui
+import detailed_settings_ui
 import execute_script
 import sensors
 import ini
 import read_machine_file
 from UIState import UIState
+from SensorInfo import SensorInfo
+import PopupList
 
 import IRLightMkE
 import IRLightPapouch
@@ -202,6 +204,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.postProcFileBtn.clicked.connect(self.openPostProcFile)
         self.ui.postProcEditBtn.clicked.connect(self.editPostProcParam)
         self.ui.postProcClearLogBtn.clicked.connect(self.clearPostProcLog)
+        self.ui.detailedSettingsButton.clicked.connect(self.detailedSettings)
 
         # Sensor window detached
         self.subWindow.topLevelChanged.connect(lambda: self.changeMainWinSize(self.geometry))
@@ -845,6 +848,24 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 # print('isMaxWinSize: ' + str(self.isMaxWinSize))
                 # print('minimumWidth: ' + str(self.minimumWidth()))
                 # print('-----')
+
+    # ----- detailed settings -----
+    def detailedSettings(self):
+        # detailedSettingsWindow = detailed_settings_ui.Ui_Dialog()
+        # detailedSettingsWindow.setupUi(QtWidgets.QDialog)
+
+        detailedSettingsWindow = PopupList.PopupList()
+        pos = self.ui.detailedSettingsButton.mapToGlobal(QtCore.QPoint(32, 24))
+        width = 240
+        height = 200
+        rect = QtCore.QRect(pos.x() - width, pos.y(), width, height)
+        detailedSettingsWindow.setGeometry(rect)
+        # strlist = [dict[key] + ":" + key for key in dict]
+        detailedSettingsWindow.setDic_detailedSettings()
+        # detailedSettingsWindow.selected.connect(self.sensorListSelected)
+        # detailedSettingsWindow.selected.connect()
+        detailedSettingsWindow.show()
+
 
     # ----- Post Process -----
 
