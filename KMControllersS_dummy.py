@@ -795,6 +795,17 @@ class USBController(Controller):
         self.port = tty_dummy
         self.serial = serial.Serial(tty_dummy)
 
+        # pid
+        self.m_speed_p = 0.2
+        self.m_speed_i = 0.2
+        self.m_speed_d = 0.2
+        self.m_position_p = 0.2
+        self.m_position_i = 0.2
+        self.m_position_d = 0.2
+        self.m_qCurrent_p = 0.2
+        self.m_qCurrent_i = 0.2
+        self.m_qCurrent_d = 0.2
+
 
     def __del__(self):
         self.close()
@@ -907,31 +918,68 @@ class USBController(Controller):
         return self.__read_uint8_reg(0x17)
 
     def read_qCurrentP(self):
-        return self.__read_float_reg(0x18)
+        print('read_qCurrentP')
+        # return self.__read_float_reg(0x18)
+
+        ########## dummy ##########
+        return self.m_qCurrent_p
 
     def read_qCurrentI(self):
-        return self.__read_float_reg(0x19)
+        print('read_qCurrentI')
+        # return self.__read_float_reg(0x19)
+
+        ########## dummy ##########
+        return self.m_qCurrent_i
 
     def read_qCurrentD(self):
-        return self.__read_float_reg(0x1A)
+        print('read_qCurrentD')
+        # return self.__read_float_reg(0x1A)
+
+        ########## dummy ##########
+        return self.m_qCurrent_d
 
     def read_speedP(self):
-        return self.__read_float_reg(0x1B)
+        print('read_speedP')
+        # return self.__read_float_reg(0x1B)
+
+        ########## dummy ##########
+        return self.m_speed_p
 
     def read_speedI(self):
-        return self.__read_float_reg(0x1C)
+        print('read_speedI')
+        # return self.__read_float_reg(0x1C)
+
+        ########## dummy ##########
+        return self.m_speed_i
 
     def read_speedD(self):
-        return self.__read_float_reg(0x1D)
+        print('read_speedD')
+        # return self.__read_float_reg(0x1D)
+
+        ########## dummy ##########
+        return self.m_speed_d
 
     def read_positionP(self):
-        return self.__read_float_reg(0x1E)
+        print('read_positionP')
+        # return self.__read_float_reg(0x1E)
+
+        ########## dummy ##########
+        return self.m_position_p
 
     def read_positionI(self):
-        return self.__read_float_reg(0x1F)
+        print('read_positionI')
+        # return self.__read_float_reg(0x1F)
+
+        ########## dummy ##########
+        return self.m_position_i
 
     def read_positionD(self):
-        return self.__read_float_reg(0x20)
+        print('read_positionD')
+        # return self.__read_float_reg(0x20)
+
+        ########## dummy ##########
+        return self.m_position_d
+
 
     def read_posControlThreshold(self):
         return self.__read_float_reg(0x21)
