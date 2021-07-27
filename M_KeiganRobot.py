@@ -144,10 +144,11 @@ class KeiganMotorRobot(IMotorRobot):
         GOAL_CNT = 5  # 目標位置到達判定回数
 
         for id, p in self.params.items():
-            (init_pos, init_vel, init_torque) = p['cont'].read_motor_measurement()
-            initial_err += pow(init_pos - (targetPos[id] * p['scale']), 2)
+            if targetPos[id] != None:
+                (init_pos, init_vel, init_torque) = p['cont'].read_motor_measurement()
+                initial_err += pow(init_pos - (targetPos[id] * p['scale']), 2)
 
-            p['cont'].moveTo_scaled(targetPos[id])
+                p['cont'].moveTo_scaled(targetPos[id])
 
         initial_err = math.sqrt(initial_err)
         if initial_err == 0.0:
@@ -179,9 +180,10 @@ class KeiganMotorRobot(IMotorRobot):
                     errors = 0.0
 
                     for id, p in self.params.items():
-                        (pos_d[id], vel_d[id], torque_d[id]) = p['cont'].read_motor_measurement()
-                        errors += pow(pos_d[id] - (targetPos[id] * p['scale']), 2)
-                        pos_d[id] /= p['scale']
+                        if targetPos[id] != None:
+                            (pos_d[id], vel_d[id], torque_d[id]) = p['cont'].read_motor_measurement()
+                            errors += pow(pos_d[id] - (targetPos[id] * p['scale']), 2)
+                            pos_d[id] /= p['scale']
                     err = math.sqrt(errors)
 
                         # display Current Pos

@@ -21,7 +21,6 @@ import MyDoubleSpinBox
 from M_KeiganRobot import KeiganMotorRobot
 import motordic
 import mainwindow_ui
-import detailed_settings_ui
 import execute_script
 import sensors
 import ini
@@ -432,14 +431,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         if re.search('.+MoveExe', buttonName):
             motor_id = buttonName.replace('MoveExe', '')
             targetPos = self.motorGUI['posSpin'][motor_id].value()
-            targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+            targetPos_d = {'slider': None, 'pan': None, 'tilt': None}
 
             for id, p in self.motorRobot.params.items():
                 if id == motor_id:
                     targetPos_d[id] = targetPos
-                else:
-                    (pos, vel, torque) = p['cont'].read_motor_measurement()
-                    targetPos_d[id] = pos / p['scale']
+                # else:
+                #     (pos, vel, torque) = p['cont'].read_motor_measurement()
+                #     targetPos_d[id] = pos / p['scale']
 
             self.ui.initializeProgressBar.setEnabled(True)
             self.ui.initializeProgressLabel.setEnabled(True)
@@ -449,13 +448,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             isFinished = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
             if isFinished:
-                for id in self.motorRobot.params.keys():
-                    self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
+                # for id in self.motorRobot.params.keys():
+                self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(targetPos_d[motor_id]))
 
-                    self.ui.initializeProgressBar.setValue(100)
-                    self.ui.initializeProgressLabel.setText('Goal')
-                    self.ui.initializeProgressBar.setEnabled(False)
-                    self.ui.initializeProgressLabel.setEnabled(False)
+                self.ui.initializeProgressBar.setValue(100)
+                self.ui.initializeProgressLabel.setText('Goal')
+                self.ui.initializeProgressBar.setEnabled(False)
+                self.ui.initializeProgressLabel.setEnabled(False)
                 if self.subWindow.conn:
                     self.subWindow.prevImg(1)
             else:
