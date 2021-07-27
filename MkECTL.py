@@ -860,7 +860,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         rect = QtCore.QRect(pos.x() - width, pos.y(), width, height)
         detailedSettingsWindow.setGeometry(rect)
         # strlist = [dict[key] + ":" + key for key in dict]
-        detailedSettingsWindow.setDic_detailedSettings()
+        detailedSettingsWindow.setDic_detailedSettings(self.motorRobot.params)
         # detailedSettingsWindow.selected.connect(self.sensorListSelected)
         # detailedSettingsWindow.selected.connect()
         detailedSettingsWindow.show()
@@ -940,10 +940,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.manualOperation.setEnabled(True)
             self.ui.MagikEye.setEnabled(True)
             self.ui.getCurrentPosButton.setEnabled(True)
+            self.ui.detailedSettingsButton.setEnabled(True)
         else:
             self.ui.manualOperation.setEnabled(False)
             self.ui.MagikEye.setEnabled(False)
             self.ui.getCurrentPosButton.setEnabled(False)
+            self.ui.detailedSettingsButton.setEnabled(False)
 
         if UIState.IRLIGHT in status and self.IRLight.isvalid():
             self.ui.IRlightControlGroup.setEnabled(True)
