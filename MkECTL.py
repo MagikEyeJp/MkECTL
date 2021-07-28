@@ -708,6 +708,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.scriptName_label.setText(os.path.basename(self.scriptParams.scriptName[0]))
         else:
             self.scriptParams.isContinue = False
+            self.renewSubFolder()
 
         if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
             self.openScriptFile(1)
