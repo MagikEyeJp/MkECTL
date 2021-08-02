@@ -60,12 +60,32 @@ class KeiganMotorRobot(IMotorRobot):
         # super(KeiganMotor, self).__init__(parent)
         self.machineParams_m = machineParams_m
 
+        self.motorSet = ['slider', 'pan', 'tilt']
+
         # cont
         self.slider = None
         self.pan = None
         self.tilt = None
 
         self.params = None
+
+        self.pid_settings = {
+            'speed': {
+                'P': [14.0, 14.0, 14.0],
+                'I': [0.001, 0.001, 0.001],
+                'D': [0.0, 0.0, 0.0]
+            },
+            'position': {
+                'P': [30.0, 80.0, 40.0],
+                'I': [400.0, 20.0, 400.0],
+                'D': [0.0, 0.0, 0.0]
+            },
+            'qCurrent': {
+                'P': [0.2, 0.6, 0.2],
+                'I': [10.0, 4.0, 10.0],
+                'D': [0.0, 0.0, 0.0]
+            }
+        }
 
     def getMotorDic(self):
         global defaultMotors
@@ -129,6 +149,13 @@ class KeiganMotorRobot(IMotorRobot):
                 exec(execCode)
 
             time.sleep(0.2)
+
+    def changePIDparam(self, pid_category, pid_param, motor_i, value):
+        execCode = 'self.params[\'%s\'][\'cont\'].%s%s(%f)' % (self.motorSet[motor_i], pid_category, pid_param, value)
+        val = eval(execCode)
+
+        self.pid_settings[pid_category][pid_param][motor_i] = value
+        print(self.pid_settings)
 
     def goToTargetPos(self, targetPos, callback, isAborted=None, scriptParams=None, mainWindow=None):
         # pos: dict ('slider', 'pan', 'tilt')
