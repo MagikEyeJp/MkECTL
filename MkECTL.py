@@ -855,14 +855,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         detailedSettingsWindow = PopupList.PopupList()
         pos = self.ui.detailedSettingsButton.mapToGlobal(QtCore.QPoint(32, 24))
-        width = 240
+        width = 320
         height = 200
         rect = QtCore.QRect(pos.x() - width, pos.y(), width, height)
         detailedSettingsWindow.setGeometry(rect)
         # strlist = [dict[key] + ":" + key for key in dict]
-        detailedSettingsWindow.setDic_detailedSettings(self.motorRobot.params)
-        # detailedSettingsWindow.selected.connect(self.sensorListSelected)
-        # detailedSettingsWindow.selected.connect()
+        detailedSettingsWindow.setDic_detailedSettings(self.motorRobot)
+        detailedSettingsWindow.pidChanged.connect(self.motorRobot.changePIDparam)
         detailedSettingsWindow.show()
 
 

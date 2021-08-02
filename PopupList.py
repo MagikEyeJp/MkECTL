@@ -6,6 +6,7 @@ from PyQt5.QtCore import *
 class PopupList(QDialog):
     # select signal
     selected = pyqtSignal(str, str)
+    pidChanged = pyqtSignal(str, str, int, float)
 
     def __init__(self, parent=None):
         super().__init__()
@@ -34,40 +35,31 @@ class PopupList(QDialog):
         self.tableWidget.cellClicked.connect(self.cellClicked)
 
     def setDic_detailedSettings(self, robot):
-        self.dic_settings = \
-            {'P (speed)': [0.2, 0.2, 0.2],
-             'I (speed)': [0.2, 0.2, 0.2],
-             'D (speed)': [0.2, 0.2, 0.2],
-             'P (position)': [0.2, 0.2, 0.2],
-             'I (position)': [0.2, 0.2, 0.2],
-             'D (position)': [0.2, 0.2, 0.2],
-             'P (current)': [0.2, 0.2, 0.2],
-             'I (current)': [0.2, 0.2, 0.2],
-             'D (current)': [0.2, 0.2, 0.2]
-             }
+        # self.dic_settings = \
+        #     {'P (speed)': [0.2, 0.2, 0.2],
+        #      'I (speed)': [0.2, 0.2, 0.2],
+        #      'D (speed)': [0.2, 0.2, 0.2],
+        #      'P (position)': [0.2, 0.2, 0.2],
+        #      'I (position)': [0.2, 0.2, 0.2],
+        #      'D (position)': [0.2, 0.2, 0.2],
+        #      'P (current)': [0.2, 0.2, 0.2],
+        #      'I (current)': [0.2, 0.2, 0.2],
+        #      'D (current)': [0.2, 0.2, 0.2]
+        #      }
 
         self.tableWidget.clear()
         self.tableWidget.setColumnCount(5)
-        self.tableWidget.setRowCount(len(self.dic_settings))
+        self.tableWidget.setRowCount(len(robot.pid_settings)*3)
         self.tableWidget.setHorizontalHeaderLabels(["", "param", "slider", "pan", "tilt"])
         r = 0
         col = 2
-        # for name, value in self.dic_settings.items():
-        #     self.tableWidget.setItem(r, 1, QTableWidgetItem(name))
-        #     self.tableWidget.setItem(r, 2, QTableWidgetItem(str(value[0])))
-        #     self.tableWidget.setItem(r, 3, QTableWidgetItem(str(value[1])))
-        #     self.tableWidget.setItem(r, 4, QTableWidgetItem(str(value[2])))
-        #     r += 1
 
-        for id, p in robot.items():
+        for i in range(len(robot.params.keys())):
             for pid_category in ['speed', 'position', 'qCurrent']:
                 for pid_param in ['P', 'I', 'D']:
-                    val = 0
-                    execCode = 'p[\'cont\'].read_%s%s()' % (pid_category, pid_param)
-                    # exec(execCode)
-                    val = eval(execCode)
-                    # print(val)
-                    # print(type(val))
+                    # execCode = 'p[\'cont\'].read_%s%s()' % (pid_category, pid_param)
+                    # val = eval(execCode)
+                    val = robot.pid_settings[pid_category][pid_param][i]
 
                     self.tableWidget.setItem(r, 1, QTableWidgetItem(pid_param))
                     self.tableWidget.setItem(r, col, QTableWidgetItem(str(val)))
@@ -91,7 +83,7 @@ class PopupList(QDialog):
 
         # QTableView.setSpan(row, column, rowSpan, columnSpan)
 
-        self.tableWidget.cellClicked.connect(self.changeDetailedSettengs)
+        self.tableWidget.cellChanged.connect(self.changeDetailedSettings)
 
     def show(self):
         self.exec_()
@@ -101,7 +93,24 @@ class PopupList(QDialog):
         self.selected.emit(list(self.dic.keys())[row], list(self.dic.values())[row])
         self.close()
 
-    def changeDetailedSettengs(self, row):
+    def changeDetailedSettings(self, row, col):
         # ここで本当はpidパラメータを変更するor main windowに返す？
-        self.selected.emit(list(self.dic_settings.keys())[row], list(self.dic_settings.values())[row])
+        # row -> 0,1,2:speed 3,4,5:position 6,7,8:qCurrent
+        #        0,3,6:P     1,4,7:I        2,5,8:D
+        # col -> 2:slider(0) 3:pan(1) 4:tilt(2)
+        pid_category_dic = {
+            0: 'speed', 1: 'speed', 2: 'speed',
+            3: 'position', 4: 'position', 5: 'position',
+            6: 'qCurrent', 7: 'qCurrent', 8: 'qCurrent'
+        }
+        pid_param_dic = {
+            0: 'P', 3: 'P', 6: 'P',
+            1: 'I', 4: 'I', 7: 'I',
+            2: 'P', 5: 'P', 8: 'P'
+        }
+        print(row, col)
+        value = float(self.tableWidget.item(row, col).text())
+        print(value)
+        self.pidChanged.emit(pid_category_dic[row], pid_param_dic[row], col-2, value)
 
+        # self.close()
