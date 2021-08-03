@@ -138,74 +138,109 @@ class Controller:
         """
         Set the q-axis current PID controller's Proportional gain to the postiive 'q_current_p'.
         """
-        command=b'\x18'
-        values=float2bytes(q_current_p)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x18'
+        # values=float2bytes(q_current_p)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('qCurrentP: ' + str(q_current_p))
+        self.m_qCurrent_p = q_current_p
 
     def qCurrentI(self,q_current_i,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the q-axis current PID controller's Integral gain to the positive 'q_current_i'.
         """
-        command=b'\x19'
-        values=float2bytes(q_current_i)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x19'
+        # values=float2bytes(q_current_i)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('qCurrentI: ' + str(q_current_i))
+        self.m_qCurrent_i = q_current_i
 
     def qCurrentD(self,q_current_d,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the q-axis current PID controller's Differential gain to the postiive 'q_current_d'.
         """
-        command=b'\x1A'
-        values=float2bytes(q_current_d)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x1A'
+        # values=float2bytes(q_current_d)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('qCurrentD: ' + str(q_current_d))
+        self.m_qCurrent_d = q_current_d
 
     def speedP(self,speed_p,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the speed PID controller's Proportional gain to the positive 'speed_p'.
         """
-        command=b'\x1B'
-        values=float2bytes(speed_p)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x1B'
+        # values=float2bytes(speed_p)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('speedP: ' + str(speed_p))
+        self.m_speed_p = speed_p
 
     def speedI(self,speed_i,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the speed PID controller's Integral gain to the positive 'speed_i'.
         """
-        command=b'\x1C'
-        values=float2bytes(speed_i)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x1C'
+        # values=float2bytes(speed_i)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('speedI: ' + str(speed_i))
+        self.m_speed_i = speed_i
 
     def speedD(self,speed_d,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the speed PID controller's Deferential gain to the positive 'speed_d'.
         """
-        command=b'\x1D'
-        values=float2bytes(speed_d)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x1D'
+        # values=float2bytes(speed_d)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('speedD: ' + str(speed_d))
+        self.m_speed_d = speed_d
 
     def positionP(self,position_p,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the position PID controller's Proportional gain to the positive 'position_p'.
         """
-        command=b'\x1E'
-        values=float2bytes(position_p)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x1E'
+        # values=float2bytes(position_p)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
 
+        ########## dummy ##########
+        print('positionP: ' + str(position_p))
+        self.m_position_p = position_p
 
     def positionI(self,position_i,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the position PID controller's Proportional gain to the positive 'position_p'.
         """
-        command=b'\x1F'
-        values=float2bytes(position_i)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x1F'
+        # values=float2bytes(position_i)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('positionI: ' + str(position_i))
+        self.m_position_i = position_i
 
     def positionD(self,position_d,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         Set the position PID controller's Proportional gain to the positive 'position_p'.
         """
-        command=b'\x20'
-        values=float2bytes(position_d)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x20'
+        # values=float2bytes(position_d)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('positionD: ' + str(position_d))
+        self.m_position_d = position_d
 
     def posControlThreshold(self, threshold, identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -795,6 +830,17 @@ class USBController(Controller):
         self.port = tty_dummy
         self.serial = serial.Serial(tty_dummy)
 
+        # pid
+        self.m_speed_p = 0.2
+        self.m_speed_i = 0.2
+        self.m_speed_d = 0.2
+        self.m_position_p = 0.2
+        self.m_position_i = 0.2
+        self.m_position_d = 0.2
+        self.m_qCurrent_p = 0.2
+        self.m_qCurrent_i = 0.2
+        self.m_qCurrent_d = 0.2
+
 
     def __del__(self):
         self.close()
@@ -907,31 +953,68 @@ class USBController(Controller):
         return self.__read_uint8_reg(0x17)
 
     def read_qCurrentP(self):
-        return self.__read_float_reg(0x18)
+        print('read_qCurrentP')
+        # return self.__read_float_reg(0x18)
+
+        ########## dummy ##########
+        return self.m_qCurrent_p
 
     def read_qCurrentI(self):
-        return self.__read_float_reg(0x19)
+        print('read_qCurrentI')
+        # return self.__read_float_reg(0x19)
+
+        ########## dummy ##########
+        return self.m_qCurrent_i
 
     def read_qCurrentD(self):
-        return self.__read_float_reg(0x1A)
+        print('read_qCurrentD')
+        # return self.__read_float_reg(0x1A)
+
+        ########## dummy ##########
+        return self.m_qCurrent_d
 
     def read_speedP(self):
-        return self.__read_float_reg(0x1B)
+        print('read_speedP')
+        # return self.__read_float_reg(0x1B)
+
+        ########## dummy ##########
+        return self.m_speed_p
 
     def read_speedI(self):
-        return self.__read_float_reg(0x1C)
+        print('read_speedI')
+        # return self.__read_float_reg(0x1C)
+
+        ########## dummy ##########
+        return self.m_speed_i
 
     def read_speedD(self):
-        return self.__read_float_reg(0x1D)
+        print('read_speedD')
+        # return self.__read_float_reg(0x1D)
+
+        ########## dummy ##########
+        return self.m_speed_d
 
     def read_positionP(self):
-        return self.__read_float_reg(0x1E)
+        print('read_positionP')
+        # return self.__read_float_reg(0x1E)
+
+        ########## dummy ##########
+        return self.m_position_p
 
     def read_positionI(self):
-        return self.__read_float_reg(0x1F)
+        print('read_positionI')
+        # return self.__read_float_reg(0x1F)
+
+        ########## dummy ##########
+        return self.m_position_i
 
     def read_positionD(self):
-        return self.__read_float_reg(0x20)
+        print('read_positionD')
+        # return self.__read_float_reg(0x20)
+
+        ########## dummy ##########
+        return self.m_position_d
+
 
     def read_posControlThreshold(self):
         return self.__read_float_reg(0x21)

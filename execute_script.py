@@ -214,13 +214,12 @@ def countCommandNum(scriptParams, args_hist, com_hist):
 
     return len(com_hist)
 
-def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
+def execute_script(scriptParams, devices, mainWindow, isdemo=False):
     global systate
     global isDemo
     isDemo = isdemo
     systate.seqn = 0
     # devices: motors, lights, 3D sensors(sensor window)
-    # params: motorDic
 
     systate.past_parameters.reset()
     print(vars(systate.past_parameters))
@@ -228,7 +227,7 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
     args_hist: list = []
     com_hist: list = []
 
-    warm_lasers(scriptParams, devices, params, mainWindow)
+    warm_lasers(scriptParams, devices, mainWindow)
 
     # ---------- make ini file ----------
     if not isDemo:
@@ -253,10 +252,12 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
 
     if isDemo:
         commands['mov'][1] = False
+        range_obj = range(scriptParams.start_command_num, commandNum)
     else:
         commands['mov'][1] = True
+        range_obj = range(commandNum)
 
-    for i in range(commandNum):
+    for i in range_obj:
 
         if isAborted(scriptParams, mainWindow):
             return mainWindow.stopClicked
@@ -271,7 +272,7 @@ def execute_script(scriptParams, devices, params, mainWindow, isdemo=False):
 
         # jump to a method(function)
         try:
-            isStop = eval(commands[com_hist[i]][0])(systate.args, scriptParams, devices, params, mainWindow)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
+            isStop = eval(commands[com_hist[i]][0])(systate.args, scriptParams, devices, mainWindow)  # https://qiita.com/Chanmoro/items/9b0105e4c18bb76ed4e9
         except TimeoutError:
             timeoutCallback(mainWindow)
             return True
@@ -369,14 +370,14 @@ def expand_dynvars(args, devices):
 ##########
 
 @timeout(5)
-def set_root(args, scriptParams, devices, params, mainWindow):
+def set_root(args, scriptParams, devices, mainWindow):
     print('---set_root---')
     app.processEvents()
     global systate
     systate.root = args[0]
 
 @timeout(5)
-def set_filename(args, scriptParams, devices, params, mainWindow):
+def set_filename(args, scriptParams, devices, mainWindow):
     print('---set_filename---')
 
     app.processEvents()
@@ -396,7 +397,7 @@ def set_filename(args, scriptParams, devices, params, mainWindow):
 
 
 @timeout(15)
-def snap_image(args, scriptParams, devices, params, mainWindow):
+def snap_image(args, scriptParams, devices, mainWindow):
     print('---snap_image---')
 
     if isAborted(scriptParams, mainWindow):
@@ -419,7 +420,7 @@ def snap_image(args, scriptParams, devices, params, mainWindow):
     devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
-        resume_state(scriptParams, devices, params, mainWindow)
+        resume_state(scriptParams, devices, mainWindow)
         time.sleep(0.2)
 
         image, pixmap = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
@@ -429,10 +430,10 @@ def snap_image(args, scriptParams, devices, params, mainWindow):
         image.save(devices['3Dsensors'].imgPath)
 
     systate.seqn += 1
-    warm_lasers(scriptParams, devices, params, mainWindow)
+    warm_lasers(scriptParams, devices, mainWindow)
 
 @timeout(15)
-def snap_3D_frame(args, scriptParams, devices, params, mainWindow):
+def snap_3D_frame(args, scriptParams, devices, mainWindow):
     print('---snap_3D_frame---')
 
     global systate
@@ -450,18 +451,17 @@ def snap_3D_frame(args, scriptParams, devices, params, mainWindow):
     devices['3Dsensors'].csvPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].csvPath):
-        resume_state(scriptParams, devices, params, mainWindow)
+        resume_state(scriptParams, devices, mainWindow)
 
         devices['3Dsensors'].snap3D(devices['3Dsensors'].csvPath)
 
     systate.seqn += 1
 
-def move_robot(args, scriptParams, devices, params, mainWindow):
+def move_robot(args, scriptParams, devices, mainWindow):
     print('---move_robot---')
     print('move to ' + str(args))
     global systate
     global isDemo
-    motorSet = ['slider', 'pan', 'tilt']
 
     # time.sleep(20)
 
@@ -478,65 +478,23 @@ def move_robot(args, scriptParams, devices, params, mainWindow):
     GOAL_EPS = 0.002   # 目標位置到達誤差しきい値
     GOAL_CNT = 5     # 目標位置到達判定回数
 
-    for param_i in range(args.size):
-        m.append(devices['motors'][motorSet[param_i]])
-        scale.append(params[motorSet[param_i]]['scale'])
-        motorPos.append(args[param_i])
-
-    systate.pos = motorPos
+    # systate.pos = motorPos
+    systate.pos = list(args)
+    targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2]}
 
     if not systate.skip:
         if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
-            for param_i in range(args.size):
-                m[param_i].moveTo(motorPos[param_i] * scale[param_i])
+            app.processEvents()
 
-            while True:
-                if isAborted(scriptParams, mainWindow):
-                    return mainWindow.stopClicked
-
-                @timeout(8)
-                def waitmove():
-                    nonlocal minerr
-                    nonlocal cnt
-                    err = 0.0
-                    while True:
-                        time.sleep(0.2)
-                        errors = 0.0
-
-                        for param_i in range(args.size):
-
-                            (pos[param_i], vel[param_i], torque[param_i]) = m[param_i].read_motor_measurement()
-                            errors += pow(pos[param_i] - (motorPos[param_i] * scale[param_i]), 2)
-                            err = math.sqrt(errors)
-
-                            # display Current Pos
-                            mainWindow.motorGUI['currentPosLabel'][mainWindow.get_key_from_value(
-                                mainWindow.devices['motors'], m[param_i])].setText('{:.2f}'.format(
-                                pos[param_i] / scale[param_i]))
-
-                        if err < GOAL_EPS:
-                            print("err=", err)
-                            cnt += 1
-                            if cnt > GOAL_CNT:
-                                break
-                        else:
-                            cnt = 0
-
-                        if err < minerr:
-                            print("err=", err)
-                            minerr = err  # 最小値更新
-                            break
-                    return err
-
-                err = waitmove()
-                if cnt > GOAL_CNT:
-                    break
+            isStopped = devices['robot'].goToTargetPos(targetPos_d, mainWindow.changeMovRoboStatus, isAborted, scriptParams, mainWindow)
+            if isStopped:
+                return mainWindow.stopClicked
 
             systate.past_parameters.pos = systate.pos
             systate.sentSig.pos = True
 
 
-def home_robot(args, scriptParams, devices, params, mainWindow):
+def home_robot(args, scriptParams, devices, mainWindow):
     print('---home_robot---')
     global systate
 
@@ -547,11 +505,11 @@ def home_robot(args, scriptParams, devices, params, mainWindow):
 
     # if not systate.skip:
     # print('move to ' + str(pos))
-    move_robot(pos, scriptParams, devices, params, mainWindow)
+    move_robot(pos, scriptParams, devices, mainWindow)
 
 
 @timeout(5)
-def set_shutter(args, scriptParams, devices, params, mainWindow):
+def set_shutter(args, scriptParams, devices, mainWindow):
     print('---set_shutter---')
     global systate
 
@@ -582,7 +540,7 @@ def set_shutter(args, scriptParams, devices, params, mainWindow):
 
 
 @timeout(5)
-def set_gainiso(args, scriptParams, devices, params, mainWindow):
+def set_gainiso(args, scriptParams, devices, mainWindow):
     print('---set_gainiso---')
     global systate
 
@@ -607,7 +565,7 @@ def set_gainiso(args, scriptParams, devices, params, mainWindow):
             systate.sentSig.gainiso = True
 
 @timeout(5)
-def set_lasers(args, scriptParams, devices, params, mainWindow):
+def set_lasers(args, scriptParams, devices, mainWindow):
     print('---set_lasers---')
     global systate
 
@@ -630,7 +588,7 @@ def set_lasers(args, scriptParams, devices, params, mainWindow):
 
 
 @timeout(5)
-def set_light(args, scriptParams, devices, params, mainWindow):
+def set_light(args, scriptParams, devices, mainWindow):
     print('---set_light---')
     global systate
 
@@ -657,7 +615,7 @@ def set_light(args, scriptParams, devices, params, mainWindow):
                 systate.sentSig.light[ch - 1] = True
 
 
-def wait_pause(args, scriptParams, devices, params, mainWindow):
+def wait_pause(args, scriptParams, devices, mainWindow):
     print('---wait_pause---')
     sec = int(args[0])
     for i in range(sec):
@@ -666,13 +624,13 @@ def wait_pause(args, scriptParams, devices, params, mainWindow):
         time.sleep(1)
 
 
-def show_message(args, scriptParams, devices, params, mainWindow):
+def show_message(args, scriptParams, devices, mainWindow):
     print('---show_message---')
     QtWidgets.QMessageBox.information(mainWindow, 'MkECTL script', args[0], QtWidgets.QMessageBox.Ok)
 
 
 @timeout(5)
-def warm_lasers(scriptParams, devices, params, mainWindow):
+def warm_lasers(scriptParams, devices, mainWindow):
     global systate
 
     if isAborted(scriptParams, mainWindow):
@@ -685,9 +643,9 @@ def warm_lasers(scriptParams, devices, params, mainWindow):
     print('---warm lasers---')
     systate.skip = False
     if systate.shutter_IRoff > 0:
-        set_shutter([systate.shutter_IRoff], scriptParams, devices, params)
+        set_shutter([systate.shutter_IRoff], scriptParams, devices, mainWindow)
         print('  shutter=', systate.shutter_IRoff)
-    set_lasers([255], scriptParams, devices, params, mainWindow)
+    set_lasers([255], scriptParams, devices, mainWindow)
 
     systate.skip = current_skip
     systate.lasers = current_lasers
@@ -695,7 +653,7 @@ def warm_lasers(scriptParams, devices, params, mainWindow):
     time.sleep(0.1)
 
 
-def resume_state(scriptParams, devices, params, mainWindow):
+def resume_state(scriptParams, devices, mainWindow):
     global systate
 
     if isAborted(scriptParams, mainWindow):
@@ -704,11 +662,11 @@ def resume_state(scriptParams, devices, params, mainWindow):
     systate.skip = False
 
     for i in range(len(systate.light)):
-        set_light([i + 1, systate.light[i]], scriptParams, devices, params, mainWindow)
-    set_lasers([systate.lasers], scriptParams, devices, params, mainWindow)
-    set_gainiso([systate.gainiso], scriptParams, devices, params, mainWindow)
-    set_shutter([systate.shutter], scriptParams, devices, params, mainWindow)
-    move_robot(systate.pos, scriptParams, devices, params, mainWindow)
+        set_light([i + 1, systate.light[i]], scriptParams, devices, mainWindow)
+    set_lasers([systate.lasers], scriptParams, devices, mainWindow)
+    set_gainiso([systate.gainiso], scriptParams, devices, mainWindow)
+    set_shutter([systate.shutter], scriptParams, devices, mainWindow)
+    move_robot(systate.pos, scriptParams, devices, mainWindow)
 
 
 # def snap_3D_frame():
