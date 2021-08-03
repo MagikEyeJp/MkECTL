@@ -916,9 +916,17 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         self.IRLight.set(ch, state)
 
+    def toFloat(self, text, default):
+        try:
+            val = float(text)
+            return val
+        except ValueError:
+            return default
+
+
     def setMultiplier(self):
-        self.scriptParams.IRonMultiplier = float(self.ui.IRonMultiplier.text())
-        self.scriptParams.IRoffMultiplier = float(self.ui.IRoffMultiplier.text())
+        self.scriptParams.IRonMultiplier = self.toFloat(self.ui.IRonMultiplier.text(), 1.0)
+        self.scriptParams.IRoffMultiplier = self.toFloat(self.ui.IRoffMultiplier.text(), 1.0)
         self.scriptParams.isoValue = self.ui.isoValue.currentText()
 
     def changeMainWinSize(self, geometry):
