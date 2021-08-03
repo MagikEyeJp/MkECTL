@@ -49,6 +49,7 @@ class ScriptParams():
         self.baseFolderName: str = 'data'
         self.subFolderName: str = self.now.strftime('%Y%m%d_%H%M%S')
         self.isContinue = False
+        self.start_command_num: int = 0
 
         self.IRonMultiplier = 1.0
         self.IRoffMultiplier = 1.0
@@ -114,6 +115,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.total = 100
         self.percent = 0
         self.stopClicked = False
+        self.demo_script = 'script/demo.txt'
 
         # pygame.mixer
         # mixer.init()
@@ -176,7 +178,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # other buttons
         self.ui.initializeButton.setEnabled(False)
         self.ui.initializeButton.clicked.connect(self.initializeMotors)
-        self.ui.MagikEye.clicked.connect(self.demo)
+        self.ui.MagikEye.clicked.connect(lambda: self.demo(False))
         self.ui.getCurrentPosButton.setEnabled(False)
         self.ui.getCurrentPosButton.clicked.connect(self.getCurrentPos)
         self.ui.selectScript_toolButton.clicked.connect(lambda: self.openScriptFile(1))
@@ -569,17 +571,22 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.scriptParams.renewSubFolderName()
         self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
 
-    def demo(self):
-        demo_script = 'script/demo.txt'
-        self.scriptParams.scriptName[0] = demo_script
-        self.ui.scriptName_label.setText(demo_script)
+    def demo(self, isContinue):
+        self.scriptParams.scriptName[0] = self.demo_script
+        self.ui.scriptName_label.setText(self.demo_script)
+        self.scriptParams.isContinue = isContinue
 
-        if not os.path.exists(demo_script):
+        if isContinue:
+            self.scriptParams.start_command_num = self.done
+        else:
+            self.scriptParams.start_command_num = 0
+
+        if not os.path.exists(self.demo_script):
             QtWidgets.QMessageBox.critical \
                 (self, "File",
                  'Demo script doesn\'t exist. \n '
                  'Please check \" ~'
-                 + os.path.abspath(os.getcwd()) + demo_script.replace("./", "/") + '\"')
+                 + os.path.abspath(os.getcwd()) + self.demo_script.replace("./", "/") + '\"')
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
@@ -604,6 +611,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def run_script(self, isContinue):
         self.stopClicked = False
+
+        if self.scriptParams.scriptName[0] == self.demo_script:
+            self.demo(isContinue)
+            return
 
         if isContinue:
             self.scriptParams.isContinue = True

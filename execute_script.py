@@ -252,10 +252,12 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
 
     if isDemo:
         commands['mov'][1] = False
+        range_obj = range(scriptParams.start_command_num, commandNum)
     else:
         commands['mov'][1] = True
+        range_obj = range(commandNum)
 
-    for i in range(commandNum):
+    for i in range_obj:
 
         if isAborted(scriptParams, mainWindow):
             return mainWindow.stopClicked
