@@ -445,9 +445,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.initializeProgressLabel.setText('Moving...')
             self.ui.initializeProgressBar.setValue(0.0)
 
-            isFinished = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
+            isAborted = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
-            if isFinished:
+            if isAborted:
+                QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+            else:
                 # for id in self.motorRobot.params.keys():
                 self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(targetPos_d[motor_id]))
 
@@ -457,8 +459,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.initializeProgressLabel.setEnabled(False)
                 if self.subWindow.conn:
                     self.subWindow.prevImg(1)
-            else:
-                QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
 
             if self.subWindow.conn:
                 self.subWindow.prevImg(1)
@@ -745,9 +745,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeProgressLabel.setText('Going to origin...')
         self.ui.initializeProgressBar.setValue(0.0)
 
-        isFinished = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
+        isAborted = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
-        if isFinished:
+        if isAborted:
+            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+        else:
             for id in self.motorRobot.params.keys():
                 self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
                 # self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
@@ -758,8 +760,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.initializeProgressLabel.setEnabled(False)
             if self.subWindow.conn:
                 self.subWindow.prevImg(1)
-        else:
-            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
 
     def savePositions(self):
         save_name = ''
@@ -780,9 +780,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeProgressLabel.setText('Moving...')
         self.ui.initializeProgressBar.setValue(0.0)
 
-        isFinished = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
+        isAborted = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
-        if isFinished:
+        if isAborted:
+            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+        else:
             for id in self.motorRobot.params.keys():
                 self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
                 # self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
@@ -793,8 +795,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.initializeProgressLabel.setEnabled(False)
             if self.subWindow.conn:
                 self.subWindow.prevImg(1)
-        else:
-            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
 
 
     def showSubWindow(self, geometry, framesize):

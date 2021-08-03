@@ -179,7 +179,7 @@ class KeiganMotorRobot(IMotorRobot):
 
         initial_err = math.sqrt(initial_err)
         if initial_err == 0.0:
-            return True
+            return False    # isAborted
 
         # systate.pos = motorPos
 
@@ -242,16 +242,19 @@ class KeiganMotorRobot(IMotorRobot):
                     # raise StopIteration()
                     break
 
-                if isAborted is None:   # main window event
-                    return True # isFinished
-                else:   # script event
-                    return False    # isStopped
+                # if isAborted is None:   # main window event
+                #     return True # isFinished
+                # else:   # script event
+                #     return False    # isStopped
 
             except TimeoutError:
-                if isAborted is None:   # main window event
-                    return False # isFinished
-                else:   # script event
-                    return True    # isStopped
+                # if isAborted is None:   # main window event
+                #     return False # isFinished
+                # else:   # script event
+                #     return True    # isStopped
+                return True     # isAborted
+
+        return False
 
 # class KeiganMotor(KMControllersS.USBController):
 #     def __init__(self, parent=None):

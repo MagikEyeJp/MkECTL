@@ -460,7 +460,6 @@ def move_robot(args, scriptParams, devices, mainWindow):
     print('move to ' + str(args))
     global systate
     global isDemo
-    motorSet = ['slider', 'pan', 'tilt']
 
     # time.sleep(20)
 
