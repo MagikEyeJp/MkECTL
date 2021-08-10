@@ -54,57 +54,6 @@ dynvars = {
 app = QtWidgets.qApp
 isDemo = False
 
-class ProgressWindow(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super(ProgressWindow, self).__init__(parent)
-
-        self.ui_script = scriptProgress_ui.Ui_script()
-        self.ui_script.setupUi(self)
-
-        self.done = 0
-        self.total = 100
-        self.percent = 0
-
-        self.stopClicked = False
-
-        # window position
-        desktop = app.desktop()
-        self.geometry = desktop.screenGeometry()
-        # ウインドウサイズ(枠込)を取得
-        self.framesize = self.frameSize()
-        # ウインドウの位置を指定
-        self.move(self.geometry.width() / 2 - self.framesize.width() / 2, self.geometry.height() / 2 - self.framesize.height() / 2)
-        # self.move(self.geometry.width() / 2 - self.framesize.width(), self.geometry.height() / 2 - self.framesize.height() / 2)
-
-
-        self.ui_script.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
-        self.ui_script.progressBar.setValue(self.percent)
-        self.ui_script.stopButton.clicked.connect(self.interrupt)
-
-
-    def updatePercentage(self):
-        self.percent = self.done / self.total * 100
-        # print(self.percent)
-        self.ui_script.progressBar.setValue(self.percent)
-        return self.percent
-
-    def updateProgressLabel(self):
-        self.ui_script.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
-
-    def interrupt(self):
-        self.stopClicked = True
-        self.close()
-
-    def keyPressEvent(self, event):
-        key = event.key()
-        if key == QtCore.Qt.Key_Escape:
-            self.interrupt()
-
-    def closeEvent(self, event):  # https://www.qtcentre.org/threads/20895-PyQt4-Want-to-connect-a-window-s-close-button
-        # self.deleteLater()
-        # event.accept()
-        self.interrupt()
-
 class Systate():
     def __init__(self):
         self.root = None
