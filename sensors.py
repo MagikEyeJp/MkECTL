@@ -7,6 +7,7 @@ import sys
 import re
 import os
 import time
+import datetime
 from PIL import Image
 import csv
 import numpy as np
@@ -200,7 +201,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.prevAveButton.clicked.connect(lambda: self.startGetImageThread(self.frames, False))
         self.ui_s.save1Button.clicked.connect(lambda: self.startGetImageThread(1, True))
         self.ui_s.saveAveButton.clicked.connect(lambda: self.startGetImageThread(self.frames, True))
-        self.ui_s.frameButton.clicked.connect(lambda: self.snap3D('sample.csv'))
+        self.ui_s.frameButton.clicked.connect(self.snap3D)
 
         self.ui_s.selectDirectoryButton.clicked.connect(self.selectDirectory)
         self.ui_s.resetButton.clicked.connect(self.resetCounter)
@@ -220,7 +221,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.saveImgBool = False
 
         # 3D frame data
-        self.csvPath = ''
+        self.frame3DDirPath = os.getcwd() + '/frame3Ddata'
 
         # group
         self.ui_s.cameraControlGroup.setEnabled(False)
@@ -510,7 +511,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.imgCounter = 0
         self.ui_s.saveImgName.setText('img_' + str(self.imgCounter).zfill(4) + '.png')
 
-    def snap3D(self, csvName):
+    def snap3D(self):
+        now = datetime.datetime.now()
+        ymd_hms = now.strftime('%Y%m%d_%H%M%S')
+
         frame = self.sensor.get_frame()
 
         uid = np.array(frame.uid).reshape(-1, 1)
@@ -518,7 +522,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
         data = np.hstack((uid, lut3d))
 
-        f = open(csvName, 'w')
+        if not os.path.exists(self.frame3DDirPath):
+            os.makedirs(self.frame3DDirPath)
+
+        f = open(self.frame3DDirPath + '/' + ymd_hms + '.csv', 'w')
         writer = csv.writer(f)
         writer.writerow(['uid', 'x', 'y', 'z'])
         writer.writerows(data)

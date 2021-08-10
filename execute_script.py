@@ -448,12 +448,12 @@ def snap_3D_frame(args, scriptParams, devices, mainWindow):
     fileName.append(systate.saveFileName[fileCategory])
     expand_dynvars(fileName, devices)
 
-    devices['3Dsensors'].csvPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
+    devices['3Dsensors'].frame3DDirPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
-    if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].csvPath):
+    if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].frame3DDirPath):
         resume_state(scriptParams, devices, mainWindow)
 
-        devices['3Dsensors'].snap3D(devices['3Dsensors'].csvPath)
+        devices['3Dsensors'].snap3D(devices['3Dsensors'].frame3DDirPath)
 
     systate.seqn += 1
 
