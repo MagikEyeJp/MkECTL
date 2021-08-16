@@ -351,32 +351,37 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.motorRobot.getMotorDic()
         self.ui.initializeProgressBar.setValue(40)
 
-        self.motorRobot.initializeMotors()
-        self.ui.initializeProgressBar.setValue(80)
+        if self.motorRobot.initializeMotors():
+            self.ui.initializeProgressBar.setValue(80)
 
-        self.devices['motors'] = self.motorRobot.params
-        self.devices['robot'] = self.motorRobot
+            self.devices['motors'] = self.motorRobot.params
+            self.devices['robot'] = self.motorRobot
 
-        # IR light
-        if "IRLight" in self.machineParams:
-            IRtype = self.machineParams["IRLight"].get("type")
-            IRdevice = self.machineParams["IRLight"].get("device")
-            if IRtype == "MkE":
-                self.IRLight = IRLightMkE.IRLightMkE(IRtype, IRdevice)
-            elif IRtype == "PAPOUCH":
-                self.IRLight = IRLightPapouch.IRLightPapouch(IRtype, IRdevice)
-            else:   # dummy
-                self.IRLight = IRLightDummy.IRLightDummy(IRtype, IRdevice)
+            # IR light
+            if "IRLight" in self.machineParams:
+                IRtype = self.machineParams["IRLight"].get("type")
+                IRdevice = self.machineParams["IRLight"].get("device")
+                if IRtype == "MkE":
+                    self.IRLight = IRLightMkE.IRLightMkE(IRtype, IRdevice)
+                elif IRtype == "PAPOUCH":
+                    self.IRLight = IRLightPapouch.IRLightPapouch(IRtype, IRdevice)
+                else:   # dummy
+                    self.IRLight = IRLightDummy.IRLightDummy(IRtype, IRdevice)
 
-        self.openIR()
+            self.openIR()
 
-        # GUI
-        print('--initialization completed--')
-        self.ui.initializeProgressBar.setValue(100)
-        self.ui.initializeProgressLabel.setText('Initialized all motors')
+            # GUI
+            print('--initialization completed--')
+            self.ui.initializeProgressBar.setValue(100)
+            self.ui.initializeProgressLabel.setText('Initialized all motors')
 
-        self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
-        self.setUIStatus(self.states)
+            self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
+            self.setUIStatus(self.states)
+        else:
+            QtWidgets.QMessageBox.critical(self, "Initialization Error",
+                           "Couldn\'t initialize motors.\nPlease check if the motors are ready to be initialized.")
+            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+            self.setUIStatus(self.states)
 
     def getCurrentPos(self):
         for id, p in self.motorRobot.params.items():
@@ -461,9 +466,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.initializeProgressLabel.setEnabled(False)
                 if self.subWindow.conn:
                     self.subWindow.prevImg(1)
-
-            if self.subWindow.conn:
-                self.subWindow.prevImg(1)
 
         elif buttonName == 'presetExe':
             motor_id = self.ui.presetMotorCombo.currentText()
