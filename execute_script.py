@@ -435,7 +435,7 @@ def move_robot(args, scriptParams, devices, mainWindow):
         if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
             app.processEvents()
 
-            isStopped = devices['robot'].goToTargetPos(targetPos_d, mainWindow.changeMovRoboStatus, isAborted, scriptParams, mainWindow)
+            isStopped = devices['robot'].goToTargetPos(targetPos_d, mainWindow.changeMovRoboStatus, True, isAborted, scriptParams, mainWindow)
             if isStopped:
                 return mainWindow.stopClicked
 
