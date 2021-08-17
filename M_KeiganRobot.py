@@ -134,13 +134,14 @@ class KeiganMotorRobot(IMotorRobot):
     def initializeMotors(self):
         global initialParameters
 
-        try:
+        self.slider = self.params.get('slider', {}).get('cont', None)
+        self.pan = self.params.get('pan', {}).get('cont', None)
+        self.tilt = self.params.get('tilt', {}).get('cont', None)
+
+        if [self.slider, self.pan, self.tilt].count(None) == 0:
+        # try:
             for id, p in self.params.items():
-                # motorVal = 'self.' + id
-                # locals()[motorVal] = p['cont']
-                # locals()[motorVal].enable()
-                # locals()[motorVal].interface(8)
-                exec('self.%s = p[\'cont\']' % id)
+                # exec('self.%s = p[\'cont\']' % id)
                 exec('self.%s.enable()' % id)
                 exec('self.%s.interface(8)' % id)
                 # print(self.slider)
@@ -152,7 +153,8 @@ class KeiganMotorRobot(IMotorRobot):
                 time.sleep(0.2)
 
             return True
-        except Exception:
+        else:
+        # except Exception:
             return False
 
     def changePIDparam(self, pid_category, pid_param, motor_i, value):
