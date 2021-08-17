@@ -91,15 +91,6 @@ class GetImageThread(threading.Thread):
             self.pixmap = QtGui.QPixmap(self.image)
             inmain(self.callback, self.pixmap, self.image)
 
-class SensorWindowDock(QtWidgets.QDockWidget):  # https://teratail.com/questions/118024
-    def __init__(self, parent=None, mainUI:IMainUI=None):
-        super(SensorWindowDock, self).__init__(parent)
-        # print(mainUI)
-        # mainUI.sensorChanged()
-        self.mainUI = mainUI
-
-        self.ui_s = sensorwindow_dock_ui.Ui_sensor()
-        self.ui_s.setupUi(self)
 
 class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118024
     def __init__(self, parent=None, mainUI:IMainUI=None):
