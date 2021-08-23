@@ -23,6 +23,7 @@ import motordic
 import mainwindow_ui
 import execute_script
 import sensors
+import detailedSettings_ui
 import ini
 import read_machine_file
 from UIState import UIState
@@ -76,6 +77,169 @@ class MyMessageBox(QtWidgets.QMessageBox):
         else:
             event.ignore()
 
+class DetailedSettingsWindow(QtWidgets.QWidget):
+    pidChanged = QtCore.pyqtSignal(str, str, int, float)
+
+    def __init__(self, parent=None, mainUI:IMainUI=None):
+        super(DetailedSettingsWindow, self).__init__(parent)
+        # self.pidChanged.connect(self.mainUI.motorRobot.changePIDparam)
+        self.mainUI = mainUI
+
+        self.ui_setting = detailedSettings_ui.Ui_settings()
+        self.ui_setting.setupUi(self)
+
+        self.pidDirPath = 'PIDparams'
+        self.savedPIDfile = 'saved_pid.json'
+
+        self.currentPIDvalues = {}
+        self.tableWidget = self.ui_setting.pidTable
+        self.resetPID()
+
+        self.setDicTable()
+        self.tableWidget.cellChanged.connect(self.changeDetailedSettings)
+        # self.setTableSize()
+
+        self.defaultWinHeight = self.geometry().height()
+        self.defaultTableHeight = self.tableWidget.height()
+
+        self.ui_setting.saveButton.clicked.connect(self.savePID)
+        self.ui_setting.resetButton.clicked.connect(self.resetPID)
+
+        self.ui_setting.resetButton.setEnabled(False)
+
+    def setTableSize(self):
+        width = self.tableWidget.verticalHeader().width()
+        width += self.tableWidget.horizontalHeader().length()
+        if self.tableWidget.verticalScrollBar().isVisible():
+            width += self.tableWidget.verticalScrollBar().width()
+        width += self.tableWidget.frameWidth() * 2
+        # self.tableWidget.setFixedWidth(width)
+
+        # height = self.tableWidget.horizontalHeader().height()
+        # height += self.tableWidget.verticalHeader().height()
+        # if self.tableWidget.verticalScrollBar().isVisible():
+        #     height += self.tableWidget.verticalScrollBar().width()
+        # height += self.tableWidget.frameWidth() * 2
+
+        height = self.defaultTableHeight
+        height += self.geometry().height() - self.defaultWinHeight
+
+        posX = self.tableWidget.pos().x()
+        posY = self.tableWidget.pos().y()
+
+        # self.tableWidget.setGeometry(posX, posY, width, height)
+        self.tableWidget.setFixedHeight(height)
+
+    def resizeEvent(self, event):
+        # self.tableWidget.resizeRowsToContents()
+        self.setTableSize()
+        super(DetailedSettingsWindow, self).resizeEvent(event)
+
+    def setDicTable(self):
+
+        # self.tableWidget.clear()
+        # self.tableWidget.setColumnCount(5)
+        # self.tableWidget.setRowCount(len(self.robot.pid_settings)*3)
+        # self.tableWidget.setHorizontalHeaderLabels(["", "param", "slider", "pan", "tilt"])
+        r = 0
+        col = 1
+
+        for i in range(len(self.mainUI.motorRobot.params.keys())):
+            for pid_category, pid_category_val in self.currentPIDvalues.items():
+                for pid_param, pid_param_val in pid_category_val.items():
+                    # execCode = 'p[\'cont\'].read_%s%s()' % (pid_category, pid_param)
+                    # val = eval(execCode)
+                    val = self.currentPIDvalues[pid_category][pid_param][i]
+
+                    # self.tableWidget.setItem(r, 1, QtWidgets.QTableWidgetItem(pid_param))
+                    self.tableWidget.setItem(r, col, QtWidgets.QTableWidgetItem(str(val)))
+                    r += 1
+            r = 0
+            col += 1
+
+        # # QTableView.setSpan(row, column, rowSpan, columnSpan)
+        # self.tableWidget.setSpan(0, 0, 4, 1)    # speed
+        # self.tableWidget.setSpan(4, 0, 4, 1)    # current
+        # self.tableWidget.setSpan(8, 0, 5, 1)    # position
+        # self.tableWidget.setItem(0, 0, QtWidgets.QTableWidgetItem("speed"))
+        # self.tableWidget.setItem(4, 0, QtWidgets.QTableWidgetItem("current"))
+        # self.tableWidget.setItem(8, 0, QtWidgets.QTableWidgetItem("position"))
+
+        # self.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        # self.tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+        # self.tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
+        # self.tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
+        # self.tableWidget.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
+
+    def changeDetailedSettings(self, row, col):
+        # ここで本当はpidパラメータを変更するor main windowに返す？
+        # row -> 0,1,2:speed 3,4,5:position 6,7,8:qCurrent
+        #        0,3,6:P     1,4,7:I        2,5,8:D
+        # col -> 2:slider(0) 3:pan(1) 4:tilt(2)
+        pid_category_dic = {
+            0: 'speed', 1: 'speed', 2: 'speed', 3: 'speed',
+            4: 'qCurrent', 5: 'qCurrent', 6: 'qCurrent', 7: 'qCurrent',
+            8: 'position', 9: 'position', 10: 'position', 11: 'position', 12: 'position'
+        }
+        pid_param_dic = {
+            0: 'P', 4: 'P', 8: 'P',
+            1: 'I', 5: 'I', 9: 'I',
+            2: 'D', 6: 'D', 10: 'D',
+            3: 'lowPassFilter', 7: 'lowPassFilter', 11: 'lowPassFilter',
+            12: 'posControlThreshold'
+        }
+        print(row, col)
+        value = float(self.tableWidget.item(row, col).text())
+        self.pidChanged.emit(pid_category_dic[row], pid_param_dic[row], col-1, value)
+
+        self.currentPIDvalues[pid_category_dic[row]][pid_param_dic[row]][col-1] = value
+        # print(self.currentPIDvalues)
+        self.ui_setting.resetButton.setEnabled(True)
+
+    def savePID(self):
+        print('savePID')
+
+        if not os.path.exists(self.pidDirPath):
+            os.makedirs(self.pidDirPath)
+
+        with open(self.pidDirPath + '/' + self.savedPIDfile, 'w') as f:
+            # json.dump(self.mainUI.motorRobot.pid_settings, f, indent=4)
+            json.dump(self.currentPIDvalues, f, indent=4)
+
+        self.ui_setting.resetButton.setEnabled(False)
+
+    def resetPID(self):
+        print('resetPID')
+
+        if os.path.exists(self.pidDirPath + '/' + self.savedPIDfile):
+            self.currentPIDvalues = read_machine_file.loadJson(self.pidDirPath + '/' + self.savedPIDfile)
+            # print(self.currentPIDvalues)
+        else:
+            self.currentPIDvalues = {
+                'speed': {
+                    'P': [14.0, 14.0, 14.0],
+                    'I': [0.001, 0.001, 0.001],
+                    'D': [0.0, 0.0, 0.0],
+                    'lowPassFilter': [0.1, 0.1, 0.1]
+                },
+                'qCurrent': {
+                    'P': [0.2, 0.6, 0.2],
+                    'I': [10.0, 4.0, 10.0],
+                    'D': [0.0, 0.0, 0.0],
+                    'lowPassFilter': [1.0, 1.0, 1.0]
+                },
+                'position': {
+                    'P': [30.0, 80.0, 40.0],
+                    'I': [400.0, 20.0, 400.0],
+                    'D': [0.0, 0.0, 0.0],
+                    'lowPassFilter': [0.1, 0.1, 0.1],
+                    'posControlThreshold': [1.0, 1.0, 1.0]
+                }
+            }
+
+        self.setDicTable()
+        self.ui_setting.resetButton.setEnabled(False)
+
 class Ui(QtWidgets.QMainWindow, IMainUI):
     def __init__(self, parent=None):
         super(Ui, self).__init__(parent)
@@ -86,12 +250,15 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # self.subWindow = sensors.SensorWindow(mainUI=self)
 
-        ### docking test https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
+        ### docking window https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
         self.subWindow = sensors.SensorWindow(mainUI=self)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.subWindow)
         self.sensorWinWidth = self.subWindow.frameGeometry().width()
         self.sensorWinHeight = self.subWindow.frameGeometry().height()
         self.subWindow_isOpen = False
+
+        ### detailed settings window
+        self.detailedSettingsWindow = None  # made in initializeMotors()
 
         self.initializeProcessFlag = False
 
@@ -351,6 +518,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.motorRobot.getMotorDic()
         self.ui.initializeProgressBar.setValue(40)
 
+        ### detailed settings window
+        self.detailedSettingsWindow = DetailedSettingsWindow(mainUI=self)
+
         if self.motorRobot.initializeMotors():
             self.ui.initializeProgressBar.setValue(80)
 
@@ -436,6 +606,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def exeButtonClicked(self, buttonName):
         if re.search('.+MoveExe', buttonName):
+            sender = self.sender()
+            text = '''Called : %(person)s\nSender : %(sender)s''' \
+            % {
+                'sender': sender,
+                'person': sender.text()
+            }
+            print(text)
+
             motor_id = buttonName.replace('MoveExe', '')
             targetPos = self.motorGUI['posSpin'][motor_id].value()
             targetPos_d = {'slider': None, 'pan': None, 'tilt': None}
@@ -751,6 +929,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(0.0))
 
     def goToHomePosition(self):
+        sender = self.sender()
+        text = '''Called : %(person)s\nSender : %(sender)s''' \
+               % {
+                   'sender': sender,
+                   'person': sender.text()
+               }
+        print(text)
+
         targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
 
         self.ui.initializeProgressBar.setEnabled(True)
@@ -872,20 +1058,24 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     # ----- detailed settings -----
     def detailedSettings(self):
-        # detailedSettingsWindow = detailed_settings_ui.Ui_Dialog()
-        # detailedSettingsWindow.setupUi(QtWidgets.QDialog)
 
-        detailedSettingsWindow = PopupList.PopupList()
-        pos = self.ui.detailedSettingsButton.mapToGlobal(QtCore.QPoint(32, 24))
-        width = 320
-        height = 200
-        rect = QtCore.QRect(pos.x() - width, pos.y(), width, height)
-        detailedSettingsWindow.setGeometry(rect)
-        # strlist = [dict[key] + ":" + key for key in dict]
-        detailedSettingsWindow.setDic_detailedSettings(self.motorRobot)
-        detailedSettingsWindow.pidChanged.connect(self.motorRobot.changePIDparam)
-        detailedSettingsWindow.show()
+        # # detailedSettingsWindow = detailed_settings_ui.Ui_Dialog()
+        # # detailedSettingsWindow.setupUi(QtWidgets.QDialog)
+        #
+        # detailedSettingsWindow = PopupList.PopupList()
+        # pos = self.ui.detailedSettingsButton.mapToGlobal(QtCore.QPoint(32, 24))
+        # width = 320
+        # height = 200
+        # rect = QtCore.QRect(pos.x() - width, pos.y(), width, height)
+        # detailedSettingsWindow.setGeometry(rect)
+        # # strlist = [dict[key] + ":" + key for key in dict]
+        # detailedSettingsWindow.setDic_detailedSettings(self.motorRobot)
+        self.detailedSettingsWindow.pidChanged.connect(self.motorRobot.changePIDparam)
+        # detailedSettingsWindow.show()
 
+        self.detailedSettingsWindow.activateWindow()
+        self.detailedSettingsWindow.move(self.pos().x()+500, self.pos().y())
+        self.detailedSettingsWindow.show()
 
     # ----- Post Process -----
 
