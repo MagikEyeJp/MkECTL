@@ -246,9 +246,12 @@ class Controller:
         """
         Set the position PID controller's Proportional gain to the positive 'position_p'.
         """
-        command=b'\x21'
-        values=float2bytes(threshold)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command=b'\x21'
+        # values=float2bytes(threshold)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        print('posControlThreshold: ' + str(threshold))
 
     def resetPID(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -261,10 +264,15 @@ class Controller:
         """
         Set the PID low pass filter factor.
         """
-        command = b'\x27'
-        values = uint8_t2bytes(filtertype)+float2bytes(value)
-        print(values)
-        self.run_command(command+identifier+values+crc16,'motor_settings')
+        # command = b'\x27'
+        # values = uint8_t2bytes(filtertype)+float2bytes(value)
+        # print(values)
+        # self.run_command(command+identifier+values+crc16,'motor_settings')
+
+        ########## dummy ##########
+        lpf_category = {1: 'speed', 0: 'qCurrent', 2: 'position'}
+
+        print('lowPassFilter: ' + str(lpf_category[filtertype]) + '...' + str(value))
 
     def measureInterval(self,interval,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
