@@ -13,8 +13,6 @@ TODO & Ideas
 ・[PENDING]既にあるサブフォルダを選択した上で異なるスクリプトをこのときに指定してしまうと、
     フォルダ内がごっちゃになっちゃうので、そうさせない工夫も今後必要かも知れない
 ・[PENDING(いい構造が思い浮かばない＆必要なさそうなので)]frame3Ddataのcsvのようなjsonファイルも作れるといい
-・[DOING]PIDパラメータの制御に関して、saveとcancel(もとに戻す)とok(値を反映)ボタンがほしい
-・[DOING]detailed settingsにposControlThreatholdとLPFも追加する
 
 BUG?
 ・SensorWindowの撮影枚数の数値が、単発撮影ボタンが押された後反映されなくなる。1回しか撮影されない。数値を編集するとまた反映される。
@@ -55,6 +53,8 @@ Done
 ・[DONE]PIDなどの設定機能(detailed settingsの追加)
 ・[DONE]ProgressWindow class(in execute_script.py)をScriptParams(in MkECTL.py)に統合？
 ・[DONE]モータ移動を同期型(待つ)/非同期型(待たない)の選択ができるようにする
+・[DONE]PIDパラメータの制御に関して、reset(もとに戻す)ボタンがほしい
+・[DONE]detailed settingsにposControlThreatholdとLPFも追加する
 
 ・[DONE]センサーをオープンしたまま、センサーを再起動すると、センサーウィンドウでキャプチャできなくなる。MkECTLを立ち上げ直さないと復帰できない。
 ・[DONE]モータ移動進捗表示のためのtotalInitialErrorsが0だと0割りエラーになる
