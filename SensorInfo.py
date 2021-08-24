@@ -1,4 +1,4 @@
-import json
+import json_IO
 import csv
 
 
@@ -67,13 +67,12 @@ class SensorInfo:
 
     def load_from_file(self, filename):
         with open(filename) as f:
-            dic = json.load(f)
+            dic = json_IO.loadJson(f)
             self.from_dic(dic)
 
     def save_to_file(self, filename):
         dic = self.to_dic()
-        with open(filename, 'w') as f:
-            json.dump(dic, f, indent=4)
+        json_IO.writeJson(dic, filename)
 
     def smid_from_labelid(self):
         if self.labelid in self.smiddic.values():

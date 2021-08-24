@@ -25,7 +25,7 @@ import execute_script
 import sensors
 import detailedSettings_ui
 import ini
-import read_machine_file
+import json_IO
 from UIState import UIState
 from SensorInfo import SensorInfo
 import PopupList
@@ -145,10 +145,6 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
             col += 1
 
     def changeDetailedSettings(self, row, col):
-        # ここで本当はpidパラメータを変更するor main windowに返す？
-        # row -> 0,1,2:speed 3,4,5:position 6,7,8:qCurrent
-        #        0,3,6:P     1,4,7:I        2,5,8:D
-        # col -> 2:slider(0) 3:pan(1) 4:tilt(2)
         pid_category_dic = {
             0: 'speed', 1: 'speed', 2: 'speed', 3: 'speed',
             4: 'qCurrent', 5: 'qCurrent', 6: 'qCurrent', 7: 'qCurrent',
@@ -166,18 +162,13 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
         self.pidChanged.emit(pid_category_dic[row], pid_param_dic[row], col-1, value)
 
         self.currentPIDvalues[pid_category_dic[row]][pid_param_dic[row]][col-1] = value
-        # print(self.currentPIDvalues)
         self.ui_setting.resetButton.setEnabled(True)
 
     def savePID(self):
-        print('savePID')
-
         if not os.path.exists(self.pidDirPath):
             os.makedirs(self.pidDirPath)
 
-        with open(self.pidDirPath + '/' + self.savedPIDfile, 'w') as f:
-            # json.dump(self.mainUI.motorRobot.pid_settings, f, indent=4)
-            json.dump(self.currentPIDvalues, f, indent=4)
+        json_IO.writeJson(self.currentPIDvalues, self.pidDirPath + '/' + self.savedPIDfile)
 
         self.ui_setting.resetButton.setEnabled(False)
 
@@ -185,7 +176,7 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
         print('resetPID')
 
         if os.path.exists(self.pidDirPath + '/' + self.savedPIDfile):
-            self.currentPIDvalues = read_machine_file.loadJson(self.pidDirPath + '/' + self.savedPIDfile)
+            self.currentPIDvalues = json_IO.loadJson(self.pidDirPath + '/' + self.savedPIDfile)
             # print(self.currentPIDvalues)
         else:
             self.currentPIDvalues = {
@@ -376,7 +367,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         if os.path.exists(self.previousMachineIni):
             self.previousMachineFilePath = ini.getPreviousMachineFile(self.previousMachineIni)
             if os.path.exists(self.previousMachineFilePath):
-                self.machineParams = read_machine_file.loadJson(self.previousMachineFilePath)
+                self.machineParams = json_IO.loadJson(self.previousMachineFilePath)
                 self.ui.initializeButton.setEnabled(True)
             self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
 
@@ -1213,7 +1204,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.previousMachineFilePath = fileName
             ini.updatePreviousMachineFile('data/previousMachine.ini', self.previousMachineFilePath)
-            self.machineParams = read_machine_file.loadJson(self.previousMachineFilePath)
+            self.machineParams = json_IO.loadJson(self.previousMachineFilePath)
 
             self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
