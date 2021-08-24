@@ -109,18 +109,6 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
         self.ui_setting.resetButton.setEnabled(False)
 
     def setTableSize(self):
-        width = self.tableWidget.verticalHeader().width()
-        width += self.tableWidget.horizontalHeader().length()
-        if self.tableWidget.verticalScrollBar().isVisible():
-            width += self.tableWidget.verticalScrollBar().width()
-        width += self.tableWidget.frameWidth() * 2
-        # self.tableWidget.setFixedWidth(width)
-
-        # height = self.tableWidget.horizontalHeader().height()
-        # height += self.tableWidget.verticalHeader().height()
-        # if self.tableWidget.verticalScrollBar().isVisible():
-        #     height += self.tableWidget.verticalScrollBar().width()
-        # height += self.tableWidget.frameWidth() * 2
 
         height = self.defaultTableHeight
         height += self.geometry().height() - self.defaultWinHeight
@@ -155,20 +143,6 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
                     r += 1
             r = 0
             col += 1
-
-        # # QTableView.setSpan(row, column, rowSpan, columnSpan)
-        # self.tableWidget.setSpan(0, 0, 4, 1)    # speed
-        # self.tableWidget.setSpan(4, 0, 4, 1)    # current
-        # self.tableWidget.setSpan(8, 0, 5, 1)    # position
-        # self.tableWidget.setItem(0, 0, QtWidgets.QTableWidgetItem("speed"))
-        # self.tableWidget.setItem(4, 0, QtWidgets.QTableWidgetItem("current"))
-        # self.tableWidget.setItem(8, 0, QtWidgets.QTableWidgetItem("position"))
-
-        # self.tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        # self.tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-        # self.tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
-        # self.tableWidget.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
-        # self.tableWidget.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
 
     def changeDetailedSettings(self, row, col):
         # ここで本当はpidパラメータを変更するor main windowに返す？
