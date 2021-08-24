@@ -2,15 +2,39 @@
   "motors": {
     "slider": {
       "serial": "KM-1U 9PIG#CD1",
-      "scale": -0.104772141
+      "scale": -0.104772141,
+      "initial_param": {
+        "curveType": 1,
+        "maxSpeed": 250,
+        "acc": 8,
+        "dec": 8,
+        "speed": 20,
+        "maxTorque": 5
+      }
     },
     "pan": {
       "serial": "KM-1S 20BV#3A2",
-      "scale": -0.017453293
+      "scale": -0.017453293,
+      "initial_param": {
+        "curveType": 1,
+        "maxSpeed": 250,
+        "acc": 3,
+        "dec": 2,
+        "speed": 40,
+        "maxTorque": 5
+      }
     },
     "tilt": {
       "serial": "KM-1S CBG3#573",
-      "scale": -0.017453293
+      "scale": -0.017453293,
+      "initial_param": {
+        "curveType": 1,
+        "maxSpeed": 250,
+        "acc": 12,
+        "dec": 4,
+        "speed": 40,
+        "maxTorque": 5
+      }
     }
   },
   "IRLight": {

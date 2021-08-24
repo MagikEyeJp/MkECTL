@@ -16,42 +16,39 @@ from qtutils import inmain
 defaultMotors = {
     "slider": {
       "serial": "KM-1U 9PIG#CD1",
-      "scale": -0.104772141
-    },
-    "pan": {
-      "serial": "KM-1S 20BV#3A2",
-      "scale": -0.017453293
-    },
-    "tilt": {
-      "serial": "KM-1S 0D69#13A",
-      "scale": -0.017453293
-    }
-}
-
-initialParameters = {
-    "slider": {
+      "scale": -0.104772141,
+      "initial_param": {
         "curveType": 1,
         "maxSpeed": 250,
         "acc": 8,
         "dec": 8,
         "speed": 20,
         "maxTorque": 5
+      }
     },
     "pan": {
+      "serial": "KM-1S 20BV#3A2",
+      "scale": -0.017453293,
+      "initial_param": {
         "curveType": 1,
         "maxSpeed": 250,
         "acc": 3,
         "dec": 2,
         "speed": 40,
         "maxTorque": 5
+      }
     },
     "tilt": {
+      "serial": "KM-1S 0D69#13A",
+      "scale": -0.017453293,
+      "initial_param": {
         "curveType": 1,
         "maxSpeed": 250,
         "acc": 12,
         "dec": 4,
         "speed": 40,
         "maxTorque": 5
+      }
     }
 }
 
@@ -114,29 +111,25 @@ class KeiganMotorRobot(IMotorRobot):
         # return motordic
 
     def initializeMotors(self):
-        global initialParameters
-
         self.slider = self.params.get('slider', {}).get('cont', None)
         self.pan = self.params.get('pan', {}).get('cont', None)
         self.tilt = self.params.get('tilt', {}).get('cont', None)
 
         if [self.slider, self.pan, self.tilt].count(None) == 0:
-        # try:
             for id, p in self.params.items():
-                # exec('self.%s = p[\'cont\']' % id)
                 exec('self.%s.enable()' % id)
                 exec('self.%s.interface(8)' % id)
                 # print(self.slider)
 
-                for initKey, initPar in initialParameters[id].items():
-                    execCode: str = 'self.%s.%s(%d)' % (id, initKey, initPar)
-                    exec(execCode)
+                if "initial_param" in self.machineParams_m[id]:
+                    for initKey, initPar in self.machineParams_m[id]["initial_param"].items():
+                        execCode: str = 'self.%s.%s(%d)' % (id, initKey, initPar)
+                        exec(execCode)
 
                 time.sleep(0.2)
 
             return True
         else:
-        # except Exception:
             return False
 
     def changePIDparam(self, pid_category, pid_param, motor_i, value):
