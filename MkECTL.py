@@ -93,6 +93,7 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
 
         self.currentPIDvalues = {}
         self.tableWidget = self.ui_setting.pidTable
+        self.maxTableHeight = self.tableWidget.maximumHeight()
         self.resetPID()
 
         self.setDicTable()
@@ -128,7 +129,10 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
         posY = self.tableWidget.pos().y()
 
         # self.tableWidget.setGeometry(posX, posY, width, height)
-        self.tableWidget.setFixedHeight(height)
+        if height < self.maxTableHeight:
+            self.tableWidget.setFixedHeight(height)
+        else:
+            self.tableWidget.setFixedHeight(self.maxTableHeight)
 
     def resizeEvent(self, event):
         # self.tableWidget.resizeRowsToContents()
@@ -136,11 +140,6 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
         super(DetailedSettingsWindow, self).resizeEvent(event)
 
     def setDicTable(self):
-
-        # self.tableWidget.clear()
-        # self.tableWidget.setColumnCount(5)
-        # self.tableWidget.setRowCount(len(self.robot.pid_settings)*3)
-        # self.tableWidget.setHorizontalHeaderLabels(["", "param", "slider", "pan", "tilt"])
         r = 0
         col = 1
 
