@@ -3,26 +3,12 @@ import re  # https://qiita.com/luohao0404/items/7135b2b96f9b0b196bf3
 import numpy as np
 import datetime
 import time
-import math
-import struct
-import string
-import itertools
 from playsound import playsound
 from timeout_decorator import timeout, TimeoutError
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 
-import mainwindow_ui
-import scriptProgress_ui
 import ini
-import IRLight
-import UIState
-
-# import KMControllersS
-import motordic
-
-# import mke-api
-import pymkeapi
 
 commands = {'root': ['set_root', False],
             'set': ['set_filename', False],
@@ -272,21 +258,6 @@ def expand_dynvars(args, devices):
             if not dv_name in dynvars:
                 QtWidgets.QMessageBox.critical(devices['3Dsensors'], 'Cannot expand dynamic valuable', 'Unrecognized dynamic variable %s' % (dv_name))
 
-            ### matlab
-    #         if (dynvars{idx, 2} == 'd')
-    #             dv_pard = str2double(dv_par);
-    #             if (isnan(dv_pard))
-    #                 errmsg = sprintf('Parameter of "%s" is not a number', dv_name);
-    #                 return;
-    #             end
-    #         elseif(dynvars{idx, 2} == 't')
-    #           try
-    #                 datestr(now, dv_par);
-    #           catch
-    #           errmsg = sprintf('Parameter of "%s" in not a valid LDML string: %s', dv_name, dv_par);
-    #           return;
-    #          end
-    #       end
 
             ### datetimeも後で追加
             if dv_name == 'seqn':
@@ -452,8 +423,6 @@ def home_robot(args, scriptParams, devices, mainWindow):
 
     pos = np.array([0, 0, 0], dtype=int)
 
-    # if not systate.skip:
-    # print('move to ' + str(pos))
     move_robot(pos, scriptParams, devices, mainWindow)
 
 

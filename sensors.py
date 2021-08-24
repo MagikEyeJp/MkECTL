@@ -2,20 +2,16 @@
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt, QRect, QPoint, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtGui import QCursor
 import sys
 import re
 import os
-import time
 import datetime
-from PIL import Image
-import csv
 import numpy as np
 from timeout_decorator import TimeoutError
 import threading
 import discoverdevices
 import SensorDevice
-import sensorwindow_ui
+# import sensorwindow_ui
 import sensorwindow_dock_ui
 from IMainUI import IMainUI
 import PopupList

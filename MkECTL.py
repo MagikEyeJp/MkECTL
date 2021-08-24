@@ -6,20 +6,14 @@ import sys
 import time
 import os
 import re
-import serial
 from functools import partial
 import datetime
-import math
-# from pygame import mixer
 from playsound import playsound
-from timeout_decorator import timeout, TimeoutError
 import json
 import subprocess
-import shutil
 
 import MyDoubleSpinBox
 from M_KeiganRobot import KeiganMotorRobot
-import motordic
 import mainwindow_ui
 import execute_script
 import sensors
@@ -28,7 +22,6 @@ import ini
 import json_IO
 from UIState import UIState
 from SensorInfo import SensorInfo
-import PopupList
 
 import IRLightMkE
 import IRLightPapouch
@@ -42,9 +35,7 @@ class ScriptParams():
         self.execTwoScr: bool = False
         self.maxScriptNum = 10
         self.scriptName: list = [''] * self.maxScriptNum
-        # self.scriptName_2: str = ''
         self.commandNum: list = [0] * self.maxScriptNum
-        # self.commandNum_2: int = 0
         self.commandNum_total: int = 0
         self.currentScript: int = 1
         self.baseFolderName: str = 'data'
@@ -123,7 +114,6 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
             self.tableWidget.setFixedHeight(self.maxTableHeight)
 
     def resizeEvent(self, event):
-        # self.tableWidget.resizeRowsToContents()
         self.setTableSize()
         super(DetailedSettingsWindow, self).resizeEvent(event)
 
@@ -134,11 +124,7 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
         for i in range(len(self.mainUI.motorRobot.params.keys())):
             for pid_category, pid_category_val in self.currentPIDvalues.items():
                 for pid_param, pid_param_val in pid_category_val.items():
-                    # execCode = 'p[\'cont\'].read_%s%s()' % (pid_category, pid_param)
-                    # val = eval(execCode)
                     val = self.currentPIDvalues[pid_category][pid_param][i]
-
-                    # self.tableWidget.setItem(r, 1, QtWidgets.QTableWidgetItem(pid_param))
                     self.tableWidget.setItem(r, col, QtWidgets.QTableWidgetItem(str(val)))
                     r += 1
             r = 0
@@ -247,10 +233,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.percent = 0
         self.stopClicked = False
         self.demo_script = 'script/demo.txt'
-
-        # pygame.mixer
-        # mixer.init()
-        # mixer.music.load("SE/finish_chime.mp3")  # pygame.error: Unrecognized audio format
 
         self.ui.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
         self.ui.progressBar.setValue(self.percent)
@@ -397,11 +379,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             self.maxWinWidth = self.size().width()
             self.maxWinHeight = self.size().height()
-            # print(self.size())
-            # print(self.maxWinWidth)
-            # print(self.maxWinHeight)
-            # print(self.isMaximized())
-            # print('MAXIMIZED')
         else:
             self.isMaxWinSize = False
             self.subWindow.setFeatures(QtWidgets.QDockWidget.DockWidgetClosable | QtWidgets.QDockWidget.DockWidgetFloatable)
@@ -409,16 +386,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.showNormal()
                 self.setMinimumWidth(1040)
                 self.setMaximumWidth(self.geometry.width())
-            # print(self.size())
-            # print(self.maxWinWidth)
-            # print(self.maxWinHeight)
-            # print(self.isMaximized())
-            # print('isFloating: ' + str(self.subWindow.isFloating()))
-            # print('isHidden: ' + str(self.subWindow.isHidden()))
-            # print('isMaximized: ' + str(self.isMaximized()))
-            # print('not MAXIMIZED')
-
-        # print('isMaximized in resize: ' + str(self.isMaximized()))
 
     def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
         keys = [k for k, v in d.items() if v == val]
@@ -1013,6 +980,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.setMinimumWidth(1040)
                 self.setMaximumWidth(geometry.width())
                 self.setGeometry(posX, posY, self.minimumWidth(), max(mainHeight, self.sensorWinHeight))
+                ### for check ###
                 # print('isFloating: ' + str(self.subWindow.isFloating()))
                 # print('isHidden: ' + str(self.subWindow.isHidden()))
                 # print('isMaximized: ' + str(self.isMaximized()))
@@ -1022,20 +990,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     # ----- detailed settings -----
     def detailedSettings(self):
-
-        # # detailedSettingsWindow = detailed_settings_ui.Ui_Dialog()
-        # # detailedSettingsWindow.setupUi(QtWidgets.QDialog)
-        #
-        # detailedSettingsWindow = PopupList.PopupList()
-        # pos = self.ui.detailedSettingsButton.mapToGlobal(QtCore.QPoint(32, 24))
-        # width = 320
-        # height = 200
-        # rect = QtCore.QRect(pos.x() - width, pos.y(), width, height)
-        # detailedSettingsWindow.setGeometry(rect)
-        # # strlist = [dict[key] + ":" + key for key in dict]
-        # detailedSettingsWindow.setDic_detailedSettings(self.motorRobot)
         self.detailedSettingsWindow.pidChanged.connect(self.motorRobot.changePIDparam)
-        # detailedSettingsWindow.show()
 
         self.detailedSettingsWindow.activateWindow()
         self.detailedSettingsWindow.move(self.pos().x()+500, self.pos().y())
@@ -1209,7 +1164,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
-            # self.ui.initializeButton.setEnabled(True)
 
 # ==================================================================
     def sensorChanged(self, connected):
@@ -1228,5 +1182,3 @@ if __name__ == '__main__':
     # sensorWindow = SensorWindow()
     app.exec_()
 
-# if keiganWindow.ui.dummyMode.isEnabled():
-#     keiganWindow.ui.sliderCurrentLabel.setText(keiganWindow.devices['motors']['slider'].m_posion)

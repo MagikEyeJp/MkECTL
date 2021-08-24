@@ -237,17 +237,9 @@ class KeiganMotorRobot(IMotorRobot):
                         # raise StopIteration()
                         break
 
-                    # if isAborted is None:   # main window event
-                    #     return True # isFinished
-                    # else:   # script event
-                    #     return False    # isStopped
-
                 except TimeoutError:
-                    # if isAborted is None:   # main window event
-                    #     return False # isFinished
-                    # else:   # script event
-                    #     return True    # isStopped
                     return True     # isAborted
+
             return False
 
         else:
@@ -280,11 +272,5 @@ class KeiganMotorRobot(IMotorRobot):
 
             return False
 
-# class KeiganMotor(KMControllersS.USBController):
-#     def __init__(self, parent=None):
-#         super(KeiganMotor, self).__init__(parent)
-#         self.interface = 8
-#         self.speed = 5
-#
-#     # def initialize(self):
+
 
