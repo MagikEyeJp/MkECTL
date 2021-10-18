@@ -583,7 +583,7 @@ def resume_state(scriptParams, devices, mainWindow):
 
     systate.skip = False
 
-    move_robot(systate.pos, scriptParams, devices, params, mainWindow)
+    move_robot(systate.pos, scriptParams, devices, mainWindow)
     for i in range(len(systate.light)):
         set_light([i + 1, systate.light[i]], scriptParams, devices, mainWindow)
     set_lasers([systate.lasers], scriptParams, devices, mainWindow)
