@@ -124,7 +124,7 @@ class Systate():
         self.pos = [0, 0, 0]
         self.shutter = 0
         self.shutter_IRon = -1
-        self.shutter_IRoff = -1
+        self.shutter_IRoff = 1000
         self.gainiso = 0
         self.lasers = 0
         self.light = [0, 0]
@@ -569,6 +569,10 @@ def set_shutter(args, scriptParams, devices, params, mainWindow):
 
         mlt = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
         shutter = int(mlt * float(systate.shutter) + 0.5)
+        if isOn:
+            systate.shutter_IRon = shutter
+        else:
+            systate.shutter_IRoff = shutter
 
         if not systate.sentSig.shutter or shutter != systate.past_parameters.shutter:
             devices['3Dsensors'].shutterSpeed = shutter
@@ -685,8 +689,8 @@ def warm_lasers(scriptParams, devices, params, mainWindow):
     print('---warm lasers---')
     systate.skip = False
     if systate.shutter_IRoff > 0:
-        set_shutter([systate.shutter_IRoff], scriptParams, devices, params)
-        print('  shutter=', systate.shutter_IRoff)
+        set_shutter([systate.shutter_IRoff], scriptParams, devices, params, mainWindow)
+        print('  set shutter=', systate.shutter_IRoff)
     set_lasers([255], scriptParams, devices, params, mainWindow)
 
     systate.skip = current_skip
@@ -703,13 +707,13 @@ def resume_state(scriptParams, devices, params, mainWindow):
 
     systate.skip = False
 
+    move_robot(systate.pos, scriptParams, devices, params, mainWindow)
     for i in range(len(systate.light)):
         set_light([i + 1, systate.light[i]], scriptParams, devices, params, mainWindow)
     set_lasers([systate.lasers], scriptParams, devices, params, mainWindow)
     set_gainiso([systate.gainiso], scriptParams, devices, params, mainWindow)
     set_shutter([systate.shutter], scriptParams, devices, params, mainWindow)
-    move_robot(systate.pos, scriptParams, devices, params, mainWindow)
-
+    time.sleep(systate.shutter_IRoff * 1e-6)    # wait for an old frame
 
 # def snap_3D_frame():
 
