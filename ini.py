@@ -53,6 +53,7 @@ def updateIni_start(scriptParams):
         dt_start = datetime.datetime.now()
         config.set(newSection, 'ir_on_multiplier', str(scriptParams.IRonMultiplier))
         config.set(newSection, 'ir_off_multiplier', str(scriptParams.IRoffMultiplier))
+        config.set(newSection, 'iso_value', str(scriptParams.isoValue))
         config.set(newSection, 'start_time', str(dt_start))
 
         if scriptParams.isContinue and lastExecutedScript == scriptParams.scriptName[scriptParams.currentScript - 1]:
@@ -72,6 +73,7 @@ def updateIni_start(scriptParams):
         dt_start = datetime.datetime.now()
         config.set(section1, 'ir_on_multiplier', str(scriptParams.IRonMultiplier))
         config.set(section1, 'ir_off_multiplier', str(scriptParams.IRoffMultiplier))
+        config.set(section1, 'iso_value', str(scriptParams.isoValue))
         config.set(section1, 'start_time', str(dt_start))
 
         with open(scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/Log.ini', 'w') as configfile:
