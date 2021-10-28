@@ -66,9 +66,8 @@ class SensorInfo:
             self.labelNumber = dic.get("labelNumber", "")
 
     def load_from_file(self, filename):
-        with open(filename) as f:
-            dic = json_IO.loadJson(f)
-            self.from_dic(dic)
+        dic = json_IO.loadJson(filename)
+        self.from_dic(dic)
 
     def save_to_file(self, filename):
         dic = self.to_dic()
