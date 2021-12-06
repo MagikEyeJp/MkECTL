@@ -5,7 +5,7 @@ from time import sleep
 from timeout_decorator import timeout
 from threading import Thread, Lock
 
-import pymkeapi
+import pymkeresapi as mkeapi
 
 mutex = Lock()
 
@@ -27,13 +27,13 @@ class SensorDevice:
             sleep(0.1)
 
         try:
-            bus = pymkeapi.TcpBus(addr, port)
-            self.client = pymkeapi.ReservedSyncClient(bus)
-            self.clientDepth = pymkeapi.SyncClient(bus)
-            if self.client.get_state() != pymkeapi.STATE_IDLE:
-                self.client.set_state(pymkeapi.STATE_IDLE)
+            bus = mkeapi.TcpBus(addr, port)
+            self.client = mkeapi.ReservedSyncClient(bus)
+            self.clientDepth = mkeapi.SyncClient(bus)
+            if self.client.get_state() != mkeapi.MKE_STATE_IDLE:
+                self.client.set_state(mkeapi.MKE_STATE_IDLE)
                 sleep(0.1)
-            self.client.set_state(pymkeapi.STATE_SERVICE)
+            self.client.set_state(mkeapi.MKE_STATE_SERVICE)
             sleep(0.5)
         finally:
             mutex.release()
@@ -43,7 +43,7 @@ class SensorDevice:
 
         try:
             if self.client:
-                self.client.set_state(pymkeapi.STATE_IDLE)
+                self.client.set_state(mkeapi.MKE_STATE_IDLE)
                 self.client = None
         finally:
             mutex.release()
@@ -79,7 +79,7 @@ class SensorDevice:
         finally:
             mutex.release()
 
-    # returns pymkeapi.reserved_api.GainSetup include analog, digital
+    # returns mkeapi.reserved_api.GainSetup include analog, digital
     def set_gainiso(self, gainiso):
         mutex.acquire()
 
@@ -89,7 +89,7 @@ class SensorDevice:
         finally:
             mutex.release()
 
-    # returns pymkeapi.reserved_api.LaserSetup include pattern, duration, offset
+    # returns mkeapi.reserved_api.LaserSetup include pattern, duration, offset
     def get_lasers(self):
         mutex.acquire()
         lasers = 0
@@ -129,17 +129,17 @@ class SensorDevice:
         frame = None
         try:
             if self.clientDepth:
-                if self.client.get_state() != pymkeapi.STATE_IDLE:
-                    self.client.set_state(pymkeapi.STATE_IDLE)
+                if self.client.get_state() != mkeapi.MKE_STATE_IDLE:
+                    self.client.set_state(mkeapi.MKE_STATE_IDLE)
                     sleep(0.5)
-                self.clientDepth.set_state(pymkeapi.STATE_DEPTH_SENSOR)
+                self.clientDepth.set_state(mkeapi.MKE_STATE_DEPTH_SENSOR)
                 sleep(0.5)
 
-                frame = self.clientDepth.get_frame(pymkeapi.FRAME_TYPE_2)
+                frame = self.clientDepth.get_frame(mkeapi.MKE_FRAME_TYPE_2)
 
-                self.clientDepth.set_state(pymkeapi.STATE_IDLE)
+                self.clientDepth.set_state(mkeapi.MKE_STATE_IDLE)
                 sleep(0.5)
-                self.client.set_state(pymkeapi.STATE_SERVICE)
+                self.client.set_state(mkeapi.MKE_STATE_SERVICE)
                 sleep(0.5)
                 print(frame.lut3d, frame.uid)
 
