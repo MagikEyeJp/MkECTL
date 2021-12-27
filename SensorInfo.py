@@ -5,7 +5,6 @@ import csv
 # SensorInfo Class
 class SensorInfo:
     def __init__(self):
-        self._smidDic = None
         self.clear()
 
     def __del__(self):
@@ -16,6 +15,7 @@ class SensorInfo:
         self.serialNumber = ""
         self.moduleType = ""
         self.labelNumber = ""
+        self._smidDic = None
 
     @property
     def smid(self):
@@ -42,6 +42,7 @@ class SensorInfo:
                 self.labelNumber = t[2]
 
     @property
+
     def smiddic(self):
         if type(self._smidDic) != dict or len(self._smidDic) == 0:
             dicfile = "smid_dictionary.csv"
