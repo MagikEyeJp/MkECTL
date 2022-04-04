@@ -246,8 +246,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.framesize = self.frameSize()
         # ウインドウの位置を指定
         # self.move(geometry.width() / 2 - framesize.width() / 2, geometry.height() / 2 - framesize.height() / 2)
-        self.move(self.geometry.width() / 2 - self.framesize.width(),
-                  self.geometry.height() / 2 - self.framesize.height() / 2)
+        self.move(int(self.geometry.width() / 2 - self.framesize.width() / 2),
+                  int(self.geometry.height() / 2 - self.framesize.height() / 2))
         self.maxWinWidth = self.size().width()
         self.maxWinHeight = self.size().height()
         self.isMaxWinSize = False
@@ -498,7 +498,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         if initial_err != 0:
             progress = (1-(err / initial_err))*100
-            self.ui.initializeProgressBar.setValue(progress)
+            self.ui.initializeProgressBar.setValue(int(progress))
 
 
     def setSliderOrigin(self):
@@ -559,7 +559,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.initializeProgressBar.setEnabled(True)
             self.ui.initializeProgressLabel.setEnabled(True)
             self.ui.initializeProgressLabel.setText('Moving...')
-            self.ui.initializeProgressBar.setValue(0.0)
+            self.ui.initializeProgressBar.setValue(0)
 
             isAborted = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
