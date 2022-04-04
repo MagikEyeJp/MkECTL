@@ -6,6 +6,7 @@ from timeout_decorator import timeout
 from threading import Thread, Lock
 
 import pymkeresapi as mkeapi
+from PIL import Image
 
 mutex = Lock()
 
@@ -114,14 +115,16 @@ class SensorDevice:
         # print('get_image Locked')
 
         image = None
-
         try:
             if self.client:
-                image = self.client.get_image(avgcount, image_format="PNG")
-            return image
+                ret = self.client.get_image(avgcount, image_format="PGM")
+                if isinstance(ret, mkeapi.api.Image):
+                    image = Image.fromarray(ret.get_image())
         finally:
             # print('get_image released')
             mutex.release()
+
+        return image
 
     def get_frame(self):
         mutex.acquire()

@@ -17,6 +17,7 @@ from IMainUI import IMainUI
 import PopupList
 import csv
 from SensorInfo import SensorInfo
+from PIL import Image, ImageQt
 import subprocess
 
 app = QtWidgets.qApp
@@ -44,7 +45,6 @@ class GetImageThread(threading.Thread):
         self.sensor = sensor
         self.callback = callback
         self.image = None
-        self.pixmap = None
         self.frame = 1
         print("thread created")
 
@@ -65,8 +65,8 @@ class GetImageThread(threading.Thread):
 
     def kill(self):
         # print("kill")
-        self.started.set()
         self.alive = False
+        self.started.set()
         self.join()
         print("thread killed")
 
@@ -77,16 +77,11 @@ class GetImageThread(threading.Thread):
         # i = 0
         while self.alive:
             self.started.wait()
-            # i += 1
-            # print("{}\r".format(i), end="")
             img = self.sensor.get_image(self.frame)
-            # print(self.sensor)
-            # print(img)
-            img.format = "PNG"
-            img2 = img.get_image()
-            self.image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
-            self.pixmap = QtGui.QPixmap(self.image)
-            inmain(self.callback, self.pixmap, self.image)
+            self.end()
+            if isinstance(img, Image.Image):
+                self.image = img
+                inmain(self.callback, self.image)
 
 
 class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118024
@@ -427,8 +422,11 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         if self.getImg_thread.ended:
             self.getImg_thread.begin(frames)
 
-    def getImgCallback(self, pixmap, image):
-        if pixmap != None:
+    def getImgCallback(self, image):
+        if image:
+            qimg = QtGui.QImage(ImageQt.ImageQt(image))
+            pixmap = QtGui.QPixmap(qimg)
+
             self.ui_s.sensorImage.setPixMap(pixmap)
             self.ui_s.sensorImage.show()
             app.processEvents()
@@ -439,16 +437,17 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
                 else:
                     self.ui_s.prevAveButton.click()
             else:
-                self.getImg_thread.end()
-
                 if self.saveImgBool:
                     self.saveImg(image)
 
 
     def prevImg(self, frames):
-        image, pixmap = self.getImg(frames)
-        self.ui_s.sensorImage.setPixMap(pixmap)
-        self.ui_s.sensorImage.show()
+        img = self.getImg(frames)
+        if img:
+            image = QtGui.QImage(ImageQt.ImageQt(img))
+            pixmap = QtGui.QPixmap.fromImage(image)
+            self.ui_s.sensorImage.setPixMap(pixmap)
+            self.ui_s.sensorImage.show()
 
     def saveImg(self, image):
         if self.captureDirPath == '':
@@ -489,15 +488,11 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
     def getImg(self, frames):
         print('getImg', frames)
+        image = None
         img = self.sensor.get_image(frames)
-        # print(img)
-        img.format = "PNG"
-        img2 = img.get_image()
-        image = QtGui.QImage(img2, len(img2[0]), len(img2), QtGui.QImage.Format_Grayscale8)
-        pixmap = QtGui.QPixmap(image)
-        # img3 = Image.new('L', (len(img2[0]), len(img2)))
-        # img3.show()
-        return image, pixmap
+        if isinstance(img, Image.Image):
+            image = img
+        return image
 
     def resetCounter(self):
         self.imgCounter = 0

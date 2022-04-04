@@ -3,6 +3,8 @@ import re  # https://qiita.com/luohao0404/items/7135b2b96f9b0b196bf3
 import numpy as np
 import datetime
 import time
+
+from PIL import ImageQt
 from playsound import playsound
 from timeout_decorator import timeout, TimeoutError
 
@@ -343,11 +345,14 @@ def snap_image(args, scriptParams, devices, mainWindow):
         resume_state(scriptParams, devices, mainWindow)
         time.sleep(0.2)
 
-        image, pixmap = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
+        img = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
+        img.convert('L')
+        qimage = QtGui.QImage(ImageQt.ImageQt(img))
+        pixmap = QtGui.QPixmap.fromImage(qimage)
         devices['3Dsensors'].ui_s.sensorImage.setPixMap(pixmap)
         devices['3Dsensors'].ui_s.sensorImage.show()
 
-        image.save(devices['3Dsensors'].imgPath)
+        img.save(devices['3Dsensors'].imgPath)
 
     systate.seqn += 1
     warm_lasers(scriptParams, devices, mainWindow)
