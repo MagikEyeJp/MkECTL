@@ -17,6 +17,7 @@ from IMainUI import IMainUI
 import PopupList
 import csv
 from SensorInfo import SensorInfo
+import subprocess
 
 app = QtWidgets.qApp
 
@@ -175,6 +176,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.connectButton.clicked.connect(self.connectToSensor)
         self.ui_s.disconnectButton.clicked.connect(self.disconnectSensor)
         self.ui_s.searchButton.clicked.connect(self.searchSensor)
+        self.ui_s.smidDicEditBtn.clicked.connect(self.editsmiddic)
         # self.ui_s.setIPaddressButton.clicked.connect(self.changeIPaddress)
         self.ui_s.evenLaserButton.clicked.connect(lambda: self.setLaser('0xAAAA'))
         self.ui_s.oddLaserButton.clicked.connect(lambda: self.setLaser('0x5555'))
@@ -381,6 +383,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         print(name, adr)
         self.ui_s.IPComboBox.setCurrentText(adr)
 
+    def editsmiddic(self):
+        DicFile = "smid_dictionary.csv"
+        subprocess.Popen(['xdg-open ' + DicFile], shell=True)
 
     def laser_custom(self):
         if self.ui_s.hex4dCheckBox.isChecked():

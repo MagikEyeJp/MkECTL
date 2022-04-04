@@ -839,7 +839,7 @@
               </layout>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_sc3" stretch="0,0">
+              <layout class="QHBoxLayout" name="horizontalLayout_sc3" stretch="0,0,0">
                <property name="sizeConstraint">
                 <enum>QLayout::SetFixedSize</enum>
                </property>
@@ -884,6 +884,17 @@
                  </property>
                  <property name="readOnly">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="smidDicEditBtn">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="resources.qrc">
+                   <normaloff>:/GUI_icons/pen.png</normaloff>:/GUI_icons/pen.png</iconset>
                  </property>
                 </widget>
                </item>
