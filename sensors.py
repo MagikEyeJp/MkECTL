@@ -208,9 +208,25 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.frame3DDirPath = os.getcwd() + '/frame3Ddata'
 
         # group
+        self.setUiStatusDisconnected()
+
+    def setUiStatusConnected(self):
+        self.ui_s.connectButton.setEnabled(False)
+        self.ui_s.disconnectButton.setEnabled(True)
+        self.ui_s.IPComboBox.setEnabled(False)
+        self.ui_s.searchButton.setEnabled(False)
+        self.ui_s.cameraControlGroup.setEnabled(True)
+        self.ui_s.laserControlGroup.setEnabled(True)
+        self.ui_s.gridGroup.setEnabled(True)
+
+    def setUiStatusDisconnected(self):
+        self.ui_s.connectButton.setEnabled(True)
+        self.ui_s.disconnectButton.setEnabled(False)
+        self.ui_s.IPComboBox.setEnabled(True)
+        self.ui_s.searchButton.setEnabled(True)
         self.ui_s.cameraControlGroup.setEnabled(False)
         self.ui_s.laserControlGroup.setEnabled(False)
-
+        self.ui_s.gridGroup.setEnabled(False)
 
     def changeIPaddress(self):
         self.RPiaddress = self.ui_s.IPComboBox.currentText()
@@ -283,6 +299,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.changeISO()
             self.setLaser('0x0000')
 
+            self.ui_s.consecutiveModeButton.setChecked(False)
             self.ui_s.cameraStatusLabel.setText('Successfully connected to sensor and set parameter values')
             # get smid
             stats = self.sensor.get_stats()
@@ -302,38 +319,16 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             else:
                 self.ui_s.textLabelID.setStyleSheet("QLineEdit { background: rgb(255, 255, 0);}")
 
-
-            # どうにかする
-            # self.ui_s.setIPaddressButton.setEnabled(False)
-            self.ui_s.connectButton.setEnabled(False)
-            self.ui_s.IPComboBox.setEnabled(False)
-            self.ui_s.disconnectButton.setEnabled(True)
-            self.ui_s.searchButton.setEnabled(False)
-            self.ui_s.cameraControlGroup.setEnabled(True)
-            self.ui_s.laserControlGroup.setEnabled(True)
-            # self.ui_s.gridButton.setEnabled(True)
-            self.ui_s.gridGroup.setEnabled(True)
-
+            self.setUiStatusConnected()
             self.conn = True
             # print(self.sensor)
             self.getImg_thread = GetImageThread(self.sensor, self.getImgCallback)
-
-
 
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
             QtWidgets.QMessageBox.warning(self, "Connection Failed", str(e))
             print(e)
-            # self.ui_s.setIPaddressButton.setEnabled(True)
-            self.ui_s.connectButton.setEnabled(True)
-            self.ui_s.IPComboBox.setEnabled(True)
-            self.ui_s.disconnectButton.setEnabled(False)
-            self.ui_s.searchButton.setEnabled(True)
-            self.ui_s.cameraControlGroup.setEnabled(False)
-            self.ui_s.laserControlGroup.setEnabled(False)
-
-            # self.ui_s.sensorImage.setScene(self.scene)
-
+            self.setUiStatusDisconnected()
             self.conn = False
 
         except TimeoutError:
@@ -345,17 +340,14 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
     def disconnectSensor(self):
         try:
             self.sensor.close()
+            self.ui_s.consecutiveModeButton.setChecked(False)
             self.ui_s.cameraStatusLabel.setText('The sensor was disconnected.')
             self.conn = False
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor correctly.')
         finally:
-            self.ui_s.connectButton.setEnabled(True)
-            self.ui_s.IPComboBox.setEnabled(True)
-            self.ui_s.disconnectButton.setEnabled(False)
-            self.ui_s.searchButton.setEnabled(True)
-            self.ui_s.cameraControlGroup.setEnabled(False)
-            self.ui_s.laserControlGroup.setEnabled(False)
+            self.setUiStatusDisconnected()
+
 
     def searchSensor(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)
