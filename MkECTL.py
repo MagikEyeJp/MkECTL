@@ -442,10 +442,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeProgressBar.setValue(count)
 
         # Motor
-        if self.machineParams["calibrator_type"] == "Keigan":
-            self.motorRobot = KeiganMotorRobot(self.machineParams['motors'] if 'motors' in self.machineParams else None)
-        elif self.machineParams["calibrator_type"] == "Dobot":
+        if self.machineParams["calibrator_type"] == "Dobot":
             self.motorRobot = Dobot()
+        else:
+            self.motorRobot = KeiganMotorRobot(self.machineParams['motors'] if 'motors' in self.machineParams else None)
 
         self.motorRobot.getMotorDic()
         self.ui.initializeProgressBar.setValue(40)
