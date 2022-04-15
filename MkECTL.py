@@ -195,7 +195,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         super(Ui, self).__init__(parent)
         self.ui = mainwindow_ui.Ui_mainwindow()
         self.ui.setupUi(self)
-        self.setStyleSheet("QMainWindow::separator{ background: darkgray; width: 1px; height: 1px; }")
+        self.setStyleSheet('QMainWindow::separator{ background: darkgray; width: 1px; height: 1px; }')
         self.scriptParams = ScriptParams()
 
         # self.subWindow = sensors.SensorWindow(mainUI=self)
@@ -441,8 +441,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeProgressBar.setValue(count)
 
         # Motor
-        if "motors" in self.machineParams:
-            self.motorRobot = KeiganMotorRobot(self.machineParams["motors"])
+        print(self.machineParams)
+        if 'motors' in self.machineParams:
+            self.motorRobot = KeiganMotorRobot(self.machineParams['motors'])
         else:
             self.motorRobot = KeiganMotorRobot()
 
@@ -459,12 +460,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.devices['robot'] = self.motorRobot
 
             # IR light
-            if "IRLight" in self.machineParams:
-                IRtype = self.machineParams["IRLight"].get("type")
-                IRdevice = self.machineParams["IRLight"].get("device")
-                if IRtype == "MkE":
+            if 'IRLight' in self.machineParams:
+                IRtype = self.machineParams['IRLight'].get('type')
+                IRdevice = self.machineParams['IRLight'].get('device')
+                if IRtype == 'MkE':
                     self.IRLight = IRLightMkE.IRLightMkE(IRtype, IRdevice)
-                elif IRtype == "PAPOUCH":
+                elif IRtype == 'PAPOUCH':
                     self.IRLight = IRLightPapouch.IRLightPapouch(IRtype, IRdevice)
                 else:   # dummy
                     self.IRLight = IRLightDummy.IRLightDummy(IRtype, IRdevice)
@@ -479,8 +480,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
             self.setUIStatus(self.states)
         else:
-            QtWidgets.QMessageBox.critical(self, "Initialization Error",
-                           "Couldn\'t initialize motors.\nPlease check if the motors are ready to be initialized.")
+            QtWidgets.QMessageBox.critical(self, 'Initialization Error',
+                           'Couldn\'t initialize motors.\nPlease check if the motors are ready to be initialized.')
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
 
@@ -520,7 +521,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         m.free()
         m.maxTorque(5.0)
         self.ui.sliderPosSpin.setValue(0.0)
-        QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
+        QtWidgets.QMessageBox.information(self, 'Slider origin', 'Current position of slider is 0 mm.')
         m.moveTo(10.0)
         self.ui.sliderPosSpin.setValue(10.0)
 
@@ -528,7 +529,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def freeAllMotors(self):
         for p in self.motorRobot.params.values():
             p['cont'].free()
-        QtWidgets.QMessageBox.information(self, "free", "All motors have been freed.")
+        QtWidgets.QMessageBox.information(self, 'free', 'All motors have been freed.')
 
     def updateSpeed(self, speedSpinName):
         motorID = speedSpinName.replace('SpeedSpin', '')
@@ -564,7 +565,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             isAborted = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
             if isAborted:
-                QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+                QtWidgets.QMessageBox.critical(self, 'Timeout Error', 'Motor not moving.')
             else:
                 # for id in self.motorRobot.params.keys():
                 self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(targetPos_d[motor_id]))
@@ -595,8 +596,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         self.states = {UIState.MACHINEFILE, UIState.INITIALIZE, UIState.IRLIGHT}
         self.setUIStatus(self.states)
-        QtWidgets.QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
-                                                          "Please re-initialize motors to use again.")
+        QtWidgets.QMessageBox.information(self, 'reboot', 'All motors have been rebooted. \n'
+                                                          'Please re-initialize motors to use again.')
 
     def changeUnitLabel(self):
         motorID = self.ui.presetMotorCombo.currentText()
@@ -694,10 +695,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         if not os.path.exists(self.demo_script):
             QtWidgets.QMessageBox.critical \
-                (self, "File",
+                (self, 'File',
                  'Demo script doesn\'t exist. \n '
                  'Please check \" ~'
-                 + os.path.abspath(os.getcwd()) + self.demo_script.replace("./", "/") + '\"')
+                 + os.path.abspath(os.getcwd()) + self.demo_script.replace('./', '/') + '\"')
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
@@ -710,8 +711,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.setUIStatus(self.states)
 
             if not interrupted:
-                QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
-                                                                         "the demo file \nhave been completed.")
+                QtWidgets.QMessageBox.information(self, 'Finish scripting!', 'All commands in \n'
+                                                                         'the demo file \nhave been completed.')
 
         self.scriptParams.scriptName[0] = self.ui.scriptName_label.text()
 
@@ -747,10 +748,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 if self.ui.scriptName_label.text() != previouslyExecutedScriptName:
                     # ret = QtWidgets.QMessageBox.question \
                     ret = qm.question \
-                                (self, 'Which script to execute?', "The previously executed script is different from what you selected.\n"
-                                   "- The previous one: \"" + previouslyExecutedScriptName +"\"\n"
-                                    "- The one you selected: \"" + self.ui.scriptName_label.text() + "\"\n"
-                                    "Click [Yes] to continue the former, or [No] to execute the latter from the top.",
+                                (self, 'Which script to execute?', 'The previously executed script is different from what you selected.\n'
+                                   '- The previous one: \"' + previouslyExecutedScriptName +'\"\n'
+                                    '- The one you selected: \"' + self.ui.scriptName_label.text() + '\"\n'
+                                    'Click [Yes] to continue the former, or [No] to execute the latter from the top.',
                          qm.Yes | qm.No)
 
                     if ret == qm.Yes:
@@ -778,7 +779,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # GUI
         if self.devices['3Dsensors'].conn:
             self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
-            self.devices['3Dsensors'].sensorInfo.save_to_file(self.dataOutFolder() + "/sensorinfo.json")
+            self.devices['3Dsensors'].sensorInfo.save_to_file(self.dataOutFolder() + '/sensorinfo.json')
         else:
             self.states = {UIState.SCRIPT_PROGRESS}
 
@@ -796,11 +797,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             if not interrupted:
                 # mixer.music.play(1)
-                playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
+                playsound('SE/finish_chime.mp3')    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
                 if self.ui.PostProc_groupBox.isChecked():
                     self.doPostProc()
-                QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
-                                                                             "\"%s\" \nhave been completed."
+                QtWidgets.QMessageBox.information(self, 'Finish scripting!', 'All commands in \n'
+                                                                             '\"%s\" \nhave been completed.'
                                                                                 % os.path.basename(self.scriptParams.scriptName[self.scriptParams.currentScript - 1]))
 
 
@@ -839,9 +840,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.setUIStatus(self.states)
 
             if not interrupted:
-                playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
-                QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
-                                                                         "\"%s\" \nhave been completed."
+                playsound('SE/finish_chime.mp3')    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
+                QtWidgets.QMessageBox.information(self, 'Finish scripting!', 'All commands in \n'
+                                                                         '\"%s\" \nhave been completed.'
                                                 % os.path.basename(self.scriptParams.scriptName[self.scriptParams.currentScript - 1]))
 
             # self.scriptParams.scriptName = [''] * self.scriptParams.maxScriptNum
@@ -878,7 +879,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         isAborted = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
         if isAborted:
-            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+            QtWidgets.QMessageBox.critical(self, 'Timeout Error', 'Motor not moving.')
         else:
             for id in self.motorRobot.params.keys():
                 self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
@@ -913,7 +914,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         isAborted = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
 
         if isAborted:
-            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+            QtWidgets.QMessageBox.critical(self, 'Timeout Error', 'Motor not moving.')
         else:
             for id in self.motorRobot.params.keys():
                 self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
@@ -1024,8 +1025,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def doPostProc(self):
         info = SensorInfo()
         info.clear()
-        info.load_from_file(self.dataOutFolder() + "/sensorinfo.json")
-        self.ui.postProcLogTextEdit.append("exec postproc: " + info.labelid + "_" + self.scriptParams.subFolderName)
+        info.load_from_file(self.dataOutFolder() + '/sensorinfo.json')
+        self.ui.postProcLogTextEdit.append('exec postproc: ' + info.labelid + '_' + self.scriptParams.subFolderName)
         self.ui.postProcLogTextEdit.ensureCursorVisible()
 
         proc = subprocess.Popen(
