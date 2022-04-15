@@ -1,0 +1,45 @@
+{
+  "calibrator_type": "Dobot",
+  "motors": {
+    "slider": {
+      "serial": "slider_dummy",
+      "scale": -0.104772141,
+      "initial_param": {
+        "curveType": 1,
+        "maxSpeed": 250,
+        "acc": 8,
+        "dec": 8,
+        "speed": 20,
+        "maxTorque": 5
+      }
+    },
+    "pan": {
+      "serial": "pan_dummy",
+      "scale": -0.017453293,
+      "initial_param": {
+        "curveType": 1,
+        "maxSpeed": 250,
+        "acc": 3,
+        "dec": 2,
+        "speed": 40,
+        "maxTorque": 5
+      }
+    },
+    "tilt": {
+      "serial": "tilt_dummy",
+      "scale": -0.017453293,
+      "initial_param": {
+        "curveType": 1,
+        "maxSpeed": 250,
+        "acc": 12,
+        "dec": 4,
+        "speed": 40,
+        "maxTorque": 5
+      }
+    }
+  },
+  "IRLight": {
+    "type": "keigan_dummy",
+    "device": "tty_dummy"
+  }
+}
