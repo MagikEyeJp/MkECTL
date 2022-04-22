@@ -1,5 +1,3 @@
-from IMotorRobot import IMotorRobot
-
 import KMControllersS, KMControllersS_dummy
 
 import os
@@ -52,7 +50,7 @@ defaultMotors = {
     }
 }
 
-class KeiganMotorRobot(IMotorRobot):
+class KeiganMotorRobot():
     def __init__(self, machineParams_m=None):
         # super(KeiganMotor, self).__init__(parent)
         self.machineParams_m = machineParams_m

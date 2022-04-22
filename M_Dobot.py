@@ -1,6 +1,4 @@
-from IMotorRobot import IMotorRobot
-
-class Dobot(IMotorRobot):
+class Dobot():
     def __init__(self, machineParams_m=None):
         self.params = None
 

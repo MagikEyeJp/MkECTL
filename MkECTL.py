@@ -13,8 +13,7 @@ import json
 import subprocess
 
 import MyDoubleSpinBox
-from M_KeiganRobot import KeiganMotorRobot
-from M_Dobot import Dobot
+from M_CommonRobot import RobotIF
 import mainwindow_ui
 import execute_script
 import sensors
@@ -442,12 +441,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeProgressBar.setValue(count)
 
         # Motor
-        if self.machineParams["calibrator_type"] == "Dobot":
-            self.motorRobot = Dobot()
-        else:
-            self.motorRobot = KeiganMotorRobot(self.machineParams['motors'] if 'motors' in self.machineParams else None)
-
-        self.motorRobot.getMotorDic()
+        self.motorRobot = RobotIF(self.machineParams)
         self.ui.initializeProgressBar.setValue(40)
 
         ### detailed settings window
