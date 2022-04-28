@@ -565,18 +565,17 @@ def warm_lasers(scriptParams, devices, mainWindow):
     if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
 
-    current_skip = systate.skip
+    current_light = systate.light
     current_lasers = systate.lasers
     current_shutter = systate.shutter
 
     print('---warm lasers---')
-    systate.skip = False
+    systate.light = [0, 0]
     if systate.shutter_IRoff > 0:
-        set_shutter([systate.shutter_IRoff], scriptParams, devices, mainWindow)
-        print('  shutter=', systate.shutter_IRoff)
+        set_shutter([systate.shutter_IRoff], scriptParams, devices, mainWindow, True)
     set_lasers([projector_pattern], scriptParams, devices, mainWindow)
 
-    systate.skip = current_skip
+    systate.light = current_light
     systate.lasers = current_lasers
     systate.shutter = current_shutter
     time.sleep(0.1)
