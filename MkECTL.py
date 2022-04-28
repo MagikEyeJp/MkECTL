@@ -28,16 +28,13 @@ import IRLightPapouch
 import IRLightDummy
 from IMainUI import IMainUI
 
+
 class ScriptParams():
     def __init__(self):
         self.now = datetime.datetime.now()
 
-        self.execTwoScr: bool = False
-        self.maxScriptNum = 10
-        self.scriptName: list = [''] * self.maxScriptNum
-        self.commandNum: list = [0] * self.maxScriptNum
-        self.commandNum_total: int = 0
-        self.currentScript: int = 1
+        self.scriptName: str = ''
+        self.commandNum: int = 0
         self.baseFolderName: str = 'data'
         self.subFolderName: str = self.now.strftime('%Y%m%d_%H%M%S')
         self.isContinue = False
@@ -216,7 +213,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.IRlightControlGroup.setEnabled(False)
         self.ui.continueButton.setEnabled(False)
         self.ui.executeScript_button.setEnabled(False)
-        self.ui.Scripting_groupBox.setEnabled(False)
+        self.ui.progressBar.setEnabled(False)
 
         # config file
         self.configIniFile = 'data/MkECTL.ini'
@@ -229,7 +226,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # scripting
         self.done = 0
-        self.total = 100
+        self.total = 0
         self.percent = 0
         self.stopClicked = False
         self.demo_script = 'script/demo.txt'
@@ -294,15 +291,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.MagikEye.clicked.connect(lambda: self.demo(False))
         self.ui.getCurrentPosButton.setEnabled(False)
         self.ui.getCurrentPosButton.clicked.connect(self.getCurrentPos)
-        self.ui.selectScript_toolButton.clicked.connect(lambda: self.openScriptFile(1))
-        self.ui.selectScript_toolButton_2.clicked.connect(lambda: self.openScriptFile(2))
-        self.ui.delete2ndScriptButton.clicked.connect(lambda: self.delete2ndScript)
+        self.ui.selectScript_toolButton.clicked.connect(self.openScriptFile)
         self.ui.selectBaseFolder_toolButton.clicked.connect(self.openBaseFolder)
         self.ui.selectSubFolder_toolButton.clicked.connect(self.openSubFolder)
         self.ui.renewSubFolder_toolButton.clicked.connect(self.renewSubFolder)
-        self.ui.executeScript_button.clicked.connect(lambda: self.run_2scripts(False))
-        self.ui.continueButton.clicked.connect(lambda: self.run_2scripts(True))
-        self.ui.delete2ndScriptButton.clicked.connect(self.delete2ndScript)
+        self.ui.executeScript_button.clicked.connect(lambda: self.run_script(False))
+        self.ui.continueButton.clicked.connect(lambda: self.run_script(True))
         self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(self.geometry, self.framesize))
         self.ui.sliderOriginButton.clicked.connect(self.setSliderOrigin)
         self.ui.freeButton.clicked.connect(self.freeAllMotors)
@@ -524,7 +518,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         m.moveTo(10.0)
         self.ui.sliderPosSpin.setValue(10.0)
 
-
     def freeAllMotors(self):
         for p in self.motorRobot.params.values():
             p['cont'].free()
@@ -607,7 +600,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
 # --- Scripting
 
-    def openScriptFile(self, num):  # https://www.xsim.info/articles/PySide/special-dialogs.html#OpenFile
+    def openScriptFile(self):
         previousScriptPath = ''
         previousScriptDir = './script/'
         previousScript_iniFile = 'data/previousScript.ini'
@@ -620,40 +613,23 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', previousScriptDir, '*.txt')
 
         if fileName == '':  # when cancel pressed
-            if self.scriptParams.scriptName[num-1] == '':
+            if self.scriptParams.scriptName == '':
                 self.ui.scriptName_label.setText('')
-                self.scriptParams.scriptName[num-1] = fileName
-                self.scriptParams.commandNum[num - 1] = 0
-                self.scriptParams.commandNum_total = 0
+                self.scriptParams.scriptName = fileName
+                self.scriptParams.commandNum = 0
             else:
                 pass
         else:
             ini.updatePreviousScriptPath(previousScript_iniFile, fileName)
-            self.scriptParams.currentScript = num
 
-            if num == 1:
-                self.ui.scriptName_label.setText(
-                    os.path.basename(fileName))  # https://qiita.com/inon3135/items/f8ebe85ad0307e8ddd12
-            else:
-                self.ui.scriptName_label_2.setText(os.path.basename(fileName))
-                self.scriptParams.execTwoScr = True
+            self.ui.scriptName_label.setText(
+                os.path.basename(fileName))
 
-            self.scriptParams.scriptName[num-1] = fileName
-            self.scriptParams.commandNum[num-1] = execute_script.countCommandNum(self.scriptParams, [], [])
+            self.scriptParams.scriptName = fileName
+            self.scriptParams.commandNum = execute_script.countCommandNum(self.scriptParams, [], [])
 
-            self.scriptParams.commandNum_total = sum(self.scriptParams.commandNum)
-        self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
+        self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum))
 
-    def delete2ndScript(self):
-        self.scriptParams.scriptName[1] = ''
-        self.scriptParams.commandNum[1] = 0
-        if len(self.scriptParams.commandNum) >= 2:
-            self.scriptParams.commandNum[1] = 0
-        self.ui.scriptName_label_2.setText('')
-        self.scriptParams.execTwoScr = False
-
-        self.scriptParams.commandNum_total = sum(self.scriptParams.commandNum)
-        self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum_total))
 
     def openBaseFolder(self):
         fileName = \
@@ -683,7 +659,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
 
     def demo(self, isContinue):
-        self.scriptParams.scriptName[0] = self.demo_script
+        self.scriptParams.scriptName = self.demo_script
         self.ui.scriptName_label.setText(self.demo_script)
         self.scriptParams.isContinue = isContinue
 
@@ -713,7 +689,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "the demo file \nhave been completed.")
 
-        self.scriptParams.scriptName[0] = self.ui.scriptName_label.text()
+        self.scriptParams.scriptName = self.ui.scriptName_label.text()
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -723,7 +699,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def run_script(self, isContinue):
         self.stopClicked = False
 
-        if self.scriptParams.scriptName[0] == self.demo_script:
+        if self.scriptParams.scriptName == self.demo_script:
             self.demo(isContinue)
             return
 
@@ -754,20 +730,20 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                          qm.Yes | qm.No)
 
                     if ret == qm.Yes:
-                        self.scriptParams.scriptName[0] = previouslyExecutedScript
+                        self.scriptParams.scriptName = previouslyExecutedScript
                     elif ret == qm.No:
                         # self.scriptParams.scriptName = self.ui.scriptName_label.text()
                         pass
                     else:
                         return
-                self.ui.scriptName_label.setText(os.path.basename(self.scriptParams.scriptName[0]))
+                self.ui.scriptName_label.setText(os.path.basename(self.scriptParams.scriptName))
         else:
             self.scriptParams.isContinue = False
             self.renewSubFolder()
 
-        if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
-            self.openScriptFile(1)
-        if self.scriptParams.scriptName[0] == '' or not self.scriptParams:
+        if self.scriptParams.scriptName == '' or not self.scriptParams:
+            self.openScriptFile()
+        if self.scriptParams.scriptName == '' or not self.scriptParams:
             return
 
         if not os.path.exists(self.dataOutFolder()):
@@ -787,69 +763,21 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         ### EXECUTE
         interrupted = execute_script.execute_script(self.scriptParams, self.devices, self)
 
-        if not self.scriptParams.execTwoScr:
-            if self.devices['3Dsensors'].conn:
-                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
-            else:
-                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
-            self.setUIStatus(self.states)
-
-            if not interrupted:
-                # mixer.music.play(1)
-                playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
-                if self.ui.PostProc_groupBox.isChecked():
-                    self.doPostProc()
-                QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
-                                                                             "\"%s\" \nhave been completed."
-                                                                                % os.path.basename(self.scriptParams.scriptName[self.scriptParams.currentScript - 1]))
-
-
-    def run_2scripts(self, isContinue):
-        if self.scriptParams.execTwoScr:
-            self.scriptParams.currentScript = 1
-            self.run_script(isContinue)    # exec 1st script
-
-            # -------- 2nd script -------
-            # self.renewSubFolder()
-            print('***********************************************')
-            self.scriptParams.currentScript += 1
-
-            self.scriptParams.isContinue = False
-
-            if self.scriptParams.scriptName[1] == '':
-                self.openScriptFile(2)
-
-            if not os.path.exists(self.dataOutFolder()):
-                os.makedirs(self.dataOutFolder())
-
-            # GUI
-            if self.devices['3Dsensors'].conn:
-                self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
-            else:
-                self.states = {UIState.SCRIPT_PROGRESS}
-            self.setUIStatus(self.states)
-
-            ### EXECUTE
-            interrupted = execute_script.execute_script(self.scriptParams, self.devices, self)
-
-            if self.devices['3Dsensors'].conn:
-                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
-            else:
-                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
-            self.setUIStatus(self.states)
-
-            if not interrupted:
-                playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
-                QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
-                                                                         "\"%s\" \nhave been completed."
-                                                % os.path.basename(self.scriptParams.scriptName[self.scriptParams.currentScript - 1]))
-
-            # self.scriptParams.scriptName = [''] * self.scriptParams.maxScriptNum
-            pass  # will be updated later
-
+        if self.devices['3Dsensors'].conn:
+            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
         else:
-            self.run_script(isContinue)
-            # self.scriptParams.scriptName = [''] * self.scriptParams.maxScriptNum
+            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
+        self.setUIStatus(self.states)
+
+        if not interrupted:
+            # mixer.music.play(1)
+            playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
+            if self.ui.PostProc_groupBox.isChecked():
+                self.doPostProc()
+            QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
+                                                                         "\"%s\" \nhave been completed."
+                                              % os.path.basename(self.scriptParams.scriptName))
+
 
     def setHome(self):
         for id, p in self.motorRobot.params.items():
@@ -926,7 +854,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             if self.subWindow.conn:
                 self.subWindow.prevImg(1)
 
-
     def showSubWindow(self, geometry, framesize):
         if self.subWindow_isOpen:
             self.subWindow.activateWindow()
@@ -954,7 +881,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             return val
         except ValueError:
             return default
-
 
     def setMultiplier(self):
         self.scriptParams.IRonMultiplier = self.toFloat(self.ui.IRonMultiplier.text(), 1.0)
@@ -1106,8 +1032,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         if UIState.SCRIPT in status:
             self.ui.selectScript_toolButton.setEnabled(True)
-            self.ui.selectScript_toolButton_2.setEnabled(True)
-            self.ui.delete2ndScriptButton.setEnabled(True)
             self.ui.selectBaseFolder_toolButton.setEnabled(True)
             self.ui.selectSubFolder_toolButton.setEnabled(True)
             self.ui.renewSubFolder_toolButton.setEnabled(True)
@@ -1117,8 +1041,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.subWindow.ui_s.laserControlGroup.setEnabled(True)
         else:
             self.ui.selectScript_toolButton.setEnabled(False)
-            self.ui.selectScript_toolButton_2.setEnabled(False)
-            self.ui.delete2ndScriptButton.setEnabled(False)
             self.ui.selectBaseFolder_toolButton.setEnabled(False)
             self.ui.selectSubFolder_toolButton.setEnabled(False)
             self.ui.renewSubFolder_toolButton.setEnabled(False)
@@ -1128,16 +1050,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.subWindow.ui_s.laserControlGroup.setEnabled(False)
 
         if UIState.SCRIPT_PROGRESS in status:
-            self.ui.Scripting_groupBox.setEnabled(True)
+            self.ui.progressBar.setEnabled(True)
             self.ui.stopButton.setEnabled(True)
         else:
-            self.ui.Scripting_groupBox.setEnabled(False)
+            self.ui.progressBar.setEnabled(False)
             self.ui.stopButton.setEnabled(False)
 
 
 # ----- Scripting-related functions -----
     def updatePercentage(self):
-        self.percent = self.done / self.total * 100
+        if self.total > 0:
+            self.percent = self.done / self.total * 100
+        else:
+            self.percent = 0.0
         # print(self.percent)
         self.ui.progressBar.setValue(self.percent)
         return self.percent

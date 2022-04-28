@@ -45,7 +45,7 @@ def updateIni_start(scriptParams):
         newSection = 'script' + str(newSectionNum)
         config.add_section(newSection)
         config.set(newSection, 'section_no', str(newSectionNum))
-        config.set(newSection, 'scriptpath', scriptParams.scriptName[scriptParams.currentScript - 1])
+        config.set(newSection, 'scriptpath', scriptParams.scriptName)
 
         lastExecutedScript = config.get('script' + str(newSectionNum - 1),
                                         'scriptpath')
@@ -56,7 +56,7 @@ def updateIni_start(scriptParams):
         config.set(newSection, 'iso_value', str(scriptParams.isoValue))
         config.set(newSection, 'start_time', str(dt_start))
 
-        if scriptParams.isContinue and lastExecutedScript == scriptParams.scriptName[scriptParams.currentScript - 1]:
+        if scriptParams.isContinue and lastExecutedScript == scriptParams.scriptName:
             pass
         else:
             with open(scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/Log.ini', 'w') as configfile:
@@ -68,7 +68,7 @@ def updateIni_start(scriptParams):
         section1 = 'script1'
         config.add_section(section1)
         config.set(section1, 'section_no', '1')
-        config.set(section1, 'scriptpath', scriptParams.scriptName[scriptParams.currentScript - 1])
+        config.set(section1, 'scriptpath', scriptParams.scriptName)
 
         dt_start = datetime.datetime.now()
         config.set(section1, 'ir_on_multiplier', str(scriptParams.IRonMultiplier))
