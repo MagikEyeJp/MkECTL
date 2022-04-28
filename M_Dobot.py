@@ -1,6 +1,10 @@
+from DobotController import dobotController
+
 class Dobot():
     def __init__(self, machineParams_m=None):
         self.params = None
+        self.machineParams = machineParams_m
+        self.controller = dobotController(self.machineParams["dobot_conf"] if "dobot_conf" in self.machineParams else None)
 
     def getMotorDic(self):
         self.params = {
@@ -25,11 +29,13 @@ class Dobot():
         }
 
     def initializeMotors(self):
+        self.controller.begin()
         return True
 
     def changePIDparam(self, pid_category, pid_param, motor_i, value):
         pass
 
     def goToTargetPos(self, targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None):
-        True
+        self.controller.move(targetPos)
+        return False
 
