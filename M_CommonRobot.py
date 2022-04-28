@@ -30,4 +30,4 @@ class RobotIF(IMotorRobot):
         pass
 
     def goToTargetPos(self, targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None):
-        self.robot.goToTargetPos(targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None)
+        return self.robot.goToTargetPos(targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None)
