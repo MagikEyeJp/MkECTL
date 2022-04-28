@@ -1,5 +1,8 @@
 -----
 TODO & Ideas
+・センサータイプ設定ファイルにより、各種設定値を保存/呼び出しできるようにする(Script name, Exposure multiplier, ISO override, post script, projector mask pattern, etc...)
+・warm_lasersの点灯パターンをProjectorのみにする(flood lightはつけない)
+・camera calibartion中のwarm_lasersは、Projector全点灯,露出時間は目標値(Laser Calibrationの最初の露出時間)をProjectorの数で割った値にする
 ・クラス関係の整理(かんたんなクラス図を作って考える)
 ・複数スクリプトを連続実行
 ・flowchartやdocumentationの編集(Readmeにfile watcherのこと書いておく、見直して編集)
