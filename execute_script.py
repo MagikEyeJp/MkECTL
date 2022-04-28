@@ -443,6 +443,7 @@ def set_shutter(args, scriptParams, devices, mainWindow):
 
     if not systate.skip:
         isOn = False
+        print('light:' + str(systate.light))
         for l in systate.light:
             if l > 0:
                 isOn = True
@@ -450,14 +451,14 @@ def set_shutter(args, scriptParams, devices, mainWindow):
 
         mlt = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
         shutter = int(mlt * float(systate.shutter) + 0.5)
+        print('shutter speed: ' + str(systate.shutter) + ' x ' + str(mlt) + ' = ' + str(shutter))
         if isOn:
-            systate.shutter_IRon = shutter
+            systate.shutter_IRon = systate.shutter
         else:
-            systate.shutter_IRoff = shutter
+            systate.shutter_IRoff = systate.shutter
 
         if not systate.sentSig.shutter or shutter != systate.past_parameters.shutter:
             devices['3Dsensors'].shutterSpeed = shutter
-            print('shutter speed: ' + str(shutter))
 
             ### Request to set shutter speed
             devices['3Dsensors'].sensor.set_shutter(shutter)
@@ -551,7 +552,7 @@ def wait_pause(args, scriptParams, devices, mainWindow):
         time.sleep(1)
 
 
-def show_message(args, scriptParams, devices, mainWindow):
+def show_message(args, scriptParams, devicesNamennnnaa, mainWindow):
     print('---show_message---')
     QtWidgets.QMessageBox.information(mainWindow, 'MkECTL script', args[0], QtWidgets.QMessageBox.Ok)
 
@@ -559,6 +560,7 @@ def show_message(args, scriptParams, devices, mainWindow):
 @timeout(5)
 def warm_lasers(scriptParams, devices, mainWindow):
     global systate
+    projector_pattern = 0x01    # should be changed according to sensor type
 
     if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
@@ -572,7 +574,7 @@ def warm_lasers(scriptParams, devices, mainWindow):
     if systate.shutter_IRoff > 0:
         set_shutter([systate.shutter_IRoff], scriptParams, devices, mainWindow)
         print('  shutter=', systate.shutter_IRoff)
-    set_lasers([255], scriptParams, devices, mainWindow)
+    set_lasers([projector_pattern], scriptParams, devices, mainWindow)
 
     systate.skip = current_skip
     systate.lasers = current_lasers
