@@ -1,5 +1,14 @@
 {
   "calibrator_type": "Dobot",
+  "dobot_conf": {
+    "hostName": "mkepi.local",
+    "port": 2022,
+    "posX": 220,
+    "posY": 0,
+    "posZ": 50,
+    "posR": 0,
+    "posP": 0
+  },
   "motors": {
     "slider": {
       "serial": "slider_dummy",
