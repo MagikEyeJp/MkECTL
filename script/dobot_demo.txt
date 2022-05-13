@@ -1,0 +1,13 @@
+home
+
+mov 100, 90, 90
+
+home
+
+mov -100, 180, 180
+
+home
+
+mov 100, 45, 90
+
+home
