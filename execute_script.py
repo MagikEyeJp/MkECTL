@@ -202,7 +202,10 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
         print(' ########## ' + str(i) + '/' + str(len(com_hist)) + ' ########## ')
 
         systate.args = args_hist[i]
-        systate.skip = commands[com_hist[i]][1]
+        if scriptParams.isContinue:
+            systate.skip = commands[com_hist[i]][1]
+        else:
+            systate.skip = False
 
         # GUI
         mainWindow.ui.commandLabel.setText(com_hist[i])
