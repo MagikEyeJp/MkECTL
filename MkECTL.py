@@ -448,7 +448,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             # Show new text & button
             #TODO prepare dobot original botton in mainwindow.ui
-            self.ui.sliderLabel.setText("X [mm]")
+            self.ui.sliderLabel.setText("Z [mm]")
             self.ui.sliderLabel.show()
             self.ui.sliderPosSpin.show()
             self.ui.panLabel.setText("R [deg]")
