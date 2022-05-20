@@ -439,6 +439,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.panPosSpin.hide()
             self.ui.tiltLabel.hide()
             self.ui.tiltPosSpin.hide()
+            self.ui.savedPositionslabel.hide()
+            self.ui.savedPosCombo.hide()
+
+
+            # grayout
+            self.ui.Settings.setEnabled(False)
 
             # Show new text & button
             #TODO prepare dobot original botton in mainwindow.ui
@@ -461,7 +467,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         if RobotIF(self.machineParams).robotType == "Dobot":
             print("starting Dobot GUI")
             self.switchView(GUI_mode="Dobot")
-            
+
         elif RobotIF(self.machineParams).robotType == "Keigan":
             print("starting Keigan GUI")
             self.switchView(GUI_mode="Keigan")
