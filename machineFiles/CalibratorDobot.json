@@ -3,9 +3,9 @@
   "dobot_conf": {
     "hostName": "mkepi.local",
     "port": 2022,
-    "posX": 220,
-    "posY": 0,
-    "posZ": 50,
+    "posX": 284.837585,
+    "posY": -1.762224,
+    "posZ": 110.428604,
     "posR": 0,
     "posP": 0
   },
