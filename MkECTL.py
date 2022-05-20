@@ -429,7 +429,43 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.motorGUI[
             'currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
+    def switchView(self, GUI_mode):
+        # change dobot version
+        if GUI_mode == "Dobot":
+            # Hide text & button
+            self.ui.sliderLabel.hide()
+            self.ui.sliderPosSpin.hide()
+            self.ui.panLabel.hide()
+            self.ui.panPosSpin.hide()
+            self.ui.tiltLabel.hide()
+            self.ui.tiltPosSpin.hide()
+
+            # Show new text & button
+            #TODO prepare dobot original botton in mainwindow.ui
+            self.ui.sliderLabel.setText("X [mm]")
+            self.ui.sliderLabel.show()
+            self.ui.sliderPosSpin.show()
+            self.ui.panLabel.setText("R [deg]")
+            self.ui.panLabel.show()
+            self.ui.panPosSpin.show()
+            self.ui.tiltLabel.setText("servo [deg]")
+            self.ui.tiltLabel.show()
+            self.ui.tiltPosSpin.show()
+
+        # change keigan version
+        elif GUI_mode == "Keigan":
+            pass
+
     def initializeMotors(self):
+        # change GUI widgets layout
+        if RobotIF(self.machineParams).robotType == "Dobot":
+            print("starting Dobot GUI")
+            self.switchView(GUI_mode="Dobot")
+            
+        elif RobotIF(self.machineParams).robotType == "Keigan":
+            print("starting Keigan GUI")
+            self.switchView(GUI_mode="Keigan")
+
         count = 0
 
         # GUI
