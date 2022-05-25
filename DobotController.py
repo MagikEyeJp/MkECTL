@@ -30,6 +30,10 @@ class dobotController():
 
     def move(self,pos):
 
+        if pos["axis_x"] is not None:
+            self.targetPos["y"] = pos["axis_x"]
+        if pos["axis_y"] is not None:
+            self.targetPos["x"] = pos["axis_y"]
         if pos["slider"] is not None:
             self.targetPos["z"] = pos["slider"]
         if pos["pan"] is not None:
@@ -39,8 +43,8 @@ class dobotController():
 
         print(pos)
         code = "G00"
-        code += " X"+str(int(self.basePos["x"]))
-        code += " Y"+str(int(self.basePos["y"]))
+        code += " X"+str(int(self.basePos["x"]-self.targetPos["x"]))
+        code += " Y"+str(int(self.basePos["y"]-self.targetPos["y"]))
         code += " Z"+str(int(self.basePos["z"]-self.targetPos["z"]))
         code += " R"+str(int(self.basePos["r"]+self.targetPos["r"]))
         code += " P"+str(self.basePos["p"]+self.targetPos["p"])

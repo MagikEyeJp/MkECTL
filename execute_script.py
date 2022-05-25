@@ -58,7 +58,7 @@ class Systate():
         self.folderCreated = False
         self.skip = False
 
-        self.pos = [0, 0, 0]
+        self.pos = [0, 0, 0, 0, 0]
         self.shutter = 0
         self.shutter_IRon = -1
         self.shutter_IRoff = 1000
@@ -86,7 +86,7 @@ class Systate():
             self.reset()
 
         def reset(self):
-            self.pos = [-1, -1, -1]
+            self.pos = [-1, -1, -1, -1, -1]
             self.shutter = -1
             self.gainiso = -1
             self.lasers = -1
@@ -398,7 +398,7 @@ def move_robot(args, scriptParams, devices, mainWindow):
     m = []
     scale = []
     motorPos = []
-    pos = [0.0, 0.0, 0.0]
+    pos = [0.0, 0.0, 0.0, 0.0, 0.0]
     vel = [0.0, 0.0, 0.0]
     torque = [0.0, 0.0, 0.0]
     minerr = 999999.0   # とりあえず大きい数
@@ -408,7 +408,10 @@ def move_robot(args, scriptParams, devices, mainWindow):
 
     # systate.pos = motorPos
     systate.pos = list(args)
-    targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2]}
+    if len(args) == 5:
+        targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2], 'axis_x': args[3], 'axis_y': args[4]}
+    else:
+        targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2], 'axis_x': None, 'axis_y': None}
 
     if not systate.skip:
         if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
@@ -429,7 +432,7 @@ def home_robot(args, scriptParams, devices, mainWindow):
     if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
 
-    pos = np.array([0, 0, 0], dtype=int)
+    pos = np.array([0, 0, 0, 0, 0], dtype=int)
 
     move_robot(pos, scriptParams, devices, mainWindow)
 
