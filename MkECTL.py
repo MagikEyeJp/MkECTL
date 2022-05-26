@@ -584,7 +584,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             motor_id = buttonName.replace('MoveExe', '')
             targetPos = self.motorGUI['posSpin'][motor_id].value()
-            targetPos_d = {'slider': None, 'pan': None, 'tilt': None}
+            targetPos_d = {'slider': None, 'pan': None, 'tilt': None, 'axis_x': None, 'axis_y': None}
 
             for id, p in self.motorRobot.params.items():
                 if id == motor_id:
