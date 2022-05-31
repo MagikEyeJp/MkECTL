@@ -31,9 +31,9 @@ class dobotController():
     def move(self,pos):
 
         if pos["axis_x"] is not None:
-            self.targetPos["y"] = pos["axis_x"]
+            self.targetPos["x"] = pos["axis_x"]
         if pos["axis_y"] is not None:
-            self.targetPos["x"] = pos["axis_y"]
+            self.targetPos["y"] = pos["axis_y"]
         if pos["slider"] is not None:
             self.targetPos["z"] = pos["slider"]
         if pos["pan"] is not None:
