@@ -42,7 +42,7 @@ class dobotController():
             self.targetPos["p"] = pos["tilt"]
 
         print(pos)
-        code = "G00"
+        code = "G01"
         code += " X"+str(int(self.basePos["x"]-self.targetPos["x"]))
         code += " Y"+str(int(self.basePos["y"]-self.targetPos["y"]))
         code += " Z"+str(int(self.basePos["z"]-self.targetPos["z"]))
