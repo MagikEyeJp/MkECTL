@@ -6,8 +6,8 @@
     "posX": 280,
     "posY": 0,
     "posZ": 160,
-    "posR": 7,
-    "posP": 100
+    "posR": 8,
+    "posP": 105
   },
   "motors": {
     "slider": {
