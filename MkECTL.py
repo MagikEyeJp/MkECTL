@@ -11,6 +11,7 @@ import datetime
 from playsound import playsound
 import json
 import subprocess
+import logging
 
 import MyDoubleSpinBox
 from M_CommonRobot import RobotIF
@@ -822,7 +823,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.setUIStatus(self.states)
 
         ### EXECUTE
+        calib_start = datetime.datetime.now()
         interrupted = execute_script.execute_script(self.scriptParams, self.devices, self)
+        print(f"calibration time:{(datetime.datetime.now()-calib_start).total_seconds()}")
 
         if not self.scriptParams.execTwoScr:
             if self.devices['3Dsensors'].conn:
