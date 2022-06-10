@@ -3,11 +3,11 @@
   "dobot_conf": {
     "hostName": "mkepi.local",
     "port": 2022,
-    "posX": 280,
+    "posX": 290,
     "posY": 0,
     "posZ": 160,
-    "posR": 8,
-    "posP": 105
+    "posR": 95,
+    "posP": 100
   },
   "motors": {
     "slider": {
