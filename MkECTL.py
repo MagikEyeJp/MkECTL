@@ -15,7 +15,7 @@ import logging
 
 import MyDoubleSpinBox
 from M_CommonRobot import RobotIF
-import mainwindow_ui
+import mainwindow_new
 import execute_script
 import sensors
 import detailedSettings_ui
@@ -194,7 +194,7 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
 class Ui(QtWidgets.QMainWindow, IMainUI):
     def __init__(self, parent=None):
         super(Ui, self).__init__(parent)
-        self.ui = mainwindow_ui.Ui_mainwindow()
+        self.ui = mainwindow_new.Ui_mainwindow()
         self.ui.setupUi(self)
         self.setStyleSheet('QMainWindow::separator{ background: darkgray; width: 1px; height: 1px; }')
         self.scriptParams = ScriptParams()
