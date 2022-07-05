@@ -276,7 +276,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # position spinboxes
             self.motorGUI['posSpin'][m_name].setKeyboardTracking(False)
             self.motorGUI['posSpin'][m_name].valueChanged.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
-            self.motorGUI['posSpin'][m_name].returnPressed.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
+            # self.motorGUI['posSpin'][m_name].returnPressed.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
             # speed spinboxes
             self.motorGUI['speedSpin'][m_name].setKeyboardTracking(False)
             self.motorGUI['speedSpin'][m_name].valueChanged.connect(partial(lambda n: self.updateSpeed(n), speedSpinName))
