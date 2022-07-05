@@ -432,7 +432,7 @@ def home_robot(args, scriptParams, devices, mainWindow):
 
 
 @timeout(5)
-def set_shutter(args, scriptParams, devices, mainWindow):
+def set_shutter(args, scriptParams, devices, mainWindow, temporary=False):
     print('---set_shutter---')
     global systate
 
@@ -441,30 +441,33 @@ def set_shutter(args, scriptParams, devices, mainWindow):
 
     systate.shutter = int(args[0])
 
-    if not systate.skip:
-        isOn = False
-        print('light:' + str(systate.light))
-        for l in systate.light:
-            if l > 0:
-                isOn = True
-                break
+    isOn = False
+    print('light:' + str(systate.light))
+    for l in systate.light:
+        if l > 0:
+            isOn = True
+            break
 
-        mlt = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
-        shutter = int(mlt * float(systate.shutter) + 0.5)
-        print('shutter speed: ' + str(systate.shutter) + ' x ' + str(mlt) + ' = ' + str(shutter))
+    mlt = scriptParams.IRonMultiplier if isOn else scriptParams.IRoffMultiplier
+    shutter = int(mlt * float(systate.shutter) + 0.5)
+    print('shutter speed: ' + str(systate.shutter) + ' x ' + str(mlt) + ' = ' + str(shutter))
+    if temporary:
+        pass
+    else:
         if isOn:
             systate.shutter_IRon = systate.shutter
         else:
             systate.shutter_IRoff = systate.shutter
 
+    if not systate.skip:
         if not systate.sentSig.shutter or shutter != systate.past_parameters.shutter:
-            devices['3Dsensors'].shutterSpeed = shutter
+                devices['3Dsensors'].shutterSpeed = shutter
 
-            ### Request to set shutter speed
-            devices['3Dsensors'].sensor.set_shutter(shutter)
+                ### Request to set shutter speed
+                devices['3Dsensors'].sensor.set_shutter(shutter)
 
-            systate.past_parameters.shutter = shutter
-            systate.sentSig.shutter = True
+                systate.past_parameters.shutter = shutter
+                systate.sentSig.shutter = True
 
 
 @timeout(5)
