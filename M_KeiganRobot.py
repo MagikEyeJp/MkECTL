@@ -154,7 +154,8 @@ class KeiganMotorRobot(IMotorRobot):
         initial_err = 0.0
         minerr = 999999.0  # とりあえず大きい数
         cnt = 0
-        GOAL_EPS = 0.002  # 目標位置到達誤差しきい値
+        GOAL_EPS = 0.002  # FINE目標位置到達誤差しきい値
+        NOWAIT_EPS = 0.1  # COARSE目標位置到達誤差しきい値
         GOAL_CNT = 5  # 目標位置到達判定回数
 
         for id, p in self.params.items():
@@ -170,77 +171,25 @@ class KeiganMotorRobot(IMotorRobot):
 
         # systate.pos = motorPos
 
-        if wait:
-            while True:
-                # if isAborted(scriptParams, mainWindow):
-                #     return mainWindow.stopClicked
-                if isAborted is not None:
-                    stopClicked = inmain(isAborted, scriptParams, mainWindow)
-                    if stopClicked:
-                        return stopClicked
+        while True:
+            if isAborted is not None:
+                stopClicked = inmain(isAborted, scriptParams, mainWindow)
+                if stopClicked:
+                    return stopClicked
 
-                @timeout(8)
-                def waitmove():
-                    nonlocal initial_err
-                    nonlocal minerr
-                    nonlocal cnt
-                    nonlocal GOAL_EPS
-                    nonlocal GOAL_CNT
-
-                    err = 0.0
-                    while True:
-
-
-                        time.sleep(0.2)
-                        errors = 0.0
-
-                        for id, p in self.params.items():
-                            if targetPos[id] != None:
-                                (pos_d[id], vel_d[id], torque_d[id]) = p['cont'].read_motor_measurement()
-                                errors += pow(pos_d[id] - (targetPos[id] * p['scale']), 2)
-                                pos_d[id] /= p['scale']
-                        err = math.sqrt(errors)
-
-                            # display Current Pos
-                            # mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
-                            #     pos[param_i] / scale[param_i]))
-                        # yield pos_d
-                        inmain(callback, pos_d, initial_err, err)
-
-                        if err < GOAL_EPS:
-                            print("err=", err)
-                            cnt += 1
-                            if cnt > GOAL_CNT:
-                                break
-                        else:
-                            cnt = 0
-
-                        if err < minerr:
-                            # print("err=", err)
-                            minerr = err  # 最小値更新
-                            break
-                    return err, pos_d
-
-                try:
-                    err, pos_d = waitmove()
-                    print("err=", err)
-                    # yield pos_d
-
-                    if cnt > GOAL_CNT:
-                        # raise StopIteration()
-                        break
-
-                except TimeoutError:
-                    return True     # isAborted
-
-            return False
-
-        else:
             @timeout(8)
-            def calc_err():
+            def waitmove():
                 nonlocal initial_err
+                nonlocal minerr
+                nonlocal cnt
+                nonlocal GOAL_EPS
+                nonlocal NOWAIT_EPS
+                nonlocal GOAL_CNT
 
+                err = 0.0
                 while True:
+
+
                     time.sleep(0.2)
                     errors = 0.0
 
@@ -251,19 +200,43 @@ class KeiganMotorRobot(IMotorRobot):
                             pos_d[id] /= p['scale']
                     err = math.sqrt(errors)
 
+                        # display Current Pos
+                        # mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
+                        #     pos[param_i] / scale[param_i]))
+                    # yield pos_d
                     inmain(callback, pos_d, initial_err, err)
 
-                    if err < 0.05:
-                        # minerr = err  # 最小値更新
+                    if err < (GOAL_EPS if wait else NOWAIT_EPS):
+                        print("err=", err)
+                        if wait:
+                            cnt += 1
+                        else:
+                            cnt = GOAL_CNT + 1
+                        if cnt > GOAL_CNT:
+                            break
+                    else:
+                        cnt = 0
+
+                    if err < minerr:
+                        # print("err=", err)
+                        minerr = err  # 最小値更新
                         break
-                # return err
+                return err, pos_d
 
             try:
-                calc_err()
-            except TimeoutError:
-                return True
+                err, pos_d = waitmove()
+                print("err=", err)
+                # yield pos_d
 
-            return False
+                if cnt > GOAL_CNT:
+                    # raise StopIteration()
+                    break
+
+            except TimeoutError:
+                return True     # isAborted
+
+        return False
+
 
 
 
