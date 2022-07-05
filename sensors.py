@@ -550,6 +550,14 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
                     self.smidDic[row['smid']] = row['lblid']
         print(self.smidDic)
 
+    def get_temperature(self):
+        stats = self.sensor.get_stats()
+        print(stats)
+        temp = stats.get("engine", {}).get("camera", {}).get("measurements", {}).get("sensor_temperature") if type(
+            stats) == dict else None
+        print(temp)
+        return temp
+
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
