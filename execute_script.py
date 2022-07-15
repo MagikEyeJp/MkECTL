@@ -409,9 +409,9 @@ def move_robot(args, scriptParams, devices, mainWindow):
     # systate.pos = motorPos
     systate.pos = list(args)
     if len(args) == 5:
-        targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2], 'axis_x': args[3], 'axis_y': args[4]}
+        targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2], 'x': args[3], 'y': args[4]}
     else:
-        targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2], 'axis_x': None, 'axis_y': None}
+        targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2], 'x': None, 'y': None}
 
     if not systate.skip:
         if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
