@@ -15,7 +15,7 @@ import logging
 
 import MyDoubleSpinBox
 from M_CommonRobot import RobotIF
-import mainwindow_ui
+import mainwindow_new
 import execute_script
 import sensors
 import detailedSettings_ui
@@ -122,7 +122,7 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
         r = 0
         col = 1
 
-        for i in range(len(self.mainUI.motorRobot.params.keys())):
+        for i in range(len(self.mainUI.motorRobot.params.keys())-2):
             for pid_category, pid_category_val in self.currentPIDvalues.items():
                 for pid_param, pid_param_val in pid_category_val.items():
                     val = self.currentPIDvalues[pid_category][pid_param][i]
@@ -194,7 +194,7 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
 class Ui(QtWidgets.QMainWindow, IMainUI):
     def __init__(self, parent=None):
         super(Ui, self).__init__(parent)
-        self.ui = mainwindow_ui.Ui_mainwindow()
+        self.ui = mainwindow_new.Ui_mainwindow()
         self.ui.setupUi(self)
         self.setStyleSheet('QMainWindow::separator{ background: darkgray; width: 1px; height: 1px; }')
         self.scriptParams = ScriptParams()
@@ -254,7 +254,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.isMaxWinSize = False
 
         # motor
-        self.motorSet = ['slider', 'pan', 'tilt']
+        self.motorSet = ['slider', 'pan', 'tilt', 'x', 'y']
         self.motorRobot = None  # instance of M_KeiganRobot
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
 
@@ -272,7 +272,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # motor-related process
         for m_name in self.motorSet:
             exeButtonName: str = self.motorGUI['exe'][m_name].objectName()
-            speedSpinName: str = self.motorGUI['speedSpin'][m_name].objectName()
+            if m_name == "slider" or m_name == "pan" or m_name == "tilt": #todo tempcode. make speed spinbox
+                speedSpinName: str = self.motorGUI['speedSpin'][m_name].objectName()
             # print(m_name, exeButtonName)
 
             # exe buttons
@@ -282,8 +283,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.motorGUI['posSpin'][m_name].valueChanged.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
             # self.motorGUI['posSpin'][m_name].returnPressed.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
             # speed spinboxes
-            self.motorGUI['speedSpin'][m_name].setKeyboardTracking(False)
-            self.motorGUI['speedSpin'][m_name].valueChanged.connect(partial(lambda n: self.updateSpeed(n), speedSpinName))
+            if m_name == "slider" or m_name == "pan" or m_name == "tilt": #todo tempcode.
+                self.motorGUI['speedSpin'][m_name].setKeyboardTracking(False)
+                self.motorGUI['speedSpin'][m_name].valueChanged.connect(partial(lambda n: self.updateSpeed(n), speedSpinName))
             # https://melpon.hatenadiary.org/entry/20121206/1354636589
 
         self.ui.presetExe.clicked.connect(lambda: self.exeButtonClicked('presetExe'))
@@ -415,13 +417,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             posSpinCode = '%s[\'%s\'] = %s%s%s' % (
                 'posSpinboxes', m_name, 'self.ui.', m_name, 'PosSpin')  # posSpinboxes[~~] = self.ui.~~PosSpin
             exec(posSpinCode)
-            speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
-                'speedSpinboxes', m_name, 'self.ui.', m_name, 'SpeedSpin')  # speedSpinboxes[~~] = self.ui.~~SpeedSpin
-            exec(speedSpinCode)
-            speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
-                'currentPosLabels', m_name, 'self.ui.', m_name,
-                'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
-            exec(speedSpinCode)
+            if m_name == "slider" or m_name == "pan" or m_name == "tilt": #todo tempcode. make speed spinbox in gui.
+                speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
+                    'speedSpinboxes', m_name, 'self.ui.', m_name, 'SpeedSpin')  # speedSpinboxes[~~] = self.ui.~~SpeedSpin
+                exec(speedSpinCode)
+                speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
+                    'currentPosLabels', m_name, 'self.ui.', m_name,
+                    'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
+                exec(speedSpinCode)
 
         # print(exeButtons)
         self.motorGUI['exe'] = exeButtons  # ex.) motorGUI['exe']['slider'] == self.ui.sliderMoveExe
@@ -455,7 +458,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.panLabel.setText("R [deg]")
             self.ui.panLabel.show()
             self.ui.panPosSpin.show()
-            self.ui.tiltLabel.setText("servo [deg]")
+            self.ui.tiltLabel.setText("P [deg]")
             self.ui.tiltLabel.show()
             self.ui.tiltPosSpin.show()
 
@@ -585,7 +588,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             motor_id = buttonName.replace('MoveExe', '')
             targetPos = self.motorGUI['posSpin'][motor_id].value()
-            targetPos_d = {'slider': None, 'pan': None, 'tilt': None, 'axis_x': None, 'axis_y': None}
+            targetPos_d = {'slider': None, 'pan': None, 'tilt': None, 'x': None, 'y': None}
 
             for id, p in self.motorRobot.params.items():
                 if id == motor_id:
@@ -605,7 +608,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 QtWidgets.QMessageBox.critical(self, 'Timeout Error', 'Motor not moving.')
             else:
                 # for id in self.motorRobot.params.keys():
-                self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(targetPos_d[motor_id]))
+                if motor_id == "slider" or motor_id == "pan" or motor_id == "tilt": #TODO TempCode. Make CurrentPosLabel in GUI!
+                    self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(targetPos_d[motor_id]))
 
                 self.ui.initializeProgressBar.setValue(100)
                 self.ui.initializeProgressLabel.setText('Goal')
