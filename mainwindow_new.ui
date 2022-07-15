@@ -1608,7 +1608,7 @@
                <widget class="QDoubleSpinBox" name="rPosSpin"/>
               </item>
               <item row="4" column="1">
-               <widget class="QDoubleSpinBox" name="servoPosSpin">
+               <widget class="QDoubleSpinBox" name="pPosSpin">
                 <property name="decimals">
                  <number>0</number>
                 </property>
@@ -1703,7 +1703,7 @@
                </widget>
               </item>
               <item row="4" column="0">
-               <widget class="QLabel" name="servoLabel">
+               <widget class="QLabel" name="pLabel">
                 <property name="text">
                  <string>Servo []</string>
                 </property>
@@ -1762,7 +1762,7 @@
                </widget>
               </item>
               <item row="4" column="2">
-               <widget class="QPushButton" name="servoMoveExe">
+               <widget class="QPushButton" name="pMoveExe">
                 <property name="maximumSize">
                  <size>
                   <width>24</width>
@@ -2016,7 +2016,7 @@
                <x>10</x>
                <y>210</y>
                <width>299</width>
-               <height>41</height>
+               <height>53</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="saveLayput">
