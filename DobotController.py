@@ -1,6 +1,7 @@
 import socket
 import time
 import sys
+import json
 
 class dobotController():
     def __init__(self ,param):
@@ -27,6 +28,19 @@ class dobotController():
 
     def begin(self):
         self.sock.connect((self.host,self.port))
+
+    def getPos(self):
+        code = "M124"
+        self.sock.send(code.encode())
+        pos = json.loads(self.sock.recv(1024).decode())["body"][1]
+        d = {
+            "slider": pos["Z"],
+            "pan": pos["R"],
+            "tilt": pos["P"],
+            "x": pos["X"],
+            "y": pos["Y"]
+        }
+        return d
 
     def move(self,pos):
 
