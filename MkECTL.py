@@ -523,12 +523,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.setUIStatus(self.states)
 
     def getCurrentPos(self):
+        positionDic = self.motorRobot.getPosition()
         for id, p in self.motorRobot.params.items():
-            m = p['cont']
-            (pos, vec, tor) = m.read_motor_measurement()
-            scale = p['scale']
-            pos /= scale
-            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
+
+            if id == "x" or id == "y": #TODO this 'if~else:' is temp code. Update UI textBox.
+                pass
+            else:
+                pos = positionDic[id]
+                self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
 
     def changeMovRoboStatus(self, pos_d, initial_err, err):
         for id, pos in pos_d.items():

@@ -22,6 +22,9 @@ class RobotIF(IMotorRobot):
     def getMotorDic(self):
         self.robot.getMotorDic()
 
+    def getPosition(self):
+        return self.robot.getPosition()
+
     def initializeMotors(self):
         return self.robot.initializeMotors()
 

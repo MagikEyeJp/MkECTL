@@ -28,6 +28,10 @@ class Dobot():
             }
         }
 
+    def getPosition(self):
+        tmpPosDic = {"slider":192, "pan":168, "tilt":10, "x":1, "y":2}
+        return tmpPosDic
+
     def initializeMotors(self):
         self.controller.begin()
         return True

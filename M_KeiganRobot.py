@@ -108,6 +108,17 @@ class KeiganMotorRobot():
         self.params = motordic
         # return motordic
 
+    def getPosition(self):
+        positions = {}
+        for id, p in self.params.items():
+            m = p['cont']
+            (pos, vec, tor) = m.read_motor_measurement()
+            scale = p['scale']
+            pos = pos/scale
+            positions[id] = pos
+
+        return positions
+
     def initializeMotors(self):
         self.slider = self.params.get('slider', {}).get('cont', None)
         self.pan = self.params.get('pan', {}).get('cont', None)
