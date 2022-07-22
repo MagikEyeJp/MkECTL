@@ -9,7 +9,7 @@ class Dobot():
     def getMotorDic(self):
         self.params = {
             'slider': {
-                'id': 'x',
+                'id': 'slider',
                 'cont': "Controller object",
                 'scale': 0,
                 'SN': 'xxxxxxxxxxx'
@@ -25,6 +25,12 @@ class Dobot():
                 'cont': "Controller object",
                 'scale': 0,
                 'SN': 'xxxxxxxxxxx'
+            },
+            'x':{
+                'id':'x'
+            },
+            'y':{
+                'id':'y'
             }
         }
 
