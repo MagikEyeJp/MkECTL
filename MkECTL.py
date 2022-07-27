@@ -25,6 +25,7 @@ from SensorInfo import SensorInfo
 
 import IRLightMkE
 import IRLightPapouch
+import IRLightNumato
 import IRLightDummy
 from IMainUI import IMainUI
 
@@ -460,6 +461,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                     self.IRLight = IRLightMkE.IRLightMkE(IRtype, IRdevice)
                 elif IRtype == "PAPOUCH":
                     self.IRLight = IRLightPapouch.IRLightPapouch(IRtype, IRdevice)
+                elif IRtype == "Numato":
+                    self.IRLight = IRLightNumato.IRLightNumato(IRtype, IRdevice)
                 else:   # dummy
                     self.IRLight = IRLightDummy.IRLightDummy(IRtype, IRdevice)
 

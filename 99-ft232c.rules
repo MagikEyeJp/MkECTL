@@ -2,4 +2,4 @@
 #for Calibrator JPv1 Magik-eye
 ACTION=="add", SUBSYSTEMS=="usb", DRIVERS=="ftdi_sio", SYMLINK+="ft232c-%s{bInterfaceNumber}", MODE="0666"
 KERNEL=="ttyACM*", ATTRS{idVendor}=="1b4f", ATTRS{idProduct}=="9204", SYMLINK+="arduino", MODE="0666"
-
+KERNEL=="ttyACM*", ATTRS{idVendor}=="2a19", ATTRS{idProduct}=="0c01", SYMLINK+="arduino", MODE="0666"
