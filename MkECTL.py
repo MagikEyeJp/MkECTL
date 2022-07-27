@@ -632,11 +632,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(pos))
 
     def rebootButtonClicked(self):
-        for p in self.motorRobot.params.values():
-            m = p['cont']
-            m.reboot()
-            m.close()
-
+        self.motorRobot.reboot()
         self.states = {UIState.MACHINEFILE, UIState.INITIALIZE, UIState.IRLIGHT}
         self.setUIStatus(self.states)
         QtWidgets.QMessageBox.information(self, 'reboot', 'All motors have been rebooted. \n'

@@ -119,6 +119,12 @@ class KeiganMotorRobot():
 
         return positions
 
+    def reboot(self):
+        for p in self.params.values():
+            m = p['cont']
+            m.reboot()
+            m.close()
+
     def initializeMotors(self):
         self.slider = self.params.get('slider', {}).get('cont', None)
         self.pan = self.params.get('pan', {}).get('cont', None)
