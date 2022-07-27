@@ -37,6 +37,9 @@ class Dobot():
     def getPosition(self):
         return self.controller.getPos()
 
+    def reboot(self):
+        self.controller.__del__()
+
     def initializeMotors(self):
         self.controller.begin()
         return True
