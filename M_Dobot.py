@@ -41,8 +41,7 @@ class Dobot():
         self.controller.__del__()
 
     def initializeMotors(self):
-        self.controller.begin()
-        return True
+        return self.controller.begin()
 
     def changePIDparam(self, pid_category, pid_param, motor_i, value):
         pass

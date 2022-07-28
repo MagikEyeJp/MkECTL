@@ -27,7 +27,14 @@ class dobotController():
         self.sock.close()
 
     def begin(self):
-        self.sock.connect((self.host,self.port))
+        try:
+            self.sock.connect((self.host,self.port))
+#        except Exception as e:
+        except ConnectionRefusedError as e:
+            print(f"{e}")
+            return False
+        else:
+            return True
 
     def getPos(self):
         code = "M124"
