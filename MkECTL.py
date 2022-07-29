@@ -434,6 +434,18 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             'currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
     def switchView(self, GUI_mode):
+        # show hidden Keigan objects
+        self.ui.xCurrentPos.show()
+        self.ui.currentXLabel.show()
+        self.ui.yCurrentPos.show()
+        self.ui.currentYLabel.show()
+        self.ui.xLabel.show()
+        self.ui.xPosSpin.show()
+        self.ui.xMoveExe.show()
+        self.ui.yLabel.show()
+        self.ui.yPosSpin.show()
+        self.ui.yMoveExe.show()
+
         # change dobot version
         if GUI_mode == "Dobot":
             # Hide text & button
@@ -464,7 +476,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # change keigan version
         elif GUI_mode == "Keigan":
-            pass
+            self.ui.sliderLabel.setText("Slider [-4000 to 4000 mm]")
+            self.ui.panLabel.setText("Pan [-360 to 360 deg]")
+            self.ui.tiltLabel.setText("Tilt [-360 to 360 deg]")
+            self.ui.xCurrentPos.hide()
+            self.ui.currentXLabel.hide()
+            self.ui.yCurrentPos.hide()
+            self.ui.currentYLabel.hide()
+            self.ui.xLabel.hide()
+            self.ui.xPosSpin.hide()
+            self.ui.xMoveExe.hide()
+            self.ui.yLabel.hide()
+            self.ui.yPosSpin.hide()
+            self.ui.yMoveExe.hide()
 
     def initializeMotors(self):
         # change GUI widgets layout

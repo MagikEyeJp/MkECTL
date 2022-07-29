@@ -1404,24 +1404,14 @@
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="1">
-              <widget class="QLabel" name="currentPoslabel">
-               <property name="text">
-                <string>Current Pos.</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
+             <item row="2" column="0">
               <widget class="QLabel" name="currentTiltLabel">
                <property name="text">
                 <string>tilt</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="2" column="1">
               <widget class="QLabel" name="tiltCurrentPos">
                <property name="text">
                 <string>0</string>
@@ -1431,22 +1421,8 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="currentPanLabel">
-               <property name="text">
-                <string>pan</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="currentYLabel">
-               <property name="text">
-                <string>y</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="sliderCurrentPos">
+             <item row="4" column="1">
+              <widget class="QLabel" name="yCurrentPos">
                <property name="text">
                 <string>0</string>
                </property>
@@ -1456,30 +1432,27 @@
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="currentSliderLabel">
+              <widget class="QLabel" name="currentPanLabel">
                <property name="text">
-                <string>slider</string>
+                <string>pan</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="panCurrentPos">
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="currentXLabel">
                <property name="text">
                 <string>x</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
+             <item row="4" column="0">
+              <widget class="QLabel" name="currentYLabel">
+               <property name="text">
+                <string>y</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
               <widget class="QLabel" name="xCurrentPos">
                <property name="text">
                 <string>0</string>
@@ -1489,8 +1462,25 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
-              <widget class="QLabel" name="yCurrentPos">
+             <item row="0" column="1">
+              <widget class="QLabel" name="sliderCurrentPos">
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="currentSliderLabel">
+               <property name="text">
+                <string>slider</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="panCurrentPos">
                <property name="text">
                 <string>0</string>
                </property>
@@ -1675,7 +1665,7 @@
                  <enum>QFrame::Plain</enum>
                 </property>
                 <property name="text">
-                 <string>X []</string>
+                 <string>X [mm]</string>
                 </property>
                </widget>
               </item>
@@ -1702,7 +1692,7 @@
               <item row="4" column="0">
                <widget class="QLabel" name="yLabel">
                 <property name="text">
-                 <string>Y []</string>
+                 <string>Y [mm]</string>
                 </property>
                </widget>
               </item>
