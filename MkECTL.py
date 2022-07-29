@@ -421,10 +421,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
                     'speedSpinboxes', m_name, 'self.ui.', m_name, 'SpeedSpin')  # speedSpinboxes[~~] = self.ui.~~SpeedSpin
                 exec(speedSpinCode)
-                speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
-                    'currentPosLabels', m_name, 'self.ui.', m_name,
-                    'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
-                exec(speedSpinCode)
+            currentPosCode = '%s[\'%s\'] = %s%s%s' % (
+                'currentPosLabels', m_name, 'self.ui.', m_name,
+                'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
+            exec(currentPosCode)
 
         # print(exeButtons)
         self.motorGUI['exe'] = exeButtons  # ex.) motorGUI['exe']['slider'] == self.ui.sliderMoveExe
@@ -528,12 +528,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def getCurrentPos(self):
         positionDic = self.motorRobot.getPosition()
         for id, p in self.motorRobot.params.items():
-
-            if id == "x" or id == "y": #TODO this 'if~else:' is temp code. Update UI textBox.
-                pass
-            else:
-                pos = positionDic[id]
-                self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
+            pos = positionDic[id]
+            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
 
     def changeMovRoboStatus(self, pos_d, initial_err, err):
         for id, pos in pos_d.items():
