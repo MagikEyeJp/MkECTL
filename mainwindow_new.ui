@@ -1400,14 +1400,31 @@
               <x>370</x>
               <y>50</y>
               <width>131</width>
-              <height>101</height>
+              <height>111</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="1">
-              <widget class="QLabel" name="currentPoslabel">
+             <item row="2" column="0">
+              <widget class="QLabel" name="currentTiltLabel">
                <property name="text">
-                <string>Current Pos.</string>
+                <string>tilt</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="tiltCurrentPos">
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLabel" name="yCurrentPos">
+               <property name="text">
+                <string>0</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -1415,13 +1432,37 @@
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="currentSliderLabel">
+              <widget class="QLabel" name="currentPanLabel">
                <property name="text">
-                <string>slider</string>
+                <string>pan</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="3" column="0">
+              <widget class="QLabel" name="currentXLabel">
+               <property name="text">
+                <string>x</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="currentYLabel">
+               <property name="text">
+                <string>y</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="xCurrentPos">
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
               <widget class="QLabel" name="sliderCurrentPos">
                <property name="text">
                 <string>0</string>
@@ -1431,32 +1472,15 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="currentPanLabel">
+             <item row="0" column="0">
+              <widget class="QLabel" name="currentSliderLabel">
                <property name="text">
-                <string>pan</string>
+                <string>slider</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="1" column="1">
               <widget class="QLabel" name="panCurrentPos">
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="currentTiltLabel">
-               <property name="text">
-                <string>tilt</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QLabel" name="tiltCurrentPos">
                <property name="text">
                 <string>0</string>
                </property>
@@ -1471,9 +1495,9 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>150</y>
+              <y>140</y>
               <width>491</width>
-              <height>261</height>
+              <height>271</height>
              </rect>
             </property>
             <property name="title">
@@ -1632,26 +1656,6 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="2">
-               <widget class="QPushButton" name="sliderMoveExe">
-                <property name="maximumSize">
-                 <size>
-                  <width>24</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="resources.qrc">
-                  <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
-                </property>
-                <property name="autoDefault">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
               <item row="3" column="0">
                <widget class="QLabel" name="xLabel">
                 <property name="inputMethodHints">
@@ -1661,7 +1665,7 @@
                  <enum>QFrame::Plain</enum>
                 </property>
                 <property name="text">
-                 <string>X []</string>
+                 <string>X [mm]</string>
                 </property>
                </widget>
               </item>
@@ -1688,7 +1692,7 @@
               <item row="4" column="0">
                <widget class="QLabel" name="yLabel">
                 <property name="text">
-                 <string>Y []</string>
+                 <string>Y [mm]</string>
                 </property>
                </widget>
               </item>
@@ -1775,6 +1779,26 @@
                 <property name="icon">
                  <iconset resource="resources.qrc">
                   <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QPushButton" name="sliderMoveExe">
+                <property name="maximumSize">
+                 <size>
+                  <width>24</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="resources.qrc">
+                  <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
+                </property>
+                <property name="autoDefault">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -2599,24 +2623,11 @@
              <rect>
               <x>10</x>
               <y>36</y>
-              <width>101</width>
-              <height>32</height>
+              <width>196</width>
+              <height>432</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="L1GridLayout">
-             <item row="0" column="0">
-              <widget class="QLabel" name="L1Label">
-               <property name="maximumSize">
-                <size>
-                 <width>20</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>L1</string>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="1">
               <widget class="QPushButton" name="onL1Button">
                <property name="maximumSize">
@@ -2640,6 +2651,19 @@
                </property>
                <property name="autoExclusive">
                 <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="L1Label">
+               <property name="maximumSize">
+                <size>
+                 <width>20</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>L1</string>
                </property>
               </widget>
              </item>

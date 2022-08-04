@@ -421,10 +421,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
                     'speedSpinboxes', m_name, 'self.ui.', m_name, 'SpeedSpin')  # speedSpinboxes[~~] = self.ui.~~SpeedSpin
                 exec(speedSpinCode)
-                speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
-                    'currentPosLabels', m_name, 'self.ui.', m_name,
-                    'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
-                exec(speedSpinCode)
+            currentPosCode = '%s[\'%s\'] = %s%s%s' % (
+                'currentPosLabels', m_name, 'self.ui.', m_name,
+                'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
+            exec(currentPosCode)
 
         # print(exeButtons)
         self.motorGUI['exe'] = exeButtons  # ex.) motorGUI['exe']['slider'] == self.ui.sliderMoveExe
@@ -434,6 +434,18 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             'currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
     def switchView(self, GUI_mode):
+        # show hidden Keigan objects
+        self.ui.xCurrentPos.show()
+        self.ui.currentXLabel.show()
+        self.ui.yCurrentPos.show()
+        self.ui.currentYLabel.show()
+        self.ui.xLabel.show()
+        self.ui.xPosSpin.show()
+        self.ui.xMoveExe.show()
+        self.ui.yLabel.show()
+        self.ui.yPosSpin.show()
+        self.ui.yMoveExe.show()
+
         # change dobot version
         if GUI_mode == "Dobot":
             # Hide text & button
@@ -464,7 +476,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # change keigan version
         elif GUI_mode == "Keigan":
-            pass
+            self.ui.sliderLabel.setText("Slider [-4000 to 4000 mm]")
+            self.ui.panLabel.setText("Pan [-360 to 360 deg]")
+            self.ui.tiltLabel.setText("Tilt [-360 to 360 deg]")
+            self.ui.xCurrentPos.hide()
+            self.ui.currentXLabel.hide()
+            self.ui.yCurrentPos.hide()
+            self.ui.currentYLabel.hide()
+            self.ui.xLabel.hide()
+            self.ui.xPosSpin.hide()
+            self.ui.xMoveExe.hide()
+            self.ui.yLabel.hide()
+            self.ui.yPosSpin.hide()
+            self.ui.yMoveExe.hide()
 
     def initializeMotors(self):
         # change GUI widgets layout
@@ -528,12 +552,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def getCurrentPos(self):
         positionDic = self.motorRobot.getPosition()
         for id, p in self.motorRobot.params.items():
-
-            if id == "x" or id == "y": #TODO this 'if~else:' is temp code. Update UI textBox.
-                pass
-            else:
-                pos = positionDic[id]
-                self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
+            pos = positionDic[id]
+            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
 
     def changeMovRoboStatus(self, pos_d, initial_err, err):
         for id, pos in pos_d.items():
