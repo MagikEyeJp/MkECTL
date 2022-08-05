@@ -65,7 +65,9 @@ class KeiganMotorRobot():
         self.params = None
 
     def setPrePos(self):
-        pass
+        for id, p in self.params.items():
+            m = p['cont']
+            m.presetPosition(0.0)
 
     def getMotorDic(self):
         global defaultMotors
