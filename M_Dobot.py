@@ -6,6 +6,9 @@ class Dobot():
         self.machineParams = machineParams_m
         self.controller = dobotController(self.machineParams["dobot_conf"] if "dobot_conf" in self.machineParams else None)
 
+    def setPrePos(self):
+        self.controller.updateBasePos()
+
     def getMotorDic(self):
         self.params = {
             'slider': {

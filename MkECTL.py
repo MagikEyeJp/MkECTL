@@ -914,10 +914,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # self.scriptParams.scriptName = [''] * self.scriptParams.maxScriptNum
 
     def setHome(self):
+        self.motorRobot.setPrePos()
         for id, p in self.motorRobot.params.items():
-            m = p['cont']
-            m.presetPosition(0.0)
-
             self.motorGUI['posSpin'][id].setValue(0.0)
             self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(0.0))
 

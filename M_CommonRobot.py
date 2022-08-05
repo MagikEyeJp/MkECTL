@@ -19,6 +19,9 @@ class RobotIF(IMotorRobot):
         self.getMotorDic()
         self.params = self.robot.params
 
+    def setPrePos(self):
+        self.robot.setPrePos()
+
     def getMotorDic(self):
         self.robot.getMotorDic()
 
