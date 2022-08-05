@@ -64,6 +64,9 @@ class KeiganMotorRobot():
 
         self.params = None
 
+    def setPrePos(self):
+        pass
+
     def getMotorDic(self):
         global defaultMotors
 
