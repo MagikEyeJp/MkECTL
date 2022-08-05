@@ -928,7 +928,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                }
         print(text)
 
-        targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0, 'x':0.0, 'y':0.0}
 
         self.ui.initializeProgressBar.setEnabled(True)
         self.ui.initializeProgressLabel.setEnabled(True)
