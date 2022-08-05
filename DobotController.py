@@ -26,6 +26,11 @@ class dobotController():
     def __del__(self):
         self.sock.close()
 
+    def updateBasePos(self):
+        for key in self.basePos.keys():
+            self.basePos[key] -= self.targetPos[key]
+            self.targetPos[key] = 0
+
     def begin(self):
         try:
             self.sock.connect((self.host,self.port))

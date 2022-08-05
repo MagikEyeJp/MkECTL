@@ -7,7 +7,7 @@ class Dobot():
         self.controller = dobotController(self.machineParams["dobot_conf"] if "dobot_conf" in self.machineParams else None)
 
     def setPrePos(self):
-        pass
+        self.controller.updateBasePos()
 
     def getMotorDic(self):
         self.params = {
