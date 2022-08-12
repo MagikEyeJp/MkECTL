@@ -117,6 +117,16 @@ def getPreviousMachineFile(iniFile):
 
     return machineFilePath
 
+def getPreviousIPAddress(iniFile) -> "data/previousIPAddress.ini":
+    # if not exist IPadr iniFile, return default IPadr
+    try:
+        config = configparser.ConfigParser()
+        config.read(iniFile)
+        IPAddress = config.get('previous_IPadr', 'IP_Address')
+    except:
+        IPAddress = "127.0.0.1" # default
+    return IPAddress
+
 def getPreviousPostProcFile(iniFile):
     config = configparser.ConfigParser()
     config.read(iniFile)
@@ -142,6 +152,16 @@ def updatePreviousPostProcFile(iniFile, postprocFile):
     section = 'previous_postproc'
     config_ps.add_section(section)
     config_ps.set(section, 'postproc_file', postprocFile)
+
+    with open(iniFile, 'w') as configfile:
+        config_ps.write(configfile)
+
+def updatePreviousIPAddressFile(iniFile, IPadr):
+    config_ps = configparser.RawConfigParser()
+
+    section = 'previous_IPadr'
+    config_ps.add_section(section)
+    config_ps.set(section, "IP_address", IPadr)
 
     with open(iniFile, 'w') as configfile:
         config_ps.write(configfile)
