@@ -105,7 +105,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.getImg_thread = None
 
         # Variables (initialized with default values)
-        self.IPaddress = '127.0.0.1'  # default
+        # insert privious connected Sensor IP from saveFile
+        with open("data/recentConnectedIPAddress.txt",mode='r', encoding='UTF-8') as f:
+            self.IPaddress = f.read().replace('\n', '')
         self.portNum: int = 8888
         self.shutterSpeed: int = 30000
         self.frames: int = 5
@@ -122,6 +124,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
         # Combo Box
         self.ui_s.ISOcombo.setCurrentText(str(self.gainiso))
+        self.ui_s.IPComboBox.setCurrentText(str(self.IPaddress))
         # self.ui_s.ISOcombo.currentTextChanged.connect(lambda: self.changeISO('comboBox'))
         self.ui_s.ISOcombo.currentTextChanged.connect(self.changeISO)
         self.ui_s.ISOcombo.setValidator(QtGui.QIntValidator(self))
@@ -238,6 +241,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.portNum = int(d.group(2))
         else:
             self.IPaddress = self.RPiaddress
+        # write changed IP address to saveFile
+        with open("data/recentConnectedIPAddress.txt", mode="+w", encoding='UTF-8') as f:
+            print(self.IPaddress, file=f)
 
 
     def changeShutter(self):
