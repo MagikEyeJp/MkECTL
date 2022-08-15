@@ -1153,6 +1153,16 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.subWindow.ui_s.laserControlGroup.setEnabled(True)
             # self.subWindow.ui_s.gridButton.setEnabled(True)
             # self.subWindow.ui_s.gridGroup.setEnabled(True)
+        else:
+            # self.subWindow.ui_s.setIPaddressButton.setEnabled(True)
+            self.subWindow.ui_s.connectButton.setEnabled(True)
+            self.subWindow.ui_s.IPComboBox.setEnabled(True)
+            self.subWindow.ui_s.disconnectButton.setEnabled(False)
+            self.subWindow.ui_s.searchButton.setEnabled(True)
+            self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
+            self.subWindow.ui_s.laserControlGroup.setEnabled(False)
+            # self.subWindow.ui_s.gridButton.setEnabled(False)
+            self.subWindow.ui_s.gridGroup.setEnabled(False)
 
         if UIState.SCRIPT in status:
             self.ui.selectScript_toolButton.setEnabled(True)
