@@ -258,7 +258,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.motorRobot = None  # instance of M_KeiganRobot
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
 
-        self.states = set()
+        self.states = UIState()
 
         self.devices: dict = {}  # 'motors', 'robot', 'lights', '3Dsensors' etc.  # Dict of dictionaries
 
@@ -357,10 +357,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
 
         if self.machineParams == {}:
-            self.states = {UIState.MACHINEFILE}
+#            self.states = {UIState.MACHINEFILE}
+            self.states.machineFile = True
             self.setUIStatus(self.states)
         else:
-            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+#            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+            self.states.machineFile = True
+            self.states.initialize = True
             self.setUIStatus(self.states)
 
     def restoreConfig(self):
@@ -541,12 +544,17 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.initializeProgressBar.setValue(100)
             self.ui.initializeProgressLabel.setText('Initialized all motors')
 
-            self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
+#            self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
+            self.states.motor = True
+            self.states.irlight = True
+            self.states.script = True
             self.setUIStatus(self.states)
         else:
             QtWidgets.QMessageBox.critical(self, 'Initialization Error',
                            'Couldn\'t initialize motors.\nPlease check if the motors are ready to be initialized.')
-            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+#            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+            self.states.machineFile = True
+            self.states.initialize = True
             self.setUIStatus(self.states)
 
     def getCurrentPos(self):
@@ -653,7 +661,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def rebootButtonClicked(self):
         self.motorRobot.reboot()
-        self.states = {UIState.MACHINEFILE, UIState.INITIALIZE, UIState.IRLIGHT}
+#        self.states = {UIState.MACHINEFILE, UIState.INITIALIZE, UIState.IRLIGHT}
+        self.states.machineFile = True
+        self.states.initialize = True
+        self.states.irlight = True
         self.setUIStatus(self.states)
         QtWidgets.QMessageBox.information(self, 'reboot', 'All motors have been rebooted. \n'
                                                           'Please re-initialize motors to use again.')
@@ -761,12 +772,18 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+#            self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+            self.states.sensor_connected = True
+            self.states.script_progress = True
             self.setUIStatus(self.states)
 
             interrupted = execute_script.execute_script(self.scriptParams, self.devices, self, True)
 
-            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+#            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+            self.states.script = True
+            self.states.motor = True
+            self.states.irlight = True
+            self.states.sensor_connected = True
             self.setUIStatus(self.states)
 
             if not interrupted:
@@ -837,10 +854,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # GUI
         if self.devices['3Dsensors'].conn:
-            self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+#            self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+            self.states.sensor_connected = True
+            self.states.script_progress = True
             self.devices['3Dsensors'].sensorInfo.save_to_file(self.dataOutFolder() + '/sensorinfo.json')
         else:
-            self.states = {UIState.SCRIPT_PROGRESS}
+#            self.states = {UIState.SCRIPT_PROGRESS}
+            self.states.script_progress = True
 
         self.setUIStatus(self.states)
 
@@ -851,9 +871,17 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         if not self.scriptParams.execTwoScr:
             if self.devices['3Dsensors'].conn:
-                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+#                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+                self.states.script = True
+                self.states.motor = True
+                self.states.irlight = True
+                self.states.sensor_connected = True
             else:
-                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
+#                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
+                self.states.script = True
+                self.states.motor = True
+                self.states.irlight = True
+                
             self.setUIStatus(self.states)
 
             if not interrupted:
@@ -886,18 +914,28 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             # GUI
             if self.devices['3Dsensors'].conn:
-                self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+#                self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+                self.states.sensor_connected = True
+                self.states.script_progress = True
             else:
-                self.states = {UIState.SCRIPT_PROGRESS}
+#                self.states = {UIState.SCRIPT_PROGRESS}
+                self.states.script_progress = True
             self.setUIStatus(self.states)
 
             ### EXECUTE
             interrupted = execute_script.execute_script(self.scriptParams, self.devices, self)
 
             if self.devices['3Dsensors'].conn:
-                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+#                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+                self.states.script = True
+                self.states.motor = True
+                self.states.irlight = True
+                self.states.sensor_connected = True
             else:
-                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
+#                self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
+                self.states.script = True
+                self.states.motor = True
+                self.states.irlight = True
             self.setUIStatus(self.states)
 
             if not interrupted:
@@ -1108,12 +1146,15 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     # ----- UI-related functions -----
     def setUIStatus(self, status):
-        if UIState.MACHINEFILE in status:
+        print(f"states:{vars(status)}")
+        print(f"self.s:{vars(self.states)}")
+
+        if self.states.machineFile:
             self.ui.selectMachineFileButton.setEnabled(True)
         else:
             self.ui.selectMachineFileButton.setEnabled(False)
 
-        if UIState.INITIALIZE in status:
+        if self.states.initialize:
             self.ui.initializeButton.setEnabled(True)
             self.ui.initializeProgressBar.setEnabled(True)
             self.ui.initializeProgressBar.setValue(0)
@@ -1125,7 +1166,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.initializeProgressLabel.setEnabled(False)
             # self.ui.initializeProgressLabel.setText('Initialized all motors')
 
-        if UIState.MOTOR in status:
+        if self.states.motor:
             # self.ui.robotControl.setEnabled(True)
             self.ui.manualOperation.setEnabled(True)
             self.ui.MagikEye.setEnabled(True)
@@ -1137,12 +1178,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.getCurrentPosButton.setEnabled(False)
             self.ui.detailedSettingsButton.setEnabled(False)
 
-        if UIState.IRLIGHT in status and self.IRLight.isvalid():
+        if self.states.irlight and self.IRLight.isvalid():
             self.ui.IRlightControlGroup.setEnabled(True)
         else:
             self.ui.IRlightControlGroup.setEnabled(False)
 
-        if UIState.SENSOR_CONNECTED in status:
+        if self.states.sensor_connected:
             # self.ui.viewSensorWinButton.setEnabled(True)
             # self.subWindow.ui_s.setIPaddressButton.setEnabled(False)
             self.subWindow.ui_s.connectButton.setEnabled(False)
@@ -1164,7 +1205,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # self.subWindow.ui_s.gridButton.setEnabled(False)
             self.subWindow.ui_s.gridGroup.setEnabled(False)
 
-        if UIState.SCRIPT in status:
+        if self.states.script:
             self.ui.selectScript_toolButton.setEnabled(True)
             self.ui.selectScript_toolButton_2.setEnabled(True)
             self.ui.delete2ndScriptButton.setEnabled(True)
@@ -1187,7 +1228,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
             self.subWindow.ui_s.laserControlGroup.setEnabled(False)
 
-        if UIState.SCRIPT_PROGRESS in status:
+        if self.states.script_progress:
             self.ui.Scripting_groupBox.setEnabled(True)
             self.ui.stopButton.setEnabled(True)
         else:
@@ -1222,7 +1263,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.machineParams = json_IO.loadJson(self.previousMachineFilePath)
 
             self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
-            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+#            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+            self.states.machineFile = True
+            self.states.initialize = True
             self.setUIStatus(self.states)
 
 # ==================================================================
