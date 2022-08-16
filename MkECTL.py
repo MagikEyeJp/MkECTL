@@ -545,6 +545,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.initializeProgressLabel.setText('Initialized all motors')
 
 #            self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
+            self.states.machineFile = False
+            self.states.initialize = False
             self.states.motor = True
             self.states.irlight = True
             self.states.script = True
@@ -555,6 +557,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 #            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.states.machineFile = True
             self.states.initialize = True
+            self.states.motor = False
+            self.states.irlight = False
+            self.states.script = False
             self.setUIStatus(self.states)
 
     def getCurrentPos(self):
@@ -665,6 +670,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.states.machineFile = True
         self.states.initialize = True
         self.states.irlight = True
+        self.states.motor = False
+        self.states.script = False
         self.setUIStatus(self.states)
         QtWidgets.QMessageBox.information(self, 'reboot', 'All motors have been rebooted. \n'
                                                           'Please re-initialize motors to use again.')
@@ -1183,27 +1190,27 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.ui.IRlightControlGroup.setEnabled(False)
 
-        if self.states.sensor_connected:
+#        if self.states.sensor_connected:
             # self.ui.viewSensorWinButton.setEnabled(True)
             # self.subWindow.ui_s.setIPaddressButton.setEnabled(False)
-            self.subWindow.ui_s.connectButton.setEnabled(False)
-            self.subWindow.ui_s.IPComboBox.setEnabled(False)
-            self.subWindow.ui_s.disconnectButton.setEnabled(True)
-            self.subWindow.ui_s.searchButton.setEnabled(False)
-            self.subWindow.ui_s.cameraControlGroup.setEnabled(True)
-            self.subWindow.ui_s.laserControlGroup.setEnabled(True)
+#            self.subWindow.ui_s.connectButton.setEnabled(False)
+#            self.subWindow.ui_s.IPComboBox.setEnabled(False)
+#            self.subWindow.ui_s.disconnectButton.setEnabled(True)
+#            self.subWindow.ui_s.searchButton.setEnabled(False)
+#            self.subWindow.ui_s.cameraControlGroup.setEnabled(True)
+#            self.subWindow.ui_s.laserControlGroup.setEnabled(True)
             # self.subWindow.ui_s.gridButton.setEnabled(True)
             # self.subWindow.ui_s.gridGroup.setEnabled(True)
-        else:
+#        else:
             # self.subWindow.ui_s.setIPaddressButton.setEnabled(True)
-            self.subWindow.ui_s.connectButton.setEnabled(True)
-            self.subWindow.ui_s.IPComboBox.setEnabled(True)
-            self.subWindow.ui_s.disconnectButton.setEnabled(False)
-            self.subWindow.ui_s.searchButton.setEnabled(True)
-            self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
-            self.subWindow.ui_s.laserControlGroup.setEnabled(False)
+#            self.subWindow.ui_s.connectButton.setEnabled(True)
+#            self.subWindow.ui_s.IPComboBox.setEnabled(True)
+#            self.subWindow.ui_s.disconnectButton.setEnabled(False)
+#            self.subWindow.ui_s.searchButton.setEnabled(True)
+#            self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
+#            self.subWindow.ui_s.laserControlGroup.setEnabled(False)
             # self.subWindow.ui_s.gridButton.setEnabled(False)
-            self.subWindow.ui_s.gridGroup.setEnabled(False)
+#            self.subWindow.ui_s.gridGroup.setEnabled(False)
 
         if self.states.script:
             self.ui.selectScript_toolButton.setEnabled(True)
@@ -1214,8 +1221,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.renewSubFolder_toolButton.setEnabled(True)
             self.ui.continueButton.setEnabled(True)
             self.ui.executeScript_button.setEnabled(True)
-            self.subWindow.ui_s.cameraControlGroup.setEnabled(True)
-            self.subWindow.ui_s.laserControlGroup.setEnabled(True)
         else:
             self.ui.selectScript_toolButton.setEnabled(False)
             self.ui.selectScript_toolButton_2.setEnabled(False)
@@ -1225,8 +1230,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.renewSubFolder_toolButton.setEnabled(False)
             self.ui.continueButton.setEnabled(False)
             self.ui.executeScript_button.setEnabled(False)
-            self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
-            self.subWindow.ui_s.laserControlGroup.setEnabled(False)
 
         if self.states.script_progress:
             self.ui.Scripting_groupBox.setEnabled(True)
