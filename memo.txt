@@ -1,6 +1,7 @@
 -----
 TODO & Ideas
 ・センサータイプ設定ファイルにより、各種設定値を保存/呼び出しできるようにする(Script name, Exposure multiplier, ISO override, post script, projector mask pattern, etc...)
+・Soft Gammaを設定できるようにする
 ・warm_lasersの点灯パターンをProjectorのみにする(flood lightはつけない)
 ・camera calibartion中のwarm_lasersは、Projector全点灯,露出時間は目標値(Laser Calibrationの最初の露出時間)をProjectorの数で割った値にする
 ・クラス関係の整理(かんたんなクラス図を作って考える)
@@ -9,20 +10,22 @@ TODO & Ideas
 ・連続キャプチャ表示モードにおいて、比較明合成(ピクセルの明るいほうを残す残像)モード
 ・(setUIstatus)の元請けクラスを作る
 
-・[PENDING]既にあるサブフォルダを選択した上で異なるスクリプトをこのときに指定してしまうと、
-    フォルダ内がごっちゃになっちゃうので、そうさせない工夫も今後必要かも知れない
-・[PENDING(いい構造が思い浮かばない＆必要なさそうなので)]frame3Ddataのcsvのようなjsonファイルも作れるといい
-
 BUG?
 ・SensorWindowの撮影枚数の数値が、単発撮影ボタンが押された後反映されなくなる。1回しか撮影されない。数値を編集するとまた反映される。
 ・[?]各モーター移動させると移動完了まで待つようになっているが、一度100%になってからもう一度0%に戻ってすぐ100%になる（2回移動開始かかってる感じ）
 ・モーター移動後のキャプチャで、1つ前のフレームが取り込まれるように見える
 
 -----
+Pending
+・[PENDING]既にあるサブフォルダを選択した上で異なるスクリプトをこのときに指定してしまうと、
+    フォルダ内がごっちゃになっちゃうので、そうさせない工夫も今後必要かも知れない
+・[PENDING(いい構造が思い浮かばない＆必要なさそうなので)]frame3Ddataのcsvのようなjsonファイルも作れるといい
+
+
+-----
 Done
-(TODO & Ideas)
-・mkert API1.1対応のイメージ(カラーPNG)がうまくGRAY PNGに変換できない
-・smid_dictionaryを再起動せずに読み治せるようにする
+・[DONE]mkert API1.1対応のイメージ(カラーPNG)がうまくGRAY PNGに変換できない
+・[DONE]smid_dictionaryを再起動せずに読み治せるようにする
 ・[DONE]UPnPでセンサー一覧を取得し、そこからIPアドレス選択
 ・[DONE]センサーアドレスの履歴がコンボボックスから選べる
 ・[DONE]スクリプト命令にmessage(メッセージ表示)とpause(秒数待ち)を追加
