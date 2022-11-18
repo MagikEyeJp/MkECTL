@@ -96,7 +96,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.setupUi(self)
 
         # connection
-        self.conn = False
+        self.connected = False
         self.sensor = SensorDevice.SensorDevice()
         self.sensorInfo = SensorInfo()
         # print(self.sensor)
@@ -320,7 +320,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
                 self.ui_s.textLabelID.setStyleSheet("QLineEdit { background: rgb(255, 255, 0);}")
 
             self.setUiStatusConnected()
-            self.conn = True
+            self.connected = True
             # print(self.sensor)
             self.getImg_thread = GetImageThread(self.sensor, self.getImgCallback)
 
@@ -329,20 +329,20 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             QtWidgets.QMessageBox.warning(self, "Connection Failed", str(e))
             print(e)
             self.setUiStatusDisconnected()
-            self.conn = False
+            self.connected = False
 
         except TimeoutError:
             QtWidgets.QMessageBox.critical(self, "Connection Error", "Cannot connect to sensor (timeout)")
 
 
-        self.mainUI.sensorChanged(self.conn)
+        self.mainUI.sensorChanged(self.connected)
 
     def disconnectSensor(self):
         try:
             self.sensor.close()
             self.ui_s.consecutiveModeButton.setChecked(False)
             self.ui_s.cameraStatusLabel.setText('The sensor was disconnected.')
-            self.conn = False
+            self.connected = False
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor correctly.')
         finally:

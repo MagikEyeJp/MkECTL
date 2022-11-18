@@ -5,7 +5,6 @@ class UIState(Enum):
     INITIALIZE =        auto()
     MOTOR =             auto()
     IRLIGHT =           auto()
-    SENSOR_CONNECTED =  auto()
     SCRIPT =            auto()
     SCRIPT_PROGRESS =   auto()
 

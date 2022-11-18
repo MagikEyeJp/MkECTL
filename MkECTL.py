@@ -560,7 +560,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.initializeProgressLabel.setText('Goal')
                 self.ui.initializeProgressBar.setEnabled(False)
                 self.ui.initializeProgressLabel.setEnabled(False)
-                if self.subWindow.conn:
+                if self.subWindow.connected:
                     self.subWindow.prevImg(1)
 
         elif buttonName == 'presetExe':
@@ -672,12 +672,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # https://stackoverflow.com/questions/3430372/how-do-i-get-the-full-path-of-the-current-files-directory
 
         else:
-            self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+            self.states = {UIState.SCRIPT_PROGRESS}
             self.setUIStatus(self.states)
 
             interrupted = execute_script.execute_script(self.scriptParams, self.devices, self, True)
 
-            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
+            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
             self.setUIStatus(self.states)
 
             if not interrupted:
@@ -747,21 +747,16 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.showSubWindow(self.geometry, self.framesize)
 
         # GUI
-        if self.devices['3Dsensors'].conn:
-            self.states = {UIState.SENSOR_CONNECTED, UIState.SCRIPT_PROGRESS}
+        if self.devices['3Dsensors'].connected:
             self.devices['3Dsensors'].sensorInfo.save_to_file(self.dataOutFolder() + "/sensorinfo.json")
-        else:
-            self.states = {UIState.SCRIPT_PROGRESS}
 
+        self.states = {UIState.SCRIPT_PROGRESS}
         self.setUIStatus(self.states)
 
         ### EXECUTE
         interrupted = execute_script.execute_script(self.scriptParams, self.devices, self)
 
-        if self.devices['3Dsensors'].conn:
-            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT, UIState.SENSOR_CONNECTED}
-        else:
-            self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
+        self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
         self.setUIStatus(self.states)
 
         if not interrupted:
@@ -811,7 +806,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.initializeProgressLabel.setText('Goal')
                 self.ui.initializeProgressBar.setEnabled(False)
                 self.ui.initializeProgressLabel.setEnabled(False)
-            if self.subWindow.conn:
+            if self.subWindow.connected:
                 self.subWindow.prevImg(1)
 
     def savePositions(self):
@@ -846,7 +841,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.initializeProgressLabel.setText('Goal')
                 self.ui.initializeProgressBar.setEnabled(False)
                 self.ui.initializeProgressLabel.setEnabled(False)
-            if self.subWindow.conn:
+            if self.subWindow.connected:
                 self.subWindow.prevImg(1)
 
     def showSubWindow(self, geometry, framesize):
@@ -1003,28 +998,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.ui.IRlightControlGroup.setEnabled(False)
 
-        if UIState.SENSOR_CONNECTED in status:
-            # self.ui.viewSensorWinButton.setEnabled(True)
-            # self.subWindow.ui_s.setIPaddressButton.setEnabled(False)
-            self.subWindow.ui_s.connectButton.setEnabled(False)
-            self.subWindow.ui_s.IPComboBox.setEnabled(False)
-            self.subWindow.ui_s.disconnectButton.setEnabled(True)
-            self.subWindow.ui_s.searchButton.setEnabled(False)
-            self.subWindow.ui_s.cameraControlGroup.setEnabled(True)
-            self.subWindow.ui_s.laserControlGroup.setEnabled(True)
-            # self.subWindow.ui_s.gridButton.setEnabled(True)
-            # self.subWindow.ui_s.gridGroup.setEnabled(True)
-        else:
-            # self.subWindow.ui_s.setIPaddressButton.setEnabled(True)
-            self.subWindow.ui_s.connectButton.setEnabled(True)
-            self.subWindow.ui_s.IPComboBox.setEnabled(True)
-            self.subWindow.ui_s.disconnectButton.setEnabled(False)
-            self.subWindow.ui_s.searchButton.setEnabled(True)
-            self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
-            self.subWindow.ui_s.laserControlGroup.setEnabled(False)
-            # self.subWindow.ui_s.gridButton.setEnabled(False)
-            self.subWindow.ui_s.gridGroup.setEnabled(False)
-
         if UIState.SCRIPT in status:
             self.ui.selectScript_toolButton.setEnabled(True)
             self.ui.selectBaseFolder_toolButton.setEnabled(True)
@@ -1103,10 +1076,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def sensorChanged(self, connected):
         print('changed')
         # if connected:
-        #     # self.states = {UIState.SENSOR_CONNECTED}
-        #     # self.setUIStatus(self.states)
         # else:
-        #     # self.setUIStatus(self.states)
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

@@ -181,7 +181,7 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
     # mainWindow.show()
 
     if 'snap' in com_hist:
-        if devices['3Dsensors'].conn:
+        if devices['3Dsensors'].connected:
             pass
         else:
             QtWidgets.QMessageBox.critical(mainWindow, 'Sensor connection error',
