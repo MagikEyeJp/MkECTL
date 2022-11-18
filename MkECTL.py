@@ -232,7 +232,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.stopClicked = False
         self.demo_script = 'script/demo.txt'
 
-        self.ui.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
+        self.updateScriptProgress()
         self.ui.progressBar.setValue(self.percent)
         self.ui.stopButton.clicked.connect(self.interrupt)
 
@@ -621,8 +621,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             self.scriptParams.scriptName = fileName
             self.scriptParams.commandNum = execute_script.countCommandNum(self.scriptParams, [], [])
-
-        self.ui.numOfCommands_label.setText(str(self.scriptParams.commandNum))
+            self.total = self.scriptParams.commandNum
+            self.done = 0
+            self.updateScriptProgress()
 
 
     def openBaseFolder(self):
@@ -1063,6 +1064,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def updateProgressLabel(self):
         self.ui.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
+
+    def updateScriptProgress(self):
+        self.updateProgressLabel()
+        self.updatePercentage()
 
     def interrupt(self):
         self.stopClicked = True

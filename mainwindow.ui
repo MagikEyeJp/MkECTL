@@ -1103,7 +1103,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-431</y>
          <width>510</width>
          <height>1120</height>
         </rect>
@@ -2910,8 +2910,8 @@
             <widget class="QLabel" name="progressLabel">
              <property name="geometry">
               <rect>
-               <x>410</x>
-               <y>20</y>
+               <x>120</x>
+               <y>0</y>
                <width>91</width>
                <height>20</height>
               </rect>
@@ -2974,7 +2974,7 @@
             <widget class="QPushButton" name="executeScript_button">
              <property name="geometry">
               <rect>
-               <x>123</x>
+               <x>293</x>
                <y>10</y>
                <width>51</width>
                <height>24</height>
@@ -2991,7 +2991,7 @@
             <widget class="QPushButton" name="continueButton">
              <property name="geometry">
               <rect>
-               <x>180</x>
+               <x>350</x>
                <y>10</y>
                <width>71</width>
                <height>24</height>
@@ -3004,7 +3004,7 @@
             <widget class="QPushButton" name="stopButton">
              <property name="geometry">
               <rect>
-               <x>260</x>
+               <x>430</x>
                <y>10</y>
                <width>71</width>
                <height>24</height>
@@ -3454,32 +3454,6 @@
              </property>
              <property name="text">
               <string>Stop</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="numOfCommands_label">
-             <property name="geometry">
-              <rect>
-               <x>430</x>
-               <y>0</y>
-               <width>71</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string> -</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="opsToExeScript_label">
-             <property name="geometry">
-              <rect>
-               <x>340</x>
-               <y>0</y>
-               <width>91</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Ops to exec:</string>
              </property>
             </widget>
            </widget>

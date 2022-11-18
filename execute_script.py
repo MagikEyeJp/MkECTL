@@ -172,11 +172,12 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
     # ------------------------------
 
     commandNum = countCommandNum(scriptParams, args_hist, com_hist)
-    mainWindow.ui.numOfCommands_label.setText(str(commandNum))
 
     mainWindow.stopClicked = False
     mainWindow.total = len(com_hist)
-    mainWindow.updateProgressLabel()
+    if not scriptParams.isContinue:
+        mainWindow.done = 0
+    mainWindow.updateScriptProgress()
     # mainWindow.show()
 
     if 'snap' in com_hist:
@@ -216,8 +217,8 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
 
         # GUI
         mainWindow.done = i + 1
-        mainWindow.updateProgressLabel()
-        mainWindow.updatePercentage()
+
+        mainWindow.updateScriptProgress()
 
     # ---------- update ini file ----------
     if not isDemo:
