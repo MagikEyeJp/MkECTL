@@ -1103,7 +1103,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-431</y>
+         <y>-194</y>
          <width>510</width>
          <height>1120</height>
         </rect>
@@ -2668,7 +2668,7 @@
              <rect>
               <x>10</x>
               <y>30</y>
-              <width>231</width>
+              <width>101</width>
               <height>17</height>
              </rect>
             </property>
@@ -2679,9 +2679,9 @@
            <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>50</y>
-              <width>491</width>
+              <x>110</x>
+              <y>26</y>
+              <width>391</width>
               <height>26</height>
              </rect>
             </property>
@@ -2713,7 +2713,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>80</y>
+              <y>60</y>
               <width>91</width>
               <height>17</height>
              </rect>
@@ -2725,9 +2725,9 @@
            <widget class="QWidget" name="layoutWidget_3">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>100</y>
-              <width>241</width>
+              <x>110</x>
+              <y>55</y>
+              <width>391</width>
               <height>26</height>
              </rect>
             </property>
@@ -2739,9 +2739,6 @@
                </property>
                <property name="text">
                 <string/>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -2762,7 +2759,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>130</y>
+              <y>89</y>
               <width>91</width>
               <height>17</height>
              </rect>
@@ -2774,9 +2771,9 @@
            <widget class="QWidget" name="layoutWidget_5">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>150</y>
-              <width>241</width>
+              <x>110</x>
+              <y>85</y>
+              <width>391</width>
               <height>26</height>
              </rect>
             </property>
@@ -2821,9 +2818,9 @@
            <widget class="QLabel" name="expMultLabel">
             <property name="geometry">
              <rect>
-              <x>270</x>
-              <y>80</y>
-              <width>151</width>
+              <x>10</x>
+              <y>122</y>
+              <width>141</width>
               <height>17</height>
              </rect>
             </property>
@@ -2837,34 +2834,24 @@
            <widget class="QLabel" name="expMult_IRonLabel">
             <property name="geometry">
              <rect>
-              <x>270</x>
-              <y>100</y>
-              <width>91</width>
-              <height>17</height>
+              <x>144</x>
+              <y>120</y>
+              <width>121</width>
+              <height>20</height>
              </rect>
             </property>
             <property name="text">
-             <string>IR light - ON</string>
+             <string>IR light ON/OFF</string>
             </property>
-           </widget>
-           <widget class="QLabel" name="expMult_IRoffLabel">
-            <property name="geometry">
-             <rect>
-              <x>390</x>
-              <y>100</y>
-              <width>91</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>IR light - OFF</string>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
            <widget class="QLineEdit" name="IRonMultiplier">
             <property name="geometry">
              <rect>
               <x>270</x>
-              <y>120</y>
+              <y>118</y>
               <width>111</width>
               <height>25</height>
              </rect>
@@ -2880,7 +2867,7 @@
             <property name="geometry">
              <rect>
               <x>390</x>
-              <y>120</y>
+              <y>118</y>
               <width>111</width>
               <height>25</height>
              </rect>
@@ -3460,8 +3447,8 @@
            <widget class="QLabel" name="isoMultLabel">
             <property name="geometry">
              <rect>
-              <x>270</x>
-              <y>154</y>
+              <x>10</x>
+              <y>152</y>
               <width>111</width>
               <height>17</height>
              </rect>
@@ -3476,8 +3463,8 @@
            <widget class="QComboBox" name="isoValue">
             <property name="geometry">
              <rect>
-              <x>392</x>
-              <y>150</y>
+              <x>270</x>
+              <y>148</y>
               <width>111</width>
               <height>25</height>
              </rect>
