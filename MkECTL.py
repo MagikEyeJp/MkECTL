@@ -343,17 +343,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.previousMachineIni = 'data/previousMachine.ini'
         if os.path.exists(self.previousMachineIni):
             self.previousMachineFilePath = ini.getPreviousMachineFile(self.previousMachineIni)
-            if os.path.exists(self.previousMachineFilePath):
-                self.machineParams = json_IO.loadJson(self.previousMachineFilePath)
-                self.ui.initializeButton.setEnabled(True)
-            self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
+            self.setMachine(self.previousMachineFilePath)
 
-        if self.machineParams == {}:
-            self.states = {UIState.MACHINEFILE}
-            self.setUIStatus(self.states)
-        else:
-            self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
-            self.setUIStatus(self.states)
 
     def restoreConfig(self):
         if os.path.exists(self.configIniFile):
@@ -1085,15 +1076,25 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         if fileName == '':  # when cancel pressed
             pass
         else:
-            self.previousMachineFilePath = fileName
-            ini.updatePreviousMachineFile('data/previousMachine.ini', self.previousMachineFilePath)
-            self.machineParams = json_IO.loadJson(self.previousMachineFilePath)
+            self.setMachine(fileName)
 
-            self.ui.machineFileName_label.setText(os.path.basename(self.previousMachineFilePath))
+
+    def setMachine(self, filename):
+        if os.path.exists(filename):
+            self.machineParams = json_IO.loadJson(filename)
+            self.previousMachineFilePath = filename
+            ini.updatePreviousMachineFile('data/previousMachine.ini', filename)
+            self.ui.machineFileName_label.setText(os.path.basename(filename))
+
+        if self.machineParams == {}:
+            self.states = {UIState.MACHINEFILE}
+        else:
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
-            self.setUIStatus(self.states)
 
-# ==================================================================
+        self.setUIStatus(self.states)
+
+
+    # ==================================================================
     def sensorChanged(self, connected):
         print('changed')
         # if connected:
