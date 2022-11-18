@@ -1103,7 +1103,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-299</y>
+         <y>0</y>
          <width>510</width>
          <height>1120</height>
         </rect>
@@ -1388,79 +1388,6 @@
              </property>
             </widget>
            </widget>
-           <widget class="QWidget" name="layoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>370</x>
-              <y>50</y>
-              <width>131</width>
-              <height>101</height>
-             </rect>
-            </property>
-            <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="1">
-              <widget class="QLabel" name="currentPoslabel">
-               <property name="text">
-                <string>Current Pos.</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="currentSliderLabel">
-               <property name="text">
-                <string>slider</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="sliderCurrentPos">
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="currentPanLabel">
-               <property name="text">
-                <string>pan</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="panCurrentPos">
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="currentTiltLabel">
-               <property name="text">
-                <string>tilt</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QLabel" name="tiltCurrentPos">
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
            <widget class="QGroupBox" name="manualOperation">
             <property name="geometry">
              <rect>
@@ -1566,15 +1493,15 @@
                <height>92</height>
               </rect>
              </property>
-             <layout class="QGridLayout" name="positionControlLayout">
-              <item row="1" column="0">
-               <widget class="QLabel" name="panLabel">
+             <layout class="QGridLayout" name="positionControlLayout" rowstretch="0,0,0" columnstretch="0,0,0,0">
+              <item row="0" column="0">
+               <widget class="QLabel" name="sliderLabel">
                 <property name="text">
-                 <string>Pan [-360 to 360 deg]</string>
+                 <string>Slider</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="2">
+              <item row="2" column="3">
                <widget class="QPushButton" name="tiltMoveExe">
                 <property name="maximumSize">
                  <size>
@@ -1594,50 +1521,7 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="MyDoubleSpinBox" name="tiltPosSpin">
-                <property name="decimals">
-                 <number>2</number>
-                </property>
-                <property name="minimum">
-                 <double>-360.000000000000000</double>
-                </property>
-                <property name="maximum">
-                 <double>360.000000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>0.100000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="sliderLabel">
-                <property name="text">
-                 <string>Slider [-4000 to 4000 mm]</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QPushButton" name="panMoveExe">
-                <property name="maximumSize">
-                 <size>
-                  <width>24</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="resources.qrc">
-                  <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
-                </property>
-                <property name="autoDefault">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
+              <item row="0" column="3">
                <widget class="QPushButton" name="sliderMoveExe">
                 <property name="maximumSize">
                  <size>
@@ -1657,7 +1541,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
+              <item row="1" column="2">
                <widget class="MyDoubleSpinBox" name="panPosSpin">
                 <property name="decimals">
                  <number>2</number>
@@ -1673,14 +1557,34 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="tiltLabel">
+              <item row="1" column="3">
+               <widget class="QPushButton" name="panMoveExe">
+                <property name="maximumSize">
+                 <size>
+                  <width>24</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <property name="text">
-                 <string>Tilt [-360 to 360 deg]</string>
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="resources.qrc">
+                  <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
+                </property>
+                <property name="autoDefault">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
+              <item row="2" column="0">
+               <widget class="QLabel" name="tiltLabel">
+                <property name="text">
+                 <string>Tilt</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
                <widget class="MyDoubleSpinBox" name="sliderPosSpin">
                 <property name="decimals">
                  <number>2</number>
@@ -1696,12 +1600,65 @@
                 </property>
                </widget>
               </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="panLabel">
+                <property name="text">
+                 <string>Pan</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="MyDoubleSpinBox" name="tiltPosSpin">
+                <property name="decimals">
+                 <number>2</number>
+                </property>
+                <property name="minimum">
+                 <double>-360.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>360.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="sliderCurrentPos">
+                <property name="text">
+                 <string>0</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="panCurrentPos">
+                <property name="text">
+                 <string>0</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLabel" name="tiltCurrentPos">
+                <property name="text">
+                 <string>0</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
             <widget class="QLabel" name="originLabel">
              <property name="geometry">
               <rect>
-               <x>350</x>
+               <x>332</x>
                <y>195</y>
                <width>51</width>
                <height>20</height>
@@ -1733,9 +1690,9 @@
             <widget class="QWidget" name="layoutWidget">
              <property name="geometry">
               <rect>
-               <x>404</x>
+               <x>383</x>
                <y>190</y>
-               <width>71</width>
+               <width>98</width>
                <height>32</height>
               </rect>
              </property>
@@ -1766,6 +1723,15 @@
                   <width>30</width>
                   <height>30</height>
                  </size>
+                </property>
+                <property name="autoDefault">
+                 <bool>false</bool>
+                </property>
+                <property name="default">
+                 <bool>false</bool>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -1995,6 +1961,19 @@
                </widget>
               </item>
              </layout>
+            </widget>
+            <widget class="QPushButton" name="getCurrentPosButton">
+             <property name="geometry">
+              <rect>
+               <x>186</x>
+               <y>193</y>
+               <width>121</width>
+               <height>21</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Get Current Pos.</string>
+             </property>
             </widget>
            </widget>
            <widget class="QPushButton" name="initializeButton">
@@ -2462,19 +2441,6 @@
             </property>
             <property name="autoDefault">
              <bool>true</bool>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="getCurrentPosButton">
-            <property name="geometry">
-             <rect>
-              <x>380</x>
-              <y>30</y>
-              <width>121</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Get Current Pos.</string>
             </property>
            </widget>
           </widget>
