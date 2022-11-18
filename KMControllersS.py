@@ -609,9 +609,8 @@ def recv_thread(obj):
     logstarttime = 0
     recvtime = 0
     data = bytearray(b'\x00'*270)
-    obj.m_alive = True
 
-    while obj.m_alive and obj.serial is not None:
+    while obj.alive() and obj.serial is not None:
         rd = obj.serial.read(1)
         if len(rd) == 0:
             continue
@@ -694,8 +693,7 @@ class USBController(Controller):
         super().__init__()
         # print('init port')
         self.port = port
-#        self.serial = serial.Serial(port, 115200, 8, 'N', 1, 0.5, False, True)
-        self.serial = serial.Serial(port, 115200, 8, 'N', 1, 0.5, False, True, None, False, None, None)
+        self.serial = serial.Serial(port=port, baudrate=115200, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=0.1, rtscts=False, dsrdtr=False, write_timeout=0.1, inter_byte_timeout=0.5)
         # motor measurement value
         self.m_position = 0
         self.m_velocity = 0
@@ -723,25 +721,30 @@ class USBController(Controller):
         #threading
         self.m_lock = threading.RLock()
         self.m_th = threading.Thread(target=recv_thread, args=(self,), daemon=True)
-        self.m_alive = False
+        self.m_alive = True
         self.m_th.start()
         sleep(.1)
-        while not self.m_alive:
-            print('wait')
-            sleep(.1)
         # print('init port end')
 
     def __del__(self):
         self.close()
 
+    def alive(self):
+        return self.m_alive
+
     def close(self):
         self.m_lock.acquire()
         self.m_alive = False
+        self.m_lock.release()
         self.m_th.join()
         if self.serial is not None:
+            self.serial.set_output_flow_control(False)
+            self.serial.cancel_write()
+            self.serial.reset_output_buffer()
+            self.serial.cancel_read()
+            self.serial.reset_input_buffer()
             self.serial.close()
             self.serial = None
-        self.m_lock.release()
 
     def run_command(self,val,characteristics=None):
         self.serial.write(val)
