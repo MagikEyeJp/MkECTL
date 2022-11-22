@@ -53,11 +53,12 @@ class Ui_sensor(object):
         self.scrollArea.setMaximumSize(QtCore.QSize(260, 16777215))
         self.scrollArea.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.scrollArea.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
         self.scrollArea.setWidgetResizable(False)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 260, 910))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 240, 910))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -708,13 +709,3 @@ class Ui_sensor(object):
         self.percentLabel.setText(_translate("sensor", "%"))
 from ImageViewScene import ImageViewer
 import resources_rc
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    sensor = QtWidgets.QDockWidget()
-    ui = Ui_sensor()
-    ui.setupUi(sensor)
-    sensor.show()
-    sys.exit(app.exec_())

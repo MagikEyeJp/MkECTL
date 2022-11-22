@@ -97,6 +97,9 @@
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAsNeeded</enum>
       </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::AdjustIgnored</enum>
       </property>
@@ -108,7 +111,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>260</width>
+         <width>240</width>
          <height>910</height>
         </rect>
        </property>
