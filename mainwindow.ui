@@ -1069,7 +1069,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QScrollArea" name="scrollArea">
+     <widget class="QScrollArea" name="ControllScrollArea">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -1085,8 +1085,54 @@
       <property name="maximumSize">
        <size>
         <width>530</width>
-        <height>16777215</height>
+        <height>16777213</height>
        </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#ControllScrollArea {
+	border: none;
+}
+
+QGroupBox[objectName^=&quot;Section&quot;] {
+    font: bold; 
+    border: 1px solid silver;
+    border-radius: 6px;
+    margin-top: 6px;
+}
+
+QGroupBox[objectName^=&quot;Section&quot;]::title {
+    subcontrol-origin:  margin;
+    left: 7px;
+    padding: 0 5px 0 6px;
+}
+
+
+QScrollBar {
+	border: 0px solid #999999;
+   	background: lightgray;
+ 	width:10px;    
+   	margin: 0px 0px 0px 0px;
+}
+
+QScrollBar::handle {         
+	min-height: 0px;
+   	border: 0px solid red;
+	border-radius: 5px;
+	background-color: darkgray;
+}
+
+QScrollBar::add-line:vertical {       
+ 	height: 0px;
+	subcontrol-position: bottom;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+	height: 0 px;
+	subcontrol-position: top;
+	subcontrol-origin: margin;
+}
+</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -1108,8 +1154,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>510</width>
-         <height>1120</height>
+         <width>512</width>
+         <height>1000</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1118,24 +1164,27 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>511</width>
+          <width>512</width>
           <height>1101</height>
          </rect>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0">
+        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0">
          <property name="spacing">
-          <number>6</number>
+          <number>12</number>
          </property>
          <property name="sizeConstraint">
-          <enum>QLayout::SetDefaultConstraint</enum>
+          <enum>QLayout::SetMinimumSize</enum>
          </property>
          <item>
-          <widget class="QGroupBox" name="robotControl">
+          <widget class="QGroupBox" name="SectionRobotControl">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -1148,7 +1197,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>380</height>
+             <height>310</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -1156,6 +1205,9 @@
              <width>510</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
            <property name="title">
             <string>Robot Control</string>
@@ -1166,8 +1218,8 @@
             </property>
             <property name="geometry">
              <rect>
-              <x>9</x>
-              <y>70</y>
+              <x>129</x>
+              <y>12</y>
               <width>141</width>
               <height>17</height>
              </rect>
@@ -1182,9 +1234,9 @@
             </property>
             <property name="geometry">
              <rect>
-              <x>9</x>
-              <y>90</y>
-              <width>118</width>
+              <x>129</x>
+              <y>32</y>
+              <width>221</width>
               <height>23</height>
              </rect>
             </property>
@@ -1204,11 +1256,11 @@
            </widget>
            <widget class="QGroupBox" name="Settings">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="geometry">
              <rect>
-              <x>160</x>
+              <x>480</x>
               <y>20</y>
               <width>201</width>
               <height>135</height>
@@ -1378,25 +1430,12 @@
               <string>Speed</string>
              </property>
             </widget>
-            <widget class="QToolButton" name="detailedSettingsButton">
-             <property name="geometry">
-              <rect>
-               <x>80</x>
-               <y>0</y>
-               <width>26</width>
-               <height>24</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-            </widget>
            </widget>
            <widget class="QGroupBox" name="manualOperation">
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>140</y>
+              <y>70</y>
               <width>491</width>
               <height>231</height>
              </rect>
@@ -2447,10 +2486,23 @@
              <bool>true</bool>
             </property>
            </widget>
+           <widget class="QToolButton" name="detailedSettingsButton">
+            <property name="geometry">
+             <rect>
+              <x>380</x>
+              <y>32</y>
+              <width>121</width>
+              <height>24</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Robot Settings</string>
+            </property>
+           </widget>
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="IRlightControlGroup">
+          <widget class="QGroupBox" name="SectionIRlightControl">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -2468,6 +2520,9 @@
              <width>510</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
            <property name="title">
             <string>IR Light Control</string>
@@ -2645,7 +2700,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="Script_groupBox">
+          <widget class="QGroupBox" name="SectionScript">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -2663,6 +2718,9 @@
              <width>510</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
            <property name="title">
             <string>Script</string>
@@ -3515,7 +3573,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="PostProc_groupBox">
+          <widget class="QGroupBox" name="SectionPostProc">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -3533,6 +3591,9 @@
              <width>510</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
            <property name="title">
             <string>Post Processing</string>
@@ -3623,6 +3684,19 @@
               </widget>
              </item>
              <item>
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
               <spacer name="verticalSpacer">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
@@ -3638,6 +3712,19 @@
             </layout>
            </widget>
           </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>

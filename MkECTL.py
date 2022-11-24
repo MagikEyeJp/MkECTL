@@ -208,10 +208,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         ### detailed settings window
         self.detailedSettingsWindow = None  # made in initializeMotors()
 
+        self.ui.Settings.hide()
+
         self.initializeProcessFlag = False
+        self.ui.Settings.hide()
 
         self.ui.manualOperation.setEnabled(False)
-        self.ui.IRlightControlGroup.setEnabled(False)
+        self.ui.SectionIRlightControl.setEnabled(False)
         self.ui.continueButton.setEnabled(False)
         self.ui.executeScript_button.setEnabled(False)
         self.ui.progressBar.setEnabled(False)
@@ -994,9 +997,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.detailedSettingsButton.setEnabled(False)
 
         if UIState.IRLIGHT in status and self.IRLight.isvalid():
-            self.ui.IRlightControlGroup.setEnabled(True)
+            self.ui.SectionIRlightControl.setEnabled(True)
         else:
-            self.ui.IRlightControlGroup.setEnabled(False)
+            self.ui.SectionIRlightControl.setEnabled(False)
 
         if UIState.SCRIPT in status:
             self.ui.selectScript_toolButton.setEnabled(True)
@@ -1005,8 +1008,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.renewSubFolder_toolButton.setEnabled(True)
             self.ui.continueButton.setEnabled(True)
             self.ui.executeScript_button.setEnabled(True)
-            self.subWindow.ui_s.cameraControlGroup.setEnabled(True)
-            self.subWindow.ui_s.laserControlGroup.setEnabled(True)
+            self.subWindow.ui_s.SectionCameraControl.setEnabled(True)
+            self.subWindow.ui_s.SectionLaserControl.setEnabled(True)
         else:
             self.ui.selectScript_toolButton.setEnabled(False)
             self.ui.selectBaseFolder_toolButton.setEnabled(False)
@@ -1014,8 +1017,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.renewSubFolder_toolButton.setEnabled(False)
             self.ui.continueButton.setEnabled(False)
             self.ui.executeScript_button.setEnabled(False)
-            self.subWindow.ui_s.cameraControlGroup.setEnabled(False)
-            self.subWindow.ui_s.laserControlGroup.setEnabled(False)
+            self.subWindow.ui_s.SectionCameraControl.setEnabled(False)
+            self.subWindow.ui_s.SectionLaserControl.setEnabled(False)
 
         if UIState.SCRIPT_PROGRESS in status:
             self.ui.progressBar.setEnabled(True)

@@ -190,7 +190,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.selectDirectoryButton.clicked.connect(self.selectDirectory)
         self.ui_s.resetButton.clicked.connect(self.resetCounter)
         # self.ui_s.gridButton.clicked.connect(self.showGrid)
-        self.ui_s.gridGroup.clicked.connect(self.showGrid)
+        self.ui_s.SectionGrid.clicked.connect(self.showGrid)
 
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
@@ -215,18 +215,18 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.disconnectButton.setEnabled(True)
         self.ui_s.IPComboBox.setEnabled(False)
         self.ui_s.searchButton.setEnabled(False)
-        self.ui_s.cameraControlGroup.setEnabled(True)
-        self.ui_s.laserControlGroup.setEnabled(True)
-        self.ui_s.gridGroup.setEnabled(True)
+        self.ui_s.SectionCameraControl.setEnabled(True)
+        self.ui_s.SectionLaserControl.setEnabled(True)
+        self.ui_s.SectionGrid.setEnabled(True)
 
     def setUiStatusDisconnected(self):
         self.ui_s.connectButton.setEnabled(True)
         self.ui_s.disconnectButton.setEnabled(False)
         self.ui_s.IPComboBox.setEnabled(True)
         self.ui_s.searchButton.setEnabled(True)
-        self.ui_s.cameraControlGroup.setEnabled(False)
-        self.ui_s.laserControlGroup.setEnabled(False)
-        self.ui_s.gridGroup.setEnabled(False)
+        self.ui_s.SectionCameraControl.setEnabled(False)
+        self.ui_s.SectionLaserControl.setEnabled(False)
+        self.ui_s.SectionGrid.setEnabled(False)
 
     def changeIPaddress(self):
         self.RPiaddress = self.ui_s.IPComboBox.currentText()
@@ -496,8 +496,8 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
         frame = self.sensor.get_frame()
 
-        uid = np.array(frame.uid).reshape(-1, 1)
-        lut3d = np.array(frame.lut3d)
+        uid = np.array(frame.uids).reshape(-1, 1)
+        lut3d = np.array(frame.pts3d)
 
         data = np.hstack((uid, lut3d))
 
@@ -516,7 +516,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         if not self.ui_s.sensorImage.isPixmapSet:
             QtWidgets.QMessageBox.critical(self, "No image",
                                            "There is no image in the Image Viewer. \nPlease capture first.")
-            self.ui_s.gridGroup.setChecked(False)
+            self.ui_s.SectionGrid.setChecked(False)
             pass
 
         self.ui_s.sensorImage.m_gridItem.resetTransform()
@@ -536,7 +536,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         gp.pen.setStyle(gp.pen_styles[gp.gridType])
 
         self.ui_s.sensorImage.setGridParameter(self.ui_s.sensorImage.gridParam)
-        self.ui_s.sensorImage.setGridVisible(self.ui_s.gridGroup.isChecked())
+        self.ui_s.sensorImage.setGridVisible(self.ui_s.SectionGrid.isChecked())
 
 
     def smidDictionary(self):
