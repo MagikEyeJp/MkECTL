@@ -1155,7 +1155,7 @@ QScrollBar::sub-line:vertical {
          <x>0</x>
          <y>0</y>
          <width>512</width>
-         <height>1000</height>
+         <height>972</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1197,7 +1197,7 @@ QScrollBar::sub-line:vertical {
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>310</height>
+             <height>280</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -1437,7 +1437,7 @@ QScrollBar::sub-line:vertical {
               <x>10</x>
               <y>70</y>
               <width>491</width>
-              <height>231</height>
+              <height>201</height>
              </rect>
             </property>
             <property name="title">
@@ -1530,17 +1530,20 @@ QScrollBar::sub-line:vertical {
             <widget class="QWidget" name="layoutWidget">
              <property name="geometry">
               <rect>
-               <x>184</x>
+               <x>166</x>
                <y>30</y>
-               <width>303</width>
-               <height>92</height>
+               <width>311</width>
+               <height>91</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="positionControlLayout" rowstretch="0,0,0" columnstretch="0,0,0,0">
+              <property name="verticalSpacing">
+               <number>4</number>
+              </property>
               <item row="0" column="0">
                <widget class="QLabel" name="sliderLabel">
                 <property name="text">
-                 <string>Slider</string>
+                 <string>Slider [mm]</string>
                 </property>
                </widget>
               </item>
@@ -1623,7 +1626,7 @@ QScrollBar::sub-line:vertical {
               <item row="2" column="0">
                <widget class="QLabel" name="tiltLabel">
                 <property name="text">
-                 <string>Tilt</string>
+                 <string>Tilt  [deg]</string>
                 </property>
                </widget>
               </item>
@@ -1646,7 +1649,7 @@ QScrollBar::sub-line:vertical {
               <item row="1" column="0">
                <widget class="QLabel" name="panLabel">
                 <property name="text">
-                 <string>Pan</string>
+                 <string>Pan  [deg]</string>
                 </property>
                </widget>
               </item>
@@ -1701,8 +1704,8 @@ QScrollBar::sub-line:vertical {
             <widget class="QLabel" name="originLabel">
              <property name="geometry">
               <rect>
-               <x>332</x>
-               <y>195</y>
+               <x>324</x>
+               <y>165</y>
                <width>51</width>
                <height>20</height>
               </rect>
@@ -1733,9 +1736,9 @@ QScrollBar::sub-line:vertical {
             <widget class="QWidget" name="layoutWidget">
              <property name="geometry">
               <rect>
-               <x>384</x>
-               <y>190</y>
-               <width>98</width>
+               <x>378</x>
+               <y>160</y>
+               <width>101</width>
                <height>32</height>
               </rect>
              </property>
@@ -1813,182 +1816,153 @@ QScrollBar::sub-line:vertical {
              <property name="geometry">
               <rect>
                <x>10</x>
-               <y>129</y>
-               <width>131</width>
-               <height>64</height>
+               <y>160</y>
+               <width>261</width>
+               <height>31</height>
               </rect>
              </property>
-             <layout class="QVBoxLayout" name="presetLayout">
+             <layout class="QHBoxLayout" name="presetLayout">
+              <property name="spacing">
+               <number>6</number>
+              </property>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
-                <item>
-                 <widget class="QLabel" name="presetLabel">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>70</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Ubuntu</family>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>Preset</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="presetMotorCombo">
-                  <property name="maximumSize">
-                   <size>
-                    <width>70</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <item>
-                   <property name="text">
-                    <string>slider</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>pan</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>tilt</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QLabel" name="presetLabel">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Ubuntu</family>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Preset</string>
+                </property>
+               </widget>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <widget class="QComboBox" name="presetMotorCombo">
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_3">
-                  <item>
-                   <widget class="QLineEdit" name="presetValue">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="unitLabel">
-                    <property name="minimumSize">
-                     <size>
-                      <width>30</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>mm</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                 <property name="text">
+                  <string>slider</string>
+                 </property>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="presetExe">
-                  <property name="maximumSize">
-                   <size>
-                    <width>24</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="resources.qrc">
-                    <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
-                  </property>
-                  <property name="autoDefault">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
+                 <property name="text">
+                  <string>pan</string>
+                 </property>
                 </item>
-               </layout>
+                <item>
+                 <property name="text">
+                  <string>tilt</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="presetValue">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="unitLabel">
+                <property name="minimumSize">
+                 <size>
+                  <width>30</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>mm</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="presetExe">
+                <property name="maximumSize">
+                 <size>
+                  <width>24</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="resources.qrc">
+                  <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
+                </property>
+                <property name="autoDefault">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
+            </widget>
+            <widget class="QPushButton" name="getCurrentPosButton">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>130</y>
+               <width>91</width>
+               <height>21</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Get Current</string>
+             </property>
             </widget>
             <widget class="QWidget" name="layoutWidget">
              <property name="geometry">
               <rect>
-               <x>184</x>
-               <y>130</y>
-               <width>299</width>
-               <height>54</height>
+               <x>166</x>
+               <y>120</y>
+               <width>311</width>
+               <height>31</height>
               </rect>
              </property>
-             <layout class="QVBoxLayout" name="saveLayput">
-              <property name="spacing">
-               <number>0</number>
-              </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,1,0">
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_8">
-                <item>
-                 <widget class="QLabel" name="savedPositionslabel">
-                  <property name="text">
-                   <string>Saved Positions [slider pan tilt]</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="saveButton">
-                  <property name="maximumSize">
-                   <size>
-                    <width>50</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Save</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="GoButton">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>24</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="resources.qrc">
-                    <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
-                  </property>
-                  <property name="autoDefault">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QLabel" name="savedPositionslabel">
+                <property name="text">
+                 <string>HIstory</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="saveButton">
+                <property name="maximumSize">
+                 <size>
+                  <width>50</width>
+                  <height>24</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Save</string>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QComboBox" name="savedPosCombo">
@@ -2003,20 +1977,33 @@ QScrollBar::sub-line:vertical {
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="GoButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>24</width>
+                  <height>24</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="resources.qrc">
+                  <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
+                </property>
+                <property name="autoDefault">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
              </layout>
-            </widget>
-            <widget class="QPushButton" name="getCurrentPosButton">
-             <property name="geometry">
-              <rect>
-               <x>186</x>
-               <y>193</y>
-               <width>121</width>
-               <height>21</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Get Current Pos.</string>
-             </property>
             </widget>
            </widget>
            <widget class="QPushButton" name="initializeButton">
@@ -2512,7 +2499,7 @@ QScrollBar::sub-line:vertical {
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>80</height>
+             <height>72</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -2531,7 +2518,7 @@ QScrollBar::sub-line:vertical {
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>36</y>
+              <y>30</y>
               <width>101</width>
               <height>32</height>
              </rect>
@@ -2608,7 +2595,7 @@ QScrollBar::sub-line:vertical {
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>36</y>
+              <y>30</y>
               <width>101</width>
               <height>32</height>
              </rect>
@@ -2679,9 +2666,9 @@ QScrollBar::sub-line:vertical {
             <property name="geometry">
              <rect>
               <x>230</x>
-              <y>26</y>
+              <y>30</y>
               <width>271</width>
-              <height>51</height>
+              <height>31</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -3643,7 +3630,7 @@ QScrollBar::sub-line:vertical {
                  </property>
                  <property name="icon">
                   <iconset resource="resources.qrc">
-                   <normaloff>:/GUI_icons/049-folder-open.png</normaloff>:/GUI_icons/049-folder-open.png</iconset>
+                   <normaloff>:/GUI_icons/file_icon.png</normaloff>:/GUI_icons/file_icon.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -3765,16 +3752,12 @@ QScrollBar::sub-line:vertical {
   <tabstop>sliderSpeedSpin</tabstop>
   <tabstop>panSpeedSpin</tabstop>
   <tabstop>tiltSpeedSpin</tabstop>
-  <tabstop>presetMotorCombo</tabstop>
-  <tabstop>presetValue</tabstop>
   <tabstop>presetExe</tabstop>
   <tabstop>Settings</tabstop>
   <tabstop>freeButton</tabstop>
   <tabstop>executeScript_button</tabstop>
   <tabstop>saveButton</tabstop>
-  <tabstop>savedPosCombo</tabstop>
   <tabstop>rebootButton</tabstop>
-  <tabstop>GoButton</tabstop>
   <tabstop>goHomeButton</tabstop>
   <tabstop>setAsHomeButton</tabstop>
   <tabstop>selectScript_toolButton</tabstop>

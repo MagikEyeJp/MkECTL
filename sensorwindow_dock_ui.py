@@ -557,7 +557,7 @@ class Ui_sensor(object):
         self.hex4dLineEdit.setObjectName("hex4dLineEdit")
         self.hex4dCheckBox = QtWidgets.QCheckBox(self.SectionLaserControl)
         self.hex4dCheckBox.setEnabled(True)
-        self.hex4dCheckBox.setGeometry(QtCore.QRect(20, 70, 131, 23))
+        self.hex4dCheckBox.setGeometry(QtCore.QRect(20, 70, 61, 23))
         self.hex4dCheckBox.setAutoExclusive(True)
         self.hex4dCheckBox.setObjectName("hex4dCheckBox")
         self.setHex4dLaserButton = QtWidgets.QPushButton(self.SectionLaserControl)
