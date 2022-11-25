@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>mainwindow</class>
  <widget class="QMainWindow" name="mainwindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -1155,7 +1158,7 @@ QScrollBar::sub-line:vertical {
          <x>0</x>
          <y>0</y>
          <width>512</width>
-         <height>972</height>
+         <height>950</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1197,7 +1200,7 @@ QScrollBar::sub-line:vertical {
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>280</height>
+             <height>270</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -1437,7 +1440,7 @@ QScrollBar::sub-line:vertical {
               <x>10</x>
               <y>70</y>
               <width>491</width>
-              <height>201</height>
+              <height>190</height>
              </rect>
             </property>
             <property name="title">
@@ -1468,7 +1471,7 @@ QScrollBar::sub-line:vertical {
                  <string>detect slider limit and set origin</string>
                 </property>
                 <property name="text">
-                 <string>Set Slider Origin</string>
+                 <string>Init Slider Origin</string>
                 </property>
                 <property name="autoDefault">
                  <bool>true</bool>
@@ -1589,6 +1592,9 @@ QScrollBar::sub-line:vertical {
               </item>
               <item row="1" column="2">
                <widget class="MyDoubleSpinBox" name="panPosSpin">
+                <property name="keyboardTracking">
+                 <bool>true</bool>
+                </property>
                 <property name="decimals">
                  <number>2</number>
                 </property>
@@ -1632,6 +1638,9 @@ QScrollBar::sub-line:vertical {
               </item>
               <item row="0" column="2">
                <widget class="MyDoubleSpinBox" name="sliderPosSpin">
+                <property name="keyboardTracking">
+                 <bool>true</bool>
+                </property>
                 <property name="decimals">
                  <number>2</number>
                 </property>
@@ -1655,6 +1664,9 @@ QScrollBar::sub-line:vertical {
               </item>
               <item row="2" column="2">
                <widget class="MyDoubleSpinBox" name="tiltPosSpin">
+                <property name="keyboardTracking">
+                 <bool>true</bool>
+                </property>
                 <property name="decimals">
                  <number>2</number>
                 </property>
@@ -1672,7 +1684,7 @@ QScrollBar::sub-line:vertical {
               <item row="0" column="1">
                <widget class="QLabel" name="sliderCurrentPos">
                 <property name="text">
-                 <string>0</string>
+                 <string>0.00</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -1682,7 +1694,7 @@ QScrollBar::sub-line:vertical {
               <item row="1" column="1">
                <widget class="QLabel" name="panCurrentPos">
                 <property name="text">
-                 <string>0</string>
+                 <string>0.00</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -1692,7 +1704,7 @@ QScrollBar::sub-line:vertical {
               <item row="2" column="1">
                <widget class="QLabel" name="tiltCurrentPos">
                 <property name="text">
-                 <string>0</string>
+                 <string>0.00</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -1704,9 +1716,9 @@ QScrollBar::sub-line:vertical {
             <widget class="QLabel" name="originLabel">
              <property name="geometry">
               <rect>
-               <x>324</x>
-               <y>165</y>
-               <width>51</width>
+               <x>11</x>
+               <y>155</y>
+               <width>41</width>
                <height>20</height>
               </rect>
              </property>
@@ -1736,8 +1748,8 @@ QScrollBar::sub-line:vertical {
             <widget class="QWidget" name="layoutWidget">
              <property name="geometry">
               <rect>
-               <x>378</x>
-               <y>160</y>
+               <x>56</x>
+               <y>150</y>
                <width>101</width>
                <height>32</height>
               </rect>
@@ -1812,133 +1824,24 @@ QScrollBar::sub-line:vertical {
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="layoutWidget">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>160</y>
-               <width>261</width>
-               <height>31</height>
-              </rect>
-             </property>
-             <layout class="QHBoxLayout" name="presetLayout">
-              <property name="spacing">
-               <number>6</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="presetLabel">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>70</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <family>Ubuntu</family>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Preset</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QComboBox" name="presetMotorCombo">
-                <property name="maximumSize">
-                 <size>
-                  <width>70</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>slider</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>pan</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>tilt</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="presetValue">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="unitLabel">
-                <property name="minimumSize">
-                 <size>
-                  <width>30</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>mm</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="presetExe">
-                <property name="maximumSize">
-                 <size>
-                  <width>24</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="resources.qrc">
-                  <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
-                </property>
-                <property name="autoDefault">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
             <widget class="QPushButton" name="getCurrentPosButton">
              <property name="geometry">
               <rect>
-               <x>10</x>
-               <y>130</y>
-               <width>91</width>
+               <x>260</x>
+               <y>124</y>
+               <width>90</width>
                <height>21</height>
               </rect>
              </property>
              <property name="text">
-              <string>Get Current</string>
+              <string>Get Pos (&amp;G)</string>
              </property>
             </widget>
             <widget class="QWidget" name="layoutWidget">
              <property name="geometry">
               <rect>
                <x>166</x>
-               <y>120</y>
+               <y>150</y>
                <width>311</width>
                <height>31</height>
               </rect>
@@ -2004,6 +1907,25 @@ QScrollBar::sub-line:vertical {
                </widget>
               </item>
              </layout>
+            </widget>
+            <widget class="QPushButton" name="presetButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="geometry">
+              <rect>
+               <x>357</x>
+               <y>124</y>
+               <width>90</width>
+               <height>21</height>
+              </rect>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton::enabled { color: red }</string>
+             </property>
+             <property name="text">
+              <string>Preset (&amp;M)</string>
+             </property>
             </widget>
            </widget>
            <widget class="QPushButton" name="initializeButton">
@@ -3656,7 +3578,7 @@ QScrollBar::sub-line:vertical {
                 </sizepolicy>
                </property>
                <property name="verticalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOn</enum>
+                <enum>Qt::ScrollBarAsNeeded</enum>
                </property>
                <property name="readOnly">
                 <bool>true</bool>
@@ -3752,7 +3674,6 @@ QScrollBar::sub-line:vertical {
   <tabstop>sliderSpeedSpin</tabstop>
   <tabstop>panSpeedSpin</tabstop>
   <tabstop>tiltSpeedSpin</tabstop>
-  <tabstop>presetExe</tabstop>
   <tabstop>Settings</tabstop>
   <tabstop>freeButton</tabstop>
   <tabstop>executeScript_button</tabstop>

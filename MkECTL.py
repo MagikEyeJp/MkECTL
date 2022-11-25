@@ -112,6 +112,7 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
             self.tableWidget.setFixedHeight(self.maxTableHeight)
 
     def resizeEvent(self, event):
+        print("Detailed Setting resize event")
         self.setTableSize()
         super(DetailedSettingsWindow, self).resizeEvent(event)
 
@@ -276,17 +277,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             # print(m_name, exeButtonName)
 
             # exe buttons
-            self.motorGUI['exe'][m_name].clicked.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
+            self.motorGUI['exe'][m_name].clicked.connect(partial(lambda o: o.determine(), self.motorGUI['posSpin'][m_name]))
             # position spinboxes
-            self.motorGUI['posSpin'][m_name].setKeyboardTracking(False)
-            self.motorGUI['posSpin'][m_name].valueChanged.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
-            # self.motorGUI['posSpin'][m_name].returnPressed.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
+            self.motorGUI['posSpin'][m_name].valueChanged.connect(self.judgePresetEnable)
+            self.motorGUI['posSpin'][m_name].valueDetermined.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
             # speed spinboxes
-            self.motorGUI['speedSpin'][m_name].setKeyboardTracking(False)
             self.motorGUI['speedSpin'][m_name].valueChanged.connect(partial(lambda n: self.updateSpeed(n), speedSpinName))
             # https://melpon.hatenadiary.org/entry/20121206/1354636589
 
-        self.ui.presetExe.clicked.connect(lambda: self.exeButtonClicked('presetExe'))
         self.ui.rebootButton.clicked.connect(self.rebootButtonClicked)
 
         # other buttons
@@ -317,16 +315,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.postProcEditBtn.clicked.connect(self.editPostProcParam)
         self.ui.postProcClearLogBtn.clicked.connect(self.clearPostProcLog)
         self.ui.detailedSettingsButton.clicked.connect(self.detailedSettings)
+        self.ui.presetButton.clicked.connect(self.presetPositions)
 
         # Sensor window detached
-        self.subWindow.topLevelChanged.connect(lambda: self.changeMainWinSize(self.geometry))
-        self.subWindow.visibilityChanged.connect(lambda: self.changeMainWinSize(self.geometry))
-
-        # Combo box event
-        self.ui.presetMotorCombo.currentTextChanged.connect(self.changeUnitLabel)
+#        self.subWindow.topLevelChanged.connect(lambda toplevel: self.topLevelChanged(self.geometry, toplevel))
+        self.subWindow.visibilityChanged.connect(lambda visible: self.visivilityChanged(self.geometry, visible))
 
         # set validator of line edit
-        self.ui.presetValue.setValidator(QtGui.QDoubleValidator(-100.0, 2100.0, 2, self.ui.presetValue))
         self.ui.IRonMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRonMultiplier))
         self.ui.IRoffMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRoffMultiplier))
 
@@ -357,21 +352,35 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
 
     def resizeEvent(self, QResizeEvent):
+        print("mainwindow resize event", self.size(), "ismaximized:", self.isMaximized())
+        sender = self.sender()
+        print(sender)
+        # text = '''Called : %(person)s\nSender : %(sender)s''' \
+        #        % {
+        #            'sender': sender,
+        #            'person': sender.text()
+        #        }
+        # print(text)
         if self.isMaximized() and (self.size().width() >= self.maxWinWidth \
                 or self.size().height() >= self.maxWinHeight):
+            print("  isMaximized and size > maxsize")
             self.isMaxWinSize = True
             if self.subWindow.isHidden():
+                print("show subwindow")
                 self.showSubWindow(self.geometry, self.framesize)
             if self.subWindow.isFloating():
+                print("setFloating false")
                 self.subWindow.setFloating(False)
             self.subWindow.setFeatures(QtWidgets.QDockWidget.NoDockWidgetFeatures)
 
             self.maxWinWidth = self.size().width()
             self.maxWinHeight = self.size().height()
         else:
+            print("  not maximized")
             self.isMaxWinSize = False
             self.subWindow.setFeatures(QtWidgets.QDockWidget.DockWidgetClosable | QtWidgets.QDockWidget.DockWidgetFloatable)
             if self.isMaximized():
+                print("  but ismMaximized")
                 self.showNormal()
                 self.setMinimumWidth(1040)
                 self.setMaximumWidth(self.geometry.width())
@@ -482,6 +491,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             scale = p['scale']
             pos /= scale
             self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
+            self.judgePresetEnable()
 
     def changeMovRoboStatus(self, pos_d, initial_err, err):
         for id, pos in pos_d.items():
@@ -535,6 +545,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             }
             print(text)
 
+            self.judgePresetEnable()
             motor_id = buttonName.replace('MoveExe', '')
             targetPos = self.motorGUI['posSpin'][motor_id].value()
             targetPos_d = {'slider': None, 'pan': None, 'tilt': None}
@@ -566,16 +577,28 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 if self.subWindow.connected:
                     self.subWindow.prevImg(1)
 
-        elif buttonName == 'presetExe':
-            motor_id = self.ui.presetMotorCombo.currentText()
-            m = self.motorRobot.params[motor_id]['cont']
+    def judgePresetEnable(self):
+        modified = False
+        for v in self.motorGUI['posSpin'].values():
+            if type(v) is MyDoubleSpinBox.MyDoubleSpinBox:
+                if v.isModified():
+                    modified = True
+                    break
+        self.ui.presetButton.setEnabled(modified)
 
-            scale = self.motorRobot.params[motor_id]['scale']
-            pos = float(self.ui.presetValue.text())
-            m.presetPosition(pos * scale)
-
-            self.motorGUI['posSpin'][motor_id].setValue(pos)
-            self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(pos))
+    def presetPositions(self):
+        print("presetPositions")
+        for k, v in self.motorGUI['posSpin'].items():
+            if type(v) is MyDoubleSpinBox.MyDoubleSpinBox:
+                if v.isModified():
+                    m = self.motorRobot.params[k]['cont']
+                    scale = self.motorRobot.params[k]['scale']
+                    pos = v.value()
+                    m.presetPosition(pos * scale)
+                    v.fix()
+                    print("preset ",k, "at ", pos)
+                    self.motorGUI['currentPosLabel'][k].setText('{:.2f}'.format(pos))
+        self.judgePresetEnable()
 
     def rebootButtonClicked(self):
         for p in self.motorRobot.params.values():
@@ -588,12 +611,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         QtWidgets.QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
                                                           "Please re-initialize motors to use again.")
 
-    def changeUnitLabel(self):
-        motorID = self.ui.presetMotorCombo.currentText()
-        if motorID == 'slider':
-            self.ui.unitLabel.setText('mm')
-        elif motorID == 'pan' or 'tilt':
-            self.ui.unitLabel.setText('deg')
 
 # --- Scripting
 
@@ -811,6 +828,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.ui.initializeProgressLabel.setEnabled(False)
             if self.subWindow.connected:
                 self.subWindow.prevImg(1)
+        self.getCurrentPos()
 
     def savePositions(self):
         save_name = ''
@@ -880,22 +898,33 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.scriptParams.IRoffMultiplier = self.toFloat(self.ui.IRoffMultiplier.text(), 1.0)
         self.scriptParams.isoValue = self.ui.isoValue.currentText()
 
+
+    def topLevelChanged(self, geometry, toplevel):
+        print("toplevelChanged", toplevel)
+        self.changeMainWinSize(geometry)
+
+    def visivilityChanged(self, geometry, visible):
+        print("visivilityChanged", visible)
+        self.changeMainWinSize(geometry)
+
     def changeMainWinSize(self, geometry):
         posX = self.pos().x()
         posY = self.pos().y()
         mainWidth = self.frameGeometry().width()
         mainHeight = self.frameGeometry().height()
-        # print('changeMainWinSize')
+        print('changeMainWinSize')
 
         if not self.isMaxWinSize:
             if self.subWindow.isFloating() or self.subWindow.isHidden():
+                print("isFloating:", self.subWindow.isFloating(), " isHidden:", self.subWindow.isHidden())
                 self.showNormal()
                 self.setMinimumWidth(540)
                 self.setMaximumWidth(self.minimumWidth())
-                self.setGeometry(posX, posY, self.minimumWidth(), 756)
+                self.setGeometry(posX, posY, self.minimumWidth(), self.size().height())
             else:
+                print("  docked")
                 self.showNormal()
-                # self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
+                self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
                 self.setMinimumWidth(1040)
                 self.setMaximumWidth(geometry.width())
                 self.setGeometry(posX, posY, self.minimumWidth(), max(mainHeight, self.sensorWinHeight))
