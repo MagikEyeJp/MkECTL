@@ -796,15 +796,16 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             self.motorGUI['posSpin'][id].setValue(0.0)
             self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(0.0))
+        self.judgePresetEnable()
 
     def goToHomePosition(self):
-        sender = self.sender()
-        text = '''Called : %(person)s\nSender : %(sender)s''' \
-               % {
-                   'sender': sender,
-                   'person': sender.text()
-               }
-        print(text)
+        # sender = self.sender()
+        # text = '''Called : %(person)s\nSender : %(sender)s''' \
+        #        % {
+        #            'sender': sender,
+        #            'person': sender.text()
+        #        }
+        # print(text)
 
         targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
 
