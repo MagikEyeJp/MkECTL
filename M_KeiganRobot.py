@@ -131,6 +131,27 @@ class KeiganMotorRobot(IMotorRobot):
         else:
             return False
 
+    def initializeOrigins(self, origins, callback):
+        GOAL_VELO = 0.1
+        GOAL_TIME = 2.0
+        m = self.slider
+        m.speed(10.0)
+        m.maxTorque(1.0)
+        m.runForward()
+        prev_time = time.time()
+        duration = 0.0
+        while duration < GOAL_TIME:
+            time.sleep(0.2)
+            (pos, vel, torque) = m.read_motor_measurement()
+            if vel >= GOAL_VELO:
+                prev_time = time.time()
+            duration = time.time() - prev_time
+            inmain(callback, {}, duration, GOAL_TIME)
+
+        m.preset_scaled_position(0)
+        m.free()
+        m.maxTorque(5.0)
+
     def changePIDparam(self, pid_category, pid_param, motor_i, value):
         lpf_index = {'speed': 1, 'qCurrent': 0, 'position': 2}
 
@@ -227,7 +248,7 @@ class KeiganMotorRobot(IMotorRobot):
                         # mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
                         #     pos[param_i] / scale[param_i]))
                     # yield pos_d
-                    inmain(callback, pos_d, initial_err, err)
+                    inmain(callback, pos_d, initial_err - err, initial_err)
 
                     if err < (GOAL_EPS if wait else NOWAIT_EPS):
                         print("err=", err)

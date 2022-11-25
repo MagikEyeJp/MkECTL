@@ -486,31 +486,17 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         for k, pos in pos_d.items():
             self.motorGUI['currentPosLabel'][k].setText('{:.2f}'.format(pos))
 
-    def changeMovRoboStatus(self, pos_d, initial_err, err):
+    def changeMovRoboStatus(self, pos_d, now, goal):
         self.updateCurrentPos(pos_d)
-        if initial_err != 0:
-            progress = (1-(err / initial_err))*100
+        if goal != 0:
+            progress = (now / goal) * 100
             self.ui.initializeProgressBar.setValue(int(progress))
 
     def initSliderOrigin(self):
-        m = self.motorRobot.slider
-        m.speed(10.0)
-        m.maxTorque(1.0)
-        m.runForward()
-        time.sleep(0.2)
-        startTime = time.time()
-        while True:
-            (pos, vel, torque) = m.read_motor_measurement()
-            if vel < 0.1:
-                if time.time() - startTime > 2.0:
-                    break
-            else:
-                startTime = time.time()
-
-        m.presetPosition(0)
-        m.free()
+        self.updateActionProgress(0, 'Init Origins...', True)
+        self.motorRobot.initializeOrigins({'slider'}, self.changeMovRoboStatus)
+        self.updateActionProgress(100, 'Done', False)
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
-        m.maxTorque(5.0)
         self.moveRobot({'slider': 10.0})
 
     def freeAllMotors(self):
