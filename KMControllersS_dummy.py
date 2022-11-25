@@ -691,6 +691,11 @@ class Controller:
             scaled_position = 0.0
         return scaled_position
 
+    def preset_scaled_position(self, position):
+        abs_position = (position - self.scaling_offset) * self.scaling_rate
+        print(abs_position)
+        self.presetPosition(abs_position)
+
 # ------ USB Controller
 class LogStatus(Enum):
     IDLE = 0

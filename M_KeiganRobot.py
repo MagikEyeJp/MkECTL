@@ -151,6 +151,12 @@ class KeiganMotorRobot(IMotorRobot):
             pos_d[k] /= p['scale']
         return pos_d
 
+    def presetPos(self, targetPos):
+        for k, p in self.params.items():
+            if k in targetPos:
+                p['cont'].preset_scaled_position(targetPos[k])
+
+
     def goToTargetPos(self, targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None):
         # pos: dict ('slider', 'pan', 'tilt')
 

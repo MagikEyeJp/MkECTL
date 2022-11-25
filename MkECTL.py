@@ -315,7 +315,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.postProcEditBtn.clicked.connect(self.editPostProcParam)
         self.ui.postProcClearLogBtn.clicked.connect(self.clearPostProcLog)
         self.ui.detailedSettingsButton.clicked.connect(self.detailedSettings)
-        self.ui.presetButton.clicked.connect(self.presetPositions)
+        self.ui.presetButton.clicked.connect(self.presetModifiedPositions)
 
         # Sensor window detached
 #        self.subWindow.topLevelChanged.connect(lambda toplevel: self.topLevelChanged(self.geometry, toplevel))
@@ -540,19 +540,18 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                     break
         self.ui.presetButton.setEnabled(modified)
 
-    def presetPositions(self):
-        print("presetPositions")
+    def presetModifiedPositions(self):
         for k, v in self.motorGUI['posSpin'].items():
             if type(v) is MyDoubleSpinBox.MyDoubleSpinBox:
                 if v.isModified():
-                    m = self.motorRobot.params[k]['cont']
-                    scale = self.motorRobot.params[k]['scale']
-                    pos = v.value()
-                    m.presetPosition(pos * scale)
-                    v.fix()
-                    print("preset ",k, "at ", pos)
-                    self.motorGUI['currentPosLabel'][k].setText('{:.2f}'.format(pos))
+                    pos_d = {k: v.value()}
+                    self.presetPositions(pos_d)
         self.judgePresetEnable()
+
+    def presetPositions(self, pos_d):
+        self.updateTargetPosition(pos_d)
+        self.updateCurrentPos(pos_d)
+        self.motorRobot.presetPos(pos_d)
 
     def rebootButtonClicked(self):
         for p in self.motorRobot.params.values():
@@ -770,13 +769,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
 
     def setHome(self):
-        for id, p in self.motorRobot.params.items():
-            m = p['cont']
-            m.presetPosition(0.0)
-
-            self.motorGUI['posSpin'][id].setValue(0.0)
-            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(0.0))
-        self.judgePresetEnable()
+        targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        self.presetPositions(targetPos_d)
 
     def goToHomePosition(self):
         targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}

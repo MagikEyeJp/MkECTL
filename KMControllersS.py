@@ -329,6 +329,7 @@ class Controller:
         """
         Move the motor to the specified absolute 'position' at the speed set by 0x58: speed.
         """
+        print("moveto position", position)
         command=b'\x66'
         values=float2bytes(position)
         self.run_command(command+identifier+values+crc16,'motor_control')
@@ -594,6 +595,11 @@ class Controller:
         except ZeroDivisionError as e:
             scaled_position = 0.0
         return scaled_position
+
+    def preset_scaled_position(self, position):
+        abs_position = (position - self.scaling_offset) * self.scaling_rate
+        print(abs_position)
+        self.presetPosition(abs_position)
 
 # ------ USB Controller
 class LogStatus(Enum):
