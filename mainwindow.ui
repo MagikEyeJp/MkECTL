@@ -1200,7 +1200,7 @@ QScrollBar::sub-line:vertical {
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>270</height>
+             <height>252</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -1239,7 +1239,7 @@ QScrollBar::sub-line:vertical {
              <rect>
               <x>129</x>
               <y>32</y>
-              <width>221</width>
+              <width>231</width>
               <height>23</height>
              </rect>
             </property>
@@ -1438,9 +1438,9 @@ QScrollBar::sub-line:vertical {
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>70</y>
+              <y>62</y>
               <width>491</width>
-              <height>190</height>
+              <height>182</height>
              </rect>
             </property>
             <property name="title">
@@ -1536,22 +1536,55 @@ QScrollBar::sub-line:vertical {
                <x>166</x>
                <y>30</y>
                <width>311</width>
-               <height>91</height>
+               <height>81</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="positionControlLayout" rowstretch="0,0,0" columnstretch="0,0,0,0">
               <property name="verticalSpacing">
-               <number>4</number>
+               <number>2</number>
               </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="sliderLabel">
+              <item row="2" column="1">
+               <widget class="QLabel" name="tiltCurrentPos">
                 <property name="text">
-                 <string>Slider [mm]</string>
+                 <string>0.00</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="panCurrentPos">
+                <property name="text">
+                 <string>0.00</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
               <item row="2" column="3">
                <widget class="QPushButton" name="tiltMoveExe">
+                <property name="maximumSize">
+                 <size>
+                  <width>24</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="resources.qrc">
+                  <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
+                </property>
+                <property name="autoDefault">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QPushButton" name="panMoveExe">
                 <property name="maximumSize">
                  <size>
                   <width>24</width>
@@ -1590,6 +1623,32 @@ QScrollBar::sub-line:vertical {
                 </property>
                </widget>
               </item>
+              <item row="2" column="2">
+               <widget class="MyDoubleSpinBox" name="tiltPosSpin">
+                <property name="keyboardTracking">
+                 <bool>true</bool>
+                </property>
+                <property name="decimals">
+                 <number>2</number>
+                </property>
+                <property name="minimum">
+                 <double>-360.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>360.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="sliderLabel">
+                <property name="text">
+                 <string>Slider [mm]</string>
+                </property>
+               </widget>
+              </item>
               <item row="1" column="2">
                <widget class="MyDoubleSpinBox" name="panPosSpin">
                 <property name="keyboardTracking">
@@ -1609,23 +1668,20 @@ QScrollBar::sub-line:vertical {
                 </property>
                </widget>
               </item>
-              <item row="1" column="3">
-               <widget class="QPushButton" name="panMoveExe">
-                <property name="maximumSize">
-                 <size>
-                  <width>24</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
+              <item row="0" column="1">
+               <widget class="QLabel" name="sliderCurrentPos">
                 <property name="text">
-                 <string/>
+                 <string>0.00</string>
                 </property>
-                <property name="icon">
-                 <iconset resource="resources.qrc">
-                  <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
                 </property>
-                <property name="autoDefault">
-                 <bool>true</bool>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="panLabel">
+                <property name="text">
+                 <string>Pan  [deg]</string>
                 </property>
                </widget>
               </item>
@@ -1655,69 +1711,13 @@ QScrollBar::sub-line:vertical {
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="panLabel">
-                <property name="text">
-                 <string>Pan  [deg]</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2">
-               <widget class="MyDoubleSpinBox" name="tiltPosSpin">
-                <property name="keyboardTracking">
-                 <bool>true</bool>
-                </property>
-                <property name="decimals">
-                 <number>2</number>
-                </property>
-                <property name="minimum">
-                 <double>-360.000000000000000</double>
-                </property>
-                <property name="maximum">
-                 <double>360.000000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>0.100000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="sliderCurrentPos">
-                <property name="text">
-                 <string>0.00</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="panCurrentPos">
-                <property name="text">
-                 <string>0.00</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLabel" name="tiltCurrentPos">
-                <property name="text">
-                 <string>0.00</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
-               </widget>
-              </item>
              </layout>
             </widget>
             <widget class="QLabel" name="originLabel">
              <property name="geometry">
               <rect>
                <x>11</x>
-               <y>155</y>
+               <y>147</y>
                <width>41</width>
                <height>20</height>
               </rect>
@@ -1749,7 +1749,7 @@ QScrollBar::sub-line:vertical {
              <property name="geometry">
               <rect>
                <x>56</x>
-               <y>150</y>
+               <y>142</y>
                <width>101</width>
                <height>32</height>
               </rect>
@@ -1760,13 +1760,13 @@ QScrollBar::sub-line:vertical {
                 <property name="minimumSize">
                  <size>
                   <width>60</width>
-                  <height>30</height>
+                  <height>26</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>30</width>
-                  <height>30</height>
+                  <height>26</height>
                  </size>
                 </property>
                 <property name="text">
@@ -1798,13 +1798,13 @@ QScrollBar::sub-line:vertical {
                 <property name="minimumSize">
                  <size>
                   <width>30</width>
-                  <height>30</height>
+                  <height>26</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>30</width>
-                  <height>30</height>
+                  <height>26</height>
                  </size>
                 </property>
                 <property name="text">
@@ -1828,7 +1828,7 @@ QScrollBar::sub-line:vertical {
              <property name="geometry">
               <rect>
                <x>260</x>
-               <y>124</y>
+               <y>116</y>
                <width>90</width>
                <height>21</height>
               </rect>
@@ -1841,7 +1841,7 @@ QScrollBar::sub-line:vertical {
              <property name="geometry">
               <rect>
                <x>166</x>
-               <y>150</y>
+               <y>142</y>
                <width>311</width>
                <height>31</height>
               </rect>
@@ -1915,7 +1915,7 @@ QScrollBar::sub-line:vertical {
              <property name="geometry">
               <rect>
                <x>357</x>
-               <y>124</y>
+               <y>116</y>
                <width>90</width>
                <height>21</height>
               </rect>
@@ -1932,8 +1932,8 @@ QScrollBar::sub-line:vertical {
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>33</y>
-              <width>80</width>
+              <y>30</y>
+              <width>91</width>
               <height>25</height>
              </rect>
             </property>

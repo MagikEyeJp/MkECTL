@@ -300,7 +300,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.executeScript_button.clicked.connect(lambda: self.run_script(False))
         self.ui.continueButton.clicked.connect(lambda: self.run_script(True))
         self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(self.geometry, self.framesize))
-        self.ui.sliderOriginButton.clicked.connect(self.setSliderOrigin)
+        self.ui.sliderOriginButton.clicked.connect(self.initSliderOrigin)
         self.ui.freeButton.clicked.connect(self.freeAllMotors)
         self.ui.onL1Button.clicked.connect(lambda: self.IRlightControl(1, True))
         self.ui.offL1Button.clicked.connect(lambda: self.IRlightControl(1, False))
@@ -355,14 +355,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         print("mainwindow resize event", self.size(), "ismaximized:", self.isMaximized())
         sender = self.sender()
         print(sender)
-        # text = '''Called : %(person)s\nSender : %(sender)s''' \
-        #        % {
-        #            'sender': sender,
-        #            'person': sender.text()
-        #        }
-        # print(text)
-        if self.isMaximized() and (self.size().width() >= self.maxWinWidth \
-                or self.size().height() >= self.maxWinHeight):
+        if self.isMaximized() and (self.size().width() >= self.maxWinWidth
+                                   or self.size().height() >= self.maxWinHeight):
             print("  isMaximized and size > maxsize")
             self.isMaxWinSize = True
             if self.subWindow.isHidden():
@@ -424,8 +418,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.motorGUI['exe'] = exeButtons  # ex.) motorGUI['exe']['slider'] == self.ui.sliderMoveExe
         self.motorGUI['posSpin'] = posSpinboxes  # ex.) motorGUI['posSpin']['slider'] == self.ui.sliderPosSpin
         self.motorGUI['speedSpin'] = speedSpinboxes  # ex.) motorGUI['speedSpin']['slider'] == self.ui.sliderSpeedSpin
-        self.motorGUI[
-            'currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
+        self.motorGUI['currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
     def initializeMotors(self):
         count = 0
@@ -491,7 +484,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             scale = p['scale']
             pos /= scale
             self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
-            self.judgePresetEnable()
+        self.judgePresetEnable()
 
     def changeMovRoboStatus(self, pos_d, initial_err, err):
         for id, pos in pos_d.items():
@@ -502,7 +495,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.initializeProgressBar.setValue(int(progress))
 
 
-    def setSliderOrigin(self):
+    def initSliderOrigin(self):
         m = self.motorRobot.slider
         m.speed(10.0)
         m.maxTorque(1.0)
@@ -519,11 +512,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         m.presetPosition(0)
         m.free()
-        m.maxTorque(5.0)
-        self.ui.sliderPosSpin.setValue(0.0)
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
-        m.moveTo(10.0)
-        self.ui.sliderPosSpin.setValue(10.0)
+        m.maxTorque(5.0)
+        self.moveRobot({'slider': 10.0})
 
     def freeAllMotors(self):
         for p in self.motorRobot.params.values():
@@ -537,45 +528,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def exeButtonClicked(self, buttonName):
         if re.search('.+MoveExe', buttonName):
-            sender = self.sender()
-            text = '''Called : %(person)s\nSender : %(sender)s''' \
-            % {
-                'sender': sender,
-                'person': sender.text()
-            }
-            print(text)
-
             self.judgePresetEnable()
             motor_id = buttonName.replace('MoveExe', '')
             targetPos = self.motorGUI['posSpin'][motor_id].value()
-            targetPos_d = {'slider': None, 'pan': None, 'tilt': None}
-
-            for id, p in self.motorRobot.params.items():
-                if id == motor_id:
-                    targetPos_d[id] = targetPos
-                # else:
-                #     (pos, vel, torque) = p['cont'].read_motor_measurement()
-                #     targetPos_d[id] = pos / p['scale']
-
-            self.ui.initializeProgressBar.setEnabled(True)
-            self.ui.initializeProgressLabel.setEnabled(True)
-            self.ui.initializeProgressLabel.setText('Moving...')
-            self.ui.initializeProgressBar.setValue(0)
-
-            isAborted = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
-
-            if isAborted:
-                QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
-            else:
-                # for id in self.motorRobot.params.keys():
-                self.motorGUI['currentPosLabel'][motor_id].setText('{:.2f}'.format(targetPos_d[motor_id]))
-
-                self.ui.initializeProgressBar.setValue(100)
-                self.ui.initializeProgressLabel.setText('Goal')
-                self.ui.initializeProgressBar.setEnabled(False)
-                self.ui.initializeProgressLabel.setEnabled(False)
-                if self.subWindow.connected:
-                    self.subWindow.prevImg(1)
+            targetPos_d = {motor_id: targetPos}
+            self.moveRobot(targetPos_d)
 
     def judgePresetEnable(self):
         modified = False
@@ -611,8 +568,34 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         QtWidgets.QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
                                                           "Please re-initialize motors to use again.")
 
+    def moveRobot(self, targetpos):
+        self.updateActionProgress(0, 'Moving...', True)
 
-# --- Scripting
+        isAborted = self.motorRobot.goToTargetPos(targetpos, self.changeMovRoboStatus)
+        if isAborted:
+            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+        else:
+            self.updateActionProgress(100, 'Goal', False)
+            self.updateTargetPosition(targetpos)
+            if self.subWindow.connected:
+                self.subWindow.prevImg(1)
+        time.sleep(0.1)
+        self.getCurrentPos()
+
+    def updateTargetPosition(self, targetpos):
+        for k in targetpos.keys():
+            posspin = self.motorGUI['posSpin'].get(k)
+            if type(posspin) is MyDoubleSpinBox.MyDoubleSpinBox:
+                posspin.setValue(targetpos[k])
+        self.judgePresetEnable()
+
+    def updateActionProgress(self, value, text, active):
+        self.ui.initializeProgressBar.setValue(value)
+        self.ui.initializeProgressLabel.setText(text)
+        self.ui.initializeProgressBar.setEnabled(active)
+        self.ui.initializeProgressLabel.setEnabled(active)
+
+    # --- Scripting
 
     def openScriptFile(self):
         previousScriptPath = ''
@@ -799,37 +782,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.judgePresetEnable()
 
     def goToHomePosition(self):
-        # sender = self.sender()
-        # text = '''Called : %(person)s\nSender : %(sender)s''' \
-        #        % {
-        #            'sender': sender,
-        #            'person': sender.text()
-        #        }
-        # print(text)
-
         targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
-
-        self.ui.initializeProgressBar.setEnabled(True)
-        self.ui.initializeProgressLabel.setEnabled(True)
-        self.ui.initializeProgressLabel.setText('Going to origin...')
-        self.ui.initializeProgressBar.setValue(0.0)
-
-        isAborted = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
-
-        if isAborted:
-            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
-        else:
-            for id in self.motorRobot.params.keys():
-                self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
-                # self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
-
-                self.ui.initializeProgressBar.setValue(100)
-                self.ui.initializeProgressLabel.setText('Goal')
-                self.ui.initializeProgressBar.setEnabled(False)
-                self.ui.initializeProgressLabel.setEnabled(False)
-            if self.subWindow.connected:
-                self.subWindow.prevImg(1)
-        self.getCurrentPos()
+        self.updateTargetPosition(targetPos_d)
+        self.moveRobot(targetPos_d)
 
     def savePositions(self):
         save_name = ''
@@ -844,27 +799,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def goToSavedPositions(self):
         targetPos = self.ui.savedPosCombo.currentText().split()  # list
         targetPos_d = {'slider': float(targetPos[0]), 'pan': float(targetPos[1]), 'tilt': float(targetPos[2])}
-
-        self.ui.initializeProgressBar.setEnabled(True)
-        self.ui.initializeProgressLabel.setEnabled(True)
-        self.ui.initializeProgressLabel.setText('Moving...')
-        self.ui.initializeProgressBar.setValue(0.0)
-
-        isAborted = self.motorRobot.goToTargetPos(targetPos_d, self.changeMovRoboStatus)
-
-        if isAborted:
-            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
-        else:
-            for id in self.motorRobot.params.keys():
-                self.motorGUI['posSpin'][id].setValue(targetPos_d[id])
-                # self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(targetPos_d[id]))
-
-                self.ui.initializeProgressBar.setValue(100)
-                self.ui.initializeProgressLabel.setText('Goal')
-                self.ui.initializeProgressBar.setEnabled(False)
-                self.ui.initializeProgressLabel.setEnabled(False)
-            if self.subWindow.connected:
-                self.subWindow.prevImg(1)
+        self.updateTargetPosition(targetPos_d)
+        self.moveRobot(targetPos_d)
 
     def showSubWindow(self, geometry, framesize):
         if self.subWindow_isOpen:
