@@ -142,6 +142,14 @@ class KeiganMotorRobot(IMotorRobot):
             execCode = 'self.params[\'%s\'][\'cont\'].%s%s(%f)' % (self.motorSet[motor_i], pid_category, pid_param, value)
             eval(execCode)
 
+    def getCurrentPos(self):
+        pos_d = {}
+        vel_d = {}
+        torque_d = {}
+        for k, p in self.params.items():
+            (pos_d[k], vel_d[k], torque_d[k]) = p['cont'].read_motor_measurement()
+            pos_d[k] /= p['scale']
+        return pos_d
 
     def goToTargetPos(self, targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None):
         # pos: dict ('slider', 'pan', 'tilt')

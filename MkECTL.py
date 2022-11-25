@@ -478,22 +478,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.setUIStatus(self.states)
 
     def getCurrentPos(self):
-        for id, p in self.motorRobot.params.items():
-            m = p['cont']
-            (pos, vec, tor) = m.read_motor_measurement()
-            scale = p['scale']
-            pos /= scale
-            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
+        pos_d = self.motorRobot.getCurrentPos()
+        self.updateCurrentPos(pos_d)
         self.judgePresetEnable()
 
-    def changeMovRoboStatus(self, pos_d, initial_err, err):
-        for id, pos in pos_d.items():
-            self.motorGUI['currentPosLabel'][id].setText('{:.2f}'.format(pos))
+    def updateCurrentPos(self, pos_d):
+        for k, pos in pos_d.items():
+            self.motorGUI['currentPosLabel'][k].setText('{:.2f}'.format(pos))
 
+    def changeMovRoboStatus(self, pos_d, initial_err, err):
+        self.updateCurrentPos(pos_d)
         if initial_err != 0:
             progress = (1-(err / initial_err))*100
             self.ui.initializeProgressBar.setValue(int(progress))
-
 
     def initSliderOrigin(self):
         m = self.motorRobot.slider
