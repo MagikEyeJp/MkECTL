@@ -514,8 +514,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.moveRobot({'slider': 10.0})
 
     def freeAllMotors(self):
-        for p in self.motorRobot.params.values():
-            p['cont'].free()
+        self.motorRobot.freeMotors()
         QtWidgets.QMessageBox.information(self, "free", "All motors have been freed.")
 
     def updateSpeed(self, speedSpinName):

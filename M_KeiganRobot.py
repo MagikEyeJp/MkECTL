@@ -156,6 +156,11 @@ class KeiganMotorRobot(IMotorRobot):
             if k in targetPos:
                 p['cont'].preset_scaled_position(targetPos[k])
 
+    def freeMotors(self):
+        for k, p in self.params.items():
+            m = p['cont']
+            m.free()
+
     def reboot(self):
         for k, p in self.params.items():
             m = p['cont']
