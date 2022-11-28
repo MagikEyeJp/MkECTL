@@ -86,10 +86,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         ### detailed settings window
         self.detailedSettingsWindow = None  # made in initializeMotors()
-
-        self.ui.Settings.hide()
-
-        self.initializeProcessFlag = False
         self.ui.Settings.hide()
 
         self.ui.manualOperation.setEnabled(False)
@@ -303,11 +299,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # GUI
         print('Initialize Button was clicked')
-        self.ui.initializeProgressBar.setEnabled(True)
-        self.ui.initializeProgressLabel.setEnabled(True)
-        self.ui.initializeProgressLabel.setText('Initializing...')
+        self.ui.actionProgressBar.setEnabled(True)
+        self.ui.actionProgressLabel.setEnabled(True)
+        self.ui.actionProgressLabel.setText('Initializing...')
         count += 10
-        self.ui.initializeProgressBar.setValue(count)
+        self.ui.actionProgressBar.setValue(count)
 
         # Motor
         if "motors" in self.machineParams:
@@ -316,13 +312,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.motorRobot = KeiganMotorRobot()
 
         self.motorRobot.getMotorDic()
-        self.ui.initializeProgressBar.setValue(40)
+        self.ui.actionProgressBar.setValue(40)
 
         ### detailed settings window
         self.detailedSettingsWindow = self.motorRobot.getSettingWindow()
 
         if self.motorRobot.initializeMotors():
-            self.ui.initializeProgressBar.setValue(80)
+            self.ui.actionProgressBar.setValue(80)
 
             self.devices['motors'] = self.motorRobot.params
             self.devices['robot'] = self.motorRobot
@@ -344,8 +340,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
             # GUI
             print('--initialization completed--')
-            self.ui.initializeProgressBar.setValue(100)
-            self.ui.initializeProgressLabel.setText('Initialized all motors')
+            self.ui.actionProgressBar.setValue(100)
+            self.ui.actionProgressLabel.setText('Initialized all motors')
 
             self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
             self.setUIStatus(self.states)
@@ -368,7 +364,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.updateCurrentPos(pos_d)
         if goal != 0:
             progress = (now / goal) * 100
-            self.ui.initializeProgressBar.setValue(int(progress))
+            self.ui.actionProgressBar.setValue(int(progress))
 
     def initSliderOrigin(self):
         self.updateActionProgress(0, 'Init Origins...', True)
@@ -445,10 +441,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.judgePresetEnable()
 
     def updateActionProgress(self, value, text, active):
-        self.ui.initializeProgressBar.setValue(value)
-        self.ui.initializeProgressLabel.setText(text)
-        self.ui.initializeProgressBar.setEnabled(active)
-        self.ui.initializeProgressLabel.setEnabled(active)
+        self.ui.actionProgressBar.setValue(value)
+        self.ui.actionProgressLabel.setText(text)
+        self.ui.actionProgressBar.setEnabled(active)
+        self.ui.actionProgressLabel.setEnabled(active)
 
     # --- Scripting
 
@@ -788,15 +784,15 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         if UIState.INITIALIZE in status:
             self.ui.initializeButton.setEnabled(True)
-            self.ui.initializeProgressBar.setEnabled(True)
-            self.ui.initializeProgressBar.setValue(0)
-            self.ui.initializeProgressLabel.setEnabled(True)
-            self.ui.initializeProgressLabel.setText('Push \"Initialize\"')
+            self.ui.actionProgressBar.setEnabled(True)
+            self.ui.actionProgressBar.setValue(0)
+            self.ui.actionProgressLabel.setEnabled(True)
+            self.ui.actionProgressLabel.setText('Push \"Initialize\"')
         else:
             self.ui.initializeButton.setEnabled(False)
-            self.ui.initializeProgressBar.setEnabled(False)
-            self.ui.initializeProgressLabel.setEnabled(False)
-            # self.ui.initializeProgressLabel.setText('Initialized all motors')
+            self.ui.actionProgressBar.setEnabled(False)
+            self.ui.actionProgressLabel.setEnabled(False)
+            # self.ui.actionProgressLabel.setText('Initialized all motors')
 
         if UIState.MOTOR in status:
             # self.ui.robotControl.setEnabled(True)

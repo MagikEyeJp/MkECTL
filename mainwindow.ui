@@ -1215,7 +1215,7 @@ QScrollBar::sub-line:vertical {
            <property name="title">
             <string>Robot Control</string>
            </property>
-           <widget class="QLabel" name="initializeProgressLabel">
+           <widget class="QLabel" name="actionProgressLabel">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -1231,7 +1231,7 @@ QScrollBar::sub-line:vertical {
              <string>Initializing motors...</string>
             </property>
            </widget>
-           <widget class="QProgressBar" name="initializeProgressBar">
+           <widget class="QProgressBar" name="actionProgressBar">
             <property name="enabled">
              <bool>false</bool>
             </property>
