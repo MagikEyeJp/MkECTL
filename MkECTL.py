@@ -166,7 +166,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeButton.clicked.connect(self.initializeMotors)
         self.ui.MagikEye.clicked.connect(lambda: self.demo(False))
         self.ui.getCurrentPosButton.setEnabled(False)
-        self.ui.getCurrentPosButton.clicked.connect(self.getCurrentPos)
+        self.ui.getCurrentPosButton.clicked.connect(self.captureCurrentPos)
         self.ui.selectScript_toolButton.clicked.connect(self.openScriptFile)
         self.ui.selectBaseFolder_toolButton.clicked.connect(self.openBaseFolder)
         self.ui.selectSubFolder_toolButton.clicked.connect(self.openSubFolder)
@@ -217,6 +217,13 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.previousMachineFilePath = ini.getPreviousMachineFile(self.previousMachineIni)
             self.setMachine(self.previousMachineFilePath)
 
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.periodicEvent)
+        self.timer.start(1000)
+
+    def periodicEvent(self):
+        if UIState.MOTOR in self.states:
+            self.getCurrentPos()
 
     def restoreConfig(self):
         if os.path.exists(self.configIniFile):
@@ -252,12 +259,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 self.showNormal()
                 self.setMinimumWidth(1040)
                 self.setMaximumWidth(self.geometry.width())
-
-    def get_key_from_value(self, d, val):  # https://note.nkmk.me/python-dict-get-key-from-value/
-        keys = [k for k, v in d.items() if v == val]
-        if keys:
-            return keys[0]
-        return None
 
     def closeEvent(self, event):  # https://www.qtcentre.org/threads/20895-PyQt4-Want-to-connect-a-window-s-close-button
         self.deleteLater()
@@ -351,6 +352,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
 
+    def captureCurrentPos(self):
+        pos_d = self.motorRobot.getCurrentPos()
+        self.updateCurrentPos(pos_d)
+        self.updateTargetPosition(pos_d)
+        self.judgePresetEnable()
+
     def getCurrentPos(self):
         pos_d = self.motorRobot.getCurrentPos()
         self.updateCurrentPos(pos_d)
@@ -358,7 +365,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def updateCurrentPos(self, pos_d):
         for k, pos in pos_d.items():
-            self.motorGUI['currentPosLabel'][k].setText('{:.2f}'.format(pos))
+            self.motorGUI['currentPosLabel'][k].setText('{:>8.2f}'.format(pos))
 
     def changeMovRoboStatus(self, pos_d, now, goal):
         self.updateCurrentPos(pos_d)
@@ -622,7 +629,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                                                                          "\"%s\" \nhave been completed."
                                               % os.path.basename(self.scriptParams.scriptName))
 
-
     def setHome(self):
         targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
         self.presetPositions(targetPos_d)
@@ -680,7 +686,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.scriptParams.IRonMultiplier = self.toFloat(self.ui.IRonMultiplier.text(), 1.0)
         self.scriptParams.IRoffMultiplier = self.toFloat(self.ui.IRoffMultiplier.text(), 1.0)
         self.scriptParams.isoValue = self.ui.isoValue.currentText()
-
 
     def topLevelChanged(self, geometry, toplevel):
         print("toplevelChanged", toplevel)
