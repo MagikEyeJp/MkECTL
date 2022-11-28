@@ -17,7 +17,6 @@ from M_KeiganRobot import KeiganMotorRobot
 import mainwindow_ui
 import execute_script
 import sensors
-import detailedSettings_ui
 import ini
 import json_IO
 from UIState import UIState
@@ -49,6 +48,7 @@ class ScriptParams():
         self.now = datetime.datetime.now()
         self.subFolderName = self.now.strftime('%Y%m%d_%H%M%S')
 
+
 class MyMessageBox(QtWidgets.QMessageBox):
     def __init__(self):
         super(MyMessageBox, self).__init__()
@@ -66,128 +66,6 @@ class MyMessageBox(QtWidgets.QMessageBox):
         else:
             event.ignore()
 
-class DetailedSettingsWindow(QtWidgets.QWidget):
-    pidChanged = QtCore.pyqtSignal(str, str, int, float)
-
-    def __init__(self, parent=None, mainUI:IMainUI=None):
-        super(DetailedSettingsWindow, self).__init__(parent)
-        # self.pidChanged.connect(self.mainUI.motorRobot.changePIDparam)
-        self.mainUI = mainUI
-
-        self.ui_setting = detailedSettings_ui.Ui_settings()
-        self.ui_setting.setupUi(self)
-
-        self.pidDirPath = 'PIDparams'
-        self.savedPIDfile = 'saved_pid.json'
-
-        self.currentPIDvalues = {}
-        self.tableWidget = self.ui_setting.pidTable
-        self.maxTableHeight = self.tableWidget.maximumHeight()
-        self.resetPID()
-
-        self.setDicTable()
-        self.tableWidget.cellChanged.connect(self.changeDetailedSettings)
-        # self.setTableSize()
-
-        self.defaultWinHeight = self.geometry().height()
-        self.defaultTableHeight = self.tableWidget.height()
-
-        self.ui_setting.saveButton.clicked.connect(self.savePID)
-        self.ui_setting.resetButton.clicked.connect(self.resetPID)
-
-        self.ui_setting.resetButton.setEnabled(False)
-
-    def setTableSize(self):
-
-        height = self.defaultTableHeight
-        height += self.geometry().height() - self.defaultWinHeight
-
-        posX = self.tableWidget.pos().x()
-        posY = self.tableWidget.pos().y()
-
-        # self.tableWidget.setGeometry(posX, posY, width, height)
-        if height < self.maxTableHeight:
-            self.tableWidget.setFixedHeight(height)
-        else:
-            self.tableWidget.setFixedHeight(self.maxTableHeight)
-
-    def resizeEvent(self, event):
-        print("Detailed Setting resize event")
-        self.setTableSize()
-        super(DetailedSettingsWindow, self).resizeEvent(event)
-
-    def setDicTable(self):
-        r = 0
-        col = 1
-
-        for i in range(len(self.mainUI.motorRobot.params.keys())):
-            for pid_category, pid_category_val in self.currentPIDvalues.items():
-                for pid_param, pid_param_val in pid_category_val.items():
-                    val = self.currentPIDvalues[pid_category][pid_param][i]
-                    self.tableWidget.setItem(r, col, QtWidgets.QTableWidgetItem(str(val)))
-                    r += 1
-            r = 0
-            col += 1
-
-    def changeDetailedSettings(self, row, col):
-        pid_category_dic = {
-            0: 'speed', 1: 'speed', 2: 'speed', 3: 'speed',
-            4: 'qCurrent', 5: 'qCurrent', 6: 'qCurrent', 7: 'qCurrent',
-            8: 'position', 9: 'position', 10: 'position', 11: 'position', 12: 'position'
-        }
-        pid_param_dic = {
-            0: 'P', 4: 'P', 8: 'P',
-            1: 'I', 5: 'I', 9: 'I',
-            2: 'D', 6: 'D', 10: 'D',
-            3: 'lowPassFilter', 7: 'lowPassFilter', 11: 'lowPassFilter',
-            12: 'posControlThreshold'
-        }
-        print(row, col)
-        value = float(self.tableWidget.item(row, col).text())
-        self.pidChanged.emit(pid_category_dic[row], pid_param_dic[row], col-1, value)
-
-        self.currentPIDvalues[pid_category_dic[row]][pid_param_dic[row]][col-1] = value
-        self.ui_setting.resetButton.setEnabled(True)
-
-    def savePID(self):
-        if not os.path.exists(self.pidDirPath):
-            os.makedirs(self.pidDirPath)
-
-        json_IO.writeJson(self.currentPIDvalues, self.pidDirPath + '/' + self.savedPIDfile)
-
-        self.ui_setting.resetButton.setEnabled(False)
-
-    def resetPID(self):
-        print('resetPID')
-
-        if os.path.exists(self.pidDirPath + '/' + self.savedPIDfile):
-            self.currentPIDvalues = json_IO.loadJson(self.pidDirPath + '/' + self.savedPIDfile)
-            # print(self.currentPIDvalues)
-        else:
-            self.currentPIDvalues = {
-                'speed': {
-                    'P': [14.0, 14.0, 14.0],
-                    'I': [0.001, 0.001, 0.001],
-                    'D': [0.0, 0.0, 0.0],
-                    'lowPassFilter': [0.1, 0.1, 0.1]
-                },
-                'qCurrent': {
-                    'P': [0.2, 0.6, 0.2],
-                    'I': [10.0, 4.0, 10.0],
-                    'D': [0.0, 0.0, 0.0],
-                    'lowPassFilter': [1.0, 1.0, 1.0]
-                },
-                'position': {
-                    'P': [30.0, 80.0, 40.0],
-                    'I': [400.0, 20.0, 400.0],
-                    'D': [0.0, 0.0, 0.0],
-                    'lowPassFilter': [0.1, 0.1, 0.1],
-                    'posControlThreshold': [1.0, 1.0, 1.0]
-                }
-            }
-
-        self.setDicTable()
-        self.ui_setting.resetButton.setEnabled(False)
 
 class Ui(QtWidgets.QMainWindow, IMainUI):
     def __init__(self, parent=None):
@@ -441,7 +319,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.initializeProgressBar.setValue(40)
 
         ### detailed settings window
-        self.detailedSettingsWindow = DetailedSettingsWindow(mainUI=self)
+        self.detailedSettingsWindow = self.motorRobot.getSettingWindow()
 
         if self.motorRobot.initializeMotors():
             self.ui.initializeProgressBar.setValue(80)
@@ -847,8 +725,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     # ----- detailed settings -----
     def detailedSettings(self):
-        self.detailedSettingsWindow.pidChanged.connect(self.motorRobot.changePIDparam)
-
         self.detailedSettingsWindow.activateWindow()
         self.detailedSettingsWindow.move(self.pos().x()+500, self.pos().y())
         self.detailedSettingsWindow.show()
