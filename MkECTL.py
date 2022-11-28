@@ -185,6 +185,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.saveButton.clicked.connect(self.savePositions)
         self.ui.GoButton.clicked.connect(self.goToSavedPositions)
         self.ui.selectMachineFileButton.clicked.connect(self.selectMachine)
+        self.ui.reprocessButton.clicked.connect(self.reprocesssLast)
         self.ui.postProcFileBtn.clicked.connect(self.openPostProcFile)
         self.ui.postProcEditBtn.clicked.connect(self.editPostProcParam)
         self.ui.postProcClearLogBtn.clicked.connect(self.clearPostProcLog)
@@ -554,6 +555,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def run_script(self, isContinue):
         self.stopClicked = False
+        self.ui.reprocessButton.setEnabled(False)
 
         if self.scriptParams.scriptName == self.demo_script:
             self.demo(isContinue)
@@ -623,8 +625,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         if not interrupted:
             # mixer.music.play(1)
             playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
-            if self.ui.PostProc_groupBox.isChecked():
+            if self.ui.SectionPostProc.isChecked():
                 self.doPostProc()
+            else:
+                self.ui.reprocessButton.setEnabled(True)
             QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "\"%s\" \nhave been completed."
                                               % os.path.basename(self.scriptParams.scriptName))
@@ -754,6 +758,11 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def clearPostProcLog(self):
         self.ui.postProcLogTextEdit.clear()
+
+    def reprocesssLast(self):
+        self.ui.reprocessButton.setEnabled(False)
+        self.doPostProc()           # Should be error checked in the future.
+
 
     def doPostProc(self):
         info = SensorInfo()

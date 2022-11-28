@@ -1156,7 +1156,7 @@ QScrollBar::sub-line:vertical {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-199</y>
          <width>512</width>
          <height>950</height>
         </rect>
@@ -3524,11 +3524,25 @@ QScrollBar::sub-line:vertical {
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
-              <widget class="QLabel" name="PostProcFileLabel">
-               <property name="text">
-                <string>PostProcess Definition</string>
-               </property>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="1,0">
+               <item>
+                <widget class="QLabel" name="PostProcFileLabel">
+                 <property name="text">
+                  <string>PostProcess Definition</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="reprocessButton">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>re-process</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_12">
