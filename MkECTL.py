@@ -557,7 +557,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def run_script(self, isContinue):
         self.stopClicked = False
-        self.ui.reprocessButton.setEnabled(False)
 
         if self.scriptParams.scriptName == self.demo_script:
             self.demo(isContinue)
@@ -629,8 +628,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
             if self.ui.SectionPostProc.isChecked():
                 self.doPostProc()
-            else:
-                self.ui.reprocessButton.setEnabled(True)
             QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "\"%s\" \nhave been completed."
                                               % os.path.basename(self.scriptParams.scriptName))
@@ -762,34 +759,38 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.postProcLogTextEdit.clear()
 
     def reprocesssLast(self):
-        self.ui.reprocessButton.setEnabled(False)
         self.doPostProc()           # Should be error checked in the future.
 
 
     def doPostProc(self):
-        info = SensorInfo()
-        info.clear()
-        info.load_from_file(self.dataOutFolder() + "/sensorinfo.json")
-        self.ui.postProcLogTextEdit.append("exec postproc: " + info.labelid + "_" + self.scriptParams.subFolderName)
-        self.ui.postProcLogTextEdit.ensureCursorVisible()
+        infofile = self.dataOutFolder() + "/sensorinfo.json"
+        if os.path.exists(infofile):
+            info = SensorInfo()
+            info.clear()
+            info.load_from_file(self.dataOutFolder() + "/sensorinfo.json")
+            self.ui.postProcLogTextEdit.append("exec postproc: " + info.labelid + "_" + self.scriptParams.subFolderName)
+            self.ui.postProcLogTextEdit.ensureCursorVisible()
 
-        proc = subprocess.Popen(
-            'gnome-terminal --  bash -c "' +
-            self.postproc['program'] + ' ' + self.dataOutFolder() + ' ' + self.previousPostProcFilePath + ' ;exec bash"', shell=True)
+            proc = subprocess.Popen(
+                'gnome-terminal --  bash -c "' +
+                self.postproc['program'] + ' ' + self.dataOutFolder() + ' ' + self.previousPostProcFilePath + ' ;exec bash"', shell=True)
 
-        # with subprocess.Popen(self.postproc['program'] + ' ' + self.dataOutFolder() + ' ' + self.previousPostProcFilePath,
-        #                       shell=True, encoding='UTF-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
-        # while True:
-        #         # バッファから1行読み込む.
-        #         line = proc.stdout.readline()
-        #         self.ui.postProcLogTextEdit.append(line)
-        #         proc.stdout.flush()
-        #         app.processEvents()
-        #
-        #
-        #         # バッファが空 + プロセス終了.
-        #         if not line and proc.poll() is not None:
-        #             break
+            # with subprocess.Popen(self.postproc['program'] + ' ' + self.dataOutFolder() + ' ' + self.previousPostProcFilePath,
+            #                       shell=True, encoding='UTF-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
+            # while True:
+            #         # バッファから1行読み込む.
+            #         line = proc.stdout.readline()
+            #         self.ui.postProcLogTextEdit.append(line)
+            #         proc.stdout.flush()
+            #         app.processEvents()
+            #
+            #
+            #         # バッファが空 + プロセス終了.
+            #         if not line and proc.poll() is not None:
+            #             break
+        else:
+            QtWidgets.QMessageBox.information(self, "post process", "sensor information file does not exist.")
+
 
     # ----- UI-related functions -----
     def setUIStatus(self, status):

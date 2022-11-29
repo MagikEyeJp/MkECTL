@@ -1156,7 +1156,7 @@ QScrollBar::sub-line:vertical {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-199</y>
+         <y>-253</y>
          <width>512</width>
          <height>950</height>
         </rect>
@@ -3492,7 +3492,7 @@ QScrollBar::sub-line:vertical {
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>300</height>
+             <height>308</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -3523,6 +3523,9 @@ QScrollBar::sub-line:vertical {
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
+             <property name="spacing">
+              <number>4</number>
+             </property>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="1,0">
                <item>
@@ -3534,11 +3537,14 @@ QScrollBar::sub-line:vertical {
                </item>
                <item>
                 <widget class="QPushButton" name="reprocessButton">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
                  <property name="text">
                   <string>re-process</string>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
                  </property>
                 </widget>
                </item>
