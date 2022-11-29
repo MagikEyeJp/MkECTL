@@ -212,7 +212,7 @@ class Controller:
 
     def measureInterval(self,interval,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
-        interface settings.  bit7:button bit4:I2C bit3:USB bit0:BLE
+        Set the interval time of measurement. (0:5ms, 1:10ms, 2:20ms, 3:50ms, 4:100ms, 5:200ms, 6:500ms, 7:1000ms)
         """
         command=b'\x2C'
         values=uint8_t2bytes(interval)
@@ -220,7 +220,7 @@ class Controller:
 
     def measureByDefault(self,flag,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
-        interface settings.
+        Set the auto start mode of measurement. (0:disable autostart 1:enable autostart)
         """
         command=b'\x2D'
         values=uint8_t2bytes(flag)
@@ -228,7 +228,7 @@ class Controller:
 
     def interface(self,flag,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
-        interface settings.
+        interface settings.  bit7:button bit4:I2C bit3:USB bit0:BLE
         """
         command=b'\x2E'
         values=uint8_t2bytes(flag)
