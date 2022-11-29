@@ -366,7 +366,9 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def updateCurrentPos(self, pos_d):
         for k, pos in pos_d.items():
-            self.motorGUI['currentPosLabel'][k].setText('{:>8.2f}'.format(pos))
+            lb = self.motorGUI['currentPosLabel'][k]
+            lb.setText('{:>8.2f}'.format(pos))
+            lb.repaint()
 
     def changeMovRoboStatus(self, pos_d, now, goal):
         self.updateCurrentPos(pos_d)
@@ -375,7 +377,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.actionProgressBar.setValue(int(progress))
 
     def initSliderOrigin(self):
-        self.updateActionProgress(0, 'Init Origins...', True)
+        self.updateActionProgress(5, 'Init Origins...', True)
         self.motorRobot.initializeOrigins({'slider'}, self.changeMovRoboStatus)
         self.updateActionProgress(100, 'Done', False)
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
@@ -860,10 +862,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.percent = 0.0
         # print(self.percent)
         self.ui.progressBar.setValue(self.percent)
+        self.ui.progressBar.repaint()
         return self.percent
 
     def updateProgressLabel(self):
         self.ui.progressLabel.setText(str(self.done) + ' / ' + str(self.total))
+        self.ui.progressLabel.repaint()
 
     def updateScriptProgress(self):
         self.updateProgressLabel()

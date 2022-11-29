@@ -149,7 +149,8 @@ class KeiganMotorRobot(IMotorRobot):
             if vel >= GOAL_VELO:
                 prev_time = time.time()
             duration = time.time() - prev_time
-            inmain(callback, {}, duration, GOAL_TIME)
+            pos_d = {'slider': pos}
+            inmain(callback, pos_d, duration, GOAL_TIME)
 
         m.preset_scaled_position(0)
         m.free()
@@ -202,7 +203,7 @@ class KeiganMotorRobot(IMotorRobot):
         initial_err = 0.0
         minerr = 999999.0  # とりあえず大きい数
         cnt = 0
-        GOAL_EPS = 0.002  # FINE目標位置到達誤差しきい値
+        GOAL_EPS = 0.003  # FINE目標位置到達誤差しきい値
         NOWAIT_EPS = 0.1  # COARSE目標位置到達誤差しきい値
         GOAL_CNT = 5  # 目標位置到達判定回数
 
@@ -224,7 +225,7 @@ class KeiganMotorRobot(IMotorRobot):
                 if stopClicked:
                     return stopClicked
 
-            @timeout(8)
+            @timeout(5)
             def waitmove():
                 nonlocal initial_err
                 nonlocal minerr
@@ -235,8 +236,6 @@ class KeiganMotorRobot(IMotorRobot):
 
                 err = 0.0
                 while True:
-
-
                     time.sleep(0.2)
                     errors = 0.0
 
