@@ -2866,10 +2866,13 @@ QScrollBar::sub-line:vertical {
              <enum>QFrame::Raised</enum>
             </property>
             <widget class="QLabel" name="progressLabel">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
              <property name="geometry">
               <rect>
-               <x>120</x>
-               <y>0</y>
+               <x>403</x>
+               <y>48</y>
                <width>91</width>
                <height>20</height>
               </rect>
@@ -3414,6 +3417,13 @@ QScrollBar::sub-line:vertical {
               <string>Stop</string>
              </property>
             </widget>
+            <zorder>progressBar</zorder>
+            <zorder>progressLabel</zorder>
+            <zorder>commandLabel</zorder>
+            <zorder>ExecutingScript</zorder>
+            <zorder>executeScript_button</zorder>
+            <zorder>continueButton</zorder>
+            <zorder>stopButton</zorder>
            </widget>
            <widget class="QLabel" name="isoMultLabel">
             <property name="geometry">
@@ -3537,6 +3547,9 @@ QScrollBar::sub-line:vertical {
                </item>
                <item>
                 <widget class="QPushButton" name="reprocessButton">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="text">
                   <string>re-process</string>
                  </property>
