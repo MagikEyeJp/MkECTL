@@ -40,7 +40,6 @@ class MyDoubleSpinBox(QtWidgets.QDoubleSpinBox):
         self.fix()
 
     def isModified(self):
-        print(self.undoText, self.value())
         return self.undoText != self.value()
 
     def fix(self):
