@@ -377,7 +377,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.actionProgressBar.setValue(int(progress))
 
     def initSliderOrigin(self):
-        self.updateActionProgress(5, 'Init Origins...', True)
+        self.updateActionProgress(0, 'Init Origins...', True)
         self.motorRobot.initializeOrigins({'slider'}, self.changeMovRoboStatus)
         self.updateActionProgress(100, 'Done', False)
         QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
