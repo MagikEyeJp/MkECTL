@@ -25,7 +25,9 @@ commands = {'root': ['set_root', False],
             'lasers': ['set_lasers', True],
             'light': ['set_light', True],
             'pause': ['wait_pause', False],
-            'message': ['show_message', False]
+            'message': ['show_message', False],
+            'offset': ['set_offset', False],
+            'scale': ['set_scale', False]
             }
 dynvars = {
             'seqn': 'd',
@@ -66,6 +68,8 @@ class Systate():
         self.lasers = 0
         self.light = [0, 0]
         self.lightNum = 2
+        self.offset = [0, 0, 0]
+        self.scale = [1.0, 1.0, 1.0]
 
         self.past_parameters = Systate.PastParameters()
         self.sentSig = Systate.SentSig()
@@ -318,6 +322,24 @@ def set_filename(args, scriptParams, devices, mainWindow):
     # systate.folderCreated[args[0]] = True
     systate.folderCreated = True
 
+@timeout(5)
+def set_offset(args, scriptParams, devices, mainWindow):
+    print('---set_offset---')
+    global systate
+    arglist = np.array(args)
+    print(arglist)
+    systate.offset = list(arglist)
+    print("set offset=", systate.offset)
+
+
+@timeout(5)
+def set_scale(args, scriptParams, devices, mainWindow):
+    print('---set_scale---')
+    global systate
+    arglist = np.array(args)
+    print(arglist)
+    systate.scale = list(arglist)
+    print("set scale=", systate.scale)
 
 @timeout(15)
 def snap_image(args, scriptParams, devices, mainWindow):
@@ -389,23 +411,11 @@ def move_robot(args, scriptParams, devices, mainWindow):
     global systate
     global isDemo
 
-    # time.sleep(20)
-
     args = np.array(args)
-
-    m = []
-    scale = []
-    motorPos = []
     pos = [0.0, 0.0, 0.0]
-    vel = [0.0, 0.0, 0.0]
-    torque = [0.0, 0.0, 0.0]
-    minerr = 999999.0   # とりあえず大きい数
-    cnt = 0
-    GOAL_EPS = 0.002   # 目標位置到達誤差しきい値
-    GOAL_CNT = 5     # 目標位置到達判定回数
 
-    # systate.pos = motorPos
-    systate.pos = list(args)
+    systate.pos = list(np.add(np.multiply(args, systate.scale), systate.offset))
+    print(args, systate.pos, systate.scale, systate.offset)
     targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2]}
 
     if not systate.skip:
