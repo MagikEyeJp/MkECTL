@@ -588,7 +588,7 @@ class Ui_sensor(object):
         self.SectionGrid.setEnabled(False)
         self.SectionGrid.setMinimumSize(QtCore.QSize(240, 235))
         self.SectionGrid.setMaximumSize(QtCore.QSize(240, 16777215))
-        self.SectionGrid.setStyleSheet("QGroupBox:enabled:checked{border-color:#66CCFF; border-width:3px}\n"
+        self.SectionGrid.setStyleSheet("QGroupBox:enabled:checked{border-color:#66AAFF; border-width:2px}\n"
 "")
         self.SectionGrid.setCheckable(True)
         self.SectionGrid.setChecked(False)

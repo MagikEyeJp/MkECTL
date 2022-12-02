@@ -1486,7 +1486,7 @@ QScrollBar::sub-line:vertical {
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">QGroupBox:enabled:checked{border-color:#66CCFF; border-width:3px}
+            <string notr="true">QGroupBox:enabled:checked{border-color:#66AAFF; border-width:2px}
 </string>
            </property>
            <property name="title">
