@@ -224,10 +224,10 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
 
         mainWindow.updateScriptProgress()
 
-    # ---------- update ini file ----------
+    resume_state(scriptParams, devices, mainWindow)
     if not isDemo:
         ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
-    # ------------------------------
+
     return False
 
 ##########
