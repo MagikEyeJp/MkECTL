@@ -60,6 +60,7 @@ class Ui(QMainWindow, IMainUI):
         self.scriptParams = ScriptParams()
 
         # self.subWindow = sensors.SensorWindow(mainUI=self)
+        self.initialized = False
 
         ### docking window https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
         self.sensorWindow = sensors.SensorWindow(mainUI=self)
@@ -278,57 +279,74 @@ class Ui(QMainWindow, IMainUI):
         self.motorGUI['currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
     def initialize(self):
-        count = 0
+        if self.initialized:
+            # disconnect
+            if self.robotController is not None:
+                self.robotController.disconnect()
+                self.robotController = None
 
-        # GUI
-        print('Initialize Button was clicked')
-        self.ui.actionProgressBar.setEnabled(True)
-        self.ui.actionProgressLabel.setEnabled(True)
-        self.ui.actionProgressLabel.setText('Initializing...')
-        count += 10
-        self.ui.actionProgressBar.setValue(count)
+            if self.IRLight is not None:
+                self.IRLight.close()
+                self.IRLight = None
 
-        # Motor
-        if "motors" in self.machineParams:
-            self.robotController = KeiganMotorRobot(self.machineParams["motors"])
-        else:
-            self.robotController = KeiganMotorRobot()
-
-        self.robotController.connect()
-
-        self.ui.actionProgressBar.setValue(40)
-        self.robotSettingsWindow = self.robotController.getSettingWindow()
-
-        if self.robotController.initialize():
-            self.ui.actionProgressBar.setValue(80)
-            self.devices['robot'] = self.robotController
-            # IR light
-            if "IRLight" in self.machineParams:
-                IRtype = self.machineParams["IRLight"].get("type")
-                IRdevice = self.machineParams["IRLight"].get("device")
-                if IRtype == "MkE":
-                    self.IRLight = IRLightMkE.IRLightMkE(IRtype, IRdevice)
-                elif IRtype == "PAPOUCH":
-                    self.IRLight = IRLightPapouch.IRLightPapouch(IRtype, IRdevice)
-                elif IRtype == "Numato":
-                    self.IRLight = IRLightNumato.IRLightNumato(IRtype, IRdevice)
-                else:   # dummy
-                    self.IRLight = IRLightDummy.IRLightDummy(IRtype, IRdevice)
-
-            self.openIR()
-
-            # GUI
-            print('--initialization completed--')
-            self.ui.actionProgressBar.setValue(100)
-            self.ui.actionProgressLabel.setText('Initialized all motors')
-
-            self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
-            self.setUIStatus(self.states)
-        else:
-            QMessageBox.critical(self, "Initialization Error",
-                "Couldn\'t initialize motors.\nPlease check if the motors are ready to be initialized.")
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
+            self.initialized = False
+        else:
+            # initialize
+            count = 0
+
+            # GUI
+            print('Initialize Button was clicked')
+            self.ui.actionProgressBar.setEnabled(True)
+            self.ui.actionProgressLabel.setEnabled(True)
+            self.ui.actionProgressLabel.setText('Initializing...')
+            count += 10
+            self.ui.actionProgressBar.setValue(count)
+
+            # Motor
+            if "motors" in self.machineParams:
+                self.robotController = KeiganMotorRobot(self.machineParams["motors"])
+            else:
+                self.robotController = KeiganMotorRobot()
+
+            self.robotController.connect()
+
+            self.ui.actionProgressBar.setValue(40)
+            self.robotSettingsWindow = self.robotController.getSettingWindow()
+
+            if self.robotController.initialize():
+                self.ui.actionProgressBar.setValue(80)
+                self.devices['robot'] = self.robotController
+                # IR light
+                if "IRLight" in self.machineParams:
+                    IRtype = self.machineParams["IRLight"].get("type")
+                    IRdevice = self.machineParams["IRLight"].get("device")
+                    if IRtype == "MkE":
+                        self.IRLight = IRLightMkE.IRLightMkE(IRtype, IRdevice)
+                    elif IRtype == "PAPOUCH":
+                        self.IRLight = IRLightPapouch.IRLightPapouch(IRtype, IRdevice)
+                    elif IRtype == "Numato":
+                        self.IRLight = IRLightNumato.IRLightNumato(IRtype, IRdevice)
+                    else:   # dummy
+                        self.IRLight = IRLightDummy.IRLightDummy(IRtype, IRdevice)
+
+                self.openIR()
+
+                # GUI
+                print('--initialization completed--')
+                self.ui.actionProgressBar.setValue(100)
+                self.ui.actionProgressLabel.setText('Initialized all motors')
+
+                self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
+                self.setUIStatus(self.states)
+                self.initialized = True
+            else:
+                QMessageBox.critical(self, "Initialization Error",
+                    "Couldn\'t initialize motors.\nPlease check if the motors are ready to be initialized.")
+                self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+                self.setUIStatus(self.states)
+                self.initialized = False
 
     def captureCurrentPos(self):
         pos_d = self.robotController.getPosition()
@@ -403,6 +421,7 @@ class Ui(QMainWindow, IMainUI):
         self.robotController.reboot()
         self.states = {UIState.MACHINEFILE, UIState.INITIALIZE, UIState.IRLIGHT}
         self.setUIStatus(self.states)
+        self.initialized = False
         QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
                                                           "Please re-initialize motors to use again.")
 
@@ -773,15 +792,18 @@ class Ui(QMainWindow, IMainUI):
 
         if UIState.INITIALIZE in status:
             self.ui.initializeButton.setEnabled(True)
+            self.ui.initializeButton.setText("Initialize")
+            self.ui.initializeButton.setStyleSheet("")
             self.ui.actionProgressBar.setEnabled(True)
             self.ui.actionProgressBar.setValue(0)
             self.ui.actionProgressLabel.setEnabled(True)
             self.ui.actionProgressLabel.setText('Push \"Initialize\"')
         else:
-            self.ui.initializeButton.setEnabled(False)
+            self.ui.initializeButton.setText("Disconnect")
+            self.ui.initializeButton.setStyleSheet("QPushButton{background-color:red}")
+            self.ui.initializeButton.setEnabled(True)
             self.ui.actionProgressBar.setEnabled(False)
             self.ui.actionProgressLabel.setEnabled(False)
-            # self.ui.actionProgressLabel.setText('Initialized all motors')
 
         if UIState.MOTOR in status:
             # self.ui.robotControl.setEnabled(True)

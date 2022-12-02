@@ -192,9 +192,13 @@ class KeiganMotorRobot(IRobotController):
             m = p['cont']
             m.reboot()
             m.close()
+            p['cont'] = None
 
     def disconnect(self):
-        pass
+        for k, p in self.params.items():
+            m = p['cont']
+            m.close()
+            p['cont'] = None
 
     def moveTo(self, targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None):
         # pos: dict ('slider', 'pan', 'tilt')

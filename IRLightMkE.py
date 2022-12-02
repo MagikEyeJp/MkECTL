@@ -32,3 +32,8 @@ class IRLightMkE(IRLight):
                 cmd = cmd + ch - 1
             self.IRport.write(bytes([cmd]))
 
+    def close(self):
+        if self.IRport is not None:
+            self.IRport.close()
+        self.IRport = None
+        self.valid = False

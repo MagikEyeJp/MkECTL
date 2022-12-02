@@ -14,3 +14,6 @@ class IRLight(metaclass=ABCMeta):
     @abstractmethod
     def set(self, ch, state):
         pass
+
+    def close(self):
+        pass
