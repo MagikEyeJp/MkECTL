@@ -1156,7 +1156,7 @@ QScrollBar::sub-line:vertical {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-253</y>
+         <y>0</y>
          <width>512</width>
          <height>950</height>
         </rect>
@@ -1471,7 +1471,7 @@ QScrollBar::sub-line:vertical {
                  <string>detect slider limit and set origin</string>
                 </property>
                 <property name="text">
-                 <string>Init Slider Origin</string>
+                 <string>Initialize Origins</string>
                 </property>
                 <property name="autoDefault">
                  <bool>true</bool>
@@ -3547,9 +3547,6 @@ QScrollBar::sub-line:vertical {
                </item>
                <item>
                 <widget class="QPushButton" name="reprocessButton">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
                  <property name="text">
                   <string>re-process</string>
                  </property>

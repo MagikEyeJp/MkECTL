@@ -1,4 +1,4 @@
-from IMotorRobot import IMotorRobot
+from IRobotController import IRobotController
 
 import KMControllersS, KMControllersS_dummy
 
@@ -55,10 +55,11 @@ defaultMotors = {
     }
 }
 
-class KeiganMotorRobot(IMotorRobot):
-    def __init__(self, machineParams_m=None):
-        # super(KeiganMotor, self).__init__(parent)
-        self.machineParams_m = machineParams_m
+# ---- IMotorRobot Interfaces ----
+
+class KeiganMotorRobot(IRobotController):
+    def __init__(self, machineParams=None):
+        self.m_machineParams = machineParams
         self.motorSet = ['slider', 'pan', 'tilt']
         self.settingWindow = None
 
@@ -69,14 +70,14 @@ class KeiganMotorRobot(IMotorRobot):
 
         self.params = None
 
-    def getMotorDic(self):
+    def connect(self):
         global defaultMotors
 
-        if self.machineParams_m is None:
-            self.machineParams_m = defaultMotors
+        if self.m_machineParams is None:
+            self.m_machineParams = defaultMotors
 
-        serials = {k: v.get("serial") for k, v in self.machineParams_m.items()}
-        scales = {k: v.get("scale") for k, v in self.machineParams_m.items()}
+        serials = {k: v.get("serial") for k, v in self.m_machineParams.items()}
+        scales = {k: v.get("scale") for k, v in self.m_machineParams.items()}
 
         motordic = {}
 
@@ -112,7 +113,7 @@ class KeiganMotorRobot(IMotorRobot):
         self.params = motordic
         # return motordic
 
-    def initializeMotors(self):
+    def initialize(self):
         self.slider = self.params.get('slider', {}).get('cont', None)
         self.pan = self.params.get('pan', {}).get('cont', None)
         self.tilt = self.params.get('tilt', {}).get('cont', None)
@@ -123,8 +124,8 @@ class KeiganMotorRobot(IMotorRobot):
                 exec('self.%s.interface(8)' % id)
                 # print(self.slider)
 
-                if "initial_param" in self.machineParams_m[id]:
-                    for initKey, initPar in self.machineParams_m[id]["initial_param"].items():
+                if "initial_param" in self.m_machineParams[id]:
+                    for initKey, initPar in self.m_machineParams[id]["initial_param"].items():
                         execCode: str = 'self.%s.%s(%d)' % (id, initKey, initPar)
                         exec(execCode)
 
@@ -167,7 +168,7 @@ class KeiganMotorRobot(IMotorRobot):
             execCode = 'self.params[\'%s\'][\'cont\'].%s%s(%f)' % (self.motorSet[motor_i], pid_category, pid_param, value)
             eval(execCode)
 
-    def getCurrentPos(self):
+    def getPosition(self):
         pos_d = {}
         vel_d = {}
         torque_d = {}
@@ -176,7 +177,7 @@ class KeiganMotorRobot(IMotorRobot):
             pos_d[k] /= p['scale']
         return pos_d
 
-    def presetPos(self, targetPos):
+    def presetPosition(self, targetPos):
         for k, p in self.params.items():
             if k in targetPos:
                 p['cont'].preset_scaled_position(targetPos[k])
@@ -192,8 +193,10 @@ class KeiganMotorRobot(IMotorRobot):
             m.reboot()
             m.close()
 
+    def disconnect(self):
+        pass
 
-    def goToTargetPos(self, targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None):
+    def moveTo(self, targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None):
         # pos: dict ('slider', 'pan', 'tilt')
 
         pos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
@@ -205,7 +208,7 @@ class KeiganMotorRobot(IMotorRobot):
         cnt = 0
         GOAL_EPS = 0.003  # FINE目標位置到達誤差しきい値
         NOWAIT_EPS = 0.1  # COARSE目標位置到達誤差しきい値
-        GOAL_CNT = 5  # 目標位置到達判定回数
+        GOAL_CNT = 8  # 目標位置到達判定回数
 
         for k, p in self.params.items():
             if k in targetPos:
@@ -246,9 +249,9 @@ class KeiganMotorRobot(IMotorRobot):
                         pos_d[k] /= p['scale']
                     err = math.sqrt(errors)
 
-                        # display Current Pos
-                        # mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
-                        #     pos[param_i] / scale[param_i]))
+                    # display Current Pos
+                    # mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
+                    #     pos[param_i] / scale[param_i]))
                     # yield pos_d
                     inmain(callback, pos_d, initial_err - err, initial_err)
 
@@ -284,16 +287,18 @@ class KeiganMotorRobot(IMotorRobot):
         return False
 
     def getSettingWindow(self):
-        self.settingWindow = DetailedSettingsWindow()
+        self.settingWindow = SettingsWindow()
         self.settingWindow.pidChanged.connect(self.changePIDparam)
         return self.settingWindow
 
 
-class DetailedSettingsWindow(QtWidgets.QWidget):
+# ---- Setting Window ----
+
+class SettingsWindow(QtWidgets.QWidget):
     pidChanged = QtCore.pyqtSignal(str, str, int, float)
 
     def __init__(self, parent=None):
-        super(DetailedSettingsWindow, self).__init__(parent)
+        super(SettingsWindow, self).__init__(parent)
 
         self.ui_setting = detailedSettings_ui.Ui_settings()
         self.ui_setting.setupUi(self)
@@ -316,6 +321,7 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
         self.ui_setting.saveButton.clicked.connect(self.savePID)
         self.ui_setting.resetButton.clicked.connect(self.resetPID)
 
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.ui_setting.resetButton.setEnabled(False)
 
     def setTableSize(self):
@@ -335,7 +341,7 @@ class DetailedSettingsWindow(QtWidgets.QWidget):
     def resizeEvent(self, event):
         print("Detailed Setting resize event")
         self.setTableSize()
-        super(DetailedSettingsWindow, self).resizeEvent(event)
+        super(SettingsWindow, self).resizeEvent(event)
 
     def setDicTable(self):
         r = 0

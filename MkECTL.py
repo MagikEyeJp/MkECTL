@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from PyQt5 import QtWidgets, uic, QtGui, QtCore
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 import sys
 import time
 import os
@@ -49,25 +51,7 @@ class ScriptParams():
         self.subFolderName = self.now.strftime('%Y%m%d_%H%M%S')
 
 
-class MyMessageBox(QtWidgets.QMessageBox):
-    def __init__(self):
-        super(MyMessageBox, self).__init__()
-
-    def closeEvent(self, event: QtGui.QCloseEvent):  # real signature unknown; restored from __doc__
-        """ closeEvent(self, QCloseEvent) """
-        answer = QtWidgets.QMessageBox.question(
-            self,
-            'Message',
-            'Are you sure you want to quit ?',
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-            QtWidgets.QMessageBox.No)
-        if answer == QtWidgets.QMessageBox.Yes:
-            event.accept()
-        else:
-            event.ignore()
-
-
-class Ui(QtWidgets.QMainWindow, IMainUI):
+class Ui(QMainWindow, IMainUI):
     def __init__(self, parent=None):
         super(Ui, self).__init__(parent)
         self.ui = mainwindow_ui.Ui_mainwindow()
@@ -78,14 +62,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         # self.subWindow = sensors.SensorWindow(mainUI=self)
 
         ### docking window https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
-        self.subWindow = sensors.SensorWindow(mainUI=self)
-        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.subWindow)
-        self.sensorWinWidth = self.subWindow.frameGeometry().width()
-        self.sensorWinHeight = self.subWindow.frameGeometry().height()
-        self.subWindow_isOpen = False
+        self.sensorWindow = sensors.SensorWindow(mainUI=self)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.sensorWindow)
+        self.sensorWinWidth = self.sensorWindow.frameGeometry().width()
+        self.sensorWinHeight = self.sensorWindow.frameGeometry().height()
+        self.sensorWindow_isOpen = False
 
         ### detailed settings window
-        self.detailedSettingsWindow = None  # made in initializeMotors()
+        self.robotSettingsWindow = None  # made in initializeMotors()
         self.ui.Settings.hide()
 
         self.ui.manualOperation.setEnabled(False)
@@ -98,10 +82,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.configIniFile = 'data/MkECTL.ini'
 
         # IR light
-        self.isPortOpen = True
-        self.IRport = None
         self.IRLight = None
-        # self.openIR('/dev/ttyACM0')
 
         # scripting
         self.done = 0
@@ -114,8 +95,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.progressBar.setValue(self.percent)
         self.ui.stopButton.clicked.connect(self.interrupt)
 
-        # 画面サイズを取得 (a.desktop()は QtWidgets.QDesktopWidget )  https://ja.stackoverflow.com/questions/44060/pyqt5%E3%81%A7%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AE%E4%B8%AD%E5%A4%AE%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%97%E3%81%9F%E3%81%84
-        a = QtWidgets.qApp
+        # 画面サイズを取得 (a.desktop()は QDesktopWidget )  https://ja.stackoverflow.com/questions/44060/pyqt5%E3%81%A7%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AE%E4%B8%AD%E5%A4%AE%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%97%E3%81%9F%E3%81%84
+        a = qApp
         desktop = a.desktop()
         self.geometry = desktop.screenGeometry()
         # ウインドウサイズ(枠込)を取得
@@ -130,7 +111,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # motor
         self.motorSet = ['slider', 'pan', 'tilt']
-        self.motorRobot = None  # instance of M_KeiganRobot
+        self.robotController = None  # instance of M_KeiganRobot
         self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
 
         self.states = set()
@@ -140,7 +121,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         if not os.path.exists(self.scriptParams.baseFolderName):
             os.makedirs(self.scriptParams.baseFolderName)
 
-        self.devices['3Dsensors'] = self.subWindow
+        self.devices['3Dsensors'] = self.sensorWindow
 
         self.make_motorGUI()
 
@@ -163,7 +144,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # other buttons
         self.ui.initializeButton.setEnabled(False)
-        self.ui.initializeButton.clicked.connect(self.initializeMotors)
+        self.ui.initializeButton.clicked.connect(self.initialize)
         self.ui.MagikEye.clicked.connect(lambda: self.demo(False))
         self.ui.getCurrentPosButton.setEnabled(False)
         self.ui.getCurrentPosButton.clicked.connect(self.captureCurrentPos)
@@ -173,8 +154,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.renewSubFolder_toolButton.clicked.connect(self.renewSubFolder)
         self.ui.executeScript_button.clicked.connect(lambda: self.run_script(False))
         self.ui.continueButton.clicked.connect(lambda: self.run_script(True))
-        self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSubWindow(self.geometry, self.framesize))
-        self.ui.sliderOriginButton.clicked.connect(self.initSliderOrigin)
+        self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSensorWindow(self.geometry, self.framesize))
+        self.ui.sliderOriginButton.clicked.connect(self.initializeOrigins)
         self.ui.freeButton.clicked.connect(self.freeAllMotors)
         self.ui.onL1Button.clicked.connect(lambda: self.IRlightControl(1, True))
         self.ui.offL1Button.clicked.connect(lambda: self.IRlightControl(1, False))
@@ -189,16 +170,16 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.ui.postProcFileBtn.clicked.connect(self.openPostProcFile)
         self.ui.postProcEditBtn.clicked.connect(self.editPostProcParam)
         self.ui.postProcClearLogBtn.clicked.connect(self.clearPostProcLog)
-        self.ui.detailedSettingsButton.clicked.connect(self.detailedSettings)
+        self.ui.detailedSettingsButton.clicked.connect(self.robotSettings)
         self.ui.presetButton.clicked.connect(self.presetModifiedPositions)
 
         # Sensor window detached
 #        self.subWindow.topLevelChanged.connect(lambda toplevel: self.topLevelChanged(self.geometry, toplevel))
-        self.subWindow.visibilityChanged.connect(lambda visible: self.visivilityChanged(self.geometry, visible))
+        self.sensorWindow.visibilityChanged.connect(lambda visible: self.visivilityChanged(self.geometry, visible))
 
         # set validator of line edit
-        self.ui.IRonMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRonMultiplier))
-        self.ui.IRoffMultiplier.setValidator(QtGui.QDoubleValidator(0.0, 100.0, 2, self.ui.IRoffMultiplier))
+        self.ui.IRonMultiplier.setValidator(QDoubleValidator(0.0, 100.0, 2, self.ui.IRonMultiplier))
+        self.ui.IRoffMultiplier.setValidator(QDoubleValidator(0.0, 100.0, 2, self.ui.IRoffMultiplier))
 
         # line edit
         self.ui.IRonMultiplier.textChanged.connect(self.setMultiplier)
@@ -218,7 +199,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.previousMachineFilePath = ini.getPreviousMachineFile(self.previousMachineIni)
             self.setMachine(self.previousMachineFilePath)
 
-        self.timer = QtCore.QTimer()
+        self.timer = QTimer()
         self.timer.timeout.connect(self.periodicEvent)
         self.timer.start(1000)
 
@@ -241,30 +222,30 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                                    or self.size().height() >= self.maxWinHeight):
             print("  isMaximized and size > maxsize")
             self.isMaxWinSize = True
-            if self.subWindow.isHidden():
+            if self.sensorWindow.isHidden():
                 print("show subwindow")
-                self.showSubWindow(self.geometry, self.framesize)
-            if self.subWindow.isFloating():
+                self.showSensorWindow(self.geometry, self.framesize)
+            if self.sensorWindow.isFloating():
                 print("setFloating false")
-                self.subWindow.setFloating(False)
-            self.subWindow.setFeatures(QtWidgets.QDockWidget.NoDockWidgetFeatures)
+                self.sensorWindow.setFloating(False)
+            self.sensorWindow.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
             self.maxWinWidth = self.size().width()
             self.maxWinHeight = self.size().height()
         else:
             print("  not maximized")
             self.isMaxWinSize = False
-            self.subWindow.setFeatures(QtWidgets.QDockWidget.DockWidgetClosable | QtWidgets.QDockWidget.DockWidgetFloatable)
+            self.sensorWindow.setFeatures(QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetFloatable)
             if self.isMaximized():
                 print("  but ismMaximized")
                 self.showNormal()
                 self.setMinimumWidth(1040)
                 self.setMaximumWidth(self.geometry.width())
 
-    def closeEvent(self, event):  # https://www.qtcentre.org/threads/20895-PyQt4-Want-to-connect-a-window-s-close-button
+    def closeEvent(self, event):
         self.deleteLater()
         event.accept()
-        self.subWindow.close()  # mainwindowが閉じたらsubwindowも閉じる
+        self.sensorWindow.close()
         exit()
 
     def make_motorGUI(self):
@@ -296,7 +277,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.motorGUI['speedSpin'] = speedSpinboxes  # ex.) motorGUI['speedSpin']['slider'] == self.ui.sliderSpeedSpin
         self.motorGUI['currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
-    def initializeMotors(self):
+    def initialize(self):
         count = 0
 
         # GUI
@@ -309,22 +290,18 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         # Motor
         if "motors" in self.machineParams:
-            self.motorRobot = KeiganMotorRobot(self.machineParams["motors"])
+            self.robotController = KeiganMotorRobot(self.machineParams["motors"])
         else:
-            self.motorRobot = KeiganMotorRobot()
+            self.robotController = KeiganMotorRobot()
 
-        self.motorRobot.getMotorDic()
+        self.robotController.connect()
+
         self.ui.actionProgressBar.setValue(40)
+        self.robotSettingsWindow = self.robotController.getSettingWindow()
 
-        ### detailed settings window
-        self.detailedSettingsWindow = self.motorRobot.getSettingWindow()
-
-        if self.motorRobot.initializeMotors():
+        if self.robotController.initialize():
             self.ui.actionProgressBar.setValue(80)
-
-            self.devices['motors'] = self.motorRobot.params
-            self.devices['robot'] = self.motorRobot
-
+            self.devices['robot'] = self.robotController
             # IR light
             if "IRLight" in self.machineParams:
                 IRtype = self.machineParams["IRLight"].get("type")
@@ -348,19 +325,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
             self.setUIStatus(self.states)
         else:
-            QtWidgets.QMessageBox.critical(self, "Initialization Error",
-                           "Couldn\'t initialize motors.\nPlease check if the motors are ready to be initialized.")
+            QMessageBox.critical(self, "Initialization Error",
+                "Couldn\'t initialize motors.\nPlease check if the motors are ready to be initialized.")
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
 
     def captureCurrentPos(self):
-        pos_d = self.motorRobot.getCurrentPos()
+        pos_d = self.robotController.getPosition()
         self.updateCurrentPos(pos_d)
         self.updateTargetPosition(pos_d)
         self.judgePresetEnable()
 
     def getCurrentPos(self):
-        pos_d = self.motorRobot.getCurrentPos()
+        pos_d = self.robotController.getPosition()
         self.updateCurrentPos(pos_d)
         self.judgePresetEnable()
 
@@ -370,26 +347,26 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             lb.setText('{:>8.2f}'.format(pos))
             lb.repaint()
 
-    def changeMovRoboStatus(self, pos_d, now, goal):
+    def actionStatusCallback(self, pos_d, now, goal):
         self.updateCurrentPos(pos_d)
         if goal != 0:
             progress = (now / goal) * 100
             self.ui.actionProgressBar.setValue(int(progress))
 
-    def initSliderOrigin(self):
+    def initializeOrigins(self):
         self.updateActionProgress(0, 'Init Origins...', True)
-        self.motorRobot.initializeOrigins({'slider'}, self.changeMovRoboStatus)
+        self.robotController.initializeOrigins({'slider'}, self.actionStatusCallback)
         self.updateActionProgress(100, 'Done', False)
-        QtWidgets.QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
+        QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
         self.moveRobot({'slider': 10.0})
 
     def freeAllMotors(self):
-        self.motorRobot.freeMotors()
-        QtWidgets.QMessageBox.information(self, "free", "All motors have been freed.")
+        self.robotController.freeMotors()
+        QMessageBox.information(self, "free", "All motors have been freed.")
 
     def updateSpeed(self, speedSpinName):
         motorID = speedSpinName.replace('SpeedSpin', '')
-        m = self.motorRobot.params[motorID]['cont']
+        m = self.robotController.params[motorID]['cont']
         m.speed(self.motorGUI['speedSpin'][motorID].value())
 
     def exeButtonClicked(self, buttonName):
@@ -420,26 +397,26 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
     def presetPositions(self, pos_d):
         self.updateTargetPosition(pos_d)
         self.updateCurrentPos(pos_d)
-        self.motorRobot.presetPos(pos_d)
+        self.robotController.presetPosition(pos_d)
 
     def rebootButtonClicked(self):
-        self.motorRobot.reboot()
+        self.robotController.reboot()
         self.states = {UIState.MACHINEFILE, UIState.INITIALIZE, UIState.IRLIGHT}
         self.setUIStatus(self.states)
-        QtWidgets.QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
+        QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
                                                           "Please re-initialize motors to use again.")
 
     def moveRobot(self, targetpos):
         self.updateActionProgress(0, 'Moving...', True)
 
-        isAborted = self.motorRobot.goToTargetPos(targetpos, self.changeMovRoboStatus)
+        isAborted = self.robotController.moveTo(targetpos, self.actionStatusCallback)
         if isAborted:
-            QtWidgets.QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+            QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
         else:
             self.updateActionProgress(100, 'Goal', False)
             self.updateTargetPosition(targetpos)
-            if self.subWindow.connected:
-                self.subWindow.prevImg(1)
+            if self.sensorWindow.connected:
+                self.sensorWindow.prevImg(1)
         time.sleep(0.1)
         self.getCurrentPos()
 
@@ -468,7 +445,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 previousScriptDir = os.path.dirname(previousScriptPath)
 
         (fileName, selectedFilter) = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', previousScriptDir, '*.txt')
+            QFileDialog.getOpenFileName(self, 'Select script', previousScriptDir, '*.txt')
 
         if fileName == '':  # when cancel pressed
             if self.scriptParams.scriptName == '':
@@ -492,7 +469,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def openBaseFolder(self):
         fileName = \
-            QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder')
+            QFileDialog.getExistingDirectory(self, 'Select folder')
 
         if fileName == '':  # when cancel pressed
             pass
@@ -502,7 +479,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def openSubFolder(self):
         fileName = \
-            QtWidgets.QFileDialog.getExistingDirectory(self, 'Select folder', self.scriptParams.baseFolderName + '/')
+            QFileDialog.getExistingDirectory(self, 'Select folder', self.scriptParams.baseFolderName + '/')
 
         if fileName == '':  # when cancel pressed
             pass
@@ -528,7 +505,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.scriptParams.start_command_num = 0
 
         if not os.path.exists(self.demo_script):
-            QtWidgets.QMessageBox.critical \
+            QMessageBox.critical \
                 (self, "File",
                  'Demo script doesn\'t exist. \n '
                  'Please check \" ~'
@@ -545,14 +522,14 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.setUIStatus(self.states)
 
             if not interrupted:
-                QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
-                                                                         "the demo file \nhave been completed.")
+                QMessageBox.information(self, "Finish scripting!", "All commands in \n"
+                                                                   "the demo file \nhave been completed.")
 
         self.scriptParams.scriptName = self.ui.scriptName_label.text()
 
     def keyPressEvent(self, event):
         key = event.key()
-        if key == QtCore.Qt.Key_Escape:
+        if key == Qt.Key_Escape:
             self.interrupt()
 
     def run_script(self, isContinue):
@@ -577,21 +554,19 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 previouslyExecutedScript = ini.loadIni(
                     self.dataOutFolder())
 
-                qm = MyMessageBox()
-
                 if self.ui.scriptName_label.text() != previouslyExecutedScriptName:
-                    # ret = QtWidgets.QMessageBox.question \
-                    ret = qm.question \
-                                (self, 'Which script to execute?', "The previously executed script is different from what you selected.\n"
-                                   "- The previous one: \"" + previouslyExecutedScriptName +"\"\n"
-                                    "- The one you selected: \"" + self.ui.scriptName_label.text() + "\"\n"
-                                    "Click [Yes] to continue the former, or [No] to execute the latter from the top.",
-                         qm.Yes | qm.No)
+                    ret = QMessageBox.question(
+                        self, 'continue previous script ?',
+                        "The script name has changed.\n"
+                        " previous one: " + previouslyExecutedScriptName + "\n"
+                        " now selected: " + self.ui.scriptName_label.text() + "\n\n"
+                        "Click [Yes] to continue previous script,\n"
+                        "   or [No] to execute selected script from first.",
+                        QMessageBox.Cancel|QMessageBox.Yes | QMessageBox.No)
 
-                    if ret == qm.Yes:
+                    if ret == QMessageBox.Yes:
                         self.scriptParams.scriptName = previouslyExecutedScript
-                    elif ret == qm.No:
-                        # self.scriptParams.scriptName = self.ui.scriptName_label.text()
+                    elif ret == QMessageBox.No:
                         pass
                     else:
                         return
@@ -608,7 +583,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         if not os.path.exists(self.dataOutFolder()):
             os.makedirs(self.dataOutFolder())
 
-        self.showSubWindow(self.geometry, self.framesize)
+        self.showSensorWindow(self.geometry, self.framesize)
 
         # GUI
         if self.devices['3Dsensors'].connected:
@@ -617,7 +592,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.states = {UIState.SCRIPT_PROGRESS}
         self.setUIStatus(self.states)
 
-        ### EXECUTE
+        # execute script
         interrupted = execute_script.execute_script(self.scriptParams, self.devices, self)
 
         self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
@@ -628,7 +603,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             playsound("SE/finish_chime.mp3")    # https://qiita.com/hisshi00/items/62c555095b8ff15f9dd2
             if self.ui.SectionPostProc.isChecked():
                 self.doPostProc()
-            QtWidgets.QMessageBox.information(self, "Finish scripting!", "All commands in \n"
+            QMessageBox.information(self, "Finish scripting!", "All commands in \n"
                                                                          "\"%s\" \nhave been completed."
                                               % os.path.basename(self.scriptParams.scriptName))
 
@@ -657,22 +632,21 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         self.updateTargetPosition(targetPos_d)
         self.moveRobot(targetPos_d)
 
-    def showSubWindow(self, geometry, framesize):
-        if self.subWindow_isOpen:
-            self.subWindow.activateWindow()
-            self.subWindow.show()
+    def showSensorWindow(self, geometry, framesize):
+        if self.sensorWindow_isOpen:
+            self.sensorWindow.activateWindow()
+            self.sensorWindow.show()
         else:
-            self.subWindow.show()
-            self.subWindow.move(geometry.width() / 2 - framesize.width() / 16,
-                                geometry.height() / 2 - framesize.height() / 3)
-            self.subWindow_isOpen = True
-        self.restoreDockWidget(self.subWindow)
-        # self.subWindow.resize(QtCore.QSize(909, 616))   # windowがfloatingしてるときはworkする。。
+            self.sensorWindow.show()
+            self.sensorWindow.move(geometry.width() / 2 - framesize.width() / 16,
+                                   geometry.height() / 2 - framesize.height() / 3)
+            self.sensorWindow_isOpen = True
+        self.restoreDockWidget(self.sensorWindow)
+        # self.subWindow.resize(QSize(909, 616))   # windowがfloatingしてるときはworkする。。
 
     def openIR(self):
         message = self.IRLight.open()
         self.devices['lights'] = self.IRLight
-
         self.ui.IRstateLabel.setText(message)
 
     def IRlightControl(self, ch, state):
@@ -706,8 +680,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         print('changeMainWinSize')
 
         if not self.isMaxWinSize:
-            if self.subWindow.isFloating() or self.subWindow.isHidden():
-                print("isFloating:", self.subWindow.isFloating(), " isHidden:", self.subWindow.isHidden())
+            if self.sensorWindow.isFloating() or self.sensorWindow.isHidden():
+                print("isFloating:", self.sensorWindow.isFloating(), " isHidden:", self.sensorWindow.isHidden())
                 self.showNormal()
                 self.setMinimumWidth(540)
                 self.setMaximumWidth(self.minimumWidth())
@@ -715,7 +689,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             else:
                 print("  docked")
                 self.showNormal()
-                self.setMinimumWidth(self.minimumWidth()+self.subWindow.minimumWidth())
+                self.setMinimumWidth(self.minimumWidth() + self.sensorWindow.minimumWidth())
                 self.setMinimumWidth(1040)
                 self.setMaximumWidth(geometry.width())
                 self.setGeometry(posX, posY, self.minimumWidth(), max(mainHeight, self.sensorWinHeight))
@@ -728,13 +702,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
                 # print('-----')
 
     # ----- detailed settings -----
-    def detailedSettings(self):
-        self.detailedSettingsWindow.activateWindow()
-        self.detailedSettingsWindow.move(self.pos().x()+500, self.pos().y())
-        self.detailedSettingsWindow.show()
+    def robotSettings(self):
+        self.robotSettingsWindow.activateWindow()
+        self.robotSettingsWindow.move(self.pos().x() + 500, self.pos().y())
+        self.robotSettingsWindow.show()
 
     # ----- Post Process -----
-
     def readPostProcFile(self):
         if os.path.exists(self.previousPostProcFilePath):
             self.ui.postProcFilelabel.setText(os.path.basename(self.previousPostProcFilePath))
@@ -743,7 +716,7 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def openPostProcFile(self):
         (fileName, selectedFilter) = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Select Post Process File', 'postproc', '*.json')
+            QFileDialog.getOpenFileName(self, 'Select Post Process File', 'postproc', '*.json')
 
         if fileName == '':  # when cancel pressed
             pass
@@ -760,7 +733,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
     def reprocesssLast(self):
         self.doPostProc()           # Should be error checked in the future.
-
 
     def doPostProc(self):
         infofile = self.dataOutFolder() + "/sensorinfo.json"
@@ -789,10 +761,10 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             #         if not line and proc.poll() is not None:
             #             break
         else:
-            QtWidgets.QMessageBox.information(self, "post process", "sensor information file does not exist.")
-
+            QMessageBox.information(self, "post process", "sensor information file does not exist.")
 
     # ----- UI-related functions -----
+
     def setUIStatus(self, status):
         if UIState.MACHINEFILE in status:
             self.ui.selectMachineFileButton.setEnabled(True)
@@ -835,8 +807,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.renewSubFolder_toolButton.setEnabled(True)
             self.ui.continueButton.setEnabled(True)
             self.ui.executeScript_button.setEnabled(True)
-            self.subWindow.ui_s.SectionCameraControl.setEnabled(True)
-            self.subWindow.ui_s.SectionLaserControl.setEnabled(True)
+            self.sensorWindow.ui_s.SectionCameraControl.setEnabled(True)
+            self.sensorWindow.ui_s.SectionLaserControl.setEnabled(True)
         else:
             self.ui.selectScript_toolButton.setEnabled(False)
             self.ui.selectBaseFolder_toolButton.setEnabled(False)
@@ -844,8 +816,8 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
             self.ui.renewSubFolder_toolButton.setEnabled(False)
             self.ui.continueButton.setEnabled(False)
             self.ui.executeScript_button.setEnabled(False)
-            self.subWindow.ui_s.SectionCameraControl.setEnabled(False)
-            self.subWindow.ui_s.SectionLaserControl.setEnabled(False)
+            self.sensorWindow.ui_s.SectionCameraControl.setEnabled(False)
+            self.sensorWindow.ui_s.SectionLaserControl.setEnabled(False)
 
         if UIState.SCRIPT_PROGRESS in status:
             self.ui.progressBar.setEnabled(True)
@@ -853,7 +825,6 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
         else:
             self.ui.progressBar.setEnabled(False)
             self.ui.stopButton.setEnabled(False)
-
 
 # ----- Scripting-related functions -----
     def updatePercentage(self):
@@ -881,13 +852,12 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 # ----- Select machine -----
     def selectMachine(self):
         (fileName, selectedFilter) = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Select script', 'machineFiles', '*.json')
+            QFileDialog.getOpenFileName(self, 'Select script', 'machineFiles', '*.json')
 
         if fileName == '':  # when cancel pressed
             pass
         else:
             self.setMachine(fileName)
-
 
     def setMachine(self, filename):
         if os.path.exists(filename):
@@ -903,16 +873,16 @@ class Ui(QtWidgets.QMainWindow, IMainUI):
 
         self.setUIStatus(self.states)
 
-
     # ==================================================================
     def sensorChanged(self, connected):
         print('changed')
         # if connected:
         # else:
 
+
 if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    app.setWindowIcon(QtGui.QIcon(':/MkECTL.png'))
+    app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(':/MkECTL.png'))
     keiganWindow = Ui()
     keiganWindow.show()
     # sensorWindow = SensorWindow()

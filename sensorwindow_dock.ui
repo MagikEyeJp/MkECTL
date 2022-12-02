@@ -43,6 +43,12 @@
        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
         <item>
          <widget class="QLabel" name="cameraStatusLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>CAMERA STATE</string>
           </property>
