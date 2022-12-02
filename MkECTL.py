@@ -15,7 +15,7 @@ import json
 import subprocess
 
 import MyDoubleSpinBox
-from M_KeiganRobot import KeiganMotorRobot
+from KeiganRobot import KeiganMotorRobot
 import mainwindow_ui
 import execute_script
 import sensors
