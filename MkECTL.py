@@ -1,37 +1,37 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-import sys
-import time
+import datetime
+import json
 import os
 import re
-from functools import partial
-import datetime
-from playsound import playsound
-import json
 import subprocess
+import sys
+import time
+from functools import partial
 
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from playsound import playsound
+
+import IRLightDummy
+import IRLightMkE
+import IRLightNumato
+import IRLightPapouch
 import MyDoubleSpinBox
-from KeiganRobot import KeiganRobot
-import mainwindow_ui
 import execute_script
-import sensors
 import ini
 import json_IO
-from UIState import UIState
-from SensorInfo import SensorInfo
-
-import IRLightMkE
-import IRLightPapouch
-import IRLightNumato
-import IRLightDummy
+import mainwindow_ui
+import sensors
 from IMainUI import IMainUI
+from KeiganRobot import KeiganRobot
+from SensorInfo import SensorInfo
+from UIState import UIState
 
 
-class ScriptParams():
+class ScriptParams:
     def __init__(self):
         self.now = datetime.datetime.now()
 
@@ -811,16 +811,20 @@ class Ui(QMainWindow, IMainUI):
             self.ui.MagikEye.setEnabled(True)
             self.ui.getCurrentPosButton.setEnabled(True)
             self.ui.detailedSettingsButton.setEnabled(True)
+            self.ui.SectionRobotControl.setStyleSheet("QGroupBox{border-color:#66AAFF; border-width:2px}")
         else:
             self.ui.manualOperation.setEnabled(False)
             self.ui.MagikEye.setEnabled(False)
             self.ui.getCurrentPosButton.setEnabled(False)
             self.ui.detailedSettingsButton.setEnabled(False)
+            self.ui.SectionRobotControl.setStyleSheet("")
 
         if UIState.IRLIGHT in status and self.IRLight.isvalid():
             self.ui.SectionIRlightControl.setEnabled(True)
+            self.ui.SectionIRlightControl.setStyleSheet("QGroupBox{border-color:#66AAFF; border-width:2px}")
         else:
             self.ui.SectionIRlightControl.setEnabled(False)
+            self.ui.SectionIRlightControl.setStyleSheet("")
 
         if UIState.SCRIPT in status:
             self.ui.selectScript_toolButton.setEnabled(True)
@@ -829,8 +833,8 @@ class Ui(QMainWindow, IMainUI):
             self.ui.renewSubFolder_toolButton.setEnabled(True)
             self.ui.continueButton.setEnabled(True)
             self.ui.executeScript_button.setEnabled(True)
-            self.sensorWindow.ui_s.SectionCameraControl.setEnabled(True)
-            self.sensorWindow.ui_s.SectionLaserControl.setEnabled(True)
+            self.ui.SectionScript.setStyleSheet("QGroupBox{border-color:#66AAFF; border-width:2px}")
+            self.ui.SectionPostProc.setEnabled(True)
         else:
             self.ui.selectScript_toolButton.setEnabled(False)
             self.ui.selectBaseFolder_toolButton.setEnabled(False)
@@ -838,15 +842,19 @@ class Ui(QMainWindow, IMainUI):
             self.ui.renewSubFolder_toolButton.setEnabled(False)
             self.ui.continueButton.setEnabled(False)
             self.ui.executeScript_button.setEnabled(False)
-            self.sensorWindow.ui_s.SectionCameraControl.setEnabled(False)
-            self.sensorWindow.ui_s.SectionLaserControl.setEnabled(False)
+            self.ui.SectionScript.setStyleSheet("")
+            self.ui.SectionPostProc.setEnabled(False)
 
         if UIState.SCRIPT_PROGRESS in status:
             self.ui.progressBar.setEnabled(True)
             self.ui.stopButton.setEnabled(True)
+            self.sensorWindow.setAllowManualOperation(False)
+            self.ui.initializeButton.setEnabled(False)
         else:
             self.ui.progressBar.setEnabled(False)
             self.ui.stopButton.setEnabled(False)
+            self.sensorWindow.setAllowManualOperation(True)
+
 
 # ----- Scripting-related functions -----
     def updatePercentage(self):

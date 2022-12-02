@@ -99,6 +99,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.connected = False
         self.sensor = SensorDevice.SensorDevice()
         self.sensorInfo = SensorInfo()
+        self.allowManualOperation = True
         # print(self.sensor)
 
         # thread
@@ -208,25 +209,33 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.frame3DDirPath = os.getcwd() + '/frame3Ddata'
 
         # group
-        self.setUiStatusDisconnected()
+        self.updateUIStatus()
 
-    def setUiStatusConnected(self):
-        self.ui_s.connectButton.setEnabled(False)
-        self.ui_s.disconnectButton.setEnabled(True)
-        self.ui_s.IPComboBox.setEnabled(False)
-        self.ui_s.searchButton.setEnabled(False)
-        self.ui_s.SectionCameraControl.setEnabled(True)
-        self.ui_s.SectionLaserControl.setEnabled(True)
-        self.ui_s.SectionGrid.setEnabled(True)
+    def setAllowManualOperation(self, allow):
+        self.allowManualOperation = allow
+        self.updateUIStatus()
 
-    def setUiStatusDisconnected(self):
-        self.ui_s.connectButton.setEnabled(True)
-        self.ui_s.disconnectButton.setEnabled(False)
-        self.ui_s.IPComboBox.setEnabled(True)
-        self.ui_s.searchButton.setEnabled(True)
-        self.ui_s.SectionCameraControl.setEnabled(False)
-        self.ui_s.SectionLaserControl.setEnabled(False)
-        self.ui_s.SectionGrid.setEnabled(False)
+    def updateUIStatus(self):
+        if self.connected:
+            self.ui_s.SectionSensorConnection.setStyleSheet("QGroupBox{border-color:#66AAFF; border-width:2px}")
+            self.ui_s.connectButton.setEnabled(False)
+            self.ui_s.IPComboBox.setEnabled(False)
+            self.ui_s.searchButton.setEnabled(False)
+            self.ui_s.SectionSensorConnection.setEnabled(self.allowManualOperation)
+            self.ui_s.disconnectButton.setEnabled(self.allowManualOperation)
+            self.ui_s.SectionCameraControl.setEnabled(self.allowManualOperation)
+            self.ui_s.SectionLaserControl.setEnabled(self.allowManualOperation)
+            self.ui_s.SectionGrid.setEnabled(self.allowManualOperation)
+        else:
+            self.ui_s.SectionSensorConnection.setStyleSheet("")
+            self.ui_s.connectButton.setEnabled(True)
+            self.ui_s.disconnectButton.setEnabled(False)
+            self.ui_s.IPComboBox.setEnabled(True)
+            self.ui_s.searchButton.setEnabled(True)
+            self.ui_s.SectionCameraControl.setEnabled(False)
+            self.ui_s.SectionLaserControl.setEnabled(False)
+            self.ui_s.SectionGrid.setEnabled(False)
+
 
     def changeIPaddress(self):
         self.RPiaddress = self.ui_s.IPComboBox.currentText()
@@ -319,17 +328,16 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             else:
                 self.ui_s.textLabelID.setStyleSheet("QLineEdit { background: rgb(255, 255, 0);}")
 
-            self.setUiStatusConnected()
             self.connected = True
-            # print(self.sensor)
+            self.updateUIStatus()
             self.getImg_thread = GetImageThread(self.sensor, self.getImgCallback)
 
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
             QtWidgets.QMessageBox.warning(self, "Connection Failed", str(e))
             print(e)
-            self.setUiStatusDisconnected()
             self.connected = False
+            self.updateUIStatus()
 
         except TimeoutError:
             QtWidgets.QMessageBox.critical(self, "Connection Error", "Cannot connect to sensor (timeout)")
@@ -339,14 +347,14 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
     def disconnectSensor(self):
         try:
+            self.connected = False
             self.sensor.close()
             self.ui_s.consecutiveModeButton.setChecked(False)
             self.ui_s.cameraStatusLabel.setText('The sensor was disconnected.')
-            self.connected = False
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor correctly.')
         finally:
-            self.setUiStatusDisconnected()
+            self.updateUIStatus()
 
 
     def searchSensor(self):

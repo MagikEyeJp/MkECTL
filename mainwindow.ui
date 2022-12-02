@@ -39,6 +39,9 @@
   <property name="windowTitle">
    <string>MkECTL</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <property name="dockNestingEnabled">
    <bool>false</bool>
   </property>
@@ -1156,7 +1159,7 @@ QScrollBar::sub-line:vertical {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-253</y>
          <width>512</width>
          <height>950</height>
         </rect>
@@ -1208,9 +1211,6 @@ QScrollBar::sub-line:vertical {
              <width>510</width>
              <height>16777215</height>
             </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true"/>
            </property>
            <property name="title">
             <string>Robot Control</string>
@@ -3512,7 +3512,8 @@ QScrollBar::sub-line:vertical {
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true"/>
+            <string notr="true">QGroupBox:enabled:checked{border-color:#66AAFF; border-width:2px}
+</string>
            </property>
            <property name="title">
             <string>Post Processing</string>

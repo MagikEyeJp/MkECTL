@@ -40,7 +40,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0">
         <item>
          <widget class="QLabel" name="cameraStatusLabel">
           <property name="sizePolicy">
@@ -56,19 +56,6 @@
            <bool>true</bool>
           </property>
          </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </item>
@@ -970,6 +957,9 @@ QScrollBar::sub-line:vertical {
          </item>
          <item>
           <widget class="QGroupBox" name="SectionCameraControl">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="minimumSize">
             <size>
              <width>240</width>
@@ -981,6 +971,9 @@ QScrollBar::sub-line:vertical {
              <width>240</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QGroupBox:enabled{border-color:#66AAFF; border-width:2px}</string>
            </property>
            <property name="title">
             <string>Camera Control</string>
@@ -1284,6 +1277,9 @@ QScrollBar::sub-line:vertical {
          </item>
          <item>
           <widget class="QGroupBox" name="SectionLaserControl">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="minimumSize">
             <size>
              <width>240</width>
@@ -1295,6 +1291,9 @@ QScrollBar::sub-line:vertical {
              <width>240</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QGroupBox:enabled{border-color:#66AAFF; border-width:2px}</string>
            </property>
            <property name="title">
             <string>Laser Control</string>
@@ -1398,7 +1397,7 @@ QScrollBar::sub-line:vertical {
            </widget>
            <widget class="QCheckBox" name="hex4dCheckBox">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="geometry">
              <rect>
@@ -1471,6 +1470,9 @@ QScrollBar::sub-line:vertical {
          </item>
          <item>
           <widget class="QGroupBox" name="SectionGrid">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="minimumSize">
             <size>
              <width>240</width>
@@ -1482,6 +1484,10 @@ QScrollBar::sub-line:vertical {
              <width>240</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QGroupBox:enabled:checked{border-color:#66CCFF; border-width:3px}
+</string>
            </property>
            <property name="title">
             <string>Grid</string>
