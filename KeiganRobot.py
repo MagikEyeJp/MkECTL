@@ -57,7 +57,7 @@ defaultMotors = {
 
 # ---- IMotorRobot Interfaces ----
 
-class KeiganMotorRobot(IRobotController):
+class KeiganRobot(IRobotController):
     def __init__(self, machineParams=None):
         self.m_machineParams = machineParams
         self.motorSet = ['slider', 'pan', 'tilt']

@@ -15,7 +15,7 @@ import json
 import subprocess
 
 import MyDoubleSpinBox
-from KeiganRobot import KeiganMotorRobot
+from KeiganRobot import KeiganRobot
 import mainwindow_ui
 import execute_script
 import sensors
@@ -306,9 +306,9 @@ class Ui(QMainWindow, IMainUI):
 
             # Motor
             if "motors" in self.machineParams:
-                self.robotController = KeiganMotorRobot(self.machineParams["motors"])
+                self.robotController = KeiganRobot(self.machineParams["motors"])
             else:
-                self.robotController = KeiganMotorRobot()
+                self.robotController = KeiganRobot()
 
             self.robotController.connect()
 
