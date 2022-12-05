@@ -169,8 +169,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
 
         # Push buttons
-        self.ui_s.connectButton.clicked.connect(self.connectToSensor)
-        self.ui_s.disconnectButton.clicked.connect(self.disconnectSensor)
+        self.ui_s.connectButton.clicked.connect(self.toggleConnection)
         self.ui_s.searchButton.clicked.connect(self.searchSensor)
         self.ui_s.smidDicEditBtn.clicked.connect(self.editsmiddic)
         # self.ui_s.setIPaddressButton.clicked.connect(self.changeIPaddress)
@@ -216,20 +215,23 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.updateUIStatus()
 
     def updateUIStatus(self):
+        self.ui_s.SectionSensorConnection.setEnabled(self.allowManualOperation)
         if self.connected:
             self.ui_s.SectionSensorConnection.setStyleSheet("QGroupBox{border-color:#66AAFF; border-width:2px}")
-            self.ui_s.connectButton.setEnabled(False)
+            self.ui_s.connectButton.setText("Disconnect")
+            self.ui_s.connectButton.setStyleSheet("QPushButton{background-color:red}")
+            self.ui_s.connectButton.setEnabled(self.allowManualOperation)
             self.ui_s.IPComboBox.setEnabled(False)
             self.ui_s.searchButton.setEnabled(False)
             self.ui_s.SectionSensorConnection.setEnabled(self.allowManualOperation)
-            self.ui_s.disconnectButton.setEnabled(self.allowManualOperation)
             self.ui_s.SectionCameraControl.setEnabled(self.allowManualOperation)
             self.ui_s.SectionLaserControl.setEnabled(self.allowManualOperation)
             self.ui_s.SectionGrid.setEnabled(self.allowManualOperation)
         else:
             self.ui_s.SectionSensorConnection.setStyleSheet("")
+            self.ui_s.connectButton.setText("Connect")
+            self.ui_s.connectButton.setStyleSheet("")
             self.ui_s.connectButton.setEnabled(self.allowManualOperation)
-            self.ui_s.disconnectButton.setEnabled(False)
             self.ui_s.IPComboBox.setEnabled(self.allowManualOperation)
             self.ui_s.searchButton.setEnabled(self.allowManualOperation)
             self.ui_s.SectionCameraControl.setEnabled(False)
@@ -288,9 +290,14 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             except Exception:
                 self.ui_s.cameraStatusLabel.setText('Sensor is not connected.')
 
+    def toggleConnection(self):
+        if self.connected:
+            self.disconnectSensor()
+        else:
+            self.connectToSensor()
+
     def connectToSensor(self):
         # connect to sensors and display again
-
         try:
             self.changeIPaddress()
             self.sensor = SensorDevice.SensorDevice()
@@ -355,7 +362,6 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor correctly.')
         finally:
             self.updateUIStatus()
-
 
     def searchSensor(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)

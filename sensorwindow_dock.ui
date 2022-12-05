@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>934</width>
+    <width>933</width>
     <height>946</height>
    </rect>
   </property>
@@ -676,56 +676,6 @@ QScrollBar::sub-line:vertical {
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="disconnectButton">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                   <horstretch>5</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="palette">
-                  <palette>
-                   <active>
-                    <colorrole role="Button">
-                     <brush brushstyle="SolidPattern">
-                      <color alpha="255">
-                       <red>239</red>
-                       <green>41</green>
-                       <blue>41</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
-                   </active>
-                   <inactive>
-                    <colorrole role="Button">
-                     <brush brushstyle="SolidPattern">
-                      <color alpha="255">
-                       <red>239</red>
-                       <green>41</green>
-                       <blue>41</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
-                   </inactive>
-                   <disabled>
-                    <colorrole role="Button">
-                     <brush brushstyle="SolidPattern">
-                      <color alpha="255">
-                       <red>186</red>
-                       <green>189</green>
-                       <blue>182</blue>
-                      </color>
-                     </brush>
-                    </colorrole>
-                   </disabled>
-                  </palette>
-                 </property>
-                 <property name="text">
-                  <string>Disconnect</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QPushButton" name="searchButton">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -1032,6 +982,9 @@ QScrollBar::sub-line:vertical {
                <width>20</width>
                <height>20</height>
               </rect>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton:checked{background-color:orange}</string>
              </property>
              <property name="text">
               <string/>
