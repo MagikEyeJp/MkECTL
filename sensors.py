@@ -444,7 +444,6 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
                 if self.saveImgBool:
                     self.saveImg(image)
 
-
     def prevImg(self, frames):
         img = self.getImg(frames)
         if img:
