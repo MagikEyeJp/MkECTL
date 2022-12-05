@@ -1159,7 +1159,7 @@ QScrollBar::sub-line:vertical {
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-253</y>
+         <y>0</y>
          <width>512</width>
          <height>950</height>
         </rect>
@@ -1928,7 +1928,7 @@ QScrollBar::sub-line:vertical {
              </property>
             </widget>
            </widget>
-           <widget class="QPushButton" name="initializeButton">
+           <widget class="QPushButton" name="connectButton">
             <property name="geometry">
              <rect>
               <x>10</x>
@@ -2389,7 +2389,7 @@ QScrollBar::sub-line:vertical {
              <string>initialize robot</string>
             </property>
             <property name="text">
-             <string>Initialize</string>
+             <string>Connect</string>
             </property>
             <property name="autoDefault">
              <bool>true</bool>
@@ -3693,7 +3693,7 @@ QScrollBar::sub-line:vertical {
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>initializeButton</tabstop>
+  <tabstop>connectButton</tabstop>
   <tabstop>sliderOriginButton</tabstop>
   <tabstop>MagikEye</tabstop>
   <tabstop>sliderPosSpin</tabstop>

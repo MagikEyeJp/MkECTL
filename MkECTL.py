@@ -60,7 +60,7 @@ class Ui(QMainWindow, IMainUI):
         self.scriptParams = ScriptParams()
 
         # self.subWindow = sensors.SensorWindow(mainUI=self)
-        self.initialized = False
+        self.robot_connected = False
 
         ### docking window https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
         self.sensorWindow = sensors.SensorWindow(mainUI=self)
@@ -144,8 +144,8 @@ class Ui(QMainWindow, IMainUI):
         self.ui.rebootButton.clicked.connect(self.rebootButtonClicked)
 
         # other buttons
-        self.ui.initializeButton.setEnabled(False)
-        self.ui.initializeButton.clicked.connect(self.initialize)
+        self.ui.connectButton.setEnabled(False)
+        self.ui.connectButton.clicked.connect(self.connectRobot)
         self.ui.MagikEye.clicked.connect(lambda: self.demo(False))
         self.ui.getCurrentPosButton.setEnabled(False)
         self.ui.getCurrentPosButton.clicked.connect(self.captureCurrentPos)
@@ -278,8 +278,8 @@ class Ui(QMainWindow, IMainUI):
         self.motorGUI['speedSpin'] = speedSpinboxes  # ex.) motorGUI['speedSpin']['slider'] == self.ui.sliderSpeedSpin
         self.motorGUI['currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
-    def initialize(self):
-        if self.initialized:
+    def connectRobot(self):
+        if self.robot_connected:
             # disconnect
             if self.robotController is not None:
                 self.robotController.disconnect()
@@ -291,16 +291,16 @@ class Ui(QMainWindow, IMainUI):
 
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
             self.setUIStatus(self.states)
-            self.initialized = False
+            self.robot_connected = False
         else:
             # initialize
             count = 0
 
             # GUI
-            print('Initialize Button was clicked')
+            print('Connect Button was clicked')
             self.ui.actionProgressBar.setEnabled(True)
             self.ui.actionProgressLabel.setEnabled(True)
-            self.ui.actionProgressLabel.setText('Initializing...')
+            self.ui.actionProgressLabel.setText('Connecting...')
             count += 10
             self.ui.actionProgressBar.setValue(count)
 
@@ -312,6 +312,7 @@ class Ui(QMainWindow, IMainUI):
 
             self.robotController.connect()
 
+            self.ui.actionProgressLabel.setText('Initializing...')
             self.ui.actionProgressBar.setValue(40)
             self.robotSettingsWindow = self.robotController.getSettingWindow()
 
@@ -336,17 +337,17 @@ class Ui(QMainWindow, IMainUI):
                 # GUI
                 print('--initialization completed--')
                 self.ui.actionProgressBar.setValue(100)
-                self.ui.actionProgressLabel.setText('Initialized all motors')
+                self.ui.actionProgressLabel.setText('Robot Connected.')
 
                 self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
                 self.setUIStatus(self.states)
-                self.initialized = True
+                self.robot_connected = True
             else:
                 QMessageBox.critical(self, "Initialization Error",
-                    "Couldn\'t initialize motors.\nPlease check if the motors are ready to be initialized.")
+                    "Couldn\'t connect robot.\nPlease check if the robot is ready to be initialized.")
                 self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
                 self.setUIStatus(self.states)
-                self.initialized = False
+                self.robot_connected = False
 
     def captureCurrentPos(self):
         pos_d = self.robotController.getPosition()
@@ -421,7 +422,7 @@ class Ui(QMainWindow, IMainUI):
         self.robotController.reboot()
         self.states = {UIState.MACHINEFILE, UIState.INITIALIZE, UIState.IRLIGHT}
         self.setUIStatus(self.states)
-        self.initialized = False
+        self.robot_connected = False
         QMessageBox.information(self, "reboot", "All motors have been rebooted. \n"
                                                           "Please re-initialize motors to use again.")
 
@@ -791,17 +792,17 @@ class Ui(QMainWindow, IMainUI):
             self.ui.selectMachineFileButton.setEnabled(False)
 
         if UIState.INITIALIZE in status:
-            self.ui.initializeButton.setEnabled(True)
-            self.ui.initializeButton.setText("Initialize")
-            self.ui.initializeButton.setStyleSheet("")
+            self.ui.connectButton.setEnabled(True)
+            self.ui.connectButton.setText("Connect")
+            self.ui.connectButton.setStyleSheet("")
             self.ui.actionProgressBar.setEnabled(True)
             self.ui.actionProgressBar.setValue(0)
             self.ui.actionProgressLabel.setEnabled(True)
-            self.ui.actionProgressLabel.setText('Push \"Initialize\"')
+            self.ui.actionProgressLabel.setText('Push \"Connect\"')
         else:
-            self.ui.initializeButton.setText("Disconnect")
-            self.ui.initializeButton.setStyleSheet("QPushButton{background-color:red}")
-            self.ui.initializeButton.setEnabled(True)
+            self.ui.connectButton.setText("Disconnect")
+            self.ui.connectButton.setStyleSheet("QPushButton{background-color:red}")
+            self.ui.connectButton.setEnabled(True)
             self.ui.actionProgressBar.setEnabled(False)
             self.ui.actionProgressLabel.setEnabled(False)
 
@@ -849,7 +850,7 @@ class Ui(QMainWindow, IMainUI):
             self.ui.progressBar.setEnabled(True)
             self.ui.stopButton.setEnabled(True)
             self.sensorWindow.setAllowManualOperation(False)
-            self.ui.initializeButton.setEnabled(False)
+            self.ui.connectButton.setEnabled(False)
         else:
             self.ui.progressBar.setEnabled(False)
             self.ui.stopButton.setEnabled(False)
