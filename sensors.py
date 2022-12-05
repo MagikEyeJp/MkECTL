@@ -228,10 +228,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.ui_s.SectionGrid.setEnabled(self.allowManualOperation)
         else:
             self.ui_s.SectionSensorConnection.setStyleSheet("")
-            self.ui_s.connectButton.setEnabled(True)
+            self.ui_s.connectButton.setEnabled(self.allowManualOperation)
             self.ui_s.disconnectButton.setEnabled(False)
-            self.ui_s.IPComboBox.setEnabled(True)
-            self.ui_s.searchButton.setEnabled(True)
+            self.ui_s.IPComboBox.setEnabled(self.allowManualOperation)
+            self.ui_s.searchButton.setEnabled(self.allowManualOperation)
             self.ui_s.SectionCameraControl.setEnabled(False)
             self.ui_s.SectionLaserControl.setEnabled(False)
             self.ui_s.SectionGrid.setEnabled(False)
