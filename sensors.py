@@ -424,7 +424,6 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
 
     def startGetImageThread(self, frames, saveImgBool):
-        self.frames = frames
         self.saveImgBool = saveImgBool
 
         if self.getImg_thread.ended:
@@ -440,10 +439,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             app.processEvents()
 
             if self.ui_s.consecutiveModeButton.isChecked() and self.ui_s.consecutiveModeButton.isEnabled():
-                if self.frames == 1:
-                    self.ui_s.prev1Button.click()
-                else:
-                    self.ui_s.prevAveButton.click()
+                self.ui_s.prev1Button.click()
             else:
                 if self.saveImgBool:
                     self.saveImg(image)
