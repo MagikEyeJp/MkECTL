@@ -192,6 +192,8 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         # self.ui_s.gridButton.clicked.connect(self.showGrid)
         self.ui_s.SectionGrid.clicked.connect(self.showGrid)
 
+        self.ui_s.homeButton.clicked.connect(self.homePosition)
+
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
         # self.ui_s.CurrentLaserPattern_value.setText('-'.join(self.binLaserPattern.replace('0b', '').zfill(16)))
@@ -571,6 +573,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             stats) == dict else None
         print(temp)
         return temp
+
+    def homePosition(self):
+        self.ui_s.sensorImage.scaleFit()
 
 
 if __name__ == '__main__':

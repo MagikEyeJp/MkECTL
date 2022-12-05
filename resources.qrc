@@ -15,5 +15,6 @@
         <file>GUI_icons/pen.png</file>
         <file>GUI_icons/magikeye_logo.png</file>
         <file>MkECTL.png</file>
+        <file>GUI_icons/001-home.png</file>
     </qresource>
 </RCC>
