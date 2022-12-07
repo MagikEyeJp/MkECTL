@@ -34,7 +34,6 @@ from UIState import UIState
 class ScriptParams:
     def __init__(self):
         self.now = datetime.datetime.now()
-
         self.scriptName: str = ''
         self.commandNum: int = 0
         self.baseFolderName: str = 'data'
@@ -144,6 +143,8 @@ class Ui(QMainWindow, IMainUI):
         self.ui.rebootButton.clicked.connect(self.rebootButtonClicked)
 
         # other buttons
+        self.actionAbortRequest = False
+        self.ui.actionAbortButton.clicked.connect(self.actionAbort)
         self.ui.connectButton.setEnabled(False)
         self.ui.connectButton.clicked.connect(self.connectRobot)
         self.ui.MagikEye.clicked.connect(lambda: self.demo(False))
@@ -278,6 +279,14 @@ class Ui(QMainWindow, IMainUI):
         self.motorGUI['speedSpin'] = speedSpinboxes  # ex.) motorGUI['speedSpin']['slider'] == self.ui.sliderSpeedSpin
         self.motorGUI['currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
+    def actionAbort(self):
+        self.actionAbortRequest = True
+
+    def isActionAbortRequest(self) -> bool:
+        ret = self.actionAbortRequest
+        self.actionAbortRequest = False
+        return ret
+
     def connectRobot(self):
         if self.robot_connected:
             # disconnect
@@ -297,12 +306,7 @@ class Ui(QMainWindow, IMainUI):
             count = 0
 
             # GUI
-            print('Connect Button was clicked')
-            self.ui.actionProgressBar.setEnabled(True)
-            self.ui.actionProgressLabel.setEnabled(True)
-            self.ui.actionProgressLabel.setText('Connecting...')
-            count += 10
-            self.ui.actionProgressBar.setValue(count)
+            self.startAction('Connecting...')
 
             # Motor
             if "motors" in self.machineParams:
@@ -310,15 +314,16 @@ class Ui(QMainWindow, IMainUI):
             else:
                 self.robotController = KeiganRobot()
 
+            count += 10
+            self.updateActionProgress(10, None, True)
             self.robotController.connect()
 
-            self.ui.actionProgressLabel.setText('Initializing...')
-            self.ui.actionProgressBar.setValue(40)
+            self.updateActionProgress(40, 'Initializing Robot...', True)
             self.robotSettingsWindow = self.robotController.getSettingWindow()
 
             if self.robotController.initialize():
-                self.ui.actionProgressBar.setValue(80)
                 self.devices['robot'] = self.robotController
+                self.updateActionProgress(80, 'Initializing IRLight...', True)
                 # IR light
                 if "IRLight" in self.machineParams:
                     IRtype = self.machineParams["IRLight"].get("type")
@@ -336,15 +341,15 @@ class Ui(QMainWindow, IMainUI):
 
                 # GUI
                 print('--initialization completed--')
-                self.ui.actionProgressBar.setValue(100)
-                self.ui.actionProgressLabel.setText('Robot Connected.')
+                self.endAction('Connected.')
 
                 self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
                 self.setUIStatus(self.states)
                 self.robot_connected = True
             else:
-                QMessageBox.critical(self, "Initialization Error",
-                    "Couldn\'t connect robot.\nPlease check if the robot is ready to be initialized.")
+                # QMessageBox.critical(self, "Initialization Error",
+                #     "Couldn\'t connect robot.\nPlease check if the robot is ready to be initialized.")
+                self.abortAction('Initialization Error\nCouldn\'t connect robot.\nPlease check if the robot is ready to be initialized.')
                 self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
                 self.setUIStatus(self.states)
                 self.robot_connected = False
@@ -366,16 +371,23 @@ class Ui(QMainWindow, IMainUI):
             lb.setText('{:>8.2f}'.format(pos))
             lb.repaint()
 
-    def actionStatusCallback(self, pos_d, now, goal):
+    def allowActionAbort(self, enable):
+        if enable != self.ui.actionAbortButton.isEnabled():
+            self.actionAbortRequest = False
+        self.ui.actionAbortButton.setEnabled(enable)
+
+    def actionStatusCallback(self, pos_d, now, goal, allowAbort=False):
+        self.allowActionAbort(allowAbort)
         self.updateCurrentPos(pos_d)
         if goal != 0:
             progress = (now / goal) * 100
-            self.ui.actionProgressBar.setValue(int(progress))
+            self.updateActionProgress(progress, None, None)
+        app.processEvents()
 
     def initializeOrigins(self):
-        self.updateActionProgress(0, 'Init Origins...', True)
+        self.startAction('Init Origins...')
         self.robotController.initializeOrigins({'slider'}, self.actionStatusCallback)
-        self.updateActionProgress(100, 'Done', False)
+        self.endAction('Done')
         QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
         self.moveRobot({'slider': 10.0})
 
@@ -427,18 +439,37 @@ class Ui(QMainWindow, IMainUI):
                                                           "Please re-initialize motors to use again.")
 
     def moveRobot(self, targetpos):
-        self.updateActionProgress(0, 'Moving...', True)
-
-        isAborted = self.robotController.moveTo(targetpos, self.actionStatusCallback)
+        self.startAction('Moving...')
+        self.allowManualUI(False)
+        isAborted = self.robotController.moveTo(targetpos, self.actionStatusCallback, False, self.isActionAbortRequest)
+        self.allowActionAbort(False)
+        self.allowManualUI(True)
         if isAborted:
-            QMessageBox.critical(self, "Timeout Error", "Motor not moving.")
+            self.abortAction("Interrupted or Motor not moving.")
         else:
-            self.updateActionProgress(100, 'Goal', False)
+            self.endAction('Goal')
             self.updateTargetPosition(targetpos)
             if self.sensorWindow.connected:
                 self.sensorWindow.prevImg(1)
         time.sleep(0.1)
         self.getCurrentPos()
+
+    def startAction(self, action):
+        self.allowActionAbort(False)
+        self.updateActionProgress(0, action, True)
+
+    def endAction(self, message):
+        self.allowActionAbort(False)
+        self.updateActionProgress(100, message, False)
+
+    def abortAction(self, message):
+        self.allowActionAbort(False)
+        QMessageBox.critical(self, 'Aborted', message)
+        self.updateActionProgress(None, None, False)
+
+    def allowManualUI(self, enable):
+        self.ui.manualOperation.setEnabled(enable)
+        self.ui.connectButton.setEnabled(enable)
 
     def updateTargetPosition(self, targetpos):
         for k in targetpos.keys():
@@ -448,10 +479,15 @@ class Ui(QMainWindow, IMainUI):
         self.judgePresetEnable()
 
     def updateActionProgress(self, value, text, active):
-        self.ui.actionProgressBar.setValue(value)
-        self.ui.actionProgressLabel.setText(text)
-        self.ui.actionProgressBar.setEnabled(active)
-        self.ui.actionProgressLabel.setEnabled(active)
+        if value is not None:
+            self.ui.actionProgressBar.setValue(value)
+            self.ui.actionAbortButton.repaint()
+        if text is not None:
+            self.ui.actionProgressLabel.setText(text)
+            self.ui.actionProgressLabel.repaint()
+        if active is not None:
+            self.ui.actionProgressBar.setEnabled(active)
+            self.ui.actionProgressLabel.setEnabled(active)
 
     # --- Scripting
 
@@ -795,7 +831,7 @@ class Ui(QMainWindow, IMainUI):
             self.ui.connectButton.setEnabled(True)
             self.ui.connectButton.setText("Connect")
             self.ui.connectButton.setStyleSheet("")
-            self.ui.actionProgressBar.setEnabled(True)
+            self.ui.actionProgressBar.setEnabled(False)
             self.ui.actionProgressBar.setValue(0)
             self.ui.actionProgressLabel.setEnabled(True)
             self.ui.actionProgressLabel.setText('Push \"Connect\"')

@@ -200,7 +200,7 @@ class KeiganRobot(IRobotController):
             m.close()
             p['cont'] = None
 
-    def moveTo(self, targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None):
+    def moveTo(self, targetPos, callback, wait=False, isAborted=None):
         # pos: dict ('slider', 'pan', 'tilt')
 
         pos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
@@ -224,13 +224,12 @@ class KeiganRobot(IRobotController):
         if initial_err == 0.0:
             return False    # isAborted
 
-        # systate.pos = motorPos
+        starttime = time.time()
 
         while True:
             if isAborted is not None:
-                stopClicked = inmain(isAborted, scriptParams, mainWindow)
-                if stopClicked:
-                    return stopClicked
+                if inmain(isAborted):
+                    return True
 
             @timeout(5)
             def waitmove():
@@ -257,7 +256,7 @@ class KeiganRobot(IRobotController):
                     # mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
                     #     pos[param_i] / scale[param_i]))
                     # yield pos_d
-                    inmain(callback, pos_d, initial_err - err, initial_err)
+                    inmain(callback, pos_d, initial_err - err, initial_err, time.time() - starttime > 5.0)
 
                     if err < (GOAL_EPS if wait else NOWAIT_EPS):
                         print("err=", err)
