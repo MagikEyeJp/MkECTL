@@ -366,6 +366,7 @@ class Ui(QMainWindow, IMainUI):
         self.ui.actionAbortButton.setEnabled(enable)
 
     def actionStatusCallback(self, pos_d, now, goal, allowAbort=False):
+        # print("actionStatusCallBack", pos_d, now, goal, allowAbort)
         self.allowActionAbort(allowAbort)
         self.updateCurrentPos(pos_d)
         if goal != 0:
@@ -376,9 +377,9 @@ class Ui(QMainWindow, IMainUI):
     def initializeOrigins(self):
         self.startAction('Init Origins...')
         self.robotController.initializeOrigins({'slider'}, self.actionStatusCallback)
-        self.endAction('Done')
         QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
         self.moveRobot({'slider': 10.0})
+        self.endAction('Done')
 
     def freeAllMotors(self):
         self.robotController.freeMotors()
@@ -452,8 +453,15 @@ class Ui(QMainWindow, IMainUI):
         self.updateActionProgress(None, None, False)
 
     def allowManualUI(self, enable):
-        self.ui.manualOperation.setEnabled(enable)
         self.ui.connectButton.setEnabled(enable)
+        self.ui.sliderOriginButton.setEnabled(enable)
+        self.ui.freeButton.setEnabled(enable)
+        self.ui.rebootButton.setEnabled(enable)
+        self.ui.goHomeButton.setEnabled(enable)
+        self.ui.sliderMoveExe.setEnabled(enable)
+        self.ui.panMoveExe.setEnabled(enable)
+        self.ui.tiltMoveExe.setEnabled(enable)
+        self.ui.GoButton.setEnabled(enable)
 
     def updateTargetPosition(self, targetpos):
         for k in targetpos.keys():
@@ -465,7 +473,7 @@ class Ui(QMainWindow, IMainUI):
     def updateActionProgress(self, value, text, active):
         if value is not None:
             self.ui.actionProgressBar.setValue(value)
-            self.ui.actionAbortButton.repaint()
+            self.ui.actionProgressBar.repaint()
         if text is not None:
             self.ui.actionProgressLabel.setText(text)
             self.ui.actionProgressLabel.repaint()
