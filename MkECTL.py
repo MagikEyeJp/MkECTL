@@ -30,7 +30,7 @@ from KeiganRobot import KeiganRobot
 from SensorInfo import SensorInfo
 from UIState import UIState
 
-VERSION = '1.0.0'
+VERSION = '1.1.0'
 
 class ScriptParams:
     def __init__(self):
