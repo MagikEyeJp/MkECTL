@@ -30,6 +30,7 @@ from KeiganRobot import KeiganRobot
 from SensorInfo import SensorInfo
 from UIState import UIState
 
+VERSION = '1.0.0'
 
 class ScriptParams:
     def __init__(self):
@@ -56,8 +57,9 @@ class Ui(QMainWindow, IMainUI):
         self.ui = mainwindow_ui.Ui_mainwindow()
         self.ui.setupUi(self)
         self.setStyleSheet("QMainWindow::separator{ background: darkgray; width: 1px; height: 1px; }")
-        self.scriptParams = ScriptParams()
 
+        self.ui.MagikEye.setToolTip('MkECTL v' + VERSION + ' ©MagikEye Inc.\nPress this button to run the demo script.')
+        self.scriptParams = ScriptParams()
         # self.subWindow = sensors.SensorWindow(mainUI=self)
         self.robot_connected = False
 
@@ -70,7 +72,6 @@ class Ui(QMainWindow, IMainUI):
 
         ### detailed settings window
         self.robotSettingsWindow = None  # made in initializeMotors()
-        self.ui.Settings.hide()
 
         self.ui.manualOperation.setEnabled(False)
         self.ui.SectionIRlightControl.setEnabled(False)
@@ -112,10 +113,8 @@ class Ui(QMainWindow, IMainUI):
         # motor
         self.motorSet = ['slider', 'pan', 'tilt']
         self.robotController = None  # instance of M_KeiganRobot
-        self.motorGUI: dict = {}  # 'exe', 'posSpin', 'speedSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
-
+        self.motorGUI: dict = {}  # 'exe', 'posSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
         self.states = set()
-
         self.devices: dict = {}  # 'motors', 'robot', 'lights', '3Dsensors' etc.  # Dict of dictionaries
 
         if not os.path.exists(self.scriptParams.baseFolderName):
@@ -128,17 +127,12 @@ class Ui(QMainWindow, IMainUI):
         # motor-related process
         for m_name in self.motorSet:
             exeButtonName: str = self.motorGUI['exe'][m_name].objectName()
-            speedSpinName: str = self.motorGUI['speedSpin'][m_name].objectName()
-            # print(m_name, exeButtonName)
 
             # exe buttons
             self.motorGUI['exe'][m_name].clicked.connect(partial(lambda o: o.determine(), self.motorGUI['posSpin'][m_name]))
             # position spinboxes
             self.motorGUI['posSpin'][m_name].valueChanged.connect(self.judgePresetEnable)
             self.motorGUI['posSpin'][m_name].valueDetermined.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
-            # speed spinboxes
-            self.motorGUI['speedSpin'][m_name].valueChanged.connect(partial(lambda n: self.updateSpeed(n), speedSpinName))
-            # https://melpon.hatenadiary.org/entry/20121206/1354636589
 
         self.ui.rebootButton.clicked.connect(self.rebootButtonClicked)
 
@@ -254,7 +248,6 @@ class Ui(QMainWindow, IMainUI):
         # make dictionaries of member valuables
         exeButtons: dict = {}
         posSpinboxes: dict = {}
-        speedSpinboxes: dict = {}
         currentPosLabels: dict = {}
 
         for m_name in self.motorSet:
@@ -265,18 +258,14 @@ class Ui(QMainWindow, IMainUI):
             posSpinCode = '%s[\'%s\'] = %s%s%s' % (
                 'posSpinboxes', m_name, 'self.ui.', m_name, 'PosSpin')  # posSpinboxes[~~] = self.ui.~~PosSpin
             exec(posSpinCode)
-            speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
-                'speedSpinboxes', m_name, 'self.ui.', m_name, 'SpeedSpin')  # speedSpinboxes[~~] = self.ui.~~SpeedSpin
-            exec(speedSpinCode)
-            speedSpinCode = '%s[\'%s\'] = %s%s%s' % (
+            currentPosCode = '%s[\'%s\'] = %s%s%s' % (
                 'currentPosLabels', m_name, 'self.ui.', m_name,
                 'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
-            exec(speedSpinCode)
+            exec(currentPosCode)
 
         # print(exeButtons)
         self.motorGUI['exe'] = exeButtons  # ex.) motorGUI['exe']['slider'] == self.ui.sliderMoveExe
         self.motorGUI['posSpin'] = posSpinboxes  # ex.) motorGUI['posSpin']['slider'] == self.ui.sliderPosSpin
-        self.motorGUI['speedSpin'] = speedSpinboxes  # ex.) motorGUI['speedSpin']['slider'] == self.ui.sliderSpeedSpin
         self.motorGUI['currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
 
     def actionAbort(self):
@@ -394,11 +383,6 @@ class Ui(QMainWindow, IMainUI):
     def freeAllMotors(self):
         self.robotController.freeMotors()
         QMessageBox.information(self, "free", "All motors have been freed.")
-
-    def updateSpeed(self, speedSpinName):
-        motorID = speedSpinName.replace('SpeedSpin', '')
-        m = self.robotController.params[motorID]['cont']
-        m.speed(self.motorGUI['speedSpin'][motorID].value())
 
     def exeButtonClicked(self, buttonName):
         if re.search('.+MoveExe', buttonName):

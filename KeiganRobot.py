@@ -158,12 +158,17 @@ class KeiganRobot(IRobotController):
         m.maxTorque(5.0)
 
     def changePIDparam(self, pid_category, pid_param, motor_i, value):
+        print("changePID", pid_category, pid_param, motor_i, value)
         lpf_index = {'speed': 1, 'qCurrent': 0, 'position': 2}
 
         if pid_param == 'lowPassFilter':
             self.params[self.motorSet[motor_i]]['cont'].lowPassFilter(lpf_index[pid_category], value)
         elif pid_param == 'posControlThreshold':
             self.params[self.motorSet[motor_i]]['cont'].posControlThreshold(value)
+        elif pid_category == 'motion' or pid_category == 'torque':
+            execCode = 'self.params[\'%s\'][\'cont\'].%s(%f)' % (self.motorSet[motor_i], pid_param, value)
+            print(execCode)
+            eval(execCode)
         else:
             execCode = 'self.params[\'%s\'][\'cont\'].%s%s(%f)' % (self.motorSet[motor_i], pid_category, pid_param, value)
             eval(execCode)
@@ -223,6 +228,7 @@ class KeiganRobot(IRobotController):
             if k in targetPos:
                 (init_pos, init_vel, init_torque) = p['cont'].read_motor_measurement()
                 initial_err += pow(init_pos - (targetPos[k] * p['scale']), 2)
+                p['cont'].speed(p['cont'].read_maxSpeed()[0])
                 p['cont'].moveTo_scaled(targetPos[k])
 
         initial_err = math.sqrt(initial_err)
@@ -370,14 +376,18 @@ class SettingsWindow(QtWidgets.QWidget):
         pid_category_dic = {
             0: 'speed', 1: 'speed', 2: 'speed', 3: 'speed',
             4: 'qCurrent', 5: 'qCurrent', 6: 'qCurrent', 7: 'qCurrent',
-            8: 'position', 9: 'position', 10: 'position', 11: 'position', 12: 'position'
+            8: 'position', 9: 'position', 10: 'position', 11: 'position', 12: 'position',
+            13: 'motion', 14: 'motion', 15: 'motion',
+            16: 'torque', 17: 'torque'
         }
         pid_param_dic = {
             0: 'P', 4: 'P', 8: 'P',
             1: 'I', 5: 'I', 9: 'I',
             2: 'D', 6: 'D', 10: 'D',
             3: 'lowPassFilter', 7: 'lowPassFilter', 11: 'lowPassFilter',
-            12: 'posControlThreshold'
+            12: 'posControlThreshold',
+            13: 'acc', 14: 'dec', 15: 'maxSpeed',
+            16: 'maxTorque', 17: 'limitCurrent'
         }
         print(row, col)
         value = float(self.tableWidget.item(row, col).text())
@@ -420,12 +430,17 @@ class SettingsWindow(QtWidgets.QWidget):
                     'D': [0.0, 0.0, 0.0],
                     'lowPassFilter': [0.1, 0.1, 0.1],
                     'posControlThreshold': [1.0, 1.0, 1.0]
+                },
+                'motion': {
+                    'acc': [8.0, 3.0, 12.0],
+                    'dec': [8.0, 2.0, 4.0],
+                    'maxSpeed': [20.0, 5.0, 5.0],
+                },
+                'torque': {
+                    'maxTorque': [5.0, 5.0, 5.0],
+                    'limitCurrent': [20.0, 20.0, 20.0],
                 }
             }
 
         self.setDicTable()
         self.ui_setting.resetButton.setEnabled(False)
-
-
-
-

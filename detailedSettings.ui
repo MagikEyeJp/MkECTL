@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>440</width>
-    <height>333</height>
+    <height>451</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,13 +25,13 @@
   <property name="maximumSize">
    <size>
     <width>440</width>
-    <height>16777215</height>
+    <height>16777211</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Detailed Settings</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
    <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="verticalScrollBarPolicy">
@@ -49,12 +49,12 @@
         <x>0</x>
         <y>0</y>
         <width>420</width>
-        <height>313</height>
+        <height>421</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
+        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,1">
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0,0">
            <item>
@@ -994,13 +994,13 @@
            <property name="minimumSize">
             <size>
              <width>80</width>
-             <height>250</height>
+             <height>360</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>413</height>
+             <height>16777211</height>
             </size>
            </property>
            <property name="horizontalScrollBarPolicy">
@@ -1162,6 +1162,66 @@
               <red>252</red>
               <green>175</green>
               <blue>62</blue>
+             </color>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>motion</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>238</red>
+              <green>238</green>
+              <blue>236</blue>
+             </color>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>motion</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>238</red>
+              <green>238</green>
+              <blue>236</blue>
+             </color>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>motion</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>238</red>
+              <green>238</green>
+              <blue>236</blue>
+             </color>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>torque</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>237</red>
+              <green>212</green>
+              <blue>0</blue>
+             </color>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>torque</string>
+            </property>
+            <property name="background">
+             <color>
+              <red>237</red>
+              <green>212</green>
+              <blue>0</blue>
              </color>
             </property>
            </row>
@@ -1450,6 +1510,101 @@
              <set>ItemIsEnabled</set>
             </property>
            </item>
+           <item row="13" column="0">
+            <property name="text">
+             <string>acc</string>
+            </property>
+            <property name="background">
+             <brush brushstyle="Dense5Pattern">
+              <color alpha="255">
+               <red>238</red>
+               <green>238</green>
+               <blue>236</blue>
+              </color>
+             </brush>
+            </property>
+            <property name="flags">
+             <set>ItemIsEnabled</set>
+            </property>
+           </item>
+           <item row="14" column="0">
+            <property name="text">
+             <string>dec</string>
+            </property>
+            <property name="background">
+             <brush brushstyle="Dense6Pattern">
+              <color alpha="255">
+               <red>238</red>
+               <green>238</green>
+               <blue>236</blue>
+              </color>
+             </brush>
+            </property>
+            <property name="flags">
+             <set>ItemIsEnabled</set>
+            </property>
+           </item>
+           <item row="15" column="0">
+            <property name="text">
+             <string>maxSpeed</string>
+            </property>
+            <property name="background">
+             <brush brushstyle="Dense7Pattern">
+              <color alpha="255">
+               <red>238</red>
+               <green>238</green>
+               <blue>236</blue>
+              </color>
+             </brush>
+            </property>
+            <property name="flags">
+             <set>ItemIsEnabled</set>
+            </property>
+           </item>
+           <item row="16" column="0">
+            <property name="text">
+             <string>maxTorque</string>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="background">
+             <brush brushstyle="Dense5Pattern">
+              <color alpha="255">
+               <red>237</red>
+               <green>212</green>
+               <blue>0</blue>
+              </color>
+             </brush>
+            </property>
+            <property name="flags">
+             <set>ItemIsEnabled</set>
+            </property>
+           </item>
+           <item row="17" column="0">
+            <property name="text">
+             <string>limitCurrent</string>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="background">
+             <brush brushstyle="Dense6Pattern">
+              <color alpha="255">
+               <red>237</red>
+               <green>212</green>
+               <blue>0</blue>
+              </color>
+             </brush>
+            </property>
+            <property name="flags">
+             <set>ItemIsEnabled</set>
+            </property>
+           </item>
           </widget>
          </item>
          <item>
@@ -1457,10 +1612,13 @@
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Preferred</enum>
+           </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>40</height>
+             <height>4</height>
             </size>
            </property>
           </spacer>
@@ -1470,6 +1628,19 @@
       </layout>
      </widget>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>4</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

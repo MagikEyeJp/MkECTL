@@ -1,44 +1,29 @@
 {
   "motors": {
     "slider": {
-      "serial": "slider_dummy",
+      "serial": "keigan_dummy",
       "scale": -0.104772141,
       "initial_param": {
         "curveType": 1,
-        "maxSpeed": 250,
-        "acc": 8,
-        "dec": 8,
-        "speed": 20,
-        "maxTorque": 5
       }
     },
     "pan": {
-      "serial": "pan_dummy",
+      "serial": "keigan_dummy",
       "scale": -0.017453293,
       "initial_param": {
-        "curveType": 1,
-        "maxSpeed": 250,
-        "acc": 3,
-        "dec": 2,
-        "speed": 40,
-        "maxTorque": 5
+        "curveType": 1
       }
     },
     "tilt": {
-      "serial": "tilt_dummy",
+      "serial": "keigan_dummy",
       "scale": -0.017453293,
       "initial_param": {
-        "curveType": 1,
-        "maxSpeed": 250,
-        "acc": 12,
-        "dec": 4,
-        "speed": 40,
-        "maxTorque": 5
+        "curveType": 1
       }
     }
   },
   "IRLight": {
-    "type": "keigan_dummy",
+    "type": "dummy",
     "device": "tty_dummy"
   }
 }
