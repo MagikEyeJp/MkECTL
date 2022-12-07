@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>mainwindow</class>
  <widget class="QMainWindow" name="mainwindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -35,6 +38,9 @@
   </property>
   <property name="windowTitle">
    <string>MkECTL</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <property name="dockNestingEnabled">
    <bool>false</bool>
@@ -1053,7 +1059,11 @@
            <string>run robot demo script</string>
           </property>
           <property name="text">
-           <string>●MagikEye●</string>
+           <string>MagikEye</string>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/GUI_icons/magikeye_logo.png</normaloff>:/GUI_icons/magikeye_logo.png</iconset>
           </property>
           <property name="autoDefault">
            <bool>true</bool>
@@ -1065,7 +1075,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QScrollArea" name="scrollArea">
+     <widget class="QScrollArea" name="ControllScrollArea">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -1081,8 +1091,54 @@
       <property name="maximumSize">
        <size>
         <width>530</width>
-        <height>16777215</height>
+        <height>16777213</height>
        </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#ControllScrollArea {
+	border: none;
+}
+
+QGroupBox[objectName^=&quot;Section&quot;] {
+    font: bold; 
+    border: 1px solid silver;
+    border-radius: 6px;
+    margin-top: 6px;
+}
+
+QGroupBox[objectName^=&quot;Section&quot;]::title {
+    subcontrol-origin:  margin;
+    left: 7px;
+    padding: 0 5px 0 6px;
+}
+
+
+QScrollBar {
+	border: 0px solid #999999;
+   	background: lightgray;
+ 	width:10px;    
+   	margin: 0px 0px 0px 0px;
+}
+
+QScrollBar::handle {         
+	min-height: 0px;
+   	border: 0px solid red;
+	border-radius: 5px;
+	background-color: darkgray;
+}
+
+QScrollBar::add-line:vertical {       
+ 	height: 0px;
+	subcontrol-position: bottom;
+	subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+	height: 0 px;
+	subcontrol-position: top;
+	subcontrol-origin: margin;
+}
+</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -1103,9 +1159,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-286</y>
-         <width>510</width>
-         <height>1120</height>
+         <y>0</y>
+         <width>512</width>
+         <height>950</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1114,24 +1170,27 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>511</width>
+          <width>512</width>
           <height>1101</height>
          </rect>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0">
+        <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,0,0">
          <property name="spacing">
-          <number>6</number>
+          <number>12</number>
          </property>
          <property name="sizeConstraint">
-          <enum>QLayout::SetDefaultConstraint</enum>
+          <enum>QLayout::SetMinimumSize</enum>
          </property>
          <item>
-          <widget class="QGroupBox" name="robotControl">
+          <widget class="QGroupBox" name="SectionRobotControl">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -1144,7 +1203,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>380</height>
+             <height>252</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -1156,14 +1215,14 @@
            <property name="title">
             <string>Robot Control</string>
            </property>
-           <widget class="QLabel" name="initializeProgressLabel">
+           <widget class="QLabel" name="actionProgressLabel">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="geometry">
              <rect>
-              <x>9</x>
-              <y>70</y>
+              <x>129</x>
+              <y>12</y>
               <width>141</width>
               <height>17</height>
              </rect>
@@ -1172,15 +1231,15 @@
              <string>Initializing motors...</string>
             </property>
            </widget>
-           <widget class="QProgressBar" name="initializeProgressBar">
+           <widget class="QProgressBar" name="actionProgressBar">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="geometry">
              <rect>
-              <x>9</x>
-              <y>90</y>
-              <width>118</width>
+              <x>129</x>
+              <y>32</y>
+              <width>231</width>
               <height>23</height>
              </rect>
             </property>
@@ -1200,11 +1259,11 @@
            </widget>
            <widget class="QGroupBox" name="Settings">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="geometry">
              <rect>
-              <x>160</x>
+              <x>480</x>
               <y>20</y>
               <width>201</width>
               <height>135</height>
@@ -1374,100 +1433,14 @@
               <string>Speed</string>
              </property>
             </widget>
-            <widget class="QToolButton" name="detailedSettingsButton">
-             <property name="geometry">
-              <rect>
-               <x>80</x>
-               <y>0</y>
-               <width>26</width>
-               <height>24</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-            </widget>
-           </widget>
-           <widget class="QWidget" name="layoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>370</x>
-              <y>50</y>
-              <width>131</width>
-              <height>101</height>
-             </rect>
-            </property>
-            <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="1">
-              <widget class="QLabel" name="currentPoslabel">
-               <property name="text">
-                <string>Current Pos.</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="currentSliderLabel">
-               <property name="text">
-                <string>slider</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="sliderCurrentPos">
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="currentPanLabel">
-               <property name="text">
-                <string>pan</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="panCurrentPos">
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="currentTiltLabel">
-               <property name="text">
-                <string>tilt</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QLabel" name="tiltCurrentPos">
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-            </layout>
            </widget>
            <widget class="QGroupBox" name="manualOperation">
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>140</y>
+              <y>62</y>
               <width>491</width>
-              <height>231</height>
+              <height>182</height>
              </rect>
             </property>
             <property name="title">
@@ -1498,7 +1471,7 @@
                  <string>detect slider limit and set origin</string>
                 </property>
                 <property name="text">
-                 <string>Set Slider Origin</string>
+                 <string>Initialize Origins</string>
                 </property>
                 <property name="autoDefault">
                  <bool>true</bool>
@@ -1560,21 +1533,37 @@
             <widget class="QWidget" name="layoutWidget">
              <property name="geometry">
               <rect>
-               <x>184</x>
+               <x>166</x>
                <y>30</y>
-               <width>303</width>
-               <height>92</height>
+               <width>311</width>
+               <height>81</height>
               </rect>
              </property>
-             <layout class="QGridLayout" name="positionControlLayout">
-              <item row="1" column="0">
-               <widget class="QLabel" name="panLabel">
+             <layout class="QGridLayout" name="positionControlLayout" rowstretch="0,0,0" columnstretch="0,0,0,0">
+              <property name="verticalSpacing">
+               <number>2</number>
+              </property>
+              <item row="2" column="1">
+               <widget class="QLabel" name="tiltCurrentPos">
                 <property name="text">
-                 <string>Pan [-360 to 360 deg]</string>
+                 <string>0.00</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
-              <item row="2" column="2">
+              <item row="1" column="1">
+               <widget class="QLabel" name="panCurrentPos">
+                <property name="text">
+                 <string>0.00</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="3">
                <widget class="QPushButton" name="tiltMoveExe">
                 <property name="maximumSize">
                  <size>
@@ -1594,30 +1583,7 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="MyDoubleSpinBox" name="tiltPosSpin">
-                <property name="decimals">
-                 <number>2</number>
-                </property>
-                <property name="minimum">
-                 <double>-360.000000000000000</double>
-                </property>
-                <property name="maximum">
-                 <double>360.000000000000000</double>
-                </property>
-                <property name="singleStep">
-                 <double>0.100000000000000</double>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="sliderLabel">
-                <property name="text">
-                 <string>Slider [-4000 to 4000 mm]</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
+              <item row="1" column="3">
                <widget class="QPushButton" name="panMoveExe">
                 <property name="maximumSize">
                  <size>
@@ -1637,7 +1603,7 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="2">
+              <item row="0" column="3">
                <widget class="QPushButton" name="sliderMoveExe">
                 <property name="maximumSize">
                  <size>
@@ -1657,8 +1623,11 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
-               <widget class="MyDoubleSpinBox" name="panPosSpin">
+              <item row="2" column="2">
+               <widget class="MyDoubleSpinBox" name="tiltPosSpin">
+                <property name="keyboardTracking">
+                 <bool>true</bool>
+                </property>
                 <property name="decimals">
                  <number>2</number>
                 </property>
@@ -1673,15 +1642,61 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="tiltLabel">
+              <item row="0" column="0">
+               <widget class="QLabel" name="sliderLabel">
                 <property name="text">
-                 <string>Tilt [-360 to 360 deg]</string>
+                 <string>Slider [mm]</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="MyDoubleSpinBox" name="panPosSpin">
+                <property name="keyboardTracking">
+                 <bool>true</bool>
+                </property>
+                <property name="decimals">
+                 <number>2</number>
+                </property>
+                <property name="minimum">
+                 <double>-360.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>360.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
+               <widget class="QLabel" name="sliderCurrentPos">
+                <property name="text">
+                 <string>0.00</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="panLabel">
+                <property name="text">
+                 <string>Pan  [deg]</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="tiltLabel">
+                <property name="text">
+                 <string>Tilt  [deg]</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
                <widget class="MyDoubleSpinBox" name="sliderPosSpin">
+                <property name="keyboardTracking">
+                 <bool>true</bool>
+                </property>
                 <property name="decimals">
                  <number>2</number>
                 </property>
@@ -1701,9 +1716,9 @@
             <widget class="QLabel" name="originLabel">
              <property name="geometry">
               <rect>
-               <x>350</x>
-               <y>195</y>
-               <width>51</width>
+               <x>11</x>
+               <y>147</y>
+               <width>41</width>
                <height>20</height>
               </rect>
              </property>
@@ -1733,9 +1748,9 @@
             <widget class="QWidget" name="layoutWidget">
              <property name="geometry">
               <rect>
-               <x>404</x>
-               <y>190</y>
-               <width>71</width>
+               <x>56</x>
+               <y>142</y>
+               <width>101</width>
                <height>32</height>
               </rect>
              </property>
@@ -1744,14 +1759,14 @@
                <widget class="QPushButton" name="goHomeButton">
                 <property name="minimumSize">
                  <size>
-                  <width>30</width>
-                  <height>30</height>
+                  <width>60</width>
+                  <height>26</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>30</width>
-                  <height>30</height>
+                  <height>26</height>
                  </size>
                 </property>
                 <property name="text">
@@ -1767,6 +1782,15 @@
                   <height>30</height>
                  </size>
                 </property>
+                <property name="autoDefault">
+                 <bool>false</bool>
+                </property>
+                <property name="default">
+                 <bool>false</bool>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
+                </property>
                </widget>
               </item>
               <item row="0" column="0">
@@ -1774,13 +1798,13 @@
                 <property name="minimumSize">
                  <size>
                   <width>30</width>
-                  <height>30</height>
+                  <height>26</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>30</width>
-                  <height>30</height>
+                  <height>26</height>
                  </size>
                 </property>
                 <property name="text">
@@ -1800,186 +1824,48 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="layoutWidget">
+            <widget class="QPushButton" name="getCurrentPosButton">
              <property name="geometry">
               <rect>
-               <x>10</x>
-               <y>129</y>
-               <width>131</width>
-               <height>64</height>
+               <x>260</x>
+               <y>116</y>
+               <width>90</width>
+               <height>21</height>
               </rect>
              </property>
-             <layout class="QVBoxLayout" name="presetLayout">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
-                <item>
-                 <widget class="QLabel" name="presetLabel">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>70</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Ubuntu</family>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>Preset</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="presetMotorCombo">
-                  <property name="maximumSize">
-                   <size>
-                    <width>70</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <item>
-                   <property name="text">
-                    <string>slider</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>pan</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>tilt</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_4">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_3">
-                  <item>
-                   <widget class="QLineEdit" name="presetValue">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="unitLabel">
-                    <property name="minimumSize">
-                     <size>
-                      <width>30</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>mm</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="presetExe">
-                  <property name="maximumSize">
-                   <size>
-                    <width>24</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="resources.qrc">
-                    <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
-                  </property>
-                  <property name="autoDefault">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
+             <property name="text">
+              <string>Get Pos (&amp;G)</string>
+             </property>
             </widget>
             <widget class="QWidget" name="layoutWidget">
              <property name="geometry">
               <rect>
-               <x>184</x>
-               <y>130</y>
-               <width>299</width>
-               <height>54</height>
+               <x>166</x>
+               <y>142</y>
+               <width>311</width>
+               <height>31</height>
               </rect>
              </property>
-             <layout class="QVBoxLayout" name="saveLayput">
-              <property name="spacing">
-               <number>0</number>
-              </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,1,0">
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_8">
-                <item>
-                 <widget class="QLabel" name="savedPositionslabel">
-                  <property name="text">
-                   <string>Saved Positions [slider pan tilt]</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="saveButton">
-                  <property name="maximumSize">
-                   <size>
-                    <width>50</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Save</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="GoButton">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>24</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="icon">
-                   <iconset resource="resources.qrc">
-                    <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
-                  </property>
-                  <property name="autoDefault">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QLabel" name="savedPositionslabel">
+                <property name="text">
+                 <string>HIstory</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="saveButton">
+                <property name="maximumSize">
+                 <size>
+                  <width>50</width>
+                  <height>24</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Save</string>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QComboBox" name="savedPosCombo">
@@ -1994,15 +1880,60 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="GoButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>24</width>
+                  <height>24</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="resources.qrc">
+                  <normaloff>:/GUI_icons/exec.png</normaloff>:/GUI_icons/exec.png</iconset>
+                </property>
+                <property name="autoDefault">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
+            <widget class="QPushButton" name="presetButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="geometry">
+              <rect>
+               <x>357</x>
+               <y>116</y>
+               <width>90</width>
+               <height>21</height>
+              </rect>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton::enabled { color: red }</string>
+             </property>
+             <property name="text">
+              <string>Preset (&amp;M)</string>
+             </property>
+            </widget>
            </widget>
-           <widget class="QPushButton" name="initializeButton">
+           <widget class="QPushButton" name="connectButton">
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>33</y>
-              <width>80</width>
+              <y>30</y>
+              <width>91</width>
               <height>25</height>
              </rect>
             </property>
@@ -2458,29 +2389,29 @@
              <string>initialize robot</string>
             </property>
             <property name="text">
-             <string>Initialize</string>
+             <string>Connect</string>
             </property>
             <property name="autoDefault">
              <bool>true</bool>
             </property>
            </widget>
-           <widget class="QPushButton" name="getCurrentPosButton">
+           <widget class="QToolButton" name="detailedSettingsButton">
             <property name="geometry">
              <rect>
               <x>380</x>
-              <y>30</y>
+              <y>32</y>
               <width>121</width>
-              <height>21</height>
+              <height>24</height>
              </rect>
             </property>
             <property name="text">
-             <string>Get Current Pos.</string>
+             <string>Robot Settings</string>
             </property>
            </widget>
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="IRlightControlGroup">
+          <widget class="QGroupBox" name="SectionIRlightControl">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -2490,7 +2421,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>80</height>
+             <height>72</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -2499,6 +2430,9 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
            <property name="title">
             <string>IR Light Control</string>
            </property>
@@ -2506,7 +2440,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>36</y>
+              <y>30</y>
               <width>101</width>
               <height>32</height>
              </rect>
@@ -2583,7 +2517,7 @@
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>36</y>
+              <y>30</y>
               <width>101</width>
               <height>32</height>
              </rect>
@@ -2654,9 +2588,9 @@
             <property name="geometry">
              <rect>
               <x>230</x>
-              <y>26</y>
+              <y>30</y>
               <width>271</width>
-              <height>51</height>
+              <height>31</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -2675,7 +2609,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="Script_groupBox">
+          <widget class="QGroupBox" name="SectionScript">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -2694,6 +2628,9 @@
              <height>16777215</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
            <property name="title">
             <string>Script</string>
            </property>
@@ -2702,7 +2639,7 @@
              <rect>
               <x>10</x>
               <y>30</y>
-              <width>231</width>
+              <width>101</width>
               <height>17</height>
              </rect>
             </property>
@@ -2713,9 +2650,9 @@
            <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>50</y>
-              <width>241</width>
+              <x>110</x>
+              <y>26</y>
+              <width>391</width>
               <height>26</height>
              </rect>
             </property>
@@ -2747,7 +2684,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>80</y>
+              <y>60</y>
               <width>91</width>
               <height>17</height>
              </rect>
@@ -2759,9 +2696,9 @@
            <widget class="QWidget" name="layoutWidget_3">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>100</y>
-              <width>241</width>
+              <x>110</x>
+              <y>55</y>
+              <width>391</width>
               <height>26</height>
              </rect>
             </property>
@@ -2773,9 +2710,6 @@
                </property>
                <property name="text">
                 <string/>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -2796,7 +2730,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>130</y>
+              <y>89</y>
               <width>91</width>
               <height>17</height>
              </rect>
@@ -2808,9 +2742,9 @@
            <widget class="QWidget" name="layoutWidget_5">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>150</y>
-              <width>241</width>
+              <x>110</x>
+              <y>85</y>
+              <width>391</width>
               <height>26</height>
              </rect>
             </property>
@@ -2855,9 +2789,9 @@
            <widget class="QLabel" name="expMultLabel">
             <property name="geometry">
              <rect>
-              <x>270</x>
-              <y>80</y>
-              <width>151</width>
+              <x>10</x>
+              <y>122</y>
+              <width>141</width>
               <height>17</height>
              </rect>
             </property>
@@ -2871,34 +2805,24 @@
            <widget class="QLabel" name="expMult_IRonLabel">
             <property name="geometry">
              <rect>
-              <x>270</x>
-              <y>100</y>
-              <width>91</width>
-              <height>17</height>
+              <x>144</x>
+              <y>120</y>
+              <width>121</width>
+              <height>20</height>
              </rect>
             </property>
             <property name="text">
-             <string>IR light - ON</string>
+             <string>IR light ON/OFF</string>
             </property>
-           </widget>
-           <widget class="QLabel" name="expMult_IRoffLabel">
-            <property name="geometry">
-             <rect>
-              <x>390</x>
-              <y>100</y>
-              <width>91</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>IR light - OFF</string>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
            <widget class="QLineEdit" name="IRonMultiplier">
             <property name="geometry">
              <rect>
               <x>270</x>
-              <y>120</y>
+              <y>118</y>
               <width>111</width>
               <height>25</height>
              </rect>
@@ -2914,7 +2838,7 @@
             <property name="geometry">
              <rect>
               <x>390</x>
-              <y>120</y>
+              <y>118</y>
               <width>111</width>
               <height>25</height>
              </rect>
@@ -2942,10 +2866,13 @@
              <enum>QFrame::Raised</enum>
             </property>
             <widget class="QLabel" name="progressLabel">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
              <property name="geometry">
               <rect>
-               <x>410</x>
-               <y>20</y>
+               <x>403</x>
+               <y>48</y>
                <width>91</width>
                <height>20</height>
               </rect>
@@ -3008,7 +2935,7 @@
             <widget class="QPushButton" name="executeScript_button">
              <property name="geometry">
               <rect>
-               <x>123</x>
+               <x>293</x>
                <y>10</y>
                <width>51</width>
                <height>24</height>
@@ -3025,7 +2952,7 @@
             <widget class="QPushButton" name="continueButton">
              <property name="geometry">
               <rect>
-               <x>180</x>
+               <x>350</x>
                <y>10</y>
                <width>71</width>
                <height>24</height>
@@ -3038,7 +2965,7 @@
             <widget class="QPushButton" name="stopButton">
              <property name="geometry">
               <rect>
-               <x>260</x>
+               <x>430</x>
                <y>10</y>
                <width>71</width>
                <height>24</height>
@@ -3490,38 +3417,19 @@
               <string>Stop</string>
              </property>
             </widget>
-            <widget class="QLabel" name="numOfCommands_label">
-             <property name="geometry">
-              <rect>
-               <x>430</x>
-               <y>0</y>
-               <width>71</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string> -</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="opsToExeScript_label">
-             <property name="geometry">
-              <rect>
-               <x>340</x>
-               <y>0</y>
-               <width>91</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Ops to exec:</string>
-             </property>
-            </widget>
+            <zorder>progressBar</zorder>
+            <zorder>progressLabel</zorder>
+            <zorder>commandLabel</zorder>
+            <zorder>ExecutingScript</zorder>
+            <zorder>executeScript_button</zorder>
+            <zorder>continueButton</zorder>
+            <zorder>stopButton</zorder>
            </widget>
            <widget class="QLabel" name="isoMultLabel">
             <property name="geometry">
              <rect>
-              <x>270</x>
-              <y>154</y>
+              <x>10</x>
+              <y>152</y>
               <width>111</width>
               <height>17</height>
              </rect>
@@ -3536,8 +3444,8 @@
            <widget class="QComboBox" name="isoValue">
             <property name="geometry">
              <rect>
-              <x>392</x>
-              <y>150</y>
+              <x>270</x>
+              <y>148</y>
               <width>111</width>
               <height>25</height>
              </rect>
@@ -3584,7 +3492,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="PostProc_groupBox">
+          <widget class="QGroupBox" name="SectionPostProc">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -3594,7 +3502,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>300</height>
+             <height>308</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -3602,6 +3510,10 @@
              <width>510</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QGroupBox:enabled:checked{border-color:#66AAFF; border-width:2px}
+</string>
            </property>
            <property name="title">
             <string>Post Processing</string>
@@ -3622,12 +3534,32 @@
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
+             <property name="spacing">
+              <number>4</number>
+             </property>
              <item>
-              <widget class="QLabel" name="PostProcFileLabel">
-               <property name="text">
-                <string>PostProcess Definition</string>
-               </property>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="1,0">
+               <item>
+                <widget class="QLabel" name="PostProcFileLabel">
+                 <property name="text">
+                  <string>PostProcess Definition</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="reprocessButton">
+                 <property name="text">
+                  <string>re-process</string>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>16</width>
+                   <height>16</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -3651,7 +3583,7 @@
                  </property>
                  <property name="icon">
                   <iconset resource="resources.qrc">
-                   <normaloff>:/GUI_icons/049-folder-open.png</normaloff>:/GUI_icons/049-folder-open.png</iconset>
+                   <normaloff>:/GUI_icons/file_icon.png</normaloff>:/GUI_icons/file_icon.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -3677,7 +3609,7 @@
                 </sizepolicy>
                </property>
                <property name="verticalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOn</enum>
+                <enum>Qt::ScrollBarAsNeeded</enum>
                </property>
                <property name="readOnly">
                 <bool>true</bool>
@@ -3690,6 +3622,19 @@
                 <string>Clear Log</string>
                </property>
               </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
              <item>
               <spacer name="verticalSpacer">
@@ -3707,6 +3652,19 @@
             </layout>
            </widget>
           </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </widget>
@@ -3735,7 +3693,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>initializeButton</tabstop>
+  <tabstop>connectButton</tabstop>
   <tabstop>sliderOriginButton</tabstop>
   <tabstop>MagikEye</tabstop>
   <tabstop>sliderPosSpin</tabstop>
@@ -3747,16 +3705,11 @@
   <tabstop>sliderSpeedSpin</tabstop>
   <tabstop>panSpeedSpin</tabstop>
   <tabstop>tiltSpeedSpin</tabstop>
-  <tabstop>presetMotorCombo</tabstop>
-  <tabstop>presetValue</tabstop>
-  <tabstop>presetExe</tabstop>
   <tabstop>Settings</tabstop>
   <tabstop>freeButton</tabstop>
   <tabstop>executeScript_button</tabstop>
   <tabstop>saveButton</tabstop>
-  <tabstop>savedPosCombo</tabstop>
   <tabstop>rebootButton</tabstop>
-  <tabstop>GoButton</tabstop>
   <tabstop>goHomeButton</tabstop>
   <tabstop>setAsHomeButton</tabstop>
   <tabstop>selectScript_toolButton</tabstop>

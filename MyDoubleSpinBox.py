@@ -3,19 +3,49 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 
 class MyDoubleSpinBox(QtWidgets.QDoubleSpinBox):
 
-    returnPressed = QtCore.pyqtSignal()
+    valueDetermined = QtCore.pyqtSignal()
 
     def __init__(self, parent):
         super(QtWidgets.QDoubleSpinBox, self).__init__(parent)
-        self.undoText = self.value()
+        self.fix()
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):
         if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
             # self.editingFinished()
-            super(QtWidgets.QDoubleSpinBox, self).keyPressEvent(event)
-            self.undoText = self.value()
-            self.returnPressed.emit()
+            super().keyPressEvent(event)
+            self.determine()
         elif event.key() == QtCore.Qt.Key_Escape:
-            self.setValue(self.undoText)
+            self.undo()
         else:
-            super(QtWidgets.QDoubleSpinBox, self).keyPressEvent(event)
+            super().keyPressEvent(event)
+            self.updateColor()
+
+    def updateColor(self):
+        if self.value() == self.undoText:
+            self.setStyleSheet("")
+        else:
+            self.setStyleSheet("QDoubleSpinBox { color:red }")
+
+    def stepBy(self, steps: int) -> None:
+        # self.undo()
+        super().stepBy(steps)
+        self.determine()
+
+    def determine(self):
+        self.fix()
+        self.valueDetermined.emit()
+
+    def setValue(self, val: float) -> None:
+        super().setValue(val)
+        self.fix()
+
+    def isModified(self):
+        return self.undoText != self.value()
+
+    def fix(self):
+        self.undoText = self.value()
+        self.updateColor()
+
+    def undo(self):
+        self.setValue(self.undoText)
+        self.updateColor()

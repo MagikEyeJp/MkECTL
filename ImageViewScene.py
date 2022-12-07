@@ -82,7 +82,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
     def scaleFit(self):
         self.fitInView(self.m_scene.itemsBoundingRect(), QtCore.Qt.KeepAspectRatio)
         if self.m_scene.itemsBoundingRect().width() != 0:
-            m_scale = self.width() / self.m_scene.itemsBoundingRect().width()
+            self.m_scale = self.width() / self.m_scene.itemsBoundingRect().width()
         self.m_fitmode = True
 
     def sizeHint(self) -> QtCore.QSize:

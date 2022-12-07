@@ -26,3 +26,6 @@ class IRLightDummy(IRLight):
 
     def set(self, ch, state):
         pass
+
+    def close(self):
+        pass

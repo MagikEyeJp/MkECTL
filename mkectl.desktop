@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.1
+Type=Application
+Name=MkECTL
+Comment=MkECTL
+Icon=<path to MkECTL>/MkECTL.png
+Exec=<path to MkECTL>/venv/bin/python <path to MkECTL>/MkECTL.py
+Path=<path to MkECTL>
+Actions=
+Categories=Development;X-GNOME-SystemSettings;
+StartupWMClass=MkECTL.py

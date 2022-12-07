@@ -13,6 +13,8 @@
         <file>GUI_icons/file_icon.png</file>
         <file>GUI_icons/135-search.png</file>
         <file>GUI_icons/pen.png</file>
+        <file>GUI_icons/magikeye_logo.png</file>
         <file>MkECTL.png</file>
+        <file>GUI_icons/001-home.png</file>
     </qresource>
 </RCC>

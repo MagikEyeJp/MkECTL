@@ -33,3 +33,8 @@ class IRLightNumato(IRLight):
                 print(cmd.encode('utf-8').hex())
                 self.IRport.write(cmd.encode('utf-8'))
 
+    def close(self):
+        if self.IRport is not None:
+            self.IRport.close()
+        self.IRport = None
+        self.valid = False

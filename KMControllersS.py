@@ -212,7 +212,7 @@ class Controller:
 
     def measureInterval(self,interval,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
-        interface settings.  bit7:button bit4:I2C bit3:USB bit0:BLE
+        Set the interval time of measurement. (0:5ms, 1:10ms, 2:20ms, 3:50ms, 4:100ms, 5:200ms, 6:500ms, 7:1000ms)
         """
         command=b'\x2C'
         values=uint8_t2bytes(interval)
@@ -220,7 +220,7 @@ class Controller:
 
     def measureByDefault(self,flag,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
-        interface settings.
+        Set the auto start mode of measurement. (0:disable autostart 1:enable autostart)
         """
         command=b'\x2D'
         values=uint8_t2bytes(flag)
@@ -228,7 +228,7 @@ class Controller:
 
     def interface(self,flag,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
-        interface settings.
+        interface settings.  bit7:button bit4:I2C bit3:USB bit0:BLE
         """
         command=b'\x2E'
         values=uint8_t2bytes(flag)
@@ -329,6 +329,7 @@ class Controller:
         """
         Move the motor to the specified absolute 'position' at the speed set by 0x58: speed.
         """
+        print("moveto position", position)
         command=b'\x66'
         values=float2bytes(position)
         self.run_command(command+identifier+values+crc16,'motor_control')
@@ -595,6 +596,11 @@ class Controller:
             scaled_position = 0.0
         return scaled_position
 
+    def preset_scaled_position(self, position):
+        abs_position = (position - self.scaling_offset) * self.scaling_rate
+        print(abs_position)
+        self.presetPosition(abs_position)
+
 # ------ USB Controller
 class LogStatus(Enum):
     IDLE = 0
@@ -609,9 +615,8 @@ def recv_thread(obj):
     logstarttime = 0
     recvtime = 0
     data = bytearray(b'\x00'*270)
-    obj.m_alive = True
 
-    while obj.m_alive and obj.serial is not None:
+    while obj.alive() and obj.serial is not None:
         rd = obj.serial.read(1)
         if len(rd) == 0:
             continue
@@ -694,8 +699,7 @@ class USBController(Controller):
         super().__init__()
         # print('init port')
         self.port = port
-#        self.serial = serial.Serial(port, 115200, 8, 'N', 1, 0.5, False, True)
-        self.serial = serial.Serial(port, 115200, 8, 'N', 1, 0.5, False, True, None, False, None, None)
+        self.serial = serial.Serial(port=port, baudrate=115200, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=0.1, rtscts=False, dsrdtr=False, write_timeout=0.1, inter_byte_timeout=0.5)
         # motor measurement value
         self.m_position = 0
         self.m_velocity = 0
@@ -723,25 +727,30 @@ class USBController(Controller):
         #threading
         self.m_lock = threading.RLock()
         self.m_th = threading.Thread(target=recv_thread, args=(self,), daemon=True)
-        self.m_alive = False
+        self.m_alive = True
         self.m_th.start()
         sleep(.1)
-        while not self.m_alive:
-            print('wait')
-            sleep(.1)
         # print('init port end')
 
     def __del__(self):
         self.close()
 
+    def alive(self):
+        return self.m_alive
+
     def close(self):
         self.m_lock.acquire()
         self.m_alive = False
+        self.m_lock.release()
         self.m_th.join()
         if self.serial is not None:
+            self.serial.set_output_flow_control(False)
+            self.serial.cancel_write()
+            self.serial.reset_output_buffer()
+            self.serial.cancel_read()
+            self.serial.reset_input_buffer()
             self.serial.close()
             self.serial = None
-        self.m_lock.release()
 
     def run_command(self,val,characteristics=None):
         self.serial.write(val)

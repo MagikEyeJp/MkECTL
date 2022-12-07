@@ -97,9 +97,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.setupUi(self)
 
         # connection
-        self.conn = False
+        self.connected = False
         self.sensor = SensorDevice.SensorDevice()
         self.sensorInfo = SensorInfo()
+        self.allowManualOperation = True
         # print(self.sensor)
 
         # thread
@@ -169,8 +170,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             (lambda: self.setLaser('0x' + self.ui_s.hex4dLineEdit.text()))
 
         # Push buttons
-        self.ui_s.connectButton.clicked.connect(self.connectToSensor)
-        self.ui_s.disconnectButton.clicked.connect(self.disconnectSensor)
+        self.ui_s.connectButton.clicked.connect(self.toggleConnection)
         self.ui_s.searchButton.clicked.connect(self.searchSensor)
         self.ui_s.smidDicEditBtn.clicked.connect(self.editsmiddic)
         # self.ui_s.setIPaddressButton.clicked.connect(self.changeIPaddress)
@@ -191,7 +191,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.selectDirectoryButton.clicked.connect(self.selectDirectory)
         self.ui_s.resetButton.clicked.connect(self.resetCounter)
         # self.ui_s.gridButton.clicked.connect(self.showGrid)
-        self.ui_s.gridGroup.clicked.connect(self.showGrid)
+        self.ui_s.SectionGrid.clicked.connect(self.showGrid)
+
+        self.ui_s.homeButton.clicked.connect(self.homePosition)
 
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
@@ -209,25 +211,36 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.frame3DDirPath = os.getcwd() + '/frame3Ddata'
 
         # group
-        self.setUiStatusDisconnected()
+        self.updateUIStatus()
 
-    def setUiStatusConnected(self):
-        self.ui_s.connectButton.setEnabled(False)
-        self.ui_s.disconnectButton.setEnabled(True)
-        self.ui_s.IPComboBox.setEnabled(False)
-        self.ui_s.searchButton.setEnabled(False)
-        self.ui_s.cameraControlGroup.setEnabled(True)
-        self.ui_s.laserControlGroup.setEnabled(True)
-        self.ui_s.gridGroup.setEnabled(True)
+    def setAllowManualOperation(self, allow):
+        self.allowManualOperation = allow
+        self.updateUIStatus()
 
-    def setUiStatusDisconnected(self):
-        self.ui_s.connectButton.setEnabled(True)
-        self.ui_s.disconnectButton.setEnabled(False)
-        self.ui_s.IPComboBox.setEnabled(True)
-        self.ui_s.searchButton.setEnabled(True)
-        self.ui_s.cameraControlGroup.setEnabled(False)
-        self.ui_s.laserControlGroup.setEnabled(False)
-        self.ui_s.gridGroup.setEnabled(False)
+    def updateUIStatus(self):
+        self.ui_s.SectionSensorConnection.setEnabled(self.allowManualOperation)
+        if self.connected:
+            self.ui_s.SectionSensorConnection.setStyleSheet("QGroupBox{border-color:#66AAFF; border-width:2px}")
+            self.ui_s.connectButton.setText("Disconnect")
+            self.ui_s.connectButton.setStyleSheet("QPushButton{background-color:red}")
+            self.ui_s.connectButton.setEnabled(self.allowManualOperation)
+            self.ui_s.IPComboBox.setEnabled(False)
+            self.ui_s.searchButton.setEnabled(False)
+            self.ui_s.SectionSensorConnection.setEnabled(self.allowManualOperation)
+            self.ui_s.SectionCameraControl.setEnabled(self.allowManualOperation)
+            self.ui_s.SectionLaserControl.setEnabled(self.allowManualOperation)
+            self.ui_s.SectionGrid.setEnabled(self.allowManualOperation)
+        else:
+            self.ui_s.SectionSensorConnection.setStyleSheet("")
+            self.ui_s.connectButton.setText("Connect")
+            self.ui_s.connectButton.setStyleSheet("")
+            self.ui_s.connectButton.setEnabled(self.allowManualOperation)
+            self.ui_s.IPComboBox.setEnabled(self.allowManualOperation)
+            self.ui_s.searchButton.setEnabled(self.allowManualOperation)
+            self.ui_s.SectionCameraControl.setEnabled(False)
+            self.ui_s.SectionLaserControl.setEnabled(False)
+            self.ui_s.SectionGrid.setEnabled(False)
+
 
     def changeIPaddress(self):
         self.RPiaddress = self.ui_s.IPComboBox.currentText()
@@ -281,9 +294,14 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             except Exception:
                 self.ui_s.cameraStatusLabel.setText('Sensor is not connected.')
 
+    def toggleConnection(self):
+        if self.connected:
+            self.disconnectSensor()
+        else:
+            self.connectToSensor()
+
     def connectToSensor(self):
         # connect to sensors and display again
-
         try:
             self.changeIPaddress()
             self.sensor = SensorDevice.SensorDevice()
@@ -321,35 +339,33 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             else:
                 self.ui_s.textLabelID.setStyleSheet("QLineEdit { background: rgb(255, 255, 0);}")
 
-            self.setUiStatusConnected()
-            self.conn = True
-            # print(self.sensor)
+            self.connected = True
+            self.updateUIStatus()
             self.getImg_thread = GetImageThread(self.sensor, self.getImgCallback)
 
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('!!! Sensor was not detected.')
             QtWidgets.QMessageBox.warning(self, "Connection Failed", str(e))
             print(e)
-            self.setUiStatusDisconnected()
-            self.conn = False
+            self.connected = False
+            self.updateUIStatus()
 
         except TimeoutError:
             QtWidgets.QMessageBox.critical(self, "Connection Error", "Cannot connect to sensor (timeout)")
 
 
-        self.mainUI.sensorChanged(self.conn)
+        self.mainUI.sensorChanged(self.connected)
 
     def disconnectSensor(self):
         try:
+            self.connected = False
             self.sensor.close()
             self.ui_s.consecutiveModeButton.setChecked(False)
             self.ui_s.cameraStatusLabel.setText('The sensor was disconnected.')
-            self.conn = False
         except Exception as e:
             self.ui_s.cameraStatusLabel.setText('Could not disconnect the sensor correctly.')
         finally:
-            self.setUiStatusDisconnected()
-
+            self.updateUIStatus()
 
     def searchSensor(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -410,7 +426,6 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
 
     def startGetImageThread(self, frames, saveImgBool):
-        self.frames = frames
         self.saveImgBool = saveImgBool
 
         if self.getImg_thread.ended:
@@ -426,14 +441,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             app.processEvents()
 
             if self.ui_s.consecutiveModeButton.isChecked() and self.ui_s.consecutiveModeButton.isEnabled():
-                if self.frames == 1:
-                    self.ui_s.prev1Button.click()
-                else:
-                    self.ui_s.prevAveButton.click()
+                self.ui_s.prev1Button.click()
             else:
                 if self.saveImgBool:
                     self.saveImg(image)
-
 
     def prevImg(self, frames):
         img = self.getImg(frames)
@@ -498,8 +509,8 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
         frame = self.sensor.get_frame()
 
-        uid = np.array(frame.uid).reshape(-1, 1)
-        lut3d = np.array(frame.lut3d)
+        uid = np.array(frame.uids).reshape(-1, 1)
+        lut3d = np.array(frame.pts3d)
 
         data = np.hstack((uid, lut3d))
 
@@ -518,7 +529,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         if not self.ui_s.sensorImage.isPixmapSet:
             QtWidgets.QMessageBox.critical(self, "No image",
                                            "There is no image in the Image Viewer. \nPlease capture first.")
-            self.ui_s.gridGroup.setChecked(False)
+            self.ui_s.SectionGrid.setChecked(False)
             pass
 
         self.ui_s.sensorImage.m_gridItem.resetTransform()
@@ -538,7 +549,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         gp.pen.setStyle(gp.pen_styles[gp.gridType])
 
         self.ui_s.sensorImage.setGridParameter(self.ui_s.sensorImage.gridParam)
-        self.ui_s.sensorImage.setGridVisible(self.ui_s.gridGroup.isChecked())
+        self.ui_s.sensorImage.setGridVisible(self.ui_s.SectionGrid.isChecked())
 
 
     def smidDictionary(self):
@@ -559,6 +570,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             stats) == dict else None
         print(temp)
         return temp
+
+    def homePosition(self):
+        self.ui_s.sensorImage.scaleFit()
 
 
 if __name__ == '__main__':

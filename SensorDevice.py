@@ -144,7 +144,7 @@ class SensorDevice:
                 sleep(0.5)
                 self.client.set_state(mkeapi.MKE_STATE_SERVICE)
                 sleep(0.5)
-                print(frame.lut3d, frame.uid)
+                # print(frame.pts3d, frame.uids)
 
                 return frame
         finally:
