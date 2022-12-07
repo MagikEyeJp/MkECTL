@@ -168,6 +168,11 @@ class KeiganRobot(IRobotController):
             execCode = 'self.params[\'%s\'][\'cont\'].%s%s(%f)' % (self.motorSet[motor_i], pid_category, pid_param, value)
             eval(execCode)
 
+    def saveAllRegisters(self):
+        for p in self.params.values():
+            p['cont'].saveAllRegisters()
+
+
     def getPosition(self):
         pos_d = {}
         vel_d = {}
@@ -292,6 +297,7 @@ class KeiganRobot(IRobotController):
     def getSettingWindow(self):
         self.settingWindow = SettingsWindow()
         self.settingWindow.pidChanged.connect(self.changePIDparam)
+        self.settingWindow.parameterSaved.connect(self.saveAllRegisters)
         return self.settingWindow
 
 
@@ -299,6 +305,7 @@ class KeiganRobot(IRobotController):
 
 class SettingsWindow(QtWidgets.QWidget):
     pidChanged = QtCore.pyqtSignal(str, str, int, float)
+    parameterSaved = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super(SettingsWindow, self).__init__(parent)
@@ -384,7 +391,7 @@ class SettingsWindow(QtWidgets.QWidget):
             os.makedirs(self.pidDirPath)
 
         json_IO.writeJson(self.currentPIDvalues, self.pidDirPath + '/' + self.savedPIDfile)
-
+        self.parameterSaved.emit()
         self.ui_setting.resetButton.setEnabled(False)
 
     def resetPID(self):
