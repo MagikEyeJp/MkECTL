@@ -584,20 +584,20 @@ class Controller:
         """
         Move the motor to the specified absolute 'position' in user defined coordinate.
         """
-        abs_position = (position - self.scaling_offset) * self.scaling_rate
+        abs_position = (position + self.scaling_offset) * self.scaling_rate
         print(abs_position)
         self.moveTo(abs_position)
 
     def read_scaled_position(self):
         (position, velocity, torque) = self.read_motor_measurement()
         try:
-            scaled_position = (position / self.scaling_rate) + self.scaling_offset
+            scaled_position = (position / self.scaling_rate) - self.scaling_offset
         except ZeroDivisionError as e:
             scaled_position = 0.0
         return scaled_position
 
     def preset_scaled_position(self, position):
-        abs_position = (position - self.scaling_offset) * self.scaling_rate
+        abs_position = (position + self.scaling_offset) * self.scaling_rate
         print(abs_position)
         self.presetPosition(abs_position)
 

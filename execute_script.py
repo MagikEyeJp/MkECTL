@@ -218,6 +218,9 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
         except TimeoutError:
             timeoutCallback(mainWindow)
             return True
+        if isStop:
+            timeoutCallback(mainWindow)
+            return True
 
         # GUI
         mainWindow.done = i + 1
@@ -424,7 +427,7 @@ def move_robot(args, scriptParams, devices, mainWindow):
 
             isStopped = devices['robot'].moveTo(targetPos_d, mainWindow.actionStatusCallback, True)
             if isStopped:
-                return mainWindow.stopClicked
+                return True
 
             systate.past_parameters.pos = systate.pos
             systate.sentSig.pos = True

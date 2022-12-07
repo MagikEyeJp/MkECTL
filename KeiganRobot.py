@@ -78,6 +78,7 @@ class KeiganRobot(IRobotController):
 
         serials = {k: v.get("serial") for k, v in self.m_machineParams.items()}
         scales = {k: v.get("scale") for k, v in self.m_machineParams.items()}
+        offsets = {k: v.get("offset") for k, v in self.m_machineParams.items()}
 
         motordic = {}
 
@@ -89,6 +90,7 @@ class KeiganRobot(IRobotController):
                 param['id'] = id
                 param['cont'] = KMControllersS_dummy.USBController('dev/dummy')
                 param['scale'] = scales[id]
+                param['offset'] = offsets[id] if offsets[id] is not None else 0.0
                 param['SN'] = serials[id]
                 motordic[id] = param
 
@@ -103,9 +105,10 @@ class KeiganRobot(IRobotController):
                 param['id'] = id
                 param['cont'] = motor
                 param['scale'] = scales[id]
+                param['offset'] = offsets[id] if offsets[id] is not None else 0.0
                 param['SN'] = serialnum
                 motordic[id] = param
-                motor.set_scaling(scales[id], 0.0)  # offset = 0.0 (temp)
+                motor.set_scaling(scales[id], param['offset'])
             else:
                 motor.close()
                 motor = None
@@ -136,26 +139,44 @@ class KeiganRobot(IRobotController):
             return False
 
     def initializeOrigins(self, origins, callback):
+        for m in [self.slider, self.pan, self.tilt]:
+            m.reboot()
+        time.sleep(2.0)
+
+        # slider origin
         GOAL_VELO = 0.1
         GOAL_TIME = 2.0
         m = self.slider
+        m.enable()
         m.speed(10.0)
+        maxTorque = m.read_maxTorque()[0]
         m.maxTorque(1.0)
         m.runForward()
-        prev_time = time.time()
         duration = 0.0
+        prev_time = time.time()
+        inmain(callback, None, duration, GOAL_TIME)
+        time.sleep(0.5)
         while duration < GOAL_TIME:
-            time.sleep(0.2)
             (pos, vel, torque) = m.read_motor_measurement()
             if vel >= GOAL_VELO:
                 prev_time = time.time()
-            duration = time.time() - prev_time
             pos_d = {'slider': pos}
+            time.sleep(0.2)
+            duration = time.time() - prev_time
             inmain(callback, pos_d, duration, GOAL_TIME)
-
-        m.preset_scaled_position(0)
+        time.sleep(1.0)
+        m.presetPosition(0.0)
         m.free()
-        m.maxTorque(5.0)
+        m.maxTorque(maxTorque)
+
+        # pan, tilt origin
+        for m in [self.pan, self.tilt]:
+            m.enable()
+            m.stop()
+            time.sleep(1)
+            pos, _, _ = m.read_motor_measurement()
+            m.presetPosition(pos)
+            m.free()
 
     def changePIDparam(self, pid_category, pid_param, motor_i, value):
         print("changePID", pid_category, pid_param, motor_i, value)
@@ -177,14 +198,10 @@ class KeiganRobot(IRobotController):
         for p in self.params.values():
             p['cont'].saveAllRegisters()
 
-
     def getPosition(self):
         pos_d = {}
-        vel_d = {}
-        torque_d = {}
         for k, p in self.params.items():
-            (pos_d[k], vel_d[k], torque_d[k]) = p['cont'].read_motor_measurement()
-            pos_d[k] /= p['scale']
+            pos_d[k] = p['cont'].read_scaled_position()
         return pos_d
 
     def presetPosition(self, targetPos):
@@ -220,14 +237,14 @@ class KeiganRobot(IRobotController):
         initial_err = 0.0
         minerr = 999999.0  # とりあえず大きい数
         cnt = 0
-        GOAL_EPS = 0.003  # FINE目標位置到達誤差しきい値
+        GOAL_EPS = 0.03  # FINE目標位置到達誤差しきい値
         NOWAIT_EPS = 0.1  # COARSE目標位置到達誤差しきい値
         GOAL_CNT = 8  # 目標位置到達判定回数
 
         for k, p in self.params.items():
             if k in targetPos:
-                (init_pos, init_vel, init_torque) = p['cont'].read_motor_measurement()
-                initial_err += pow(init_pos - (targetPos[k] * p['scale']), 2)
+                init_pos = p['cont'].read_scaled_position()
+                initial_err += pow(init_pos - targetPos[k], 2)
                 p['cont'].speed(p['cont'].read_maxSpeed()[0])
                 p['cont'].moveTo_scaled(targetPos[k])
 
@@ -251,26 +268,20 @@ class KeiganRobot(IRobotController):
                 nonlocal NOWAIT_EPS
                 nonlocal GOAL_CNT
 
-                err = 0.0
                 while True:
                     time.sleep(0.2)
                     errors = 0.0
 
                     for k, p in self.params.items():
-                        (pos_d[k], vel_d[k], torque_d[k]) = p['cont'].read_motor_measurement()
+                        pos_d[k] = p['cont'].read_scaled_position()
                         if k in targetPos:
-                            errors += pow(pos_d[k] - (targetPos[k] * p['scale']), 2)
-                        pos_d[k] /= p['scale']
-                    err = math.sqrt(errors)
+                            errors += pow(pos_d[k] - targetPos[k], 2)
+                    err_pos = math.sqrt(errors)
+                    print("err=", err_pos, cnt)
 
-                    # display Current Pos
-                    # mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
-                    #     pos[param_i] / scale[param_i]))
-                    # yield pos_d
-                    inmain(callback, pos_d, initial_err - err, initial_err, time.time() - starttime > 5.0)
+                    inmain(callback, pos_d, initial_err - err_pos, initial_err, time.time() - starttime > 5.0)
 
-                    if err < (GOAL_EPS if wait else NOWAIT_EPS):
-                        print("err=", err)
+                    if err_pos < (GOAL_EPS if wait else NOWAIT_EPS):
                         if wait:
                             cnt += 1
                         else:
@@ -280,22 +291,20 @@ class KeiganRobot(IRobotController):
                     else:
                         cnt = 0
 
-                    if err < minerr:
-                        # print("err=", err)
-                        minerr = err  # 最小値更新
+                    if err_pos < minerr:
+                        minerr = err_pos  # 最小値更新
                         break
-                return err, pos_d
+                return err_pos, pos_d
 
             try:
                 err, pos_d = waitmove()
-                print("err=", err)
-                # yield pos_d
 
                 if cnt > GOAL_CNT:
                     # raise StopIteration()
                     break
 
             except TimeoutError:
+                print("Timeout")
                 return True     # isAborted
 
         return False

@@ -355,10 +355,11 @@ class Ui(QMainWindow, IMainUI):
         self.judgePresetEnable()
 
     def updateCurrentPos(self, pos_d):
-        for k, pos in pos_d.items():
-            lb = self.motorGUI['currentPosLabel'][k]
-            lb.setText('{:>8.2f}'.format(pos))
-            lb.repaint()
+        if isinstance(pos_d, dict):
+            for k, pos in pos_d.items():
+                lb = self.motorGUI['currentPosLabel'][k]
+                lb.setText('{:>8.2f}'.format(pos))
+                lb.repaint()
 
     def allowActionAbort(self, enable):
         if enable != self.ui.actionAbortButton.isEnabled():
@@ -371,14 +372,17 @@ class Ui(QMainWindow, IMainUI):
         self.updateCurrentPos(pos_d)
         if goal != 0:
             progress = (now / goal) * 100
-            self.updateActionProgress(progress, None, None)
+            if progress < 0:
+                progress = 0
+            elif progress > 100:
+                progress = 100
+            self.updateActionProgress(progress , None, None)
         app.processEvents()
 
     def initializeOrigins(self):
         self.startAction('Init Origins...')
         self.robotController.initializeOrigins({'slider'}, self.actionStatusCallback)
-        QMessageBox.information(self, "Slider origin", "Current position of slider is 0 mm.")
-        self.moveRobot({'slider': 10.0})
+        QMessageBox.information(self, "Initialize Origin", "finished")
         self.endAction('Done')
 
     def freeAllMotors(self):
