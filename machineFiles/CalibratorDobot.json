@@ -1,0 +1,31 @@
+{
+  "motors": {
+    "type": "Dobot",
+    "gateway_addr": "med.local",
+    "gateway_port": 2022,
+    "X": {
+      "axis": "axisX",
+      "offset": 292
+    },
+    "Y": {
+      "axis": "axisY",
+      "offset": -1
+    },
+    "Z": {
+      "axis": "axisZ",
+      "offset": 158
+    },
+    "R": {
+      "axis": "axisR",
+      "offset": 97.5
+    },
+    "P": {
+      "axis": "axisP",
+      "offset": 100
+    }
+  },
+  "IRLight": {
+    "type": "dummy",
+    "device": "tty_dummy"
+  }
+}
