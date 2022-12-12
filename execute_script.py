@@ -164,6 +164,8 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
 
     systate.past_parameters.reset()
     print(vars(systate.past_parameters))
+    systate.offset = [0, 0, 0]
+    systate.scale = [1.0, 1.0, 1.0]
 
     args_hist: list = []
     com_hist: list = []
@@ -417,14 +419,16 @@ def move_robot(args, scriptParams, devices, mainWindow):
     args = np.array(args)
     pos = [0.0, 0.0, 0.0]
 
-    systate.pos = list(np.add(np.multiply(args, systate.scale), systate.offset))
+    systate.pos = list(args)
     print(args, systate.pos, systate.scale, systate.offset)
-    targetPos_d = {'slider': args[0], 'pan': args[1], 'tilt': args[2]}
 
     if not systate.skip:
+        scaled_pos = list(np.add(np.multiply(systate.pos, systate.scale), systate.offset))
+        targetPos_d = {'slider': scaled_pos[0], 'pan': scaled_pos[1], 'tilt': scaled_pos[2]}
         if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
             app.processEvents()
 
+            print('move_robot', targetPos_d)
             isStopped = devices['robot'].moveTo(targetPos_d, mainWindow.actionStatusCallback, True)
             if isStopped:
                 return True
