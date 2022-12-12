@@ -2,24 +2,15 @@
   "motors": {
     "slider": {
       "serial": "KM-1S SW59#0E9",
-      "scale": -0.116355283,
-      "initial_param": {
-        "curveType": 1
-      }
+      "scale": -0.116355283
     },
     "pan": {
       "serial": "KM-1S K1UK#E45",
-      "scale": 0.017453293,
-      "initial_param": {
-        "curveType": 1
-      }
+      "scale": 0.017453293
     },
     "tilt": {
       "serial": "KM-1S 0D69#13A",
-      "scale": 0.017453293,
-      "initial_param": {
-        "curveType": 1
-      }
+      "scale": 0.017453293
     }
   },
   "IRLight": {

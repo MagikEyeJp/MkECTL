@@ -3,26 +3,17 @@
     "slider": {
       "serial": "KM-1U 9PIG#CD1",
       "scale": -0.104772141,
-      "offset": 10.0,
-      "initial_param": {
-        "curveType": 1
-      }
+      "offset": 10.0
     },
     "pan": {
       "serial": "KM-1S 20BV#3A2",
       "scale": -0.017453293,
-      "offset": -98.4,
-      "initial_param": {
-        "curveType": 1
-      }
+      "offset": -98.4
     },
     "tilt": {
       "serial": "KM-1S CBG3#573",
       "scale": -0.017453293,
-      "offset": -6.0,
-      "initial_param": {
-        "curveType": 1
-      }
+      "offset": -6.0
     }
   },
   "IRLight": {
