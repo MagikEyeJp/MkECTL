@@ -1,26 +1,36 @@
+from IRobotController import IRobotController
+import socket
+
+defaultAixs = ["X", "Y", "Z", "R", "P"]
+
 class DobotRobot(IRobotController):
     def __init__(self, machineParams=None):
+        self.gwAddr = machineParams["gateway_addr"]
+        self.gwPort = machineParams["gateway_port"]
+
+        axes = machineParams["axes"]
+        self.basePos = {axes[i]["axis"]: axes[i]["offset"] for i in axes.keys() if axes[i]["axis"] in defaultAixs }
+        self.targetPos = {i:0 for i in self.basePos.keys()}
+
+    def connect(self, callback: callable = None, isAborted: callable = None):
         pass
 
-    def connect(self, callback: callable = None, isAborted: callable = None) -> bool:
+    def initialize(self, callback: callable = None, isAborted: callable = None):
         pass
 
-    def initialize(self, callback: callable = None, isAborted: callable = None) -> bool:
+    def initializeOrigins(self, origins, callback: callable = None, isAborted: callable = None):
         pass
 
-    def initializeOrigins(self, origins, callback: callable = None, isAborted:callable = None) -> bool:
+    def getSettingWindow(self):
         pass
 
-    def getSettingWindow(self) -> object:
-        pass
-
-    def getPosition(self) -> dict:
+    def getPosition(self):
         pass
 
     def presetPosition(self, targetPos):
         pass
 
-    def moveTo(self, targetPos: dict, callback: callable, wait: bool = False, isAborted: callable = None) -> bool:
+    def moveTo(self, targetPos: dict, callback: callable, wait: bool = False, isAborted: callable = None):
         """move to target position
 
         Move the robot to the target position.
