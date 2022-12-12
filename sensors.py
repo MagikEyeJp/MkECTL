@@ -228,7 +228,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.ui_s.SectionSensorConnection.setEnabled(self.allowManualOperation)
             self.ui_s.SectionCameraControl.setEnabled(self.allowManualOperation)
             self.ui_s.SectionLaserControl.setEnabled(self.allowManualOperation)
-            self.ui_s.SectionGrid.setEnabled(self.allowManualOperation)
+            self.ui_s.SectionGrid.setEnabled(True)
+            if not self.allowManualOperation:
+                self.ui_s.consecutiveModeButton.setChecked(False)
         else:
             self.ui_s.SectionSensorConnection.setStyleSheet("")
             self.ui_s.connectButton.setText("Connect")
@@ -239,6 +241,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.ui_s.SectionCameraControl.setEnabled(False)
             self.ui_s.SectionLaserControl.setEnabled(False)
             self.ui_s.SectionGrid.setEnabled(False)
+            self.ui_s.consecutiveModeButton.setChecked(False)
 
 
     def changeIPaddress(self):

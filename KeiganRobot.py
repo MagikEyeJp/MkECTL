@@ -141,13 +141,15 @@ class KeiganRobot(IRobotController):
     def initializeOrigins(self, origins, callback):
         for m in [self.slider, self.pan, self.tilt]:
             m.reboot()
-        time.sleep(2.0)
+        time.sleep(0.5)
 
         # slider origin
         GOAL_VELO = 0.1
         GOAL_TIME = 2.0
         m = self.slider
+        m.wait_start()
         m.enable()
+        m.interface(8)
         m.speed(10.0)
         maxTorque = m.read_maxTorque()[0]
         m.maxTorque(1.0)
@@ -172,11 +174,8 @@ class KeiganRobot(IRobotController):
         # pan, tilt origin
         for m in [self.pan, self.tilt]:
             m.enable()
-            m.stop()
-            time.sleep(1)
-            pos, _, _ = m.read_motor_measurement()
-            m.presetPosition(pos)
-            m.free()
+            m.interface(8)
+
 
     def changePIDparam(self, pid_category, pid_param, motor_i, value):
         print("changePID", pid_category, pid_param, motor_i, value)
@@ -237,20 +236,42 @@ class KeiganRobot(IRobotController):
         initial_err = 0.0
         minerr = 999999.0  # とりあえず大きい数
         cnt = 0
-        GOAL_EPS = 0.03  # FINE目標位置到達誤差しきい値
+        GOAL_EPS = 0.003  # FINE目標位置到達誤差しきい値
         NOWAIT_EPS = 0.1  # COARSE目標位置到達誤差しきい値
         GOAL_CNT = 8  # 目標位置到達判定回数
 
+        class Axis:
+            def __init__(self, cont, target):
+                self.cont = cont
+                self.target = target
+
+        def getpos(ax: Axis):
+            pos = {}
+            for k, v in ax.items():
+                pos[k] = v.cont.read_scaled_position()
+            return pos
+
+        def geterr(ax: Axis, pos: dict):
+            err = 0
+            for k, v in ax.items():
+                e = (pos[k] - v.target) * v.cont.get_scaling()[0]
+                err += pow(e, 2)
+            return math.sqrt(err)
+
+        axis = {}
         for k, p in self.params.items():
             if k in targetPos:
-                init_pos = p['cont'].read_scaled_position()
-                initial_err += pow(init_pos - targetPos[k], 2)
-                p['cont'].speed(p['cont'].read_maxSpeed()[0])
-                p['cont'].moveTo_scaled(targetPos[k])
+                c = p['cont']
+                c.speed(c.read_maxSpeed()[0])
+                c.moveTo_scaled(targetPos[k])
+                axis[k] = Axis(c, targetPos[k])
 
-        initial_err = math.sqrt(initial_err)
+        # initial_err = math.sqrt(initial_err)
+
+        pos_d = getpos(axis)
+        initial_err = geterr(axis, pos_d)
         if initial_err == 0.0:
-            return False    # isAborted
+            return False
 
         starttime = time.time()
 
@@ -271,12 +292,8 @@ class KeiganRobot(IRobotController):
                 while True:
                     time.sleep(0.2)
                     errors = 0.0
-
-                    for k, p in self.params.items():
-                        pos_d[k] = p['cont'].read_scaled_position()
-                        if k in targetPos:
-                            errors += pow(pos_d[k] - targetPos[k], 2)
-                    err_pos = math.sqrt(errors)
+                    pos_d = getpos(axis)
+                    err_pos = geterr(axis, pos_d)
                     print("err=", err_pos, cnt)
 
                     inmain(callback, pos_d, initial_err - err_pos, initial_err, time.time() - starttime > 5.0)

@@ -480,7 +480,7 @@ class Ui(QMainWindow, IMainUI):
 
     def updateActionProgress(self, value, text, active):
         if value is not None:
-            self.ui.actionProgressBar.setValue(value)
+            self.ui.actionProgressBar.setValue(int(value))
             self.ui.actionProgressBar.repaint()
         if text is not None:
             self.ui.actionProgressLabel.setText(text)

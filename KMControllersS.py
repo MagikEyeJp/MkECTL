@@ -207,7 +207,6 @@ class Controller:
         """
         command = b'\x27'
         values = uint8_t2bytes(filtertype)+float2bytes(value)
-        print(values)
         self.run_command(command+identifier+values+crc16,'motor_settings')
 
     def measureInterval(self,interval,identifier=b'\x00\x00',crc16=b'\x00\x00'):
@@ -790,7 +789,7 @@ class USBController(Controller):
 
     def getRegister(self, reg):
         self.m_reg = -1
-        self.m_value = b''
+        self.m_regvalue = b''
         self.readRegister(reg)
         for w in range(100):
             sleep(.01)
@@ -805,6 +804,11 @@ class USBController(Controller):
         else:
             ret = b''
         return ret
+
+    def wait_start(self):
+        sn = b''
+        while len(sn) == 0:
+            sn = self.getRegister(0x46)
 
     def __read_float_reg(self, r):
         return struct.unpack_from('>f', self.getRegister(r))
