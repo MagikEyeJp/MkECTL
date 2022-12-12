@@ -27,6 +27,7 @@ import mainwindow_ui
 import sensors
 from IMainUI import IMainUI
 from KeiganRobot import KeiganRobot
+from DobotRobot import DobotRobot
 from SensorInfo import SensorInfo
 from UIState import UIState
 
@@ -299,7 +300,10 @@ class Ui(QMainWindow, IMainUI):
 
             # Motor
             if "motors" in self.machineParams:
-                self.robotController = KeiganRobot(self.machineParams["motors"])
+                if "Keigan" in self.machineParams["motors"]:
+                    self.robotController = KeiganRobot(self.machineParams["motors"])
+                else:
+                    self.robotController = DobotRobot(self.machineParams["motors"])
             else:
                 self.robotController = KeiganRobot()
 
