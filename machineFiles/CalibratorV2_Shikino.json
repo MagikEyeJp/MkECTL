@@ -1,6 +1,6 @@
 {
   "motors": {
-    "slider": {
+    "slide": {
       "serial": "KM-1S ILI4#1DC",
       "scale": -0.116355283,
       "offset": 10.0

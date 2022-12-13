@@ -1,5 +1,5 @@
 import os
-import re  # https://qiita.com/luohao0404/items/7135b2b96f9b0b196bf3
+import re
 import numpy as np
 import datetime
 import time
@@ -282,13 +282,10 @@ def expand_dynvars(args, devices):
             elif dv_name == 'gainiso':
                 dv_val = ('{:0=%d}' % (dv_par)).format(systate.gainiso)
             elif dv_name == 'slide':
-                # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['slider'].m_position))
                 dv_val = '{val:0{width}d}'.format(width=dv_par, val=int(systate.pos[0]))
             elif dv_name == 'pan':
-                # dv_val = ('{:0=%d}' % (dv_par)).format(round(devices['motors']['pan'].m_position))
                 dv_val = '{val:0{width}d}'.format(width=dv_par, val=int(systate.pos[1]))
             elif dv_name == 'tilt':
-                # dv_val = ('{:0.0=%d}' % (dv_par)).format(round(devices['motors']['tilt'].m_position))
                 dv_val = '{val:0{width}d}'.format(width=dv_par, val=int(systate.pos[2]))
             else:
                 dv_val = 'xxxx'  # temp

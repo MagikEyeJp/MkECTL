@@ -17,7 +17,7 @@ import json_IO
 
 
 defaultMotors = {
-    "slider": {
+    "slide": {
       "serial": "KM-1U 9PIG#CD1",
       "scale": -0.104772141,
       "initial_param": {
@@ -60,11 +60,11 @@ defaultMotors = {
 class KeiganRobot(IRobotController):
     def __init__(self, machineParams=None):
         self.m_machineParams = machineParams
-        self.motorSet = ['slider', 'pan', 'tilt']
+        self.motorSet = ['slide', 'pan', 'tilt']
         self.settingWindow = None
 
         # cont
-        self.slider = None
+        self.slide = None
         self.pan = None
         self.tilt = None
 
@@ -117,12 +117,12 @@ class KeiganRobot(IRobotController):
         # return motordic
 
     def initialize(self):
-        self.slider = self.params.get('slider', {}).get('cont', None)
+        self.slide = self.params.get('slide', {}).get('cont', None)
         self.pan = self.params.get('pan', {}).get('cont', None)
         self.tilt = self.params.get('tilt', {}).get('cont', None)
 
-        if [self.slider, self.pan, self.tilt].count(None) == 0:
-            for m in [self.slider, self.pan, self.tilt]:
+        if [self.slide, self.pan, self.tilt].count(None) == 0:
+            for m in [self.slide, self.pan, self.tilt]:
                 self.initializeMotor(m)
             return True
         else:
@@ -135,14 +135,14 @@ class KeiganRobot(IRobotController):
         m.curveType(1)      # trapezoid speed curve
 
     def initializeOrigins(self, origins=None, callback=None):
-        for m in [self.slider, self.pan, self.tilt]:
+        for m in [self.slide, self.pan, self.tilt]:
             m.reboot()
         time.sleep(0.5)
 
-        # slider origin
+        # slide origin
         GOAL_VELO = 0.1
         GOAL_TIME = 2.0
-        m = self.slider
+        m = self.slide
         self.initializeMotor(m)
         m.speed(10.0)
         maxTorque = m.read_maxTorque()[0]
@@ -157,7 +157,7 @@ class KeiganRobot(IRobotController):
             (pos, vel, torque) = m.read_motor_measurement()
             if vel >= GOAL_VELO:
                 prev_time = time.time()
-            pos_d = {'slider': pos}
+            pos_d = {'slide': pos}
             time.sleep(0.2)
             duration = time.time() - prev_time
             inmain(callback, pos_d, duration, GOAL_TIME)
@@ -221,11 +221,11 @@ class KeiganRobot(IRobotController):
             p['cont'] = None
 
     def moveTo(self, targetPos, wait=False, callback=None, isAborted=None):
-        # pos: dict ('slider', 'pan', 'tilt')
+        # pos: dict ('slide', 'pan', 'tilt')
 
-        pos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
-        vel_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
-        torque_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        pos_d = {'slide': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        vel_d = {'slide': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        torque_d = {'slide': 0.0, 'pan': 0.0, 'tilt': 0.0}
 
         initial_err = 0.0
         minerr = 999999.0  # とりあえず大きい数
