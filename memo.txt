@@ -12,6 +12,8 @@ TODO & Ideas
 ・InitializeOriginsの時モーターの絶対位置が0付近をまたぐ場合の初期位置の補正
 ・KMControllserS_dummyをKMControllerSに吸収
 ・devices 辞書廃止
+・スクリプトのoffset, scale, move命令で各軸を省略できるように
+・マルチプラットフォーム対応(Ubuntuに加え、他Linuxディストリビューション、Mac、Windows、RaspberryPiなど)
 
 BUG?
 ・モーター移動後のキャプチャで、1つ前のフレームが取り込まれるように見える

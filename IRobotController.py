@@ -9,7 +9,7 @@ class IRobotController:
     def initialize(self, callback: callable = None, isAborted: callable = None) -> bool:
         pass
 
-    def initializeOrigins(self, origins, callback: callable = None, isAborted:callable = None) -> bool:
+    def initializeOrigins(self, origins: list = None, callback: callable = None, isAborted:callable = None) -> bool:
         pass
 
     def getSettingWindow(self) -> object:

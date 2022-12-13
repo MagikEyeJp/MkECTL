@@ -7,7 +7,11 @@ class MyDoubleSpinBox(QtWidgets.QDoubleSpinBox):
 
     def __init__(self, parent):
         super(QtWidgets.QDoubleSpinBox, self).__init__(parent)
+        self.emittable = True
         self.fix()
+
+    def allowDetermine(self, enable):
+        self.emittable = enable
 
     def keyPressEvent(self, event: QtGui.QKeyEvent):
         if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
@@ -32,8 +36,9 @@ class MyDoubleSpinBox(QtWidgets.QDoubleSpinBox):
         self.determine()
 
     def determine(self):
-        self.fix()
-        self.valueDetermined.emit()
+        if self.emittable:
+            self.fix()
+            self.valueDetermined.emit()
 
     def setValue(self, val: float) -> None:
         super().setValue(val)
