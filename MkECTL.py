@@ -15,10 +15,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from playsound import playsound
 
-import IRLightDummy
-import IRLightMkE
-import IRLightNumato
-import IRLightPapouch
+import IRobotController
+import IRLight
+from MachineBuilder import Machine, MachineBuilder
+
 from MyDoubleSpinBox import MyDoubleSpinBox
 import execute_script
 import ini
@@ -26,11 +26,10 @@ import json_IO
 import mainwindow_ui
 import sensors
 from IMainUI import IMainUI
-from KeiganRobot import KeiganRobot
 from SensorInfo import SensorInfo
 from UIState import UIState
 
-VERSION = '1.1.0'
+VERSION = '1.2.0beta'
 
 class ScriptParams:
     def __init__(self):
@@ -51,12 +50,12 @@ class ScriptParams:
         self.subFolderName = self.now.strftime('%Y%m%d_%H%M%S')
 
 class UiAxis:
-    def __init__(self, name: str, unit: str, step: float, min=-10000, max=10000):
+    def __init__(self, name: str, unit: str, step: float, minvalue: float = -10000.0, maxvalue: float = 10000.0):
         self.name = name
         self.unit = unit
         self.step = step
-        self.min = min
-        self.max = max
+        self.min = minvalue
+        self.max = maxvalue
         self.currentLabel = None
         self.spinbox = None
         self.execButton = None
@@ -77,7 +76,8 @@ class Ui(QMainWindow, IMainUI):
         self.ui.MagikEye.setToolTip('MkECTL v' + VERSION + ' ©MagikEye Inc.\nPress this button to run the demo script.')
         self.scriptParams = ScriptParams()
         self.robot_connected = False
-        self.uiaxes = [UiAxis('slider', 'mm', 5.0), UiAxis('pan', 'deg', 0.1), UiAxis('tilt', 'deg', 0.1)]
+        self.uiaxes = []
+        self.machine = None
 
         ### docking window https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
         self.sensorWindow = sensors.SensorWindow(mainUI=self)
@@ -129,14 +129,9 @@ class Ui(QMainWindow, IMainUI):
         # motor
         self.robotController = None  # instance of M_KeiganRobot
         self.states = set()
-        self.devices: dict = {}  # 'motors', 'robot', 'lights', '3Dsensors' etc.  # Dict of dictionaries
 
         if not os.path.exists(self.scriptParams.baseFolderName):
             os.makedirs(self.scriptParams.baseFolderName)
-
-        self.devices['3Dsensors'] = self.sensorWindow
-
-        self.make_motorGUI()
 
         # other buttons
         self.actionAbortRequest = False
@@ -273,7 +268,27 @@ class Ui(QMainWindow, IMainUI):
         self.sensorWindow.close()
         exit()
 
+    @staticmethod
+    def clearLayout(layout):
+        if layout is not None:
+            while layout.count():
+                child = layout.takeAt(0)
+                if child.widget() is not None:
+                    child.widget().setParent(None)
+                    # child.widget().deleteLater()
+                elif child.layout() is not None:
+                    clearLayout(child.layout())
+                    child.layout().setParent(None)
+                    # child.layout().deleteLater()
+
     def make_motorGUI(self):
+        self.clearLayout(self.ui.posControlLayout)
+
+        self.uiaxes = []
+        for a in self.machine.axes:
+            axis = UiAxis(a.name, a.unit, a.step, a.min, a.max)
+            self.uiaxes.append(axis)
+
         parent = self.ui.manualOperation
         layout = self.ui.posControlLayout
         layout.setColumnStretch(0, 1)   # name
@@ -286,16 +301,21 @@ class Ui(QMainWindow, IMainUI):
             row = i * 2
             label = QLabel(parent)
             label.setText(axis.name + " [" + axis.unit + "]")
+            label.setFixedHeight(24)
             layout.addWidget(label, row, 0)
             current = QLabel(parent)
             current.setText("0.00")
-            current.setAlignment(Qt.AlignCenter)
+            current.setFixedSize(90, 24)
+            current.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
             layout.addWidget(current, row, 1, Qt.AlignCenter)
             axis.currentLabel = current
 
             spinbox = MyDoubleSpinBox(parent)
             spinbox.setKeyboardTracking(True)
             spinbox.setDecimals(2)
+            spinbox.setValue(0.00)
+            spinbox.setAlignment(Qt.AlignRight)
+            spinbox.setFixedSize(90, 24)
             spinbox.setMinimum(axis.min)
             spinbox.setMaximum(axis.max)
             spinbox.setSingleStep(axis.step)
@@ -360,45 +380,24 @@ class Ui(QMainWindow, IMainUI):
             self.setUIStatus(self.states)
             self.robot_connected = False
         else:
-            # initialize
-            count = 0
-
-            # GUI
             self.startAction('Connecting...')
 
-            # Motor
-            if "motors" in self.machineParams:
-                self.robotController = KeiganRobot(self.machineParams["motors"])
-            else:
-                self.robotController = KeiganRobot()
+            # build machine
+            if self.machine is not None:
+                self.robotController = self.machine.robot
+                self.IRLight = self.machine.light
 
-            count += 10
-            self.updateActionProgress(10, None, True)
-            self.robotController.connect()
+                self.updateActionProgress(10, 'Connecting Robot...', True)
+                self.robotController.connect()
 
-            self.updateActionProgress(40, 'Initializing Robot...', True)
-            self.robotSettingsWindow = self.robotController.getSettingWindow()
+                self.updateActionProgress(40, 'Initializing Robot...', True)
+                self.robotSettingsWindow = self.robotController.getSettingWindow()
 
             if self.robotController.initialize():
-                self.devices['robot'] = self.robotController
                 self.updateActionProgress(80, 'Initializing IRLight...', True)
                 # IR light
-                if "IRLight" in self.machineParams:
-                    IRtype = self.machineParams["IRLight"].get("type")
-                    IRdevice = self.machineParams["IRLight"].get("device")
-                    if IRtype == "MkE":
-                        self.IRLight = IRLightMkE.IRLightMkE(IRtype, IRdevice)
-                    elif IRtype == "PAPOUCH":
-                        self.IRLight = IRLightPapouch.IRLightPapouch(IRtype, IRdevice)
-                    elif IRtype == "Numato":
-                        self.IRLight = IRLightNumato.IRLightNumato(IRtype, IRdevice)
-                    else:   # dummy
-                        self.IRLight = IRLightDummy.IRLightDummy(IRtype, IRdevice)
-
                 self.openIR()
 
-                # GUI
-                print('--initialization completed--')
                 self.endAction('Connected.')
 
                 self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
@@ -633,7 +632,9 @@ class Ui(QMainWindow, IMainUI):
             self.states = {UIState.SCRIPT_PROGRESS}
             self.setUIStatus(self.states)
 
-            interrupted = execute_script.execute_script(self.scriptParams, self.devices, self, True)
+            interrupted = execute_script.execute_script(self.scriptParams, {'robot': self.robotController,
+                                                                            'lights': self.IRLight,
+                                                                            '3Dsensors': self.sensorWindow}, self, True)
 
             self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
             self.setUIStatus(self.states)
@@ -703,14 +704,17 @@ class Ui(QMainWindow, IMainUI):
         self.showSensorWindow(self.geometry, self.framesize)
 
         # GUI
-        if self.devices['3Dsensors'].connected:
-            self.devices['3Dsensors'].sensorInfo.save_to_file(self.dataOutFolder() + "/sensorinfo.json")
+        if self.sensorWindow.connected:
+            self.sensorWindow.sensorInfo.save_to_file(self.dataOutFolder() + "/sensorinfo.json")
 
         self.states = {UIState.SCRIPT_PROGRESS}
         self.setUIStatus(self.states)
 
         # execute script
-        interrupted = execute_script.execute_script(self.scriptParams, self.devices, self)
+        interrupted = execute_script.execute_script(self.scriptParams,
+                                                    {'robot': self.robotController,
+                                                     'lights': self.IRLight,
+                                                     '3Dsensors': self.sensorWindow}, self)
 
         self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
         self.setUIStatus(self.states)
@@ -769,13 +773,13 @@ class Ui(QMainWindow, IMainUI):
 
     def openIR(self):
         message = self.IRLight.open()
-        self.devices['lights'] = self.IRLight
         self.ui.IRstateLabel.setText(message)
 
     def IRlightControl(self, ch, state):
         self.IRLight.set(ch, state)
 
-    def toFloat(self, text, default):
+    @staticmethod
+    def toFloat(text, default):
         try:
             val = float(text)
             return val
@@ -1000,10 +1004,12 @@ class Ui(QMainWindow, IMainUI):
             ini.updatePreviousMachineFile('data/previousMachine.ini', filename)
             self.ui.machineFileName_label.setText(os.path.basename(filename))
 
-        if self.machineParams == {}:
-            self.states = {UIState.MACHINEFILE}
-        else:
+        self.machine = MachineBuilder.build(self.machineParams)
+        if self.machine is not None:
+            self.make_motorGUI()
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+        else:
+            self.states = {UIState.MACHINEFILE}
 
         self.setUIStatus(self.states)
 
