@@ -1,6 +1,6 @@
 {
   "motors": {
-    "slider": {
+    "slide": {
       "serial": "KM-1U 9PIG#CD1",
       "scale": -0.104772141,
       "offset": 10.0

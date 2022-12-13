@@ -1808,7 +1808,7 @@ QScrollBar::sub-line:vertical {
                        </size>
                       </property>
                       <property name="toolTip">
-                       <string>detect slider limit and set origin</string>
+                       <string>detect slide limit and set origin</string>
                       </property>
                       <property name="text">
                        <string>Initialize Origins</string>
@@ -2071,6 +2071,9 @@ QScrollBar::sub-line:vertical {
                     </property>
                     <property name="text">
                      <string>Preset (&amp;M)</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>false</bool>
                     </property>
                    </widget>
                   </item>
@@ -2386,6 +2389,12 @@ QScrollBar::sub-line:vertical {
               <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
                <item>
                 <widget class="QLabel" name="showScriptName_label">
+                 <property name="minimumSize">
+                  <size>
+                   <width>90</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="text">
                   <string>Script name:</string>
                  </property>
@@ -2430,6 +2439,12 @@ QScrollBar::sub-line:vertical {
               <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,1,0">
                <item>
                 <widget class="QLabel" name="showBaseFolderName_label">
+                 <property name="minimumSize">
+                  <size>
+                   <width>90</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="text">
                   <string>Base folder:</string>
                  </property>
@@ -2474,6 +2489,12 @@ QScrollBar::sub-line:vertical {
               <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,1,0,0">
                <item>
                 <widget class="QLabel" name="showSubFolderName_label">
+                 <property name="minimumSize">
+                  <size>
+                   <width>90</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                  <property name="text">
                   <string>Sub folder:</string>
                  </property>

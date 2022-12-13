@@ -1,6 +1,6 @@
 {
   "motors": {
-    "slider": {
+    "slide": {
       "serial": "keigan_dummy",
       "scale": -0.104772141
     },

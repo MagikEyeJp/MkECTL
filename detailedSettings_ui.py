@@ -604,7 +604,7 @@ class Ui_settings(object):
         item = self.pidTable.horizontalHeaderItem(0)
         item.setText(_translate("settings", "param"))
         item = self.pidTable.horizontalHeaderItem(1)
-        item.setText(_translate("settings", "slider"))
+        item.setText(_translate("settings", "slide"))
         item = self.pidTable.horizontalHeaderItem(2)
         item.setText(_translate("settings", "pan"))
         item = self.pidTable.horizontalHeaderItem(3)

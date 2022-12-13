@@ -57,7 +57,7 @@ class MachineBuilder:
         # build robot
         if machineFileVersion <= 1.0:
             # old machine file
-            machine.axes = [Machine.Axis('slider', 'mm', 5.0), Machine.Axis('pan', 'deg', 0.1), Machine.Axis('tilt', 'deg', 0.1)]
+            machine.axes = [Machine.Axis('slide', 'mm', 5.0), Machine.Axis('pan', 'deg', 0.1), Machine.Axis('tilt', 'deg', 0.1)]
             robot_params = machineParams.get('motors')
             if isinstance(robot_params, dict):
                 machine.robot = KeiganRobot(robot_params)
