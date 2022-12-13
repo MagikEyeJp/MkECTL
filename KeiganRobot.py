@@ -134,7 +134,7 @@ class KeiganRobot(IRobotController):
         m.interface(8)      # USB only
         m.curveType(1)      # trapezoid speed curve
 
-    def initializeOrigins(self, origins, callback):
+    def initializeOrigins(self, origins=None, callback=None):
         for m in [self.slider, self.pan, self.tilt]:
             m.reboot()
         time.sleep(0.5)
@@ -150,7 +150,8 @@ class KeiganRobot(IRobotController):
         m.runForward()
         duration = 0.0
         prev_time = time.time()
-        inmain(callback, None, duration, GOAL_TIME)
+        if callback is not None:
+            inmain(callback, None, duration, GOAL_TIME)
         time.sleep(0.5)
         while duration < GOAL_TIME:
             (pos, vel, torque) = m.read_motor_measurement()
@@ -219,7 +220,7 @@ class KeiganRobot(IRobotController):
             m.close()
             p['cont'] = None
 
-    def moveTo(self, targetPos, callback, wait=False, isAborted=None):
+    def moveTo(self, targetPos, wait=False, callback=None, isAborted=None):
         # pos: dict ('slider', 'pan', 'tilt')
 
         pos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
@@ -289,7 +290,8 @@ class KeiganRobot(IRobotController):
                     err_pos = geterr(axis, pos_d)
                     print("err=", err_pos, cnt)
 
-                    inmain(callback, pos_d, initial_err - err_pos, initial_err, time.time() - starttime > 5.0)
+                    if callback is not None:
+                        inmain(callback, pos_d, initial_err - err_pos, initial_err, time.time() - starttime > 5.0)
 
                     if err_pos < (GOAL_EPS if wait else NOWAIT_EPS):
                         if wait:

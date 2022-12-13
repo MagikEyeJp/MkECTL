@@ -429,7 +429,7 @@ def move_robot(args, scriptParams, devices, mainWindow):
             app.processEvents()
 
             print('move_robot', targetPos_d)
-            isStopped = devices['robot'].moveTo(targetPos_d, mainWindow.actionStatusCallback, True)
+            isStopped = devices['robot'].moveTo(targetPos_d, True, mainWindow.actionStatusCallback)
             if isStopped:
                 return True
 

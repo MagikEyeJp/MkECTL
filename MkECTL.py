@@ -496,7 +496,7 @@ class Ui(QMainWindow, IMainUI):
     def moveRobot(self, targetpos):
         self.startAction('Moving...')
         self.allowManualUI(False)
-        isAborted = self.robotController.moveTo(targetpos, self.actionStatusCallback, False, self.isActionAbortRequest)
+        isAborted = self.robotController.moveTo(targetpos, False, self.actionStatusCallback, self.isActionAbortRequest)
         self.allowActionAbort(False)
         self.allowManualUI(True)
         if isAborted:
