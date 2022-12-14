@@ -61,7 +61,7 @@ class DobotRobot(IRobotController):
         """
         code = "G01"
         for i in self.basePos.keys():
-            code += f" {i}{self.basePos[i] - targetPos[i]}" if i in targetPos.keys() else f" {i}{self.basePos[i]}"
+            code += f" {i}{self.basePos[i] - targetPos[i]}" if i in targetPos.keys() else ""
 
         self.sock.send(code.encode())
         ret = json.loads(self.sock.recv(1024).decode())
