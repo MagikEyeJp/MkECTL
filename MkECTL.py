@@ -26,11 +26,6 @@ import json_IO
 import mainwindow_ui
 import sensors
 from IMainUI import IMainUI
-<<<<<<< HEAD
-from KeiganRobot import KeiganRobot
-from DobotRobot import DobotRobot
-=======
->>>>>>> master
 from SensorInfo import SensorInfo
 from UIState import UIState
 
