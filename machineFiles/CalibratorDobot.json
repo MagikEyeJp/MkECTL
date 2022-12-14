@@ -1,27 +1,50 @@
 {
-  "motors": {
-    "type": "Dobot",
+  "version": 1.1,
+  "robot": {
+    "type": "DOBOT",
     "gateway_addr": "med.local",
-    "gateway_port": 2022,
-    "X": {
-      "axis": "axisX",
-      "offset": 292
-    },
-    "Y": {
-      "axis": "axisY",
-      "offset": -1
-    },
-    "Z": {
-      "axis": "axisZ",
-      "offset": 158
-    },
-    "R": {
-      "axis": "axisR",
-      "offset": 97.5
-    },
-    "P": {
-      "axis": "axisP",
-      "offset": 100
+    "gateway_port": 2023,
+    "axes": {
+      "X": {
+        "unit": "mm",
+        "step": 0.1,
+        "min": 50,
+        "max": 50,
+        "axis": "X",
+        "offset": 292
+      },
+      "Y": {
+        "unit": "mm",
+        "step": 0.1,
+        "min": -200,
+        "max": 200,
+        "axis": "Y",
+        "offset": -1
+      },
+      "Z": {
+        "unit": "mm",
+        "step": 0.1,
+        "min": -100,
+        "max": 100,
+        "axis": "Z",
+        "offset": 158
+      },
+      "R": {
+        "unit": "deg",
+        "step": 0.1,
+        "min": -90,
+        "max": 90,
+        "axis": "R",
+        "offset": 97.5
+      },
+      "P": {
+        "unit": "deg",
+        "step": 0.1,
+        "min": -45,
+        "max": 45,
+        "axis": "P",
+        "offset": 100
+      }
     }
   },
   "IRLight": {
