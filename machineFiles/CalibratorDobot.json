@@ -3,12 +3,12 @@
   "robot": {
     "type": "DOBOT",
     "gateway_addr": "med.local",
-    "gateway_port": 2023,
+    "gateway_port": 2022,
     "axes": {
       "X": {
         "unit": "mm",
         "step": 0.1,
-        "min": 50,
+        "min": -50,
         "max": 50,
         "axis": "X",
         "offset": 292
