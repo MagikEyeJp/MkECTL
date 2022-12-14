@@ -1,5 +1,6 @@
 from IRobotController import IRobotController
 import socket
+import json
 
 defaultAixs = ["X", "Y", "Z", "R", "P"]
 
@@ -13,10 +14,17 @@ class DobotRobot(IRobotController):
         self.targetPos = {i:0 for i in self.basePos.keys()}
 
     def connect(self, callback: callable = None, isAborted: callable = None):
-        pass
+        self.sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        try:
+            self.sock.connect((self.gwAddr,self.gwPort))
+        except ConnectionRefusedError as e:
+            print(f"{e}")
+            return False
+        else:
+            return True
 
     def initialize(self, callback: callable = None, isAborted: callable = None):
-        pass
+        return not self.moveTo({i:0 for i in self.basePos.keys()}, False, None, None )
 
     def initializeOrigins(self, origins, callback: callable = None, isAborted: callable = None):
         pass
@@ -48,7 +56,14 @@ class DobotRobot(IRobotController):
 
         :return: True if aborted
         """
-        pass
+        code = "G01"
+        for i in self.basePos.keys():
+            code += f" {i}{self.basePos[i] - targetPos[i]}" if i in targetPos.keys() else f" {i}{self.basePos[i]}"
+
+        self.sock.send(code.encode())
+        ret = json.loads(self.sock.recv(1024).decode())
+
+        return False if ret["status"] == 200 else True
 
     def freeMotors(self):
         pass
