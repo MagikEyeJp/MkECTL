@@ -24,16 +24,19 @@ class DobotRobot(IRobotController):
             return True
 
     def initialize(self, callback: callable = None, isAborted: callable = None):
-        return not self.moveTo({i:0 for i in self.basePos.keys()}, False, None, None )
+        return True
 
     def initializeOrigins(self, origins, callback: callable = None, isAborted: callable = None):
-        pass
+        return not self.moveTo({i:0 for i in self.basePos.keys()}, False, None, None )
 
     def getSettingWindow(self):
         pass
 
     def getPosition(self):
-        pass
+        code = "M124"
+        self.sock.send(code.encode())
+        pos = json.loads(self.sock.recv(1024).decode())["body"][1]
+        return {i:self.basePos[i] - pos[i] for i in pos.keys()}
 
     def presetPosition(self, targetPos):
         pass
@@ -69,7 +72,7 @@ class DobotRobot(IRobotController):
         pass
 
     def reboot(self):
-        pass
+        self.sock.close()
 
     def disconnect(self):
-        pass
+        self.sock.close()
