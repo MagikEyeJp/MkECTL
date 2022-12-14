@@ -15,23 +15,26 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from playsound import playsound
 
-import IRLightDummy
-import IRLightMkE
-import IRLightNumato
-import IRLightPapouch
-import MyDoubleSpinBox
+import IRobotController
+import IRLight
+from MachineBuilder import Machine, MachineBuilder
+
+from MyDoubleSpinBox import MyDoubleSpinBox
 import execute_script
 import ini
 import json_IO
 import mainwindow_ui
 import sensors
 from IMainUI import IMainUI
+<<<<<<< HEAD
 from KeiganRobot import KeiganRobot
 from DobotRobot import DobotRobot
+=======
+>>>>>>> master
 from SensorInfo import SensorInfo
 from UIState import UIState
 
-VERSION = '1.1.0'
+VERSION = '1.2.0beta'
 
 class ScriptParams:
     def __init__(self):
@@ -51,18 +54,35 @@ class ScriptParams:
         self.now = datetime.datetime.now()
         self.subFolderName = self.now.strftime('%Y%m%d_%H%M%S')
 
+class UiAxis:
+    def __init__(self, name: str, unit: str, step: float, minvalue: float = -10000.0, maxvalue: float = 10000.0):
+        self.name = name
+        self.unit = unit
+        self.step = step
+        self.min = minvalue
+        self.max = maxvalue
+        self.currentLabel = None
+        self.spinbox = None
+        self.execButton = None
 
 class Ui(QMainWindow, IMainUI):
+
     def __init__(self, parent=None):
         super(Ui, self).__init__(parent)
         self.ui = mainwindow_ui.Ui_mainwindow()
         self.ui.setupUi(self)
         self.setStyleSheet("QMainWindow::separator{ background: darkgray; width: 1px; height: 1px; }")
 
+        self.isinitialized = False
+        self.initialContentSize = self.ui.scrollAreaWidgetContents.size()
+        self.initialSectionRobotSize = self.ui.SectionRobotControl.size()
+        self.initialManualOperationSize = self.ui.manualOperation.size()
+        self.initialPosControlSize = self.ui.posControlFrame.size()
         self.ui.MagikEye.setToolTip('MkECTL v' + VERSION + ' ©MagikEye Inc.\nPress this button to run the demo script.')
         self.scriptParams = ScriptParams()
-        # self.subWindow = sensors.SensorWindow(mainUI=self)
         self.robot_connected = False
+        self.uiaxes = []
+        self.machine = None
 
         ### docking window https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
         self.sensorWindow = sensors.SensorWindow(mainUI=self)
@@ -94,7 +114,7 @@ class Ui(QMainWindow, IMainUI):
         self.demo_script = 'script/demo.txt'
 
         self.updateScriptProgress()
-        self.ui.progressBar.setValue(self.percent)
+        self.ui.progressBar.setValue(int(self.percent))
         self.ui.stopButton.clicked.connect(self.interrupt)
 
         # 画面サイズを取得 (a.desktop()は QDesktopWidget )  https://ja.stackoverflow.com/questions/44060/pyqt5%E3%81%A7%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AE%E4%B8%AD%E5%A4%AE%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%97%E3%81%9F%E3%81%84
@@ -112,30 +132,11 @@ class Ui(QMainWindow, IMainUI):
         self.isMaxWinSize = False
 
         # motor
-        self.motorSet = ['slider', 'pan', 'tilt']
         self.robotController = None  # instance of M_KeiganRobot
-        self.motorGUI: dict = {}  # 'exe', 'posSpin', 'currentPosLabel'  # GUI objects related to motors  # Dict of dictionaries
         self.states = set()
-        self.devices: dict = {}  # 'motors', 'robot', 'lights', '3Dsensors' etc.  # Dict of dictionaries
 
         if not os.path.exists(self.scriptParams.baseFolderName):
             os.makedirs(self.scriptParams.baseFolderName)
-
-        self.devices['3Dsensors'] = self.sensorWindow
-
-        self.make_motorGUI()
-
-        # motor-related process
-        for m_name in self.motorSet:
-            exeButtonName: str = self.motorGUI['exe'][m_name].objectName()
-
-            # exe buttons
-            self.motorGUI['exe'][m_name].clicked.connect(partial(lambda o: o.determine(), self.motorGUI['posSpin'][m_name]))
-            # position spinboxes
-            self.motorGUI['posSpin'][m_name].valueChanged.connect(self.judgePresetEnable)
-            self.motorGUI['posSpin'][m_name].valueDetermined.connect(partial(lambda n: self.exeButtonClicked(n), exeButtonName))
-
-        self.ui.rebootButton.clicked.connect(self.rebootButtonClicked)
 
         # other buttons
         self.actionAbortRequest = False
@@ -152,8 +153,9 @@ class Ui(QMainWindow, IMainUI):
         self.ui.executeScript_button.clicked.connect(lambda: self.run_script(False))
         self.ui.continueButton.clicked.connect(lambda: self.run_script(True))
         self.ui.viewSensorWinButton.clicked.connect(lambda: self.showSensorWindow(self.geometry, self.framesize))
-        self.ui.sliderOriginButton.clicked.connect(self.initializeOrigins)
+        self.ui.initializeOriginButton.clicked.connect(self.initializeOrigins)
         self.ui.freeButton.clicked.connect(self.freeAllMotors)
+        self.ui.rebootButton.clicked.connect(self.rebootButtonClicked)
         self.ui.onL1Button.clicked.connect(lambda: self.IRlightControl(1, True))
         self.ui.offL1Button.clicked.connect(lambda: self.IRlightControl(1, False))
         self.ui.onL2Button.clicked.connect(lambda: self.IRlightControl(2, True))
@@ -210,6 +212,32 @@ class Ui(QMainWindow, IMainUI):
             self.previousPostProcFilePath = ini.getPreviousPostProcFile(self.configIniFile)
             self.readPostProcFile()
 
+    def showEvent(self, event: QShowEvent):
+        if event.spontaneous():
+            return
+        if self.isinitialized:
+            return
+        self.isinitialized = True
+        print("UI Initialized.")
+        print("posControlFrame size", self.ui.posControlFrame.size())
+
+    # def forceUpdate(self, widget: QWidget):
+    #     for child in widget.children():
+    #         if child.isWidgetType():
+    #             self.forceUpdate(child)
+    #     if widget.layout() is not None:
+    #         self.invalidateLayout(widget.layout())
+    #
+    # def invalidateLayout(self, layout: QLayout):
+    #     for i in range(layout.count()):
+    #         item = layout.itemAt(i)
+    #         if (item.layout() is not None):
+    #             self.invalidateLayout(item.layout())
+    #         else:
+    #             item.invalidate()
+    #     layout.invalidate()
+    #     layout.activate()
+
 
     def resizeEvent(self, QResizeEvent):
         print("mainwindow resize event", self.size(), "ismaximized:", self.isMaximized())
@@ -245,29 +273,94 @@ class Ui(QMainWindow, IMainUI):
         self.sensorWindow.close()
         exit()
 
+    @staticmethod
+    def clearLayout(layout):
+        if layout is not None:
+            while layout.count():
+                child = layout.takeAt(0)
+                if child.widget() is not None:
+                    child.widget().setParent(None)
+                    # child.widget().deleteLater()
+                elif child.layout() is not None:
+                    clearLayout(child.layout())
+                    child.layout().setParent(None)
+                    # child.layout().deleteLater()
+
     def make_motorGUI(self):
-        # make dictionaries of member valuables
-        exeButtons: dict = {}
-        posSpinboxes: dict = {}
-        currentPosLabels: dict = {}
+        self.clearLayout(self.ui.posControlLayout)
 
-        for m_name in self.motorSet:
-            # https://teratail.com/questions/51674
-            exeButtonsCode: str = '%s[\'%s\'] = %s%s%s' % (
-                'exeButtons', m_name, 'self.ui.', m_name, 'MoveExe')  # exeButtons[~~] = self.ui.~~MoveExe
-            exec(exeButtonsCode)
-            posSpinCode = '%s[\'%s\'] = %s%s%s' % (
-                'posSpinboxes', m_name, 'self.ui.', m_name, 'PosSpin')  # posSpinboxes[~~] = self.ui.~~PosSpin
-            exec(posSpinCode)
-            currentPosCode = '%s[\'%s\'] = %s%s%s' % (
-                'currentPosLabels', m_name, 'self.ui.', m_name,
-                'CurrentPos')  # currentPosLabels[~~] = self.ui.~~CurrentPos
-            exec(currentPosCode)
+        self.uiaxes = []
+        for a in self.machine.axes:
+            axis = UiAxis(a.name, a.unit, a.step, a.min, a.max)
+            self.uiaxes.append(axis)
 
-        # print(exeButtons)
-        self.motorGUI['exe'] = exeButtons  # ex.) motorGUI['exe']['slider'] == self.ui.sliderMoveExe
-        self.motorGUI['posSpin'] = posSpinboxes  # ex.) motorGUI['posSpin']['slider'] == self.ui.sliderPosSpin
-        self.motorGUI['currentPosLabel'] = currentPosLabels  # ex.) motorGUI['currentPosLabel']['slider'] == self.ui.sliderCurrentLabel
+        parent = self.ui.manualOperation
+        layout = self.ui.posControlLayout
+        layout.setColumnStretch(0, 1)   # name
+        layout.setColumnStretch(1, 1)   # current pos
+        layout.setColumnStretch(2, 1)   # target pos
+        layout.setColumnStretch(3, 0)   # exec button
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/GUI_icons/exec.png"), QIcon.Normal, QIcon.Off)
+        for i, axis in enumerate(self.uiaxes):
+            row = i * 2
+            label = QLabel(parent)
+            label.setText(axis.name + " [" + axis.unit + "]")
+            label.setFixedHeight(24)
+            layout.addWidget(label, row, 0)
+            current = QLabel(parent)
+            current.setText("0.00")
+            current.setFixedSize(90, 24)
+            current.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
+            layout.addWidget(current, row, 1, Qt.AlignCenter)
+            axis.currentLabel = current
+
+            spinbox = MyDoubleSpinBox(parent)
+            spinbox.setKeyboardTracking(True)
+            spinbox.setDecimals(2)
+            spinbox.setValue(0.00)
+            spinbox.setAlignment(Qt.AlignRight)
+            spinbox.setFixedSize(90, 24)
+            spinbox.setMinimum(axis.min)
+            spinbox.setMaximum(axis.max)
+            spinbox.setSingleStep(axis.step)
+            spinbox.setStepType(MyDoubleSpinBox.DefaultStepType)
+            spinbox.valueChanged.connect(self.judgePresetEnable)
+            spinbox.valueDetermined.connect(partial(self.exeButtonClicked, axis))
+            layout.addWidget(spinbox, row, 2, Qt.AlignCenter)
+            axis.spinbox = spinbox
+
+            button = QPushButton(parent)
+            button.setText("")
+            button.setFixedSize(QSize(24, 24))
+            button.setIcon(icon)
+            button.setAutoDefault(False)
+            button.clicked.connect(partial(self.exeButtonClicked, axis))
+            axis.execButton = button
+            layout.addWidget(button, row, 3, Qt.AlignCenter)
+
+            if i < len(self.uiaxes) - 1:
+                line = QFrame(parent, Qt.Window)
+                line.setGeometry(QRect(0, 0, 100, 0))
+                line.setFrameShape(QFrame.HLine)
+                line.setFrameShadow(QFrame.Sunken)
+                layout.addWidget(line, row+1, 0, 1, 4)
+
+        spacer = QSpacerItem(10, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        layout.addItem(spacer)
+        self.ui.posControlFrame.setFixedHeight(len(self.uiaxes)*32 + 8)
+        self.ui.posControlFrame.updateGeometry()
+        sizediff = self.ui.posControlFrame.size() - self.initialPosControlSize
+        print("sizediff:", sizediff)
+        self.ui.manualOperation.setMinimumHeight(self.initialManualOperationSize.height() + sizediff.height())
+        self.ui.SectionRobotControl.setMinimumHeight(self.initialSectionRobotSize.height() + sizediff.height())
+
+        prev = None
+        for axis in self.uiaxes:
+            w = axis.spinbox
+            if prev is not None:
+                self.setTabOrder(prev, w)
+            prev = w
 
     def actionAbort(self):
         self.actionAbortRequest = True
@@ -292,48 +385,24 @@ class Ui(QMainWindow, IMainUI):
             self.setUIStatus(self.states)
             self.robot_connected = False
         else:
-            # initialize
-            count = 0
-
-            # GUI
             self.startAction('Connecting...')
 
-            # Motor
-            if "motors" in self.machineParams:
-                if "Keigan" in self.machineParams["motors"]:
-                    self.robotController = KeiganRobot(self.machineParams["motors"])
-                else:
-                    self.robotController = DobotRobot(self.machineParams["motors"])
-            else:
-                self.robotController = KeiganRobot()
+            # build machine
+            if self.machine is not None:
+                self.robotController = self.machine.robot
+                self.IRLight = self.machine.light
 
-            count += 10
-            self.updateActionProgress(10, None, True)
-            self.robotController.connect()
+                self.updateActionProgress(10, 'Connecting Robot...', True)
+                self.robotController.connect()
 
-            self.updateActionProgress(40, 'Initializing Robot...', True)
-            self.robotSettingsWindow = self.robotController.getSettingWindow()
+                self.updateActionProgress(40, 'Initializing Robot...', True)
+                self.robotSettingsWindow = self.robotController.getSettingWindow()
 
             if self.robotController.initialize():
-                self.devices['robot'] = self.robotController
                 self.updateActionProgress(80, 'Initializing IRLight...', True)
                 # IR light
-                if "IRLight" in self.machineParams:
-                    IRtype = self.machineParams["IRLight"].get("type")
-                    IRdevice = self.machineParams["IRLight"].get("device")
-                    if IRtype == "MkE":
-                        self.IRLight = IRLightMkE.IRLightMkE(IRtype, IRdevice)
-                    elif IRtype == "PAPOUCH":
-                        self.IRLight = IRLightPapouch.IRLightPapouch(IRtype, IRdevice)
-                    elif IRtype == "Numato":
-                        self.IRLight = IRLightNumato.IRLightNumato(IRtype, IRdevice)
-                    else:   # dummy
-                        self.IRLight = IRLightDummy.IRLightDummy(IRtype, IRdevice)
-
                 self.openIR()
 
-                # GUI
-                print('--initialization completed--')
                 self.endAction('Connected.')
 
                 self.states = {UIState.MOTOR, UIState.IRLIGHT, UIState.SCRIPT}
@@ -360,10 +429,11 @@ class Ui(QMainWindow, IMainUI):
 
     def updateCurrentPos(self, pos_d):
         if isinstance(pos_d, dict):
-            for k, pos in pos_d.items():
-                lb = self.motorGUI['currentPosLabel'][k]
-                lb.setText('{:>8.2f}'.format(pos))
-                lb.repaint()
+            for axis in self.uiaxes:
+                if axis.name in pos_d.keys():
+                    lb = axis.currentLabel
+                    lb.setText('{:>8.2f}'.format(pos_d[axis.name]))
+                    lb.repaint()
 
     def allowActionAbort(self, enable):
         if enable != self.ui.actionAbortButton.isEnabled():
@@ -385,7 +455,7 @@ class Ui(QMainWindow, IMainUI):
 
     def initializeOrigins(self):
         self.startAction('Init Origins...')
-        self.robotController.initializeOrigins({'slider'}, self.actionStatusCallback)
+        self.robotController.initializeOrigins(None, self.actionStatusCallback)
         QMessageBox.information(self, "Initialize Origin", "finished")
         self.endAction('Done')
 
@@ -393,29 +463,25 @@ class Ui(QMainWindow, IMainUI):
         self.robotController.freeMotors()
         QMessageBox.information(self, "free", "All motors have been freed.")
 
-    def exeButtonClicked(self, buttonName):
-        if re.search('.+MoveExe', buttonName):
-            self.judgePresetEnable()
-            motor_id = buttonName.replace('MoveExe', '')
-            targetPos = self.motorGUI['posSpin'][motor_id].value()
-            targetPos_d = {motor_id: targetPos}
-            self.moveRobot(targetPos_d)
+    def exeButtonClicked(self, axis: UiAxis):
+        self.judgePresetEnable()
+        targetPos_d = {axis.name: axis.spinbox.value()}
+        self.updateTargetPosition(targetPos_d)
+        self.moveRobot(targetPos_d)
 
     def judgePresetEnable(self):
         modified = False
-        for v in self.motorGUI['posSpin'].values():
-            if type(v) is MyDoubleSpinBox.MyDoubleSpinBox:
-                if v.isModified():
-                    modified = True
-                    break
+        for axis in self.uiaxes:
+            if axis.spinbox.isModified():
+                modified = True
+                break
         self.ui.presetButton.setEnabled(modified)
 
     def presetModifiedPositions(self):
-        for k, v in self.motorGUI['posSpin'].items():
-            if type(v) is MyDoubleSpinBox.MyDoubleSpinBox:
-                if v.isModified():
-                    pos_d = {k: v.value()}
-                    self.presetPositions(pos_d)
+        for axis in self.uiaxes:
+            if axis.spinbox.isModified():
+                pos_d = {axis.name: axis.spinbox.value()}
+                self.presetPositions(pos_d)
         self.judgePresetEnable()
 
     def presetPositions(self, pos_d):
@@ -434,14 +500,14 @@ class Ui(QMainWindow, IMainUI):
     def moveRobot(self, targetpos):
         self.startAction('Moving...')
         self.allowManualUI(False)
-        isAborted = self.robotController.moveTo(targetpos, self.actionStatusCallback, False, self.isActionAbortRequest)
+        isAborted = self.robotController.moveTo(targetpos, False, self.actionStatusCallback, self.isActionAbortRequest)
         self.allowActionAbort(False)
         self.allowManualUI(True)
         if isAborted:
             self.abortAction("Interrupted or Motor not moving.")
         else:
             self.endAction('Goal')
-            self.updateTargetPosition(targetpos)
+            # self.updateTargetPosition(targetpos)
             if self.sensorWindow.connected:
                 self.sensorWindow.prevImg(1)
         time.sleep(0.1)
@@ -462,20 +528,19 @@ class Ui(QMainWindow, IMainUI):
 
     def allowManualUI(self, enable):
         self.ui.connectButton.setEnabled(enable)
-        self.ui.sliderOriginButton.setEnabled(enable)
+        self.ui.initializeOriginButton.setEnabled(enable)
         self.ui.freeButton.setEnabled(enable)
         self.ui.rebootButton.setEnabled(enable)
         self.ui.goHomeButton.setEnabled(enable)
-        self.ui.sliderMoveExe.setEnabled(enable)
-        self.ui.panMoveExe.setEnabled(enable)
-        self.ui.tiltMoveExe.setEnabled(enable)
         self.ui.GoButton.setEnabled(enable)
+        for axis in self.uiaxes:
+            axis.execButton.setEnabled(enable)
+            axis.spinbox.allowDetermine(enable)
 
     def updateTargetPosition(self, targetpos):
-        for k in targetpos.keys():
-            posspin = self.motorGUI['posSpin'].get(k)
-            if type(posspin) is MyDoubleSpinBox.MyDoubleSpinBox:
-                posspin.setValue(targetpos[k])
+        for axis in self.uiaxes:
+            if axis.name in targetpos.keys():
+                axis.spinbox.setValue(targetpos[axis.name])
         self.judgePresetEnable()
 
     def updateActionProgress(self, value, text, active):
@@ -572,7 +637,9 @@ class Ui(QMainWindow, IMainUI):
             self.states = {UIState.SCRIPT_PROGRESS}
             self.setUIStatus(self.states)
 
-            interrupted = execute_script.execute_script(self.scriptParams, self.devices, self, True)
+            interrupted = execute_script.execute_script(self.scriptParams, {'robot': self.robotController,
+                                                                            'lights': self.IRLight,
+                                                                            '3Dsensors': self.sensorWindow}, self, True)
 
             self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
             self.setUIStatus(self.states)
@@ -642,14 +709,17 @@ class Ui(QMainWindow, IMainUI):
         self.showSensorWindow(self.geometry, self.framesize)
 
         # GUI
-        if self.devices['3Dsensors'].connected:
-            self.devices['3Dsensors'].sensorInfo.save_to_file(self.dataOutFolder() + "/sensorinfo.json")
+        if self.sensorWindow.connected:
+            self.sensorWindow.sensorInfo.save_to_file(self.dataOutFolder() + "/sensorinfo.json")
 
         self.states = {UIState.SCRIPT_PROGRESS}
         self.setUIStatus(self.states)
 
         # execute script
-        interrupted = execute_script.execute_script(self.scriptParams, self.devices, self)
+        interrupted = execute_script.execute_script(self.scriptParams,
+                                                    {'robot': self.robotController,
+                                                     'lights': self.IRLight,
+                                                     '3Dsensors': self.sensorWindow}, self)
 
         self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
         self.setUIStatus(self.states)
@@ -664,27 +734,33 @@ class Ui(QMainWindow, IMainUI):
                                               % os.path.basename(self.scriptParams.scriptName))
 
     def setHome(self):
-        targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        targetPos_d = {}
+        for axis in self.uiaxes:
+            targetPos_d[axis.name] = 0.0
         self.presetPositions(targetPos_d)
 
     def goToHomePosition(self):
-        targetPos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
+        targetPos_d = {}
+        for axis in self.uiaxes:
+            targetPos_d[axis.name] = 0.0
         self.updateTargetPosition(targetPos_d)
         self.moveRobot(targetPos_d)
 
     def savePositions(self):
         save_name = ''
-        for posspin in self.motorGUI['posSpin'].values():
-            save_name += str('{:.2f}'.format(posspin.value())) + ' '
+        for axis in self.uiaxes:
+            save_name += str('{:.2f}'.format(axis.spinbox.value())) + ' '
             save_name.strip()  # https://itsakura.com/python-strip#s2
-        if not save_name in [self.ui.savedPosCombo.itemText(i) for i in range(
+        if save_name not in [self.ui.savedPosCombo.itemText(i) for i in range(
                 self.ui.savedPosCombo.count())]:  # https://stackoverflow.com/questions/7479915/getting-all-items-of-qcombobox-pyqt4-python
             self.ui.savedPosCombo.addItem(save_name)
         print(save_name)
 
     def goToSavedPositions(self):
         targetPos = self.ui.savedPosCombo.currentText().split()  # list
-        targetPos_d = {'slider': float(targetPos[0]), 'pan': float(targetPos[1]), 'tilt': float(targetPos[2])}
+        targetPos_d = {}
+        for i, axis in enumerate(self.uiaxes):
+            targetPos_d[axis.name] = float(targetPos[i])
         self.updateTargetPosition(targetPos_d)
         self.moveRobot(targetPos_d)
 
@@ -702,13 +778,13 @@ class Ui(QMainWindow, IMainUI):
 
     def openIR(self):
         message = self.IRLight.open()
-        self.devices['lights'] = self.IRLight
         self.ui.IRstateLabel.setText(message)
 
     def IRlightControl(self, ch, state):
         self.IRLight.set(ch, state)
 
-    def toFloat(self, text, default):
+    @staticmethod
+    def toFloat(text, default):
         try:
             val = float(text)
             return val
@@ -900,7 +976,7 @@ class Ui(QMainWindow, IMainUI):
         else:
             self.percent = 0.0
         # print(self.percent)
-        self.ui.progressBar.setValue(self.percent)
+        self.ui.progressBar.setValue(int(self.percent))
         self.ui.progressBar.repaint()
         return self.percent
 
@@ -933,10 +1009,12 @@ class Ui(QMainWindow, IMainUI):
             ini.updatePreviousMachineFile('data/previousMachine.ini', filename)
             self.ui.machineFileName_label.setText(os.path.basename(filename))
 
-        if self.machineParams == {}:
-            self.states = {UIState.MACHINEFILE}
-        else:
+        self.machine = MachineBuilder.build(self.machineParams)
+        if self.machine is not None:
+            self.make_motorGUI()
             self.states = {UIState.MACHINEFILE, UIState.INITIALIZE}
+        else:
+            self.states = {UIState.MACHINEFILE}
 
         self.setUIStatus(self.states)
 

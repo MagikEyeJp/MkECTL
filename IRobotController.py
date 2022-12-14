@@ -9,7 +9,7 @@ class IRobotController:
     def initialize(self, callback: callable = None, isAborted: callable = None) -> bool:
         pass
 
-    def initializeOrigins(self, origins, callback: callable = None, isAborted:callable = None) -> bool:
+    def initializeOrigins(self, origins: list = None, callback: callable = None, isAborted: callable = None) -> bool:
         pass
 
     def getSettingWindow(self) -> object:
@@ -21,7 +21,7 @@ class IRobotController:
     def presetPosition(self, targetPos):
         pass
 
-    def moveTo(self, targetPos: dict, callback: callable, wait: bool = False, isAborted: callable = None) -> bool:
+    def moveTo(self, targetPos: dict, wait: bool = False, callback: callable = None,  isAborted: callable = None) -> bool:
         """move to target position
 
         Move the robot to the target position.

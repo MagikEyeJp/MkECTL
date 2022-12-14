@@ -122,23 +122,19 @@ class KeiganRobot(IRobotController):
         self.tilt = self.params.get('tilt', {}).get('cont', None)
 
         if [self.slider, self.pan, self.tilt].count(None) == 0:
-            for id, p in self.params.items():
-                exec('self.%s.enable()' % id)
-                exec('self.%s.interface(8)' % id)
-                # print(self.slider)
-
-                if "initial_param" in self.m_machineParams[id]:
-                    for initKey, initPar in self.m_machineParams[id]["initial_param"].items():
-                        execCode: str = 'self.%s.%s(%d)' % (id, initKey, initPar)
-                        exec(execCode)
-
-                time.sleep(0.2)
-
+            for m in [self.slider, self.pan, self.tilt]:
+                self.initializeMotor(m)
             return True
         else:
             return False
 
-    def initializeOrigins(self, origins, callback):
+    def initializeMotor(self, m: KMControllersS.USBController):
+        m.wait_start()      # wait reboot
+        m.enable()
+        m.interface(8)      # USB only
+        m.curveType(1)      # trapezoid speed curve
+
+    def initializeOrigins(self, origins=None, callback=None):
         for m in [self.slider, self.pan, self.tilt]:
             m.reboot()
         time.sleep(0.5)
@@ -147,16 +143,15 @@ class KeiganRobot(IRobotController):
         GOAL_VELO = 0.1
         GOAL_TIME = 2.0
         m = self.slider
-        m.wait_start()
-        m.enable()
-        m.interface(8)
+        self.initializeMotor(m)
         m.speed(10.0)
         maxTorque = m.read_maxTorque()[0]
         m.maxTorque(1.0)
         m.runForward()
         duration = 0.0
         prev_time = time.time()
-        inmain(callback, None, duration, GOAL_TIME)
+        if callback is not None:
+            inmain(callback, None, duration, GOAL_TIME)
         time.sleep(0.5)
         while duration < GOAL_TIME:
             (pos, vel, torque) = m.read_motor_measurement()
@@ -173,8 +168,7 @@ class KeiganRobot(IRobotController):
 
         # pan, tilt origin
         for m in [self.pan, self.tilt]:
-            m.enable()
-            m.interface(8)
+            self.initializeMotor(m)
 
 
     def changePIDparam(self, pid_category, pid_param, motor_i, value):
@@ -226,7 +220,7 @@ class KeiganRobot(IRobotController):
             m.close()
             p['cont'] = None
 
-    def moveTo(self, targetPos, callback, wait=False, isAborted=None):
+    def moveTo(self, targetPos, wait=False, callback=None, isAborted=None):
         # pos: dict ('slider', 'pan', 'tilt')
 
         pos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
@@ -296,7 +290,8 @@ class KeiganRobot(IRobotController):
                     err_pos = geterr(axis, pos_d)
                     print("err=", err_pos, cnt)
 
-                    inmain(callback, pos_d, initial_err - err_pos, initial_err, time.time() - starttime > 5.0)
+                    if callback is not None:
+                        inmain(callback, pos_d, initial_err - err_pos, initial_err, time.time() - starttime > 5.0)
 
                     if err_pos < (GOAL_EPS if wait else NOWAIT_EPS):
                         if wait:
