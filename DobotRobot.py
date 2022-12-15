@@ -12,6 +12,7 @@ class DobotRobot(IRobotController):
         axes = machineParams["axes"]
         self.basePos = {axes[i]["axis"]: axes[i]["offset"] for i in axes.keys() if axes[i]["axis"] in defaultAixs }
         self.targetPos = {i:0 for i in self.basePos.keys()}
+        self.motorSet = [i for i in self.basePos.keys()]
 
     def connect(self, callback: callable = None, isAborted: callable = None):
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
