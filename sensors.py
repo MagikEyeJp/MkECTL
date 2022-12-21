@@ -107,7 +107,8 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.getImg_thread = None
 
         # Variables (initialized with default values)
-        self.IPaddress = ini.getPreviousIPAddress('data/previousIPAddress.ini')
+        self.ini = ini.Ini()
+        self.IPaddress = self.ini.getPreviousIPAddress()
         self.portNum: int = 8888
         self.shutterSpeed: int = 30000
         self.frames: int = 5
@@ -256,7 +257,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         else:
             self.IPaddress = self.RPiaddress
         # write changed IP address to inifile
-        ini.updatePreviousIPAddressFile('data/previousIPAddress.ini', self.IPaddress)
+        self.ini.updatePreviousIPAddressFile(self.IPaddress)
 
     def changeShutter(self):
         if self.ui_s.shutterLineEdit.text() == '':

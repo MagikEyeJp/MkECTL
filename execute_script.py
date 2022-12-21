@@ -10,7 +10,7 @@ from timeout_decorator import timeout, TimeoutError
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 
-import ini
+from ini import Ini
 
 commands = {'root': ['set_root', False],
             'set': ['set_filename', False],
@@ -98,6 +98,7 @@ class Systate():
 
 
 systate = Systate()
+ini = Ini()
 
 def timeoutCallback(mainWindow):
     systate.timeout = True
