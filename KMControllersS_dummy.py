@@ -928,6 +928,10 @@ class USBController(Controller):
         else:
             ret = b''
         return ret
+    def wait_start(self):
+        sn = b''
+        while len(sn) == 0:
+            sn = self.getRegister(0x46)
 
     def __read_float_reg(self, r):
         return struct.unpack_from('>f', self.getRegister(r))
