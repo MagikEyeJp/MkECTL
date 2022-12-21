@@ -78,6 +78,7 @@ class KeiganRobot(IRobotController):
 
         serials = {k: v.get("serial") for k, v in self.m_machineParams.items()}
         scales = {k: v.get("scale") for k, v in self.m_machineParams.items()}
+        offsets = {k: v.get("offset") for k, v in self.m_machineParams.items()}
 
         motordic = {}
 
@@ -89,6 +90,7 @@ class KeiganRobot(IRobotController):
                 param['id'] = id
                 param['cont'] = KMControllersS_dummy.USBController('dev/dummy')
                 param['scale'] = scales[id]
+                param['offset'] = offsets[id] if offsets[id] is not None else 0.0
                 param['SN'] = serials[id]
                 motordic[id] = param
 
@@ -103,9 +105,10 @@ class KeiganRobot(IRobotController):
                 param['id'] = id
                 param['cont'] = motor
                 param['scale'] = scales[id]
+                param['offset'] = offsets[id] if offsets[id] is not None else 0.0
                 param['SN'] = serialnum
                 motordic[id] = param
-                motor.set_scaling(scales[id], 0.0)  # offset = 0.0 (temp)
+                motor.set_scaling(scales[id], param['offset'])
             else:
                 motor.close()
                 motor = None
@@ -119,62 +122,79 @@ class KeiganRobot(IRobotController):
         self.tilt = self.params.get('tilt', {}).get('cont', None)
 
         if [self.slider, self.pan, self.tilt].count(None) == 0:
-            for id, p in self.params.items():
-                exec('self.%s.enable()' % id)
-                exec('self.%s.interface(8)' % id)
-                # print(self.slider)
-
-                if "initial_param" in self.m_machineParams[id]:
-                    for initKey, initPar in self.m_machineParams[id]["initial_param"].items():
-                        execCode: str = 'self.%s.%s(%d)' % (id, initKey, initPar)
-                        exec(execCode)
-
-                time.sleep(0.2)
-
+            for m in [self.slider, self.pan, self.tilt]:
+                self.initializeMotor(m)
             return True
         else:
             return False
 
-    def initializeOrigins(self, origins, callback):
+    def initializeMotor(self, m: KMControllersS.USBController):
+        m.wait_start()      # wait reboot
+        m.enable()
+        m.interface(8)      # USB only
+        m.curveType(1)      # trapezoid speed curve
+
+    def initializeOrigins(self, origins=None, callback=None):
+        for m in [self.slider, self.pan, self.tilt]:
+            m.reboot()
+        time.sleep(0.5)
+
+        # slider origin
         GOAL_VELO = 0.1
         GOAL_TIME = 2.0
         m = self.slider
+        self.initializeMotor(m)
         m.speed(10.0)
+        maxTorque = m.read_maxTorque()[0]
         m.maxTorque(1.0)
         m.runForward()
-        prev_time = time.time()
         duration = 0.0
+        prev_time = time.time()
+        if callback is not None:
+            inmain(callback, None, duration, GOAL_TIME)
+        time.sleep(0.5)
         while duration < GOAL_TIME:
-            time.sleep(0.2)
             (pos, vel, torque) = m.read_motor_measurement()
             if vel >= GOAL_VELO:
                 prev_time = time.time()
-            duration = time.time() - prev_time
             pos_d = {'slider': pos}
+            time.sleep(0.2)
+            duration = time.time() - prev_time
             inmain(callback, pos_d, duration, GOAL_TIME)
-
-        m.preset_scaled_position(0)
+        time.sleep(1.0)
+        m.presetPosition(0.0)
         m.free()
-        m.maxTorque(5.0)
+        m.maxTorque(maxTorque)
+
+        # pan, tilt origin
+        for m in [self.pan, self.tilt]:
+            self.initializeMotor(m)
+
 
     def changePIDparam(self, pid_category, pid_param, motor_i, value):
+        print("changePID", pid_category, pid_param, motor_i, value)
         lpf_index = {'speed': 1, 'qCurrent': 0, 'position': 2}
 
         if pid_param == 'lowPassFilter':
             self.params[self.motorSet[motor_i]]['cont'].lowPassFilter(lpf_index[pid_category], value)
         elif pid_param == 'posControlThreshold':
             self.params[self.motorSet[motor_i]]['cont'].posControlThreshold(value)
+        elif pid_category == 'motion' or pid_category == 'torque':
+            execCode = 'self.params[\'%s\'][\'cont\'].%s(%f)' % (self.motorSet[motor_i], pid_param, value)
+            print(execCode)
+            eval(execCode)
         else:
             execCode = 'self.params[\'%s\'][\'cont\'].%s%s(%f)' % (self.motorSet[motor_i], pid_category, pid_param, value)
             eval(execCode)
 
+    def saveAllRegisters(self):
+        for p in self.params.values():
+            p['cont'].saveAllRegisters()
+
     def getPosition(self):
         pos_d = {}
-        vel_d = {}
-        torque_d = {}
         for k, p in self.params.items():
-            (pos_d[k], vel_d[k], torque_d[k]) = p['cont'].read_motor_measurement()
-            pos_d[k] /= p['scale']
+            pos_d[k] = p['cont'].read_scaled_position()
         return pos_d
 
     def presetPosition(self, targetPos):
@@ -200,7 +220,7 @@ class KeiganRobot(IRobotController):
             m.close()
             p['cont'] = None
 
-    def moveTo(self, targetPos, callback, wait=False, isAborted=None, scriptParams=None, mainWindow=None):
+    def moveTo(self, targetPos, wait=False, callback=None, isAborted=None):
         # pos: dict ('slider', 'pan', 'tilt')
 
         pos_d = {'slider': 0.0, 'pan': 0.0, 'tilt': 0.0}
@@ -214,23 +234,45 @@ class KeiganRobot(IRobotController):
         NOWAIT_EPS = 0.1  # COARSE目標位置到達誤差しきい値
         GOAL_CNT = 8  # 目標位置到達判定回数
 
+        class Axis:
+            def __init__(self, cont, target):
+                self.cont = cont
+                self.target = target
+
+        def getpos(ax: Axis):
+            pos = {}
+            for k, v in ax.items():
+                pos[k] = v.cont.read_scaled_position()
+            return pos
+
+        def geterr(ax: Axis, pos: dict):
+            err = 0
+            for k, v in ax.items():
+                e = (pos[k] - v.target) * v.cont.get_scaling()[0]
+                err += pow(e, 2)
+            return math.sqrt(err)
+
+        axis = {}
         for k, p in self.params.items():
             if k in targetPos:
-                (init_pos, init_vel, init_torque) = p['cont'].read_motor_measurement()
-                initial_err += pow(init_pos - (targetPos[k] * p['scale']), 2)
-                p['cont'].moveTo_scaled(targetPos[k])
+                c = p['cont']
+                c.speed(c.read_maxSpeed()[0])
+                c.moveTo_scaled(targetPos[k])
+                axis[k] = Axis(c, targetPos[k])
 
-        initial_err = math.sqrt(initial_err)
+        # initial_err = math.sqrt(initial_err)
+
+        pos_d = getpos(axis)
+        initial_err = geterr(axis, pos_d)
         if initial_err == 0.0:
-            return False    # isAborted
+            return False
 
-        # systate.pos = motorPos
+        starttime = time.time()
 
         while True:
             if isAborted is not None:
-                stopClicked = inmain(isAborted, scriptParams, mainWindow)
-                if stopClicked:
-                    return stopClicked
+                if inmain(isAborted):
+                    return True
 
             @timeout(5)
             def waitmove():
@@ -241,26 +283,17 @@ class KeiganRobot(IRobotController):
                 nonlocal NOWAIT_EPS
                 nonlocal GOAL_CNT
 
-                err = 0.0
                 while True:
                     time.sleep(0.2)
                     errors = 0.0
+                    pos_d = getpos(axis)
+                    err_pos = geterr(axis, pos_d)
+                    print("err=", err_pos, cnt)
 
-                    for k, p in self.params.items():
-                        (pos_d[k], vel_d[k], torque_d[k]) = p['cont'].read_motor_measurement()
-                        if k in targetPos:
-                            errors += pow(pos_d[k] - (targetPos[k] * p['scale']), 2)
-                        pos_d[k] /= p['scale']
-                    err = math.sqrt(errors)
+                    if callback is not None:
+                        inmain(callback, pos_d, initial_err - err_pos, initial_err, time.time() - starttime > 5.0)
 
-                    # display Current Pos
-                    # mainWindow.motorGUI['currentPosLabel'][motorSet[param_i]].setText('{:.2f}'.format(
-                    #     pos[param_i] / scale[param_i]))
-                    # yield pos_d
-                    inmain(callback, pos_d, initial_err - err, initial_err)
-
-                    if err < (GOAL_EPS if wait else NOWAIT_EPS):
-                        print("err=", err)
+                    if err_pos < (GOAL_EPS if wait else NOWAIT_EPS):
                         if wait:
                             cnt += 1
                         else:
@@ -270,22 +303,20 @@ class KeiganRobot(IRobotController):
                     else:
                         cnt = 0
 
-                    if err < minerr:
-                        # print("err=", err)
-                        minerr = err  # 最小値更新
+                    if err_pos < minerr:
+                        minerr = err_pos  # 最小値更新
                         break
-                return err, pos_d
+                return err_pos, pos_d
 
             try:
                 err, pos_d = waitmove()
-                print("err=", err)
-                # yield pos_d
 
                 if cnt > GOAL_CNT:
                     # raise StopIteration()
                     break
 
             except TimeoutError:
+                print("Timeout")
                 return True     # isAborted
 
         return False
@@ -293,6 +324,7 @@ class KeiganRobot(IRobotController):
     def getSettingWindow(self):
         self.settingWindow = SettingsWindow()
         self.settingWindow.pidChanged.connect(self.changePIDparam)
+        self.settingWindow.parameterSaved.connect(self.saveAllRegisters)
         return self.settingWindow
 
 
@@ -300,6 +332,7 @@ class KeiganRobot(IRobotController):
 
 class SettingsWindow(QtWidgets.QWidget):
     pidChanged = QtCore.pyqtSignal(str, str, int, float)
+    parameterSaved = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super(SettingsWindow, self).__init__(parent)
@@ -364,14 +397,18 @@ class SettingsWindow(QtWidgets.QWidget):
         pid_category_dic = {
             0: 'speed', 1: 'speed', 2: 'speed', 3: 'speed',
             4: 'qCurrent', 5: 'qCurrent', 6: 'qCurrent', 7: 'qCurrent',
-            8: 'position', 9: 'position', 10: 'position', 11: 'position', 12: 'position'
+            8: 'position', 9: 'position', 10: 'position', 11: 'position', 12: 'position',
+            13: 'motion', 14: 'motion', 15: 'motion',
+            16: 'torque', 17: 'torque'
         }
         pid_param_dic = {
             0: 'P', 4: 'P', 8: 'P',
             1: 'I', 5: 'I', 9: 'I',
             2: 'D', 6: 'D', 10: 'D',
             3: 'lowPassFilter', 7: 'lowPassFilter', 11: 'lowPassFilter',
-            12: 'posControlThreshold'
+            12: 'posControlThreshold',
+            13: 'acc', 14: 'dec', 15: 'maxSpeed',
+            16: 'maxTorque', 17: 'limitCurrent'
         }
         print(row, col)
         value = float(self.tableWidget.item(row, col).text())
@@ -385,7 +422,7 @@ class SettingsWindow(QtWidgets.QWidget):
             os.makedirs(self.pidDirPath)
 
         json_IO.writeJson(self.currentPIDvalues, self.pidDirPath + '/' + self.savedPIDfile)
-
+        self.parameterSaved.emit()
         self.ui_setting.resetButton.setEnabled(False)
 
     def resetPID(self):
@@ -414,12 +451,17 @@ class SettingsWindow(QtWidgets.QWidget):
                     'D': [0.0, 0.0, 0.0],
                     'lowPassFilter': [0.1, 0.1, 0.1],
                     'posControlThreshold': [1.0, 1.0, 1.0]
+                },
+                'motion': {
+                    'acc': [8.0, 3.0, 12.0],
+                    'dec': [8.0, 2.0, 4.0],
+                    'maxSpeed': [20.0, 5.0, 5.0],
+                },
+                'torque': {
+                    'maxTorque': [5.0, 5.0, 5.0],
+                    'limitCurrent': [20.0, 20.0, 20.0],
                 }
             }
 
         self.setDicTable()
         self.ui_setting.resetButton.setEnabled(False)
-
-
-
-

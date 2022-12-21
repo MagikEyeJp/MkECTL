@@ -1,23 +1,23 @@
 {
   "motors": {
     "slider": {
-      "serial": "KM-1S SW59#0E9",
+      "serial": "KM-1S ILI4#1DC",
       "scale": -0.116355283,
-      "offset": 5.0
+      "offset": 10.0
     },
     "pan": {
-      "serial": "KM-1S K1UK#E45",
+      "serial": "KM-1S HL9J#F0F",
       "scale": 0.017453293,
-      "offset": -70.00
+      "offset": 51.0
     },
     "tilt": {
-      "serial": "KM-1S 0D69#13A",
+      "serial": "KM-1S 8UB6#F24",
       "scale": 0.017453293,
-      "offset": -17.00
+      "offset": -2.0
     }
   },
   "IRLight": {
-    "type": "MkE",
+    "type": "Numato",
     "device": "/dev/ttyACM0"
   }
 }

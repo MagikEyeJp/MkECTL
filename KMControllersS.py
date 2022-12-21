@@ -207,7 +207,6 @@ class Controller:
         """
         command = b'\x27'
         values = uint8_t2bytes(filtertype)+float2bytes(value)
-        print(values)
         self.run_command(command+identifier+values+crc16,'motor_settings')
 
     def measureInterval(self,interval,identifier=b'\x00\x00',crc16=b'\x00\x00'):
@@ -584,20 +583,20 @@ class Controller:
         """
         Move the motor to the specified absolute 'position' in user defined coordinate.
         """
-        abs_position = (position - self.scaling_offset) * self.scaling_rate
+        abs_position = (position + self.scaling_offset) * self.scaling_rate
         print(abs_position)
         self.moveTo(abs_position)
 
     def read_scaled_position(self):
         (position, velocity, torque) = self.read_motor_measurement()
         try:
-            scaled_position = (position / self.scaling_rate) + self.scaling_offset
+            scaled_position = (position / self.scaling_rate) - self.scaling_offset
         except ZeroDivisionError as e:
             scaled_position = 0.0
         return scaled_position
 
     def preset_scaled_position(self, position):
-        abs_position = (position - self.scaling_offset) * self.scaling_rate
+        abs_position = (position + self.scaling_offset) * self.scaling_rate
         print(abs_position)
         self.presetPosition(abs_position)
 
@@ -790,7 +789,7 @@ class USBController(Controller):
 
     def getRegister(self, reg):
         self.m_reg = -1
-        self.m_value = b''
+        self.m_regvalue = b''
         self.readRegister(reg)
         for w in range(100):
             sleep(.01)
@@ -805,6 +804,11 @@ class USBController(Controller):
         else:
             ret = b''
         return ret
+
+    def wait_start(self):
+        sn = b''
+        while len(sn) == 0:
+            sn = self.getRegister(0x46)
 
     def __read_float_reg(self, r):
         return struct.unpack_from('>f', self.getRegister(r))
