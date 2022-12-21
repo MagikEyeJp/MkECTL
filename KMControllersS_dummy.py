@@ -917,10 +917,10 @@ class USBController(Controller):
         self.readRegister(reg)
         for w in range(100):
             sleep(.01)
-            self.m_lock.acquire()
+            # self.m_lock.acquire()
             readreg = self.m_reg
             readval = self.m_regvalue
-            self.m_lock.release()
+            # self.m_lock.release()
             if readreg >= 0:
                 break
         if reg == readreg and len(readval) > 0:
@@ -929,9 +929,7 @@ class USBController(Controller):
             ret = b''
         return ret
     def wait_start(self):
-        sn = b''
-        while len(sn) == 0:
-            sn = self.getRegister(0x46)
+        pass
 
     def __read_float_reg(self, r):
         return struct.unpack_from('>f', self.getRegister(r))
