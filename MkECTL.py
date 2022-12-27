@@ -553,12 +553,10 @@ class Ui(QMainWindow, IMainUI):
     # --- Scripting
 
     def openScriptFile(self):
-        previousScriptPath = ''
         previousScriptDir = './script/'
-        if os.path.exists('data/previousScript.ini'):
-            previousScriptPath = self.ini.getPreviousScriptPath()
-            if os.path.exists(previousScriptPath):
-                previousScriptDir = os.path.dirname(previousScriptPath)
+        previousScriptPath = self.ini.getPreviousScriptPath()
+        if previousScriptPath:
+            previousScriptDir = os.path.dirname(previousScriptPath)
 
         (fileName, selectedFilter) = \
             QFileDialog.getOpenFileName(self, 'Select script', previousScriptDir, '*.txt')

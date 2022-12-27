@@ -102,10 +102,12 @@ class Ini:
             config.write(configfile)
 
     def getPreviousScriptPath(self):
-        config = configparser.ConfigParser()
-        config.read(self.preScript_iniFile)
-        scriptPath = config.get('previous_script', 'scriptpath')
-
+        try:
+            config = configparser.ConfigParser()
+            config.read(self.preScript_iniFile)
+            scriptPath = config.get('previous_script', 'scriptpath')
+        except:
+            scriptPath = None
         return scriptPath
 
     def updatePreviousScriptPath(self, scriptName):
