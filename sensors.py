@@ -23,6 +23,7 @@ import subprocess
 app = QtWidgets.qApp
 
 from qtutils import inmain
+import ini
 
 # xのあるbit位置が0か1か調べる
 def getbit(x, b):
@@ -106,7 +107,8 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.getImg_thread = None
 
         # Variables (initialized with default values)
-        self.IPaddress = '127.0.0.1'  # default
+        self.ini = ini.Ini()
+        self.IPaddress = self.ini.getPreviousIPAddress()
         self.portNum: int = 8888
         self.shutterSpeed: int = 30000
         self.frames: int = 5
@@ -254,7 +256,8 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.portNum = int(d.group(2))
         else:
             self.IPaddress = self.RPiaddress
-
+        # write changed IP address to inifile
+        self.ini.updatePreviousIPAddressFile(self.IPaddress)
 
     def changeShutter(self):
         if self.ui_s.shutterLineEdit.text() == '':
