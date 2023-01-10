@@ -10,7 +10,7 @@ from timeout_decorator import timeout, TimeoutError
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 
-import ini
+from ini import Ini
 
 commands = {'root': ['set_root', False],
             'set': ['set_filename', False],
@@ -98,6 +98,7 @@ class Systate():
 
 
 systate = Systate()
+ini = Ini()
 
 def timeoutCallback(mainWindow):
     systate.timeout = True
@@ -164,8 +165,8 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
 
     systate.past_parameters.reset()
     print(vars(systate.past_parameters))
-    systate.offset = [0, 0, 0]
-    systate.scale = [1.0, 1.0, 1.0]
+    systate.offset = [0] * len(devices['robot'].motorSet)
+    systate.scale = [1.0] * len(devices['robot'].motorSet)
 
     args_hist: list = []
     com_hist: list = []
@@ -424,7 +425,7 @@ def move_robot(args, scriptParams, devices, mainWindow):
 
     if not systate.skip:
         scaled_pos = list(np.add(np.multiply(systate.pos, systate.scale), systate.offset))
-        targetPos_d = {'slider': scaled_pos[0], 'pan': scaled_pos[1], 'tilt': scaled_pos[2]}
+        targetPos_d = dict(zip(devices['robot'].motorSet,scaled_pos))
         if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
             app.processEvents()
 
@@ -444,7 +445,7 @@ def home_robot(args, scriptParams, devices, mainWindow):
     if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
 
-    pos = np.array([0, 0, 0], dtype=int)
+    pos = np.array([0] * len(devices['robot'].motorSet), dtype=int)
 
     move_robot(pos, scriptParams, devices, mainWindow)
 

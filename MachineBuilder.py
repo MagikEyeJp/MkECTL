@@ -1,5 +1,6 @@
 import IRobotController
 from KeiganRobot import KeiganRobot
+from DobotRobot import DobotRobot
 import IRLight
 import IRLightDummy
 import IRLightMkE
@@ -13,6 +14,8 @@ def createRobot(params: dict) -> IRobotController:
         typ = params.get('type')
         if typ == 'KEIGAN':
             robot = KeiganRobot(params.get('axes'))
+        elif typ == 'DOBOT':
+            robot = DobotRobot(params)
     return robot
 
 
