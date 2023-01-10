@@ -122,10 +122,12 @@ class Ini:
             config_ps.write(configfile)
 
     def getPreviousMachineFile(self):
-        config = configparser.ConfigParser()
-        config.read(self.preMachine_iniFile)
-        machineFilePath = config.get('previous_machine', 'machine_file')
-
+        try: # check existence of pre_machine file
+            config = configparser.ConfigParser()
+            config.read(self.preMachine_iniFile)
+            machineFilePath = config.get('previous_machine', 'machine_file')
+        except:
+            machineFilePath = None
         return machineFilePath
 
     def getPreviousIPAddress(self):

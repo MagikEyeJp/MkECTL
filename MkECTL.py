@@ -189,9 +189,8 @@ class Ui(QMainWindow, IMainUI):
         self.restoreConfig()
 
         self.machineParams = {}
-        self.previousMachineIni = 'data/previousMachine.ini'
-        if os.path.exists(self.previousMachineIni):
-            self.previousMachineFilePath = self.ini.getPreviousMachineFile()
+        self.previousMachineFilePath = self.ini.getPreviousMachineFile()
+        if self.previousMachineFilePath != None:
             self.setMachine(self.previousMachineFilePath)
 
         self.timer = QTimer()
