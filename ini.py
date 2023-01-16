@@ -182,5 +182,6 @@ class Ini:
             config_ps.write(configfile)
 
 if __name__ == '__main__':
-    generateIni('.', 'script/sampleScript1.txt')
-    loadIni('.')
+    logIni = LogIni()
+    logIni.generateIni('.', 'script/sampleScript1.txt')
+    logIni.loadIni('.')
