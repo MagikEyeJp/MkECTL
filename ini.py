@@ -98,10 +98,10 @@ class Ini:
         self.config_file = config_file
 
     def getPreviousScriptPath(self):
-        try:
+        try: # check section & entries
             config = configparser.ConfigParser()
             config.read(self.config_file)
-            scriptPath = config.get('MkECTL', 'scriptpath')
+            scriptPath = config.get('MkECTL', 'script_file')
         except:
             scriptPath = None
         return scriptPath
@@ -114,7 +114,7 @@ class Ini:
         
 
     def getPreviousMachineFile(self):
-        try: # check existence of pre_machine file
+        try: # check section & entries
             config = configparser.ConfigParser()
             config.read(self.config_file)
             machineFilePath = config.get('MkECTL', 'machine_file')
@@ -123,8 +123,7 @@ class Ini:
         return machineFilePath
 
     def getPreviousIPAddress(self):
-        # if not exist IPadr iniFile, return default IPadr
-        try:
+        try: # check section & entries
             config = configparser.ConfigParser()
             config.read(self.config_file)
             IPAddress = config.get('SENSOR', 'ip_address')
@@ -133,7 +132,7 @@ class Ini:
         return IPAddress
 
     def getPreviousPostProcFile(self):
-        try:
+        try: # check section & entries
             config = configparser.ConfigParser()
             config.read(self.config_file)
             machineFilePath = config.get('MkECTL', 'postproc_file')
@@ -147,7 +146,7 @@ class Ini:
         key = "machine_file"
         self.updateIniFile(section, key, machineFile)
 
-    def updatePreviousPostProcFile(self, iniFile, postprocFile):
+    def updatePreviousPostProcFile(self, postprocFile):
         # update/generate previousMachine.ini
         section = 'MkECTL'
         key = "postproc_file"
@@ -161,7 +160,7 @@ class Ini:
     def updateIniFile(self, section, key, value):
         config_ps = configparser.ConfigParser()
         config_ps.read(self.config_file)
-        # check section whether has already existed
+        # check section whether it has already existed
         if not section in config_ps.sections():
             config_ps.add_section(section)
         config_ps.set(section, key, value)

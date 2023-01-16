@@ -108,7 +108,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
         # Variables (initialized with default values)
         self.ini = ini.Ini()
-        if os.path.exists(self.ini.config_file):
+        if self.ini.getPreviousIPAddress() is not None:
             self.IPaddress = self.ini.getPreviousIPAddress()
         else:
             self.IPaddress = "127.0.0.1"

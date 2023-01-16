@@ -78,6 +78,9 @@ class Ui(QMainWindow, IMainUI):
         self.robot_connected = False
         self.uiaxes = []
         self.machine = None
+        
+        self.logIni = ini.LogIni()
+        self.ini = ini.Ini()
 
         ### docking window https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
         self.sensorWindow = sensors.SensorWindow(mainUI=self)
@@ -181,11 +184,12 @@ class Ui(QMainWindow, IMainUI):
         self.ui.isoValue.currentTextChanged.connect(self.setMultiplier)
 
         # label
+        script_path = self.ini.getPreviousScriptPath()
+        if script_path is not None:
+            self.ui.scriptName_label.setText(os.path.basename(script_path))
         self.ui.baseFolderName_label.setText(os.path.abspath(self.scriptParams.baseFolderName))
         self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
 
-        self.logIni = ini.LogIni()
-        self.ini = ini.Ini()
         # before Initialize
         self.restoreConfig()
 
@@ -203,7 +207,7 @@ class Ui(QMainWindow, IMainUI):
             self.getCurrentPos()
 
     def restoreConfig(self):
-        if os.path.exists(self.configIniFile):
+        if self.ini.getPreviousPostProcFile() is not None:
             # postproc file
             self.previousPostProcFilePath = self.ini.getPreviousPostProcFile()
             self.readPostProcFile()
@@ -847,7 +851,7 @@ class Ui(QMainWindow, IMainUI):
             pass
         else:
             self.previousPostProcFilePath = fileName
-            self.ini.updatePreviousPostProcFile(self.configIniFile, self.previousPostProcFilePath)
+            self.ini.updatePreviousPostProcFile(self.previousPostProcFilePath)
             self.readPostProcFile()
 
     def editPostProcParam(self):
