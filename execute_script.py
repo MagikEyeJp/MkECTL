@@ -10,7 +10,7 @@ from timeout_decorator import timeout, TimeoutError
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 
-from ini import Ini
+from ini import Ini, LogIni
 
 commands = {'root': ['set_root', False],
             'set': ['set_filename', False],
@@ -98,7 +98,7 @@ class Systate():
 
 
 systate = Systate()
-ini = Ini()
+logIni = LogIni()
 
 def timeoutCallback(mainWindow):
     systate.timeout = True
@@ -112,7 +112,7 @@ def isAborted(scriptParams, mainWindow):
     if mainWindow.stopClicked:
         print('Interrupted')
         if not isDemo:
-            ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
+            logIni.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName,
                                  scriptParams.scriptName)
         return mainWindow.stopClicked
 
@@ -175,7 +175,7 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
 
     # ---------- make ini file ----------
     if not isDemo:
-        ini.updateIni_start(scriptParams)
+        logIni.updateIni_start(scriptParams)
     # ------------------------------
 
     commandNum = countCommandNum(scriptParams, args_hist, com_hist)
@@ -232,7 +232,7 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
 
     resume_state(scriptParams, devices, mainWindow)
     if not isDemo:
-        ini.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
+        logIni.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
 
     return False
 

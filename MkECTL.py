@@ -184,13 +184,14 @@ class Ui(QMainWindow, IMainUI):
         self.ui.baseFolderName_label.setText(os.path.abspath(self.scriptParams.baseFolderName))
         self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
 
+        self.logIni = ini.LogIni()
         self.ini = ini.Ini()
         # before Initialize
         self.restoreConfig()
 
         self.machineParams = {}
         self.previousMachineFilePath = self.ini.getPreviousMachineFile()
-        if self.previousMachineFilePath != None:
+        if self.previousMachineFilePath is not None:
             self.setMachine(self.previousMachineFilePath)
 
         self.timer = QTimer()
@@ -554,7 +555,7 @@ class Ui(QMainWindow, IMainUI):
     def openScriptFile(self):
         previousScriptDir = './script/'
         previousScriptPath = self.ini.getPreviousScriptPath()
-        if previousScriptPath:
+        if previousScriptPath is not None:
             previousScriptDir = os.path.dirname(previousScriptPath)
 
         (fileName, selectedFilter) = \
@@ -662,11 +663,11 @@ class Ui(QMainWindow, IMainUI):
                               + self.scriptParams.subFolderName + '/'
                               + 'Log.ini'):
 
-                previouslyExecutedScriptName = os.path.basename(self.ini.loadIni(
+                previouslyExecutedScriptName = os.path.basename(self.logIni.loadIni(
                     self.dataOutFolder()))
                 # previouslyExecutedScriptDir = os.path.dirname(ini.loadIni(
                 #     self.dataOutFolder()))
-                previouslyExecutedScript = self.ini.loadIni(
+                previouslyExecutedScript = self.logIni.loadIni(
                     self.dataOutFolder())
 
                 if self.ui.scriptName_label.text() != previouslyExecutedScriptName:
