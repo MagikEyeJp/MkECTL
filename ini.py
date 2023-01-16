@@ -127,7 +127,7 @@ class Ini:
         try:
             config = configparser.ConfigParser()
             config.read(self.config_file)
-            IPAddress = config.get('previous_IPadr', 'IP_address')
+            IPAddress = config.get('SENSOR', 'ip_address')
         except:
             IPAddress = None
         return IPAddress
