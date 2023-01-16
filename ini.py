@@ -4,15 +4,7 @@
 import configparser
 import os
 import datetime
-class Ini:
-    def __init__(self,  preMachine_iniFile='data/previousMachine.ini',
-                        preScript_iniFile='data/previousScript.ini',
-                        preIP_iniFile='data/previousIPAddress.ini',
-                        config_file='data/MkECTL.ini'):
-        self.preMachine_iniFile = preMachine_iniFile
-        self.preScript_iniFile = preScript_iniFile
-        self.preIP_iniFile = preIP_iniFile
-        self.config_file = config_file
+class LogIni:
 
     def loadIni(self, dirname):
         config = configparser.ConfigParser()
@@ -100,6 +92,16 @@ class Ini:
 
         with open(dirname + '/Log.ini', 'w') as configfile:
             config.write(configfile)
+
+class Ini:
+    def __init__(self,  preMachine_iniFile='data/previousMachine.ini',
+                        preScript_iniFile='data/previousScript.ini',
+                        preIP_iniFile='data/previousIPAddress.ini',
+                        config_file='data/MkECTL.ini'):
+        self.preMachine_iniFile = preMachine_iniFile
+        self.preScript_iniFile = preScript_iniFile
+        self.preIP_iniFile = preIP_iniFile
+        self.config_file = config_file
 
     def getPreviousScriptPath(self):
         try:
