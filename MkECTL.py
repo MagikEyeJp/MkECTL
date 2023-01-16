@@ -554,7 +554,7 @@ class Ui(QMainWindow, IMainUI):
     def openScriptFile(self):
         previousScriptDir = './script/'
         previousScriptPath = self.ini.getPreviousScriptPath()
-        if previousScriptPath:
+        if previousScriptPath is not None:
             previousScriptDir = os.path.dirname(previousScriptPath)
 
         (fileName, selectedFilter) = \
