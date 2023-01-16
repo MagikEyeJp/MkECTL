@@ -14,6 +14,8 @@ TODO & Ideas
 ・devices 辞書廃止
 ・スクリプトのoffset, scale, move命令で各軸を省略できるように
 ・マルチプラットフォーム対応(Ubuntuに加え、他Linuxディストリビューション、Mac、Windows、RaspberryPiなど)
+・各軸の移動制限を設ける machinefile に記述する絶対座標制限と、scriptに記述する相対座標制限
+・presetの方法を変更。presetモードに入り、returnかexecボタンで確定するように
 
 BUG?
 ・モーター移動後のキャプチャで、1つ前のフレームが取り込まれるように見える
