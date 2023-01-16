@@ -139,7 +139,7 @@ class Ini:
             config.read(self.preIP_iniFile)
             IPAddress = config.get('previous_IPadr', 'IP_address')
         except:
-            IPAddress = "127.0.0.1" # default
+            IPAddress = None
         return IPAddress
 
     def getPreviousPostProcFile(self):
