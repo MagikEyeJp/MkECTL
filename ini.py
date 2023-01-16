@@ -94,40 +94,30 @@ class LogIni:
             config.write(configfile)
 
 class Ini:
-    def __init__(self,  preMachine_iniFile='data/previousMachine.ini',
-                        preScript_iniFile='data/previousScript.ini',
-                        preIP_iniFile='data/previousIPAddress.ini',
-                        config_file='data/MkECTL.ini'):
-        self.preMachine_iniFile = preMachine_iniFile
-        self.preScript_iniFile = preScript_iniFile
-        self.preIP_iniFile = preIP_iniFile
+    def __init__(self, config_file='data/MkECTL.ini'):
         self.config_file = config_file
 
     def getPreviousScriptPath(self):
         try:
             config = configparser.ConfigParser()
-            config.read(self.preScript_iniFile)
-            scriptPath = config.get('previous_script', 'scriptpath')
+            config.read(self.config_file)
+            scriptPath = config.get('MkECTL', 'scriptpath')
         except:
             scriptPath = None
         return scriptPath
 
     def updatePreviousScriptPath(self, scriptName):
         # update/generate previousScript.ini
-        config_ps = configparser.RawConfigParser()
-
-        section = 'previous_script'
-        config_ps.add_section(section)
-        config_ps.set(section, 'scriptpath', scriptName)
-
-        with open(self.preScript_iniFile, 'w') as configfile:
-            config_ps.write(configfile)
+        section = 'MkECTL'
+        key = "script_file"
+        self.updateIniFile(section, key, scriptName)
+        
 
     def getPreviousMachineFile(self):
         try: # check existence of pre_machine file
             config = configparser.ConfigParser()
-            config.read(self.preMachine_iniFile)
-            machineFilePath = config.get('previous_machine', 'machine_file')
+            config.read(self.config_file)
+            machineFilePath = config.get('MkECTL', 'machine_file')
         except:
             machineFilePath = None
         return machineFilePath
@@ -136,51 +126,50 @@ class Ini:
         # if not exist IPadr iniFile, return default IPadr
         try:
             config = configparser.ConfigParser()
-            config.read(self.preIP_iniFile)
+            config.read(self.config_file)
             IPAddress = config.get('previous_IPadr', 'IP_address')
         except:
             IPAddress = None
         return IPAddress
 
     def getPreviousPostProcFile(self):
-        config = configparser.ConfigParser()
-        config.read(self.config_file)
-        machineFilePath = config.get('previous_postproc', 'postproc_file')
-
+        try:
+            config = configparser.ConfigParser()
+            config.read(self.config_file)
+            machineFilePath = config.get('MkECTL', 'postproc_file')
+        except:
+            machineFilePath = None
         return machineFilePath
 
     def updatePreviousMachineFile(self, machineFile):
         # update/generate previousMachine.ini
-        config_ps = configparser.RawConfigParser()
-
-        section = 'previous_machine'
-        config_ps.add_section(section)
-        config_ps.set(section, 'machine_file', machineFile)
-
-        with open(self.preMachine_iniFile, 'w') as configfile:
-            config_ps.write(configfile)
+        section = 'MkECTL'
+        key = "machine_file"
+        self.updateIniFile(section, key, machineFile)
 
     def updatePreviousPostProcFile(self, iniFile, postprocFile):
         # update/generate previousMachine.ini
-        config_ps = configparser.RawConfigParser()
+        section = 'MkECTL'
+        key = "postproc_file"
+        self.updateIniFile(section, key, postprocFile)
 
-        section = 'previous_postproc'
-        config_ps.add_section(section)
-        config_ps.set(section, 'postproc_file', postprocFile)
+    def updatePreviousIPAddressFile(self, IPAddr):
+        section = 'SENSOR'
+        key = "ip_address"
+        self.updateIniFile(section, key, IPAddr)
+    
+    def updateIniFile(self, section, key, value):
+        config_ps = configparser.ConfigParser()
+        config_ps.read(self.config_file)
+        # check section whether has already existed
+        if not section in config_ps.sections():
+            config_ps.add_section(section)
+        config_ps.set(section, key, value)
+        with open(self.config_file, mode="w") as f:
+            config_ps.write(f)
+        
 
-        with open(iniFile, 'w') as configfile:
-            config_ps.write(configfile)
-
-    def updatePreviousIPAddressFile(self, IPadr):
-        config_ps = configparser.RawConfigParser()
-
-        section = 'previous_IPadr'
-        config_ps.add_section(section)
-        config_ps.set(section, "IP_address", IPadr)
-
-        with open(self.preIP_iniFile, 'w') as configfile:
-            config_ps.write(configfile)
-
+        
 if __name__ == '__main__':
     logIni = LogIni()
     logIni.generateIni('.', 'script/sampleScript1.txt')
