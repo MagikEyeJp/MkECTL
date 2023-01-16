@@ -190,7 +190,7 @@ class Ui(QMainWindow, IMainUI):
 
         self.machineParams = {}
         self.previousMachineFilePath = self.ini.getPreviousMachineFile()
-        if self.previousMachineFilePath != None:
+        if self.previousMachineFilePath is not None:
             self.setMachine(self.previousMachineFilePath)
 
         self.timer = QTimer()
