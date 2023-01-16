@@ -2,15 +2,18 @@
   "motors": {
     "slide": {
       "serial": "KM-1S SW59#0E9",
-      "scale": -0.116355283
+      "scale": -0.116355283,
+      "offset": 5.0
     },
     "pan": {
       "serial": "KM-1S K1UK#E45",
-      "scale": 0.017453293
+      "scale": 0.017453293,
+      "offset": -70.00
     },
     "tilt": {
       "serial": "KM-1S 0D69#13A",
-      "scale": 0.017453293
+      "scale": 0.017453293,
+      "offset": -17.00
     }
   },
   "IRLight": {
