@@ -60,7 +60,7 @@ class DobotRobot(IRobotController):
 
         :return: True if aborted
         """
-        code = "G01"
+        code = "G00"
         for i in self.basePos.keys():
             code += f" {i}{self.basePos[i] - targetPos[i]}" if i in targetPos.keys() else ""
 
