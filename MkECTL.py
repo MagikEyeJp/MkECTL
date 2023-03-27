@@ -78,6 +78,9 @@ class Ui(QMainWindow, IMainUI):
         self.robot_connected = False
         self.uiaxes = []
         self.machine = None
+        
+        self.logIni = ini.LogIni()
+        self.ini = ini.Ini()
 
         ### docking window https://www.tutorialspoint.com/pyqt/pyqt_qdockwidget.htm
         self.sensorWindow = sensors.SensorWindow(mainUI=self)
@@ -181,16 +184,18 @@ class Ui(QMainWindow, IMainUI):
         self.ui.isoValue.currentTextChanged.connect(self.setMultiplier)
 
         # label
+        script_path = self.ini.getPreviousScriptPath()
+        if script_path is not None:
+            self.ui.scriptName_label.setText(os.path.basename(script_path))
         self.ui.baseFolderName_label.setText(os.path.abspath(self.scriptParams.baseFolderName))
         self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
 
-        self.ini = ini.Ini()
         # before Initialize
         self.restoreConfig()
 
         self.machineParams = {}
         self.previousMachineFilePath = self.ini.getPreviousMachineFile()
-        if self.previousMachineFilePath != None:
+        if self.previousMachineFilePath is not None:
             self.setMachine(self.previousMachineFilePath)
 
         self.timer = QTimer()
@@ -202,7 +207,7 @@ class Ui(QMainWindow, IMainUI):
             self.getCurrentPos()
 
     def restoreConfig(self):
-        if os.path.exists(self.configIniFile):
+        if self.ini.getPreviousPostProcFile() is not None:
             # postproc file
             self.previousPostProcFilePath = self.ini.getPreviousPostProcFile()
             self.readPostProcFile()
@@ -554,7 +559,7 @@ class Ui(QMainWindow, IMainUI):
     def openScriptFile(self):
         previousScriptDir = './script/'
         previousScriptPath = self.ini.getPreviousScriptPath()
-        if previousScriptPath:
+        if previousScriptPath is not None:
             previousScriptDir = os.path.dirname(previousScriptPath)
 
         (fileName, selectedFilter) = \
@@ -662,11 +667,11 @@ class Ui(QMainWindow, IMainUI):
                               + self.scriptParams.subFolderName + '/'
                               + 'Log.ini'):
 
-                previouslyExecutedScriptName = os.path.basename(self.ini.loadIni(
+                previouslyExecutedScriptName = os.path.basename(self.logIni.loadIni(
                     self.dataOutFolder()))
                 # previouslyExecutedScriptDir = os.path.dirname(ini.loadIni(
                 #     self.dataOutFolder()))
-                previouslyExecutedScript = self.ini.loadIni(
+                previouslyExecutedScript = self.logIni.loadIni(
                     self.dataOutFolder())
 
                 if self.ui.scriptName_label.text() != previouslyExecutedScriptName:
@@ -846,7 +851,7 @@ class Ui(QMainWindow, IMainUI):
             pass
         else:
             self.previousPostProcFilePath = fileName
-            self.ini.updatePreviousPostProcFile(self.configIniFile, self.previousPostProcFilePath)
+            self.ini.updatePreviousPostProcFile(self.previousPostProcFilePath)
             self.readPostProcFile()
 
     def editPostProcParam(self):

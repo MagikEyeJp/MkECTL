@@ -108,7 +108,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
         # Variables (initialized with default values)
         self.ini = ini.Ini()
-        self.IPaddress = self.ini.getPreviousIPAddress()
+        if self.ini.getPreviousIPAddress() is not None:
+            self.IPaddress = self.ini.getPreviousIPAddress()
+        else:
+            self.IPaddress = "127.0.0.1"
         self.ui_s.IPComboBox.setCurrentText(self.IPaddress)
         self.portNum: int = 8888
         self.shutterSpeed: int = 30000
