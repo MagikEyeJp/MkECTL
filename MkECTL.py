@@ -187,6 +187,13 @@ class Ui(QMainWindow, IMainUI):
         script_path = self.ini.getPreviousScriptPath()
         if script_path is not None:
             self.ui.scriptName_label.setText(os.path.basename(script_path))
+            print(f"os.path.basename(script_path):{os.path.basename(script_path)}")
+            print(f"script_path:{script_path}")
+            self.scriptParams.scriptName = script_path
+            self.scriptParams.commandNum = execute_script.countCommandNum(self.scriptParams, [], [])
+            self.total = self.scriptParams.commandNum
+            self.updateScriptProgress()
+
         self.ui.baseFolderName_label.setText(os.path.abspath(self.scriptParams.baseFolderName))
         self.ui.subFolderName_label.setText(self.scriptParams.subFolderName)
 
