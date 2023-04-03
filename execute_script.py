@@ -15,8 +15,10 @@ from ini import Ini, LogIni
 commands = {'root': ['set_root', False],
             'set': ['set_filename', False],
             'snap': ['snap_image', True],
+            'contsnap': ['continuous_snap_image', True],
             'snap3d': ['snap_3D_frame', True],
             'mov': ['move_robot', True],
+            'asyncmov': ['async_move_robot', True],
             # 'movs': ['movs_robot', False],
             # 'jog': ['jog_robot', False],
             'home': ['home_robot', False],
@@ -61,6 +63,7 @@ class Systate():
         self.skip = False
 
         self.pos = [0, 0, 0]
+        self.speed = 100
         self.shutter = 0
         self.shutter_IRon = -1
         self.shutter_IRoff = 1000
@@ -138,11 +141,11 @@ def countCommandNum(scriptParams, args_hist, com_hist):
             com_args[1] = com_args[1].replace(" ", "")  # del space
             com_args[1] = com_args[1].replace("\"", "")  # del double-quotation
             com_args[1] = com_args[1].split(",")
-            if com_args[0] == 'set' or com_args[0] == 'root' or com_args[0] == 'snap3d' or com_args[0] == 'message':
+            if com_args[0] in ('set','root','snap3d','message'):
                 pass
-            elif com_args[0] == 'snap':
+            elif com_args[0] in ('snap','contsnap'):
                 com_args[1][1] = int(com_args[1][1])
-            elif com_args[0] == 'pause':
+            elif com_args[0] in ('pause',):
                 com_args[1][0] = int(com_args[1][0])
             else:
                 com_args[1] = np.array(com_args[1], dtype=float)
@@ -230,6 +233,8 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
 
         mainWindow.updateScriptProgress()
 
+    systate.skip = False
+    move_robot(systate.pos, scriptParams, devices, mainWindow)
     resume_state(scriptParams, devices, mainWindow)
     if not isDemo:
         logIni.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
@@ -368,6 +373,8 @@ def snap_image(args, scriptParams, devices, mainWindow):
     devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
+        systate.skip = False
+        move_robot(systate.pos, scriptParams, devices, mainWindow)
         resume_state(scriptParams, devices, mainWindow)
         time.sleep(0.2)
 
@@ -381,6 +388,51 @@ def snap_image(args, scriptParams, devices, mainWindow):
         img.save(devices['3Dsensors'].imgPath)
 
     systate.seqn += 1
+    warm_lasers(scriptParams, devices, mainWindow)
+
+@timeout(15)
+def continuous_snap_image(args, scriptParams, devices, mainWindow):
+    print('---continuous_snap_image---')
+
+    if isAborted(scriptParams, mainWindow):
+        return mainWindow.stopClicked
+
+    global systate
+
+    # im: QtGui.QPixmap() = None
+    devices['3Dsensors'].frames = int(args[1])
+
+    snapNum = int(args[2])
+    snapInterval = float(args[3])
+
+    if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
+        systate.skip = False
+        async_move_robot(systate.pos, scriptParams, devices, mainWindow)
+        resume_state(scriptParams, devices, mainWindow)
+        time.sleep(0.2)
+
+        for i in range(snapNum):
+            time.sleep(snapInterval)
+            ### Save image
+            fileName = []
+            fileCategory = re.search('([a-zA-Z_]\w*)', args[0]).group()
+            fileName.append(systate.saveFileName[fileCategory])
+            expand_dynvars(fileName, devices)
+
+            # devices['3Dsensors'].imgPath = systate.ymd_hms + '_' + str(systate.dir_num) + '/' + fileName[0]
+            devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
+
+            img = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
+            img.convert('L')
+            qimage = QtGui.QImage(ImageQt.ImageQt(img))
+            pixmap = QtGui.QPixmap.fromImage(qimage)
+            devices['3Dsensors'].ui_s.sensorImage.setPixMap(pixmap)
+            devices['3Dsensors'].ui_s.sensorImage.show()
+
+            img.save(devices['3Dsensors'].imgPath)
+
+            systate.seqn += 1
+
     warm_lasers(scriptParams, devices, mainWindow)
 
 @timeout(15)
@@ -402,6 +454,8 @@ def snap_3D_frame(args, scriptParams, devices, mainWindow):
     devices['3Dsensors'].frame3DDirPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].frame3DDirPath):
+        systate.skip = False
+        move_robot(systate.pos, scriptParams, devices, mainWindow)
         resume_state(scriptParams, devices, mainWindow)
 
         devices['3Dsensors'].snap3D(devices['3Dsensors'].frame3DDirPath)
@@ -434,6 +488,39 @@ def move_robot(args, scriptParams, devices, mainWindow):
             systate.past_parameters.pos = systate.pos
             systate.sentSig.pos = True
 
+def async_move_robot(args, scriptParams, devices, mainWindow):
+    print('---async_move_robot---')
+    print('move to ' + str(args))
+    global systate
+    global isDemo
+
+    args = np.array(args)
+    pos = [0.0, 0.0, 0.0]
+
+    systate.skip = False
+    move_robot(systate.pos, scriptParams, devices, mainWindow)
+
+    if len(args) == (len(devices['robot'].motorSet) + 1):
+        systate.speed = int(args[-1])
+        systate.pos = list(args)[:-1]
+    else:
+        systate.pos = list(args)
+
+    print(args, systate.pos, systate.scale, systate.offset)
+
+    if not systate.skip:
+        scaled_pos = list(np.add(np.multiply(systate.pos, systate.scale), systate.offset))
+        targetPos_d = dict(zip(devices['robot'].motorSet,scaled_pos))
+        if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
+            app.processEvents()
+
+            print('async_move_robot', targetPos_d)
+            isStopped = devices['robot'].AsyncMoveTo(targetPos_d, True, mainWindow.actionStatusCallback, speed = systate.speed)
+            if isStopped:
+                return True
+
+            systate.past_parameters.pos = systate.pos
+            systate.sentSig.pos = True
 
 def home_robot(args, scriptParams, devices, mainWindow):
     print('---home_robot---')
@@ -606,9 +693,6 @@ def resume_state(scriptParams, devices, mainWindow):
     if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
 
-    systate.skip = False
-
-    move_robot(systate.pos, scriptParams, devices, mainWindow)
     for i in range(len(systate.light)):
         set_light([i + 1, systate.light[i]], scriptParams, devices, mainWindow)
     set_lasers([systate.lasers], scriptParams, devices, mainWindow)

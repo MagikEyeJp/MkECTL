@@ -4,6 +4,8 @@
     "type": "DOBOT",
     "gateway_addr": "med.local",
     "gateway_port": 2022,
+    "dobot_addr": "192.168.10.111",
+    "dobot_port": 30004,
     "axes": {
       "X": {
         "unit": "mm",
