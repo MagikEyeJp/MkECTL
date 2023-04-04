@@ -232,6 +232,54 @@ class DobotRobot(IRobotController):
 
         return False
 
+    def moveTo(self, targetPos: dict, callback: callable, wait: bool = False, isAborted: callable = None):
+        """move to target position
+
+        Move the robot to the target position.
+        You can choose whether to wait until the move is complete.
+        If this function is implemented as a blocking type, it should use callbacks to notify the caller of progress.
+
+        :param targetPos: target position {"axis" : position_float ... }
+        :param callback: callback function for status update and check abort request.
+                         callback(position: dict, progress_now: int or float, progress_goal: int or float, allowAbort: bool = False}
+                         position is same format of target position
+                         The progress percentage should be displayed with progress_now / progress_goal
+                         If allowAbort=True, isAbort will return True if there is an abort request.
+        :param wait: If True, wait for the target position to reach exactly
+        :param isAborted: A function to check whether there is an abort request
+
+        :return: True if aborted
+        """
+        code = "G00"
+        for i in self.basePos.keys():
+            code += f" {i}{self.basePos[i] - targetPos[i]}" if i in targetPos.keys() else ""
+
+        self.sock.send(code.encode())
+        ret = json.loads(self.sock.recv(1024).decode())
+
+        if not ret["status"] == 200:
+            return True
+
+        @timeout(5)
+        def waitmove():
+            while True:
+                time.sleep(0.01)
+                is_arrive = True
+                for i in targetPos.keys():
+                    if i in self.currentPos.keys():
+                        if abs( self.currentPos[i] - (self.basePos[i] - targetPos[i]) ) > 1:
+                            is_arrive = False
+                if is_arrive:
+                    break
+
+        try:
+            waitmove()
+        except TimeoutError as e:
+            print(e)
+            return True
+
+        return False
+
     def freeMotors(self):
         pass
 
