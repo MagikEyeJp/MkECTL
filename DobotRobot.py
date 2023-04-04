@@ -4,6 +4,7 @@ import json
 import time
 import numpy as np
 import threading
+from timeout_decorator import timeout, TimeoutError
 
 MyType = np.dtype([(
     'len',
@@ -208,7 +209,28 @@ class DobotRobot(IRobotController):
         self.sock.send(code.encode())
         ret = json.loads(self.sock.recv(1024).decode())
 
-        return False if ret["status"] == 200 else True
+        if not ret["status"] == 200:
+            return True
+
+        @timeout(5)
+        def waitmove():
+            while True:
+                time.sleep(0.01)
+                is_arrive = True
+                for i in targetPos.keys():
+                    if i in self.currentPos.keys():
+                        if abs( self.currentPos[i] - (self.basePos[i] - targetPos[i]) ) > 1:
+                            is_arrive = False
+                if is_arrive:
+                    break
+
+        try:
+            waitmove()
+        except TimeoutError as e:
+            print(e)
+            return True
+
+        return False
 
     def freeMotors(self):
         pass
