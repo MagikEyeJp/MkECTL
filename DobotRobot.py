@@ -139,6 +139,8 @@ class DobotRobot(IRobotController):
     def __init__(self, machineParams=None):
         self.gwAddr = machineParams["gateway_addr"]
         self.gwPort = machineParams["gateway_port"]
+        self.dobotAddr = machineParams["dobot_addr"]
+        self.dobotPort = machineParams["dobot_port"]
 
         axes = machineParams["axes"]
         self.basePos = {axes[i]["axis"]: axes[i]["offset"] for i in axes.keys() if axes[i]["axis"] in defaultAixs }
@@ -152,7 +154,7 @@ class DobotRobot(IRobotController):
         try:
             self.isConnect = True
             self.sock.connect((self.gwAddr,self.gwPort))
-            self.sockFeed.connect(("192.168.10.111", 30004))
+            self.sockFeed.connect((self.dobotAddr, self.dobotPort))
             self.th = threading.Thread(target=feedbakThread,args=(self,),daemon=True)
             self.th.start()
         except ConnectionRefusedError as e:
