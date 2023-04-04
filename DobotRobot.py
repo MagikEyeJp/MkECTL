@@ -130,7 +130,7 @@ def feedbakThread(obj):
 
             # Refresh Properties
             current_actual = a["tool_vector_actual"][0]
-            print("\t".join([f"{['X','Y','Z','R'][i]}:{format(current_actual[i],'.4f')}" for i in range(len(current_actual)-2)]))
+            obj.currentPos = {list(obj.currentPos.keys())[i]:current_actual[i] for i in range(len(obj.currentPos))}
 
         time.sleep(0.001)
 
@@ -145,6 +145,7 @@ class DobotRobot(IRobotController):
         axes = machineParams["axes"]
         self.basePos = {axes[i]["axis"]: axes[i]["offset"] for i in axes.keys() if axes[i]["axis"] in defaultAixs }
         self.targetPos = {i:0 for i in self.basePos.keys()}
+        self.currentPos = {i:0 for i in ["X","Y","Z","R"]}
         self.motorSet = [i for i in self.basePos.keys()]
         self.isConnect = False
 
