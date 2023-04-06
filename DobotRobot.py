@@ -184,7 +184,7 @@ class DobotRobot(IRobotController):
     def presetPosition(self, targetPos):
         pass
 
-    def moveTo(self, targetPos: dict, callback: callable, wait: bool = False, isAborted: callable = None):
+    def AsyncMoveTo(self, targetPos: dict, callback: callable, wait: bool = False, isAborted: callable = None):
         """move to target position
 
         Move the robot to the target position.
@@ -202,7 +202,7 @@ class DobotRobot(IRobotController):
 
         :return: True if aborted
         """
-        code = "G00"
+        code = "G01"
         for i in self.basePos.keys():
             code += f" {i}{self.basePos[i] - targetPos[i]}" if i in targetPos.keys() else ""
 
@@ -210,24 +210,6 @@ class DobotRobot(IRobotController):
         ret = json.loads(self.sock.recv(1024).decode())
 
         if not ret["status"] == 200:
-            return True
-
-        @timeout(5)
-        def waitmove():
-            while True:
-                time.sleep(0.01)
-                is_arrive = True
-                for i in targetPos.keys():
-                    if i in self.currentPos.keys():
-                        if abs( self.currentPos[i] - (self.basePos[i] - targetPos[i]) ) > 1:
-                            is_arrive = False
-                if is_arrive:
-                    break
-
-        try:
-            waitmove()
-        except TimeoutError as e:
-            print(e)
             return True
 
         return False
