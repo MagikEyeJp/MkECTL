@@ -184,7 +184,7 @@ class DobotRobot(IRobotController):
     def presetPosition(self, targetPos):
         pass
 
-    def AsyncMoveTo(self, targetPos: dict, callback: callable, wait: bool = False, isAborted: callable = None):
+    def AsyncMoveTo(self, targetPos: dict, callback: callable, wait: bool = False, isAborted: callable = None, speed: int = None):
         """move to target position
 
         Move the robot to the target position.
@@ -205,6 +205,7 @@ class DobotRobot(IRobotController):
         code = "G01"
         for i in self.basePos.keys():
             code += f" {i}{self.basePos[i] - targetPos[i]}" if i in targetPos.keys() else ""
+        code += f" F{int(speed)}" if speed is not None else ""
 
         self.sock.send(code.encode())
         ret = json.loads(self.sock.recv(1024).decode())
