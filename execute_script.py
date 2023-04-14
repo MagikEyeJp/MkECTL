@@ -63,6 +63,7 @@ class Systate():
         self.skip = False
 
         self.pos = [0, 0, 0]
+        self.speed = 100
         self.shutter = 0
         self.shutter_IRon = -1
         self.shutter_IRoff = 1000
@@ -496,7 +497,12 @@ def async_move_robot(args, scriptParams, devices, mainWindow):
     args = np.array(args)
     pos = [0.0, 0.0, 0.0]
 
-    systate.pos = list(args)
+    if len(args) == (len(devices['robot'].motorSet) + 1):
+        systate.speed = int(args[-1])
+        systate.pos = list(args)[:-1]
+    else:
+        systate.pos = list(args)
+
     print(args, systate.pos, systate.scale, systate.offset)
 
     if not systate.skip:
@@ -506,7 +512,7 @@ def async_move_robot(args, scriptParams, devices, mainWindow):
             app.processEvents()
 
             print('async_move_robot', targetPos_d)
-            isStopped = devices['robot'].AsyncMoveTo(targetPos_d, True, mainWindow.actionStatusCallback)
+            isStopped = devices['robot'].AsyncMoveTo(targetPos_d, True, mainWindow.actionStatusCallback, speed = systate.speed)
             if isStopped:
                 return True
 
