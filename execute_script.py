@@ -401,15 +401,8 @@ def continuous_snap_image(args, scriptParams, devices, mainWindow):
     # im: QtGui.QPixmap() = None
     devices['3Dsensors'].frames = int(args[1])
 
-    ### Save image
-    fileName = []
-
-    fileCategory = re.search('([a-zA-Z_]\w*)', args[0]).group()
-    fileName.append(systate.saveFileName[fileCategory])
-    expand_dynvars(fileName, devices)
-
-    # devices['3Dsensors'].imgPath = systate.ymd_hms + '_' + str(systate.dir_num) + '/' + fileName[0]
-    devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
+    snapNum = int(args[2])
+    snapInterval = float(args[3])
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
         systate.skip = False
@@ -417,16 +410,28 @@ def continuous_snap_image(args, scriptParams, devices, mainWindow):
         resume_state(scriptParams, devices, mainWindow)
         time.sleep(0.2)
 
-        img = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
-        img.convert('L')
-        qimage = QtGui.QImage(ImageQt.ImageQt(img))
-        pixmap = QtGui.QPixmap.fromImage(qimage)
-        devices['3Dsensors'].ui_s.sensorImage.setPixMap(pixmap)
-        devices['3Dsensors'].ui_s.sensorImage.show()
+        for i in range(snapNum):
+            time.sleep(snapInterval)
+            ### Save image
+            fileName = []
+            fileCategory = re.search('([a-zA-Z_]\w*)', args[0]).group()
+            fileName.append(systate.saveFileName[fileCategory])
+            expand_dynvars(fileName, devices)
 
-        img.save(devices['3Dsensors'].imgPath)
+            # devices['3Dsensors'].imgPath = systate.ymd_hms + '_' + str(systate.dir_num) + '/' + fileName[0]
+            devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
-    systate.seqn += 1
+            img = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
+            img.convert('L')
+            qimage = QtGui.QImage(ImageQt.ImageQt(img))
+            pixmap = QtGui.QPixmap.fromImage(qimage)
+            devices['3Dsensors'].ui_s.sensorImage.setPixMap(pixmap)
+            devices['3Dsensors'].ui_s.sensorImage.show()
+
+            img.save(devices['3Dsensors'].imgPath)
+
+            systate.seqn += 1
+
     warm_lasers(scriptParams, devices, mainWindow)
 
 @timeout(15)
@@ -462,9 +467,6 @@ def move_robot(args, scriptParams, devices, mainWindow):
     global systate
     global isDemo
 
-    print(f"args:{args}")
-    print(f"devices:{devices}")
-
     args = np.array(args)
     pos = [0.0, 0.0, 0.0]
 
@@ -490,9 +492,6 @@ def async_move_robot(args, scriptParams, devices, mainWindow):
     print('move to ' + str(args))
     global systate
     global isDemo
-
-    print(f"args:{args}")
-    print(f"devices:{devices}")
 
     args = np.array(args)
     pos = [0.0, 0.0, 0.0]
