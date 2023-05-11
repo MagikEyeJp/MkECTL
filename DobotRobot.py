@@ -113,7 +113,13 @@ MyType = np.dtype([(
     ('actual_quaternion', np.float64, (4, )),
     ('reserve3', np.byte, (24, ))])
 
-defaultAixs = ["X", "Y", "Z", "R", "P"]
+defaultAixs = {
+    "X": -240,
+    "Y": 0,
+    "Z": 0,
+    "R": -97.5,
+    "P": -100
+    }
 
 def feedbakThread(obj):
     hasRead = 0
@@ -170,7 +176,7 @@ class DobotRobot(IRobotController):
         return True
 
     def initializeOrigins(self, origins, callback: callable = None, isAborted: callable = None):
-        return not self.moveTo({i:0 for i in self.basePos.keys()}, False, None, None )
+        return not self.moveTo(defaultAixs, False, None, None )
 
     def getSettingWindow(self):
         pass
