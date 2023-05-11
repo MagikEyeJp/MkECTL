@@ -497,6 +497,9 @@ def async_move_robot(args, scriptParams, devices, mainWindow):
     args = np.array(args)
     pos = [0.0, 0.0, 0.0]
 
+    systate.skip = False
+    move_robot(systate.pos, scriptParams, devices, mainWindow)
+
     if len(args) == (len(devices['robot'].motorSet) + 1):
         systate.speed = int(args[-1])
         systate.pos = list(args)[:-1]
