@@ -63,6 +63,7 @@ class Systate():
         self.skip = False
 
         self.pos = [0, 0, 0]
+        self.async_pos = [0, 0, 0]
         self.speed = 100
         self.shutter = 0
         self.shutter_IRon = -1
@@ -405,9 +406,15 @@ def continuous_snap_image(args, scriptParams, devices, mainWindow):
     snapNum = int(args[2])
     snapInterval = float(args[3])
 
+    fileName = []
+    fileCategory = re.search('([a-zA-Z_]\w*)', args[0]).group()
+    fileName.append(systate.saveFileName[fileCategory])
+    expand_dynvars(fileName, devices)
+    devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
+
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
         systate.skip = False
-        async_move_robot(systate.pos, scriptParams, devices, mainWindow)
+        async_move_robot(systate.async_pos, scriptParams, devices, mainWindow)
         resume_state(scriptParams, devices, mainWindow)
         time.sleep(0.2)
 
@@ -415,7 +422,6 @@ def continuous_snap_image(args, scriptParams, devices, mainWindow):
             time.sleep(snapInterval)
             ### Save image
             fileName = []
-            fileCategory = re.search('([a-zA-Z_]\w*)', args[0]).group()
             fileName.append(systate.saveFileName[fileCategory])
             expand_dynvars(fileName, devices)
 
@@ -432,6 +438,8 @@ def continuous_snap_image(args, scriptParams, devices, mainWindow):
             img.save(devices['3Dsensors'].imgPath)
 
             systate.seqn += 1
+    else:
+        systate.seqn += snapNum
 
     warm_lasers(scriptParams, devices, mainWindow)
 
@@ -497,21 +505,19 @@ def async_move_robot(args, scriptParams, devices, mainWindow):
     args = np.array(args)
     pos = [0.0, 0.0, 0.0]
 
-    systate.skip = False
-    move_robot(systate.pos, scriptParams, devices, mainWindow)
-
     if len(args) == (len(devices['robot'].motorSet) + 1):
         systate.speed = int(args[-1])
-        systate.pos = list(args)[:-1]
+        systate.async_pos = list(args)[:-1]
     else:
-        systate.pos = list(args)
+        systate.async_pos = list(args)
 
-    print(args, systate.pos, systate.scale, systate.offset)
+    print(f"{args=}, {systate.async_pos}, {systate.scale=}, {systate.offset=}")
 
     if not systate.skip:
-        scaled_pos = list(np.add(np.multiply(systate.pos, systate.scale), systate.offset))
+        move_robot(systate.pos, scriptParams, devices, mainWindow)
+        scaled_pos = list(np.add(np.multiply(systate.async_pos, systate.scale), systate.offset))
         targetPos_d = dict(zip(devices['robot'].motorSet,scaled_pos))
-        if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
+        if not systate.sentSig.pos or systate.async_pos != systate.past_parameters.pos:
             app.processEvents()
 
             print('async_move_robot', targetPos_d)
