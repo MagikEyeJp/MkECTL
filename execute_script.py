@@ -234,8 +234,6 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
 
         mainWindow.updateScriptProgress()
 
-    systate.skip = False
-    move_robot(systate.pos, scriptParams, devices, mainWindow)
     resume_state(scriptParams, devices, mainWindow)
     if not isDemo:
         logIni.updateIni_finish(scriptParams.baseFolderName + '/' + scriptParams.subFolderName, scriptParams.scriptName)
@@ -374,8 +372,6 @@ def snap_image(args, scriptParams, devices, mainWindow):
     devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
-        systate.skip = False
-        move_robot(systate.pos, scriptParams, devices, mainWindow)
         resume_state(scriptParams, devices, mainWindow)
         time.sleep(0.2)
 
@@ -413,9 +409,8 @@ def continuous_snap_image(args, scriptParams, devices, mainWindow):
     devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
-        systate.skip = False
-        async_move_robot(systate.async_pos, scriptParams, devices, mainWindow)
         resume_state(scriptParams, devices, mainWindow)
+        async_move_robot(systate.async_pos, scriptParams, devices, mainWindow)
         time.sleep(0.2)
 
         for i in range(snapNum):
@@ -462,8 +457,6 @@ def snap_3D_frame(args, scriptParams, devices, mainWindow):
     devices['3Dsensors'].frame3DDirPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].frame3DDirPath):
-        systate.skip = False
-        move_robot(systate.pos, scriptParams, devices, mainWindow)
         resume_state(scriptParams, devices, mainWindow)
 
         devices['3Dsensors'].snap3D(devices['3Dsensors'].frame3DDirPath)
@@ -699,6 +692,8 @@ def resume_state(scriptParams, devices, mainWindow):
     if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
 
+    systate.skip = False
+    move_robot(systate.pos, scriptParams, devices, mainWindow)
     for i in range(len(systate.light)):
         set_light([i + 1, systate.light[i]], scriptParams, devices, mainWindow)
     set_lasers([systate.lasers], scriptParams, devices, mainWindow)
