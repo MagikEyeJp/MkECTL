@@ -8,6 +8,7 @@ import configparser
 
 max_x = 600  # デフォルトの最大時間(秒)
 active = False
+resized = False
 INI_FILE = "plottemps.ini"
 
 
@@ -59,8 +60,11 @@ def execCmdline():
         fig.show()
         plt.ion()
         global active
+        global resized
         active = True
+        resized = False
         fig.canvas.mpl_connect('close_event', on_close)
+        fig.canvas.mpl_connect('resize_event', on_resize)
         # ax.margins(0.5)
 
         plotline = {}
@@ -92,7 +96,9 @@ def execCmdline():
                         # ax.plot(x, y, color='blue')
                         plotline[ed].set_data(x, y)
                         # print(plotline[ed], x,y)
-                    y_min = min(y)
+                    if resized:
+                        plt.autoscale(True, 'both')
+                        resized = False
                     ax.relim()
                     ax.autoscale_view()
                     x_min, x_max = ax.get_xlim()
@@ -112,6 +118,9 @@ def on_close(e):
     global active
     active = False
 
+def on_resize(e):
+    global resized
+    resized = True
 
 # 温度のみをログファイルに出力する関数
 def log_temperature(data, fname):
@@ -189,13 +198,12 @@ def plot_data(data, sensors):
         ax.plot(x, y, color=col, label=lbl)
 
         #        ax.lines[0].set_data(x, y)
+        ax.legend()
         ax.relim()
         ax.autoscale_view()
         fig.canvas.draw_idle()
         fig.canvas.flush_events()
-        time.sleep(1)
 
-    ax.legend()
     fig.autofmt_xdate()
     ymin, ymax = ax.get_ylim()
     lowertext = ax.text(0, 0, f"{ymin:.1f}", color='b', ha='right', va='top', transform=ax.transAxes)
