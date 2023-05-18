@@ -165,7 +165,7 @@ class DobotRobot(IRobotController):
             self.sockFeed.connect((self.dobotAddr, self.dobotPort))
             self.th = threading.Thread(target=feedbakThread,args=(self,),daemon=True)
             self.th.start()
-        except ConnectionRefusedError as e:
+        except Exception as e:
             print(f"{e}")
             self.isConnect = False
             return False
@@ -173,7 +173,7 @@ class DobotRobot(IRobotController):
             return True
 
     def initialize(self, callback: callable = None, isAborted: callable = None):
-        return True
+        return self.isConnect
 
     def initializeOrigins(self, origins, callback: callable = None, isAborted: callable = None):
         return not self.moveTo(defaultAixs, False, None, None )
