@@ -510,16 +510,14 @@ def async_move_robot(args, scriptParams, devices, mainWindow):
         move_robot(systate.pos, scriptParams, devices, mainWindow)
         scaled_pos = list(np.add(np.multiply(systate.async_pos, systate.scale), systate.offset))
         targetPos_d = dict(zip(devices['robot'].motorSet,scaled_pos))
-        if not systate.sentSig.pos or systate.async_pos != systate.past_parameters.pos:
-            app.processEvents()
+        app.processEvents()
 
-            print('async_move_robot', targetPos_d)
-            isStopped = devices['robot'].AsyncMoveTo(targetPos_d, True, mainWindow.actionStatusCallback, speed = systate.speed)
-            if isStopped:
-                return True
+        print('async_move_robot', targetPos_d)
+        isStopped = devices['robot'].AsyncMoveTo(targetPos_d, True, mainWindow.actionStatusCallback, speed = systate.speed)
+        if isStopped:
+            return True
 
-            systate.past_parameters.pos = systate.pos
-            systate.sentSig.pos = True
+        systate.past_parameters.pos = systate.pos
 
 def home_robot(args, scriptParams, devices, mainWindow):
     print('---home_robot---')
