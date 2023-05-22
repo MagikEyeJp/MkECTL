@@ -387,7 +387,7 @@ def snap_image(args, scriptParams, devices, mainWindow):
     systate.seqn += 1
     warm_lasers(scriptParams, devices, mainWindow)
 
-@timeout(15)
+@timeout(1500)
 def continuous_snap_image(args, scriptParams, devices, mainWindow):
     print('---continuous_snap_image---')
 
@@ -408,21 +408,26 @@ def continuous_snap_image(args, scriptParams, devices, mainWindow):
     expand_dynvars(fileName, devices)
     devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
-    if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
+    fileCategory = re.search('([a-zA-Z_]\w*)', args[0]).group()
+    pathNames =  []
+    for i in range(snapNum):
+        filename = [systate.saveFileName[fileCategory]]
+        expand_dynvars(filename, devices)
+        pathNames.append(scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + filename[0])
+        systate.seqn +=1
+    pathExists = [os.path.exists(pathname) for pathname in pathNames]
+
+
+    if not scriptParams.isContinue or False in pathExists:
         resume_state(scriptParams, devices, mainWindow)
         async_move_robot(systate.async_pos, scriptParams, devices, mainWindow)
         time.sleep(0.2)
 
         for i in range(snapNum):
+            if isAborted(scriptParams, mainWindow):
+                return mainWindow.stopClicked
+
             time.sleep(snapInterval)
-            ### Save image
-            fileName = []
-            fileName.append(systate.saveFileName[fileCategory])
-            expand_dynvars(fileName, devices)
-
-            # devices['3Dsensors'].imgPath = systate.ymd_hms + '_' + str(systate.dir_num) + '/' + fileName[0]
-            devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
-
             img = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
             img.convert('L')
             qimage = QtGui.QImage(ImageQt.ImageQt(img))
@@ -430,11 +435,7 @@ def continuous_snap_image(args, scriptParams, devices, mainWindow):
             devices['3Dsensors'].ui_s.sensorImage.setPixMap(pixmap)
             devices['3Dsensors'].ui_s.sensorImage.show()
 
-            img.save(devices['3Dsensors'].imgPath)
-
-            systate.seqn += 1
-    else:
-        systate.seqn += snapNum
+            img.save(pathNames[i])
 
     warm_lasers(scriptParams, devices, mainWindow)
 
