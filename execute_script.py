@@ -191,7 +191,7 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
     mainWindow.updateScriptProgress()
     # mainWindow.show()
 
-    if 'snap' in com_hist:
+    if 'snap' in com_hist or 'contsnap' in com_hist:
         if devices['3Dsensors'].connected:
             pass
         else:
