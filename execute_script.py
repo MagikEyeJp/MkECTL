@@ -508,7 +508,6 @@ def async_move_robot(args, scriptParams, devices, mainWindow):
     print(f"{args=}, {systate.async_pos}, {systate.scale=}, {systate.offset=}")
 
     if not systate.skip:
-        move_robot(systate.pos, scriptParams, devices, mainWindow)
         scaled_pos = list(np.add(np.multiply(systate.async_pos, systate.scale), systate.offset))
         targetPos_d = dict(zip(devices['robot'].motorSet,scaled_pos))
         app.processEvents()
