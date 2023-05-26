@@ -190,7 +190,7 @@ class DobotRobot(IRobotController):
     def presetPosition(self, targetPos):
         pass
 
-    def AsyncMoveTo(self, targetPos: dict, callback: callable, wait: bool = False, isAborted: callable = None, speed: int = None):
+    def AsyncMoveTo(self, targetPos: dict, callback: callable, isAborted: callable = None, speed: int = None):
         """move to target position
 
         Move the robot to the target position.
