@@ -114,11 +114,11 @@ MyType = np.dtype([(
     ('reserve3', np.byte, (24, ))])
 
 defaultAixs = {
-    "X": -240,
+    "X": -300,
     "Y": 0,
-    "Z": 0,
-    "R": -97.5,
-    "P": -100
+    "Z": -100,
+    "R": -98,
+    "P": -130
     }
 
 def feedbakThread(obj):
@@ -185,7 +185,7 @@ class DobotRobot(IRobotController):
         code = "M124"
         self.sock.send(code.encode())
         pos = json.loads(self.sock.recv(1024).decode())["body"][1]
-        return {i:self.basePos[i] - pos[i] for i in pos.keys()}
+        return {i:pos[i] - self.basePos[i] for i in pos.keys()}
 
     def presetPosition(self, targetPos):
         pass
@@ -210,7 +210,7 @@ class DobotRobot(IRobotController):
         """
         code = "G01"
         for i in self.basePos.keys():
-            code += f" {i}{self.basePos[i] - targetPos[i]}" if i in targetPos.keys() else ""
+            code += f" {i}{targetPos[i] - self.basePos[i]}" if i in targetPos.keys() else ""
         code += f" F{int(speed)}" if speed is not None else ""
 
         self.sock.send(code.encode())
@@ -241,7 +241,7 @@ class DobotRobot(IRobotController):
         """
         code = "G00"
         for i in self.basePos.keys():
-            code += f" {i}{self.basePos[i] - targetPos[i]}" if i in targetPos.keys() else ""
+            code += f" {i}{targetPos[i] - self.basePos[i]}" if i in targetPos.keys() else ""
 
         self.sock.send(code.encode())
         ret = json.loads(self.sock.recv(1024).decode())
@@ -256,7 +256,7 @@ class DobotRobot(IRobotController):
                 is_arrive = True
                 for i in targetPos.keys():
                     if i in self.currentPos.keys():
-                        if abs( self.currentPos[i] - (self.basePos[i] - targetPos[i]) ) > 1:
+                        if abs( self.currentPos[i] - (targetPos[i] - self.basePos[i]) ) > 1:
                             is_arrive = False
                 if is_arrive:
                     break
