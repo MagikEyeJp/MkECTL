@@ -1,6 +1,6 @@
 {
     "name": "calibration postprocess",
-    "program": "postproc/calibration_postproc_UF1.py",
+    "program": "postproc/calibration_postproc.py",
     "parameter": {
         "version": "1.0.0",
         "outpath": "/share/calib/ILT002",
