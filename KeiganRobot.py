@@ -129,10 +129,14 @@ class KeiganRobot(IRobotController):
             return False
 
     def initializeMotor(self, m: KMControllersS.USBController):
+        m.disableCheckSum()
         m.wait_start()      # wait reboot
         m.enable()
         m.interface(8)      # USB only
         m.curveType(1)      # trapezoid speed curve
+        m.measureInterval(5)    # 100ms
+        m.measureSetting(3)     # measure on
+        m.enableMotorMeasurement()  # measure start
 
     def initializeOrigins(self, origins=None, callback=None):
         for m in [self.slide, self.pan, self.tilt]:
@@ -145,7 +149,7 @@ class KeiganRobot(IRobotController):
         m = self.slide
         self.initializeMotor(m)
         m.speed(10.0)
-        maxTorque = m.read_maxTorque()[0]
+        maxTorque = m.read_maxTorque()
         m.maxTorque(1.0)
         m.runForward()
         duration = 0.0
@@ -232,7 +236,7 @@ class KeiganRobot(IRobotController):
         cnt = 0
         GOAL_EPS = 0.003  # FINE目標位置到達誤差しきい値
         NOWAIT_EPS = 0.1  # COARSE目標位置到達誤差しきい値
-        GOAL_CNT = 8  # 目標位置到達判定回数
+        GOAL_CNT = 5  # 目標位置到達判定回数
 
         class Axis:
             def __init__(self, cont, target):
@@ -249,6 +253,7 @@ class KeiganRobot(IRobotController):
             err = 0
             for k, v in ax.items():
                 e = (pos[k] - v.target) * v.cont.get_scaling()[0]
+                print(f'{k}:{e:.4f}', end=' ')
                 err += pow(e, 2)
             return math.sqrt(err)
 
@@ -256,7 +261,7 @@ class KeiganRobot(IRobotController):
         for k, p in self.params.items():
             if k in targetPos:
                 c = p['cont']
-                c.speed(c.read_maxSpeed()[0])
+                c.speed(c.read_maxSpeed())
                 c.moveTo_scaled(targetPos[k])
                 axis[k] = Axis(c, targetPos[k])
 
@@ -274,7 +279,7 @@ class KeiganRobot(IRobotController):
                 if inmain(isAborted):
                     return True
 
-            @timeout(5)
+            @timeout(6)
             def waitmove():
                 nonlocal initial_err
                 nonlocal minerr
