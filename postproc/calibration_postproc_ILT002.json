@@ -1,11 +1,11 @@
 {
     "name": "calibration postprocess",
-    "program": "postproc/calibration_postproc_UF1.py",
+    "program": "postproc/calibration_postproc.py",
     "parameter": {
         "version": "1.0.0",
-        "outpath": "/share/calib/MKE-UF1",
-        "macrofile": "/share/calib/MKE-UF1/macros_normal_BL15mm.json",
-        "configfile": "/share/calib/MKE-UF1/configs/config_UF1_det02/config_UF1-HR.json",
+        "outpath": "/share/calib/ILT002",
+        "macrofile": "/share/calib/ILT002/macros_normal_BL15mm.json",
+        "configfile": "/share/calib/ILT002/configs/config_UF1_det02/config_UF1-HR.json",
         "upload": false
     }
 }

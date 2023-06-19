@@ -61,8 +61,8 @@ if __name__ == '__main__':
     sensortype = "vcsel"
     sensorname = sensorInfo.labelid
 
-    # print(CALIB_SCRIPT + " vcsel " + sensorname + " " + newpathname)
-    retcode = subprocess.call(CALIB_SCRIPT + " vcsel " + sensorname + " " + newpathname, shell=True)
+    print(CALIB_SCRIPT + " vcsel " + sensorname + " " + newpathname)
+    retcode = subprocess.call(CALIB_SCRIPT + " -m " + os.path.basename(macrofile) + " vcsel " + sensorname + " " + newpathname, shell=True)
     print(f"returncode {retcode}")
 
     # make mfw package

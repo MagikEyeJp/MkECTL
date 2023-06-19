@@ -1,0 +1,56 @@
+{
+  "version": 1.1,
+  "robot": {
+    "type": "DOBOT",
+    "gateway_addr": "med.local",
+    "gateway_port": 2022,
+    "dobot_addr": "192.168.10.111",
+    "dobot_port": 30004,
+    "axes": {
+      "X": {
+        "unit": "mm",
+        "step": 1,
+        "min": -140,
+        "max": 90,
+        "axis": "X",
+        "offset": 300
+      },
+      "Y": {
+        "unit": "mm",
+        "step": 1,
+        "min": -320,
+        "max": 320,
+        "axis": "Y",
+        "offset": 0
+      },
+      "Z": {
+        "unit": "mm",
+        "step": 1,
+        "min": -190,
+        "max": 210,
+        "axis": "Z",
+        "offset": 0
+      },
+      "R": {
+        "unit": "deg",
+        "step": 0.1,
+        "min": -90,
+        "max": 90,
+        "axis": "R",
+        "offset": 97.5
+      },
+      "P": {
+        "unit": "deg",
+        "step": 1,
+        "min": -45,
+        "max": 90,
+        "axis": "P",
+        "offset": 100
+      }
+    }
+  },
+  "IRLight": {
+    "type": "dummy",
+    "device": "tty_dummy"
+  }
+}

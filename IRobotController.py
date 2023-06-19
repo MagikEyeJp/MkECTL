@@ -21,6 +21,9 @@ class IRobotController:
     def presetPosition(self, targetPos):
         pass
 
+    def AsyncMoveTo(self, targetPos: dict, callback: callable, isAborted: callable = None, speed: int = None) -> bool:
+        pass
+
     def moveTo(self, targetPos: dict, wait: bool = False, callback: callable = None,  isAborted: callable = None) -> bool:
         """move to target position
 

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.1
+Type=Application
+Name=plottemps
+Comment=plottemps
+Icon=/home/magikeye/bin/MkECTL/plottemps.png
+Exec=/home/magikeye/bin/MkECTL/venv/bin/python /home/magikeye/bin/MkECTL/plottemps.py
+Path=/home/magikeye/bin/MkECTL
+Actions=
+Categories=Development;X-GNOME-SystemSettings;
+StartupWMClass=matplotlib
