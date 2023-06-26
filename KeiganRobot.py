@@ -14,7 +14,9 @@ from qtutils import inmain
 from PyQt5 import QtWidgets, QtCore
 import detailedSettings_ui
 import json_IO
-
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('qtagg')
 
 defaultMotors = {
     "slide": {
@@ -326,10 +328,19 @@ class KeiganRobot(IRobotController):
 
         return False
 
+    def setMotorMeasurement(self, enable, motor_i):
+        for i, x in enumerate(self.motorSet):
+            m = self.params[x]['cont']
+            if enable and i == motor_i:
+                m.on_motor_measurement_value_cb = self.settingWindow.onMeasure
+            else:
+                m.on_motor_measurement_value_cb = False
+
     def getSettingWindow(self):
         self.settingWindow = SettingsWindow()
         self.settingWindow.pidChanged.connect(self.changePIDparam)
         self.settingWindow.parameterSaved.connect(self.saveAllRegisters)
+        self.settingWindow.graphChanged.connect(self.setMotorMeasurement)
         return self.settingWindow
 
 
@@ -338,6 +349,7 @@ class KeiganRobot(IRobotController):
 class SettingsWindow(QtWidgets.QWidget):
     pidChanged = QtCore.pyqtSignal(str, str, int, float)
     parameterSaved = QtCore.pyqtSignal()
+    graphChanged = QtCore.pyqtSignal(bool, int)
 
     def __init__(self, parent=None):
         super(SettingsWindow, self).__init__(parent)
@@ -362,9 +374,42 @@ class SettingsWindow(QtWidgets.QWidget):
 
         self.ui_setting.saveButton.clicked.connect(self.savePID)
         self.ui_setting.resetButton.clicked.connect(self.resetPID)
+        self.ui_setting.MotorComboBox.currentIndexChanged.connect(self.changeMotor)
 
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.ui_setting.resetButton.setEnabled(False)
+
+        # graph
+        self.fig = None
+        self.times = [0 for i in range(100)]
+        self.position = [0 for i in range(100)]
+        self.velocity = [0 for i in range(100)]
+        self.torque = [0 for i in range(100)]
+        self.starttime = time.time()
+
+    def closeEvent(self, event):
+        self.ui_setting.MotorComboBox.setCurrentIndex(0)
+        event.accept()
+
+    def onMeasure(self, pos, velo, trq):
+        self.times.append(time.time() - self.start_time)
+        self.times.pop(0)
+        self.position.append(pos)
+        self.position.pop(0)
+        self.velocity.append(velo)
+        self.velocity.pop(0)
+        self.torque.append(trq)
+        self.torque.pop(0)
+        self.line_pos.set_data(self.times, self.position)
+        self.line_velo.set_data(self.times, self.velocity)
+        self.line_trq.set_data(self.times, self.torque)
+        print(pos, velo, trq)
+        plt.xlim(min(self.times), max(self.times))
+        self.ax1.set_ylim(min(self.position), max(self.position))
+        self.ax2.set_ylim(min(self.velocity), max(self.velocity))
+        self.ax3.set_ylim(min(self.torque), max(self.torque))
+        # plt.axis('tight')
+        plt.draw()
 
     def setTableSize(self):
 
@@ -470,3 +515,58 @@ class SettingsWindow(QtWidgets.QWidget):
 
         self.setDicTable()
         self.ui_setting.resetButton.setEnabled(False)
+
+    def changeMotor(self):
+        index = self.ui_setting.MotorComboBox.currentIndex() - 1
+        enable = True if index >= 0 else False
+        print(enable, index)
+        self.start_time = time.time()
+        if enable:
+            self.makeGraph()
+        else:
+            self.closeGraph()
+        self.graphChanged.emit(enable, index)
+
+    def on_graphClose(event):
+        print('Closed Figure!')
+        self.graphChanged.emit(False, -1)
+
+    def closeGraph(self):
+        plt.close()
+        self.fig = None
+
+    def makeGraph(self):
+        self.times = [0 for i in range(100)]
+        self.position = [0 for i in range(100)]
+        self.velocity = [0 for i in range(100)]
+        self.torque = [0 for i in range(100)]
+        self.starttime = time.time()
+
+        if self.fig is None:
+            self.fig = plt.figure(figsize=(6, 3))
+            win = plt.gcf().canvas.manager.window
+            win.setWindowFlags(win.windowFlags() | QtCore.Qt.CustomizeWindowHint)
+            win.setWindowFlags(win.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
+            self.ax1 = self.fig.add_subplot(311)
+            # ax1.set_ylim(-180, 180)
+            # ax1.set_yticks(range(-180, 181, 60))
+            self.ax1.grid(True)
+            self.ax1.set_ylabel('pos (rad)')
+            self.ax2 = self.fig.add_subplot(312, sharex=self.ax1)
+            # ax2.set_ylim(-180, 180)
+            self.ax2.grid(True)
+            self.ax2.set_ylabel('velo')
+            self.ax3 = self.fig.add_subplot(313, sharex=self.ax1)
+            # ax3.set_ylim(-180, 180)
+            self.ax3.grid(True)
+            self.ax3.set_ylabel('trq')
+
+            self.line_pos, = self.ax1.plot(self.times, self.position)
+            self.ax1.legend([self.line_pos], ['pos'], loc='upper left')
+            self.line_velo, = self.ax2.plot(self.times, self.velocity)
+            self.ax2.legend([self.line_velo], ['velo'], loc='upper left')
+            self.line_trq, = self.ax3.plot(self.times, self.torque)
+            self.ax3.legend([self.line_trq], ['trq'], loc='upper left')
+
+            plt.pause(0.001)
+

@@ -668,6 +668,8 @@ def recv_thread(obj):
                     obj.m_position = pos
                     obj.m_velocity = velo
                     obj.m_torque = trq
+                    if (callable(obj.on_motor_measurement_value_cb)):
+                        obj.on_motor_measurement_value_cb(pos, velo, trq)
                     # logging
                     if obj.m_log_status == LogStatus.START:
                         obj.m_log_index = 0
@@ -748,6 +750,7 @@ class USBController(Controller):
         self.m_log_index = 0
         self.m_log_index_max = 0
         self.m_log_data = []
+        self.on_motor_measurement_value_cb = False
         #threading
         self.m_lock = threading.RLock()
         self.m_th = threading.Thread(target=recv_thread, args=(self,), daemon=True)
