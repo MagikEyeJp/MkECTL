@@ -32,6 +32,8 @@ class MyDoubleSpinBox(QtWidgets.QDoubleSpinBox):
 
     def stepBy(self, steps: int) -> None:
         # self.undo()
+        if QtWidgets.QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier:
+            steps *= 10
         super().stepBy(steps)
         self.determine()
 
