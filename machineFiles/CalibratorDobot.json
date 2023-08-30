@@ -10,16 +10,16 @@
       "X": {
         "unit": "mm",
         "step": 1,
-        "min": -140,
-        "max": 90,
+        "min": -370,
+        "max": 370,
         "axis": "X",
-        "offset": 300
+        "offset": 0
       },
       "Y": {
         "unit": "mm",
         "step": 1,
-        "min": -320,
-        "max": 320,
+        "min": -350,
+        "max": 350,
         "axis": "Y",
         "offset": 0
       },
@@ -27,7 +27,7 @@
         "unit": "mm",
         "step": 1,
         "min": -190,
-        "max": 210,
+        "max": 190,
         "axis": "Z",
         "offset": 0
       },
@@ -35,17 +35,17 @@
         "unit": "deg",
         "step": 0.1,
         "min": -90,
-        "max": 90,
+        "max": 190,
         "axis": "R",
-        "offset": 97.5
+        "offset": 0
       },
       "P": {
         "unit": "deg",
         "step": 1,
-        "min": -45,
-        "max": 90,
+        "min": 0,
+        "max":  180,
         "axis": "P",
-        "offset": 100
+        "offset": 0
       }
     }
   },
