@@ -211,15 +211,16 @@ class Controller:
 
     def measureInterval(self,interval,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
-        Set the interval time of measurement. (0:5ms, 1:10ms, 2:20ms, 3:50ms, 4:100ms, 5:200ms, 6:500ms, 7:1000ms)
+        Set the interval time of measurement. (0: 2ms 1:5ms, 2:10ms, 3:20ms, 4:50ms, 5:100ms, 6:200ms, 7:500ms, 8:1000ms, 9:2000ms, 10:5000ms, 11:10000ms)
         """
         command=b'\x2C'
         values=uint8_t2bytes(interval)
         self.run_command(command+identifier+values+crc16,'motor_settings')
 
-    def measureByDefault(self,flag,identifier=b'\x00\x00',crc16=b'\x00\x00'):
+    def measureSetting(self,flag,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
-        Set the auto start mode of measurement. (0:disable autostart 1:enable autostart)
+        bit1: Notification of motor measurement (1:ON, 0:OFF)
+        bit0: To start Notification of motor measurement when booting(1:ON, 0:OFF)
         """
         command=b'\x2D'
         values=uint8_t2bytes(flag)
@@ -250,9 +251,9 @@ class Controller:
         self.run_command(command+identifier+values+crc16,'motor_settings')
 
     def readRegister(self,register,identifier=b'\x00\x00',crc16=b'\x00\x00'):
-        '''
+        """
         Read a specified setting (register).
-        '''
+        """
         command=b'\x40'
         values=uint8_t2bytes(register)
         self.run_command(command+identifier+values+crc16,'motor_settings')
@@ -263,6 +264,13 @@ class Controller:
         """
         command=b'\x41'
         self.run_command(command+identifier+crc16,'motor_settings')
+
+    def readAllInfo(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):      # ver2.13
+        """
+        Reset a specified register's value to the firmware default setting.
+        """
+        command=b'\x49'
+        self.run_command(command+identifier+crc16, 'motor_settings')
 
     def resetRegister(self,register,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -515,6 +523,23 @@ class Controller:
         values=uint8_t2bytes(ledState)+uint8_t2bytes(red)+uint8_t2bytes(green)+uint8_t2bytes(blue)
         self.run_command(command+identifier+values+crc16,"motor_control")
 
+
+    def enableMotorMeasurement(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):
+        """
+        Enable the motor measurement and start continual notification of the measurement values.
+        """
+        command=b'\xE6'
+        self.run_command(command+identifier+crc16,'motor_control')
+
+
+    def disableMotorMeasurement(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):
+        """
+        Enable the motor measurement and start continual notification of the measurement values.
+        """
+        command=b'\xE7'
+        self.run_command(command+identifier+crc16,'motor_control')
+
+
     # IMU
     def enableIMU(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
@@ -579,21 +604,27 @@ class Controller:
     def get_scaling(self):
         return self.scaling_rate, self.scaling_offset
 
+    def to_scaled_position(self, abs_pos):
+        try:
+            scaled_position = (abs_pos / self.scaling_rate) - self.scaling_offset
+        except ZeroDivisionError as e:
+            scaled_position = 0.0
+        return scaled_position
+
+    def to_absolute_position(self, scaled_pos):
+        abs_position = (scaled_pos + self.scaling_offset) * self.scaling_rate
+        # print(abs_position)
+        return abs_position
+
     def moveTo_scaled(self, position):
         """
         Move the motor to the specified absolute 'position' in user defined coordinate.
         """
-        abs_position = (position + self.scaling_offset) * self.scaling_rate
-        print(abs_position)
-        self.moveTo(abs_position)
+        self.moveTo(self.to_absolute_position(position))
 
     def read_scaled_position(self):
         (position, velocity, torque) = self.read_motor_measurement()
-        try:
-            scaled_position = (position / self.scaling_rate) - self.scaling_offset
-        except ZeroDivisionError as e:
-            scaled_position = 0.0
-        return scaled_position
+        return self.to_scaled_position(position)
 
     def preset_scaled_position(self, position):
         abs_position = (position + self.scaling_offset) * self.scaling_rate
@@ -643,6 +674,8 @@ def recv_thread(obj):
                     obj.m_position = pos
                     obj.m_velocity = velo
                     obj.m_torque = trq
+                    if (callable(obj.on_motor_measurement_value_cb)):
+                        obj.on_motor_measurement_value_cb(pos, velo, trq)
                     # logging
                     if obj.m_log_status == LogStatus.START:
                         obj.m_log_index = 0
@@ -723,6 +756,7 @@ class USBController(Controller):
         self.m_log_index = 0
         self.m_log_index_max = 0
         self.m_log_data = []
+        self.on_motor_measurement_value_cb = False
         #threading
         self.m_lock = threading.RLock()
         self.m_th = threading.Thread(target=recv_thread, args=(self,), daemon=True)
@@ -811,13 +845,13 @@ class USBController(Controller):
             sn = self.getRegister(0x46)
 
     def __read_float_reg(self, r):
-        return struct.unpack_from('>f', self.getRegister(r))
+        return struct.unpack_from('>f', self.getRegister(r))[0]
 
     def __read_uint8_reg(self, r):
-        return struct.unpack_from('>B', self.getRegister(r))
+        return struct.unpack_from('>B', self.getRegister(r))[0]
 
     def __read_uint16_reg(self, r):
-        return struct.unpack_from('>H', self.getRegister(r))
+        return struct.unpack_from('>H', self.getRegister(r))[0]
 
     def __read_rgb_data(self, r):
         return struct.unpack_from('>BBB', self.getRegister(r))
@@ -885,7 +919,7 @@ class USBController(Controller):
     def read_motorMeasureInterval(self):
         return self.__read_uint8_reg(0x2c)
 
-    def read_motorMeasureByDefault(self):
+    def read_motorMeasureSetting(self):
         return self.__read_uint8_reg(0x2d)
 
     def read_interface(self):
@@ -933,7 +967,7 @@ class USBController(Controller):
     def read_regb1(self):
         return self.__read_uint16_reg(0xb1)
 
-    def read_motorMeasurement(self):
+    def read_motorMeasurementValue(self):
         return self.readRegister(0xb4)
 
     def read_imuMeasurement(self):
@@ -950,4 +984,42 @@ class USBController(Controller):
 
     def read_SerialNo(self):
         return self.getRegister(0xfa)
+
+    def get_AllSettings(self) -> dict:
+        params = {}
+        params['maxSpeed'] = self.read_maxSpeed()
+        params['minSpeed'] = self.read_minSpeed()
+        params['curveType'] = self.read_curveType()
+        params['acc'] = self.read_acc()
+        params['dec'] = self.read_dec()
+        params['maxTorque'] = self.read_maxTorque()
+        params['qCurrentP'] = self.read_qCurrentP()
+        params['qCurrentI'] = self.read_qCurrentI()
+        params['qCurrentD'] = self.read_qCurrentD()
+        params['speedP'] = self.read_speedP()
+        params['speedI'] = self.read_speedI()
+        params['speedD'] = self.read_speedD()
+        params['positionP'] = self.read_positionP()
+        params['positionI'] = self.read_positionI()
+        params['positionD'] = self.read_positionD()
+        params['posControlThreshold'] = self.read_posControlThreshold()
+        params['lowPassFilter'] = self.read_lowPassFilter()
+        params['motorMeasureInterval'] = self.read_motorMeasureInterval()
+        params['motorMeasureSetting'] = self.read_motorMeasureSetting()
+        params['interface'] = self.read_interface()
+        params['limitCurrent'] = self.read_limitCurrent()
+        params['ownColor'] = self.read_ownColor()
+        params['SN'] = self.read_SN()
+        params['FWVER'] = self.read_FWVER()
+        params['toSpeed'] = self.read_toSpeed()
+        params['reg5b'] = self.read_reg5b()
+        params['toPosition'] = self.read_toPosition()
+        params['motorMeasureInterval'] = self.read_motorMeasureInterval()
+        params['motorMeasureSetting'] = self.read_motorMeasureSetting()
+        params['imuMeasurement'] = self.read_imuMeasurement()
+        params['led'] = self.read_led()
+        params['SerialNo'] = self.read_SerialNo()
+
+        return params
+
 

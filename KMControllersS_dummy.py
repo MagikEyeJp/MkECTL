@@ -282,7 +282,7 @@ class Controller:
         values=uint8_t2bytes(interval)
         self.run_command(command+identifier+values+crc16,'motor_settings')
 
-    def measureByDefault(self,flag,identifier=b'\x00\x00',crc16=b'\x00\x00'):
+    def measureSetting(self,flag,identifier=b'\x00\x00',crc16=b'\x00\x00'):
         """
         interface settings.
         """
@@ -607,6 +607,23 @@ class Controller:
         command=b'\xE0'
         values=uint8_t2bytes(ledState)+uint8_t2bytes(red)+uint8_t2bytes(green)+uint8_t2bytes(blue)
         self.run_command(command+identifier+values+crc16,"motor_control")
+
+
+    def enableMotorMeasurement(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):
+        """
+        Enable the motor measurement and start continual notification of the measurement values.
+        """
+        command=b'\xE6'
+        self.run_command(command+identifier+crc16,'motor_control')
+
+
+    def disableMotorMeasurement(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):
+        """
+        Enable the motor measurement and start continual notification of the measurement values.
+        """
+        command=b'\xE7'
+        self.run_command(command+identifier+crc16,'motor_control')
+
 
     # IMU
     def enableIMU(self,identifier=b'\x00\x00',crc16=b'\x00\x00'):
@@ -1043,7 +1060,7 @@ class USBController(Controller):
     def read_motorMeasureInterval(self):
         return self.__read_uint8_reg(0x2c)
 
-    def read_motorMeasureByDefault(self):
+    def read_motorMeasureSetting(self):
         return self.__read_uint8_reg(0x2d)
 
     def read_interface(self):
@@ -1091,7 +1108,7 @@ class USBController(Controller):
     def read_regb1(self):
         return self.__read_uint16_reg(0xb1)
 
-    def read_motorMeasurement(self):
+    def read_motorMeasurementValue(self):
         return self.readRegister(0xb4)
 
     def read_imuMeasurement(self):

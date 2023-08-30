@@ -14,7 +14,9 @@ from qtutils import inmain
 from PyQt5 import QtWidgets, QtCore
 import detailedSettings_ui
 import json_IO
-
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('qtagg')
 
 defaultMotors = {
     "slide": {
@@ -60,6 +62,7 @@ defaultMotors = {
 class KeiganRobot(IRobotController):
     def __init__(self, machineParams=None):
         self.m_machineParams = machineParams
+        self.currentMeasureController = None
         self.motorSet = ['slide', 'pan', 'tilt']
         self.settingWindow = None
 
@@ -129,10 +132,15 @@ class KeiganRobot(IRobotController):
             return False
 
     def initializeMotor(self, m: KMControllersS.USBController):
+        m.disableCheckSum()
         m.wait_start()      # wait reboot
         m.enable()
         m.interface(8)      # USB only
         m.curveType(1)      # trapezoid speed curve
+        m.measureInterval(5)    # 100ms
+        m.measureSetting(3)     # measure on
+        m.enableMotorMeasurement()  # measure start
+        m.targetPos = 0.0
 
     def initializeOrigins(self, origins=None, callback=None):
         for m in [self.slide, self.pan, self.tilt]:
@@ -145,7 +153,7 @@ class KeiganRobot(IRobotController):
         m = self.slide
         self.initializeMotor(m)
         m.speed(10.0)
-        maxTorque = m.read_maxTorque()[0]
+        maxTorque = m.read_maxTorque()
         m.maxTorque(1.0)
         m.runForward()
         duration = 0.0
@@ -249,6 +257,7 @@ class KeiganRobot(IRobotController):
             err = 0
             for k, v in ax.items():
                 e = (pos[k] - v.target) * v.cont.get_scaling()[0]
+                print(f'{k}:{e:.4f}', end=' ')
                 err += pow(e, 2)
             return math.sqrt(err)
 
@@ -256,8 +265,9 @@ class KeiganRobot(IRobotController):
         for k, p in self.params.items():
             if k in targetPos:
                 c = p['cont']
-                c.speed(c.read_maxSpeed()[0])
+                c.speed(c.read_maxSpeed())
                 c.moveTo_scaled(targetPos[k])
+                self.setTargetPosValue(c, c.to_absolute_position(targetPos[k]))     # for PID measurement
                 axis[k] = Axis(c, targetPos[k])
 
         # initial_err = math.sqrt(initial_err)
@@ -274,7 +284,7 @@ class KeiganRobot(IRobotController):
                 if inmain(isAborted):
                     return True
 
-            @timeout(5)
+            @timeout(6)
             def waitmove():
                 nonlocal initial_err
                 nonlocal minerr
@@ -321,18 +331,38 @@ class KeiganRobot(IRobotController):
 
         return False
 
+    def setMotorMeasurement(self, enable, motor_i):
+        for i, x in enumerate(self.motorSet):
+            m = self.params[x]['cont']
+            if enable and i == motor_i:
+                self.currentMeasureController = m
+                self.settingWindow.onChangeTargetPos(m, m.targetPos)
+                m.on_motor_measurement_value_cb = self.settingWindow.onMeasure
+            else:
+                m.on_motor_measurement_value_cb = False
+        return self.currentMeasureController
+
+    def setTargetPosValue(self, cont, val):
+        cont.targetPos = val
+        if cont == self.currentMeasureController:
+            self.settingWindow.onChangeTargetPos(cont, val)
+
     def getSettingWindow(self):
         self.settingWindow = SettingsWindow()
         self.settingWindow.pidChanged.connect(self.changePIDparam)
         self.settingWindow.parameterSaved.connect(self.saveAllRegisters)
+        self.settingWindow.graphChanged.connect(self.setMotorMeasurement)
         return self.settingWindow
 
 
 # ---- Setting Window ----
+GRAPH_NUM = 100
+
 
 class SettingsWindow(QtWidgets.QWidget):
     pidChanged = QtCore.pyqtSignal(str, str, int, float)
     parameterSaved = QtCore.pyqtSignal()
+    graphChanged = QtCore.pyqtSignal(bool, int)
 
     def __init__(self, parent=None):
         super(SettingsWindow, self).__init__(parent)
@@ -357,9 +387,56 @@ class SettingsWindow(QtWidgets.QWidget):
 
         self.ui_setting.saveButton.clicked.connect(self.savePID)
         self.ui_setting.resetButton.clicked.connect(self.resetPID)
+        self.ui_setting.MotorComboBox.currentIndexChanged.connect(self.changeMotor)
 
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.ui_setting.resetButton.setEnabled(False)
+
+        # graph
+        self.fig = None
+        self.times = []
+        self.position = []
+        self.position2 = []
+        self.velocity = []
+        self.torque = []
+        self.targetpos = []
+        self.starttime = 0
+        self.currentTargetPos = 0
+        self.currentController = None
+
+    def closeEvent(self, event):
+        self.ui_setting.MotorComboBox.setCurrentIndex(0)
+        event.accept()
+
+    def onChangeTargetPos(self, cont, val):
+        self.currentController = cont
+        self.currentTargetPos = cont.to_scaled_position(val)
+        print("onChangeTargetPos: ", cont, val)
+
+    def onMeasure(self, pos, velo, trq):
+        if self.currentController is not None:
+            self.times.append(time.time() - self.start_time)
+            self.times.pop(0)
+            self.position.append(self.currentController.to_scaled_position(pos))
+            self.position.pop(0)
+            self.position2.append(self.currentController.to_scaled_position(pos) - self.currentTargetPos)
+            self.position2.pop(0)
+            self.velocity.append(velo)
+            self.velocity.pop(0)
+            self.torque.append(trq)
+            self.torque.pop(0)
+            self.line_pos.set_data(self.times, self.position)
+            self.line_pos2.set_data(self.times, self.position2)
+            self.line_velo.set_data(self.times, self.velocity)
+            self.line_trq.set_data(self.times, self.torque)
+            # print(pos, velo, trq)
+            plt.xlim(min(self.times), max(self.times))
+            self.ax1.set_ylim(min(self.position), max(self.position))
+            # self.ax1_2.set_ylim(min(self.position2), max(self.position2))
+            self.ax2.set_ylim(min(self.velocity), max(self.velocity))
+            self.ax3.set_ylim(min(self.torque), max(self.torque))
+            # plt.axis('tight')
+            plt.draw()
 
     def setTableSize(self):
 
@@ -465,3 +542,65 @@ class SettingsWindow(QtWidgets.QWidget):
 
         self.setDicTable()
         self.ui_setting.resetButton.setEnabled(False)
+
+    def changeMotor(self):
+        index = self.ui_setting.MotorComboBox.currentIndex() - 1
+        enable = True if index >= 0 else False
+        print(enable, index)
+        self.start_time = time.time()
+        if enable:
+            self.makeGraph()
+        else:
+            self.closeGraph()
+        self.graphChanged.emit(enable, index)
+
+    def on_graphClose(event):
+        print('Closed Figure!')
+        self.graphChanged.emit(False, -1)
+
+    def closeGraph(self):
+        plt.close()
+        self.fig = None
+
+    def makeGraph(self):
+        self.position = [0 for i in range(GRAPH_NUM)]
+        self.position2 = [0 for i in range(GRAPH_NUM)]
+        self.velocity = [0 for i in range(GRAPH_NUM)]
+        self.torque = [0 for i in range(GRAPH_NUM)]
+        self.targetpos = [0 for i in range(GRAPH_NUM)]
+        self.starttime = time.time()
+        self.times = [((GRAPH_NUM - i - 1) * -0.1) for i in range(GRAPH_NUM)]
+
+        if self.fig is None:
+            self.fig = plt.figure(figsize=(6, 3))
+            win = plt.gcf().canvas.manager.window
+            win.setWindowFlags(win.windowFlags() | QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowStaysOnTopHint)
+            win.setWindowFlags(win.windowFlags() & ~QtCore.Qt.WindowCloseButtonHint)
+            win.setWindowFlags
+            self.ax1 = self.fig.add_subplot(411)
+            self.ax1.grid(True)
+            self.ax1.set_ylabel('pos (rad)')
+            self.ax1_2 = self.fig.add_subplot(412, sharex=self.ax1)
+            self.ax1_2.grid(True)
+            self.ax1_2.set_ylabel('pos diff (rad)')
+            self.ax1_2.set_ylim(-0.5, 0.5)
+            self.ax2 = self.fig.add_subplot(413, sharex=self.ax1)
+            # ax2.set_ylim(-180, 180)
+            self.ax2.grid(True)
+            self.ax2.set_ylabel('velo')
+            self.ax3 = self.fig.add_subplot(414, sharex=self.ax1)
+            # ax3.set_ylim(-180, 180)
+            self.ax3.grid(True)
+            self.ax3.set_ylabel('trq')
+
+            self.line_pos, = self.ax1.plot(self.times, self.position)
+            self.ax1.legend([self.line_pos], ['pos'], loc='upper left')
+            self.line_pos2, = self.ax1_2.plot(self.times, self.position2)
+            self.ax1_2.legend([self.line_pos2], ['pos_diff'], loc='upper left')
+            self.line_velo, = self.ax2.plot(self.times, self.velocity)
+            self.ax2.legend([self.line_velo], ['velo'], loc='upper left')
+            self.line_trq, = self.ax3.plot(self.times, self.torque)
+            self.ax3.legend([self.line_trq], ['trq'], loc='upper left')
+
+            plt.pause(0.001)
+
