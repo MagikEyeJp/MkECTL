@@ -114,11 +114,11 @@ MyType = np.dtype([(
     ('reserve3', np.byte, (24, ))])
 
 defaultAixs = {
-    "X": -300,
+    "X": 300,
     "Y": 0,
-    "Z": -100,
-    "R": -98,
-    "P": -130
+    "Z": 100,
+    "R": 98,
+    "P": 130
     }
 
 def feedbakThread(obj):
