@@ -223,7 +223,7 @@ def plot_data(data, sensors):
     ymin, ymax = ax.get_ylim()
     lowertext = ax.text(0, 0, f"{ymin:.1f}", color='b', ha='right', va='top', transform=ax.transAxes)
     uppertext = ax.text(0, 1, f"{ymax:.1f}", color='b', ha='right', va='bottom', transform=ax.transAxes)
-    timetext  = ax.text(1, 0, f"{max_x}", color='b', ha='center', va='top', transform=ax.transAxes)
+    timetext = ax.annotate(f"{max_x}", xy=(1.0, 0.0), xytext=(0, -5), xycoords='axes fraction', textcoords='offset points', ha='center', va='top', color='b')
 
     return fig, ax, lowertext, uppertext, timetext
 
