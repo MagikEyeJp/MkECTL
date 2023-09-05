@@ -46,7 +46,7 @@ def execCmdline():
 
     if logfile is not None:
         read_plotdata(logfile, tempdata)
-        fig, ax, _, _ = plot_data(tempdata, sensors)
+        fig, ax, _, _, _ = plot_data(tempdata, sensors)
         plt.show(block=True)
     else:
         # シリアルポートの設定
@@ -58,7 +58,7 @@ def execCmdline():
         fname = "templog_" + now.strftime('%Y%m%d_%H%M%S') + ".csv"
 
         # グラフ
-        fig, ax, lt, ut = plot_data(tempdata, sensors)
+        fig, ax, lt, ut, tt = plot_data(tempdata, sensors)
         fig.show()
         plt.ion()
         global active
@@ -120,6 +120,7 @@ def execCmdline():
                     print(y_min, y_max)
                     lt.set_text(f"{y_min:.1f}")
                     ut.set_text(f"{y_max:.1f}")
+                    tt.set_text(f"{xvalue:.1f}")
                     fig.canvas.draw_idle()
 
                     # print(y_min, y_max)
@@ -222,8 +223,9 @@ def plot_data(data, sensors):
     ymin, ymax = ax.get_ylim()
     lowertext = ax.text(0, 0, f"{ymin:.1f}", color='b', ha='right', va='top', transform=ax.transAxes)
     uppertext = ax.text(0, 1, f"{ymax:.1f}", color='b', ha='right', va='bottom', transform=ax.transAxes)
+    timetext  = ax.text(1, 0, f"{max_x}", color='b', ha='center', va='top', transform=ax.transAxes)
 
-    return fig, ax, lowertext, uppertext
+    return fig, ax, lowertext, uppertext, timetext
 
 
 if __name__ == '__main__':
