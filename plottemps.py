@@ -5,7 +5,9 @@ from datetime import datetime, timedelta
 import serial
 import time
 import configparser
+import PyQt5
 
+plt.rcParams['backend']='Qt5Agg'
 max_x = 600  # デフォルトの最大時間(秒)
 active = False
 resized = False
@@ -68,6 +70,7 @@ def execCmdline():
         # ax.margins(0.5)
 
         plotline = {}
+        ann = {}
         starttime = datetime.now()
 
         while active:
@@ -80,8 +83,9 @@ def execCmdline():
                     # print(new_data)
                     ed, tim, temp = new_data
                     lst = tempdata.get(ed, None)
+                    xvalue = (tim - starttime).total_seconds()
                     if lst is None:
-                        tempdata[ed] = [((tim - starttime).total_seconds(), temp)]
+                        tempdata[ed] = [(xvalue, temp)]
                         x, y = zip(*tempdata[ed])
                         col = 'blue'
                         lbl = ed
@@ -89,12 +93,22 @@ def execCmdline():
                             lbl = sensors[ed][0]
                             col = sensors[ed][1]
                         plotline[ed], = ax.plot(x, y, color=col, label=lbl)
+                        bbox = dict(boxstyle="round", fc="w", ec=col)
+                        arrowprops = dict(
+                            arrowstyle="-",
+                            linestyle="--",
+                            relpos=(0., 0.5),
+                            connectionstyle="arc3,rad=0")
+                        ann[ed] = ax.annotate(f"{y[-1]}", (x[-1], y[-1]), xycoords="data", textcoords=(ax.transAxes, ax.transData), xytext=(1.0, y[-1]), bbox=bbox, arrowprops=arrowprops, ha="left", va="center")
                         ax.legend()
                     else:
-                        tempdata[ed].append(((tim - starttime).total_seconds(), temp))
+                        tempdata[ed].append((xvalue, temp))
                         x, y = zip(*tempdata[ed])
                         # ax.plot(x, y, color='blue')
                         plotline[ed].set_data(x, y)
+                        ann[ed].set_text(f"{y[-1]}")
+                        ann[ed].xy = (x[-1], y[-1])
+                        ann[ed].set_y(y[-1])
                         # print(plotline[ed], x,y)
                     if resized:
                         plt.autoscale(True, 'both')
