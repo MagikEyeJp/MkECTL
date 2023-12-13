@@ -1,0 +1,8 @@
+{
+    "name": "iltreport postprocess",
+    "program": "postproc/iltreport_postproc.py",
+    "parameter": {
+        "bindir": "/share/calib/bin",
+        "configfile": "/share/calib/ILT001/configs/config.json"
+    }
+}
