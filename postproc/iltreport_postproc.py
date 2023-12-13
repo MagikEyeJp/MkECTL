@@ -8,7 +8,7 @@ import subprocess
 from glob import glob
 import datetime
 
-import SensorInfo
+from SensorInfo import SensorInfo
 from natsort import natsorted
 
 # --- ILT Report script ---
