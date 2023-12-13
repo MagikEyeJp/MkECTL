@@ -1,0 +1,17 @@
+set laser_image, "laser/img_@{seqn}{4}_@{slide}{4}.png"
+
+home
+
+gainiso 100
+
+mov 100, 0, 0
+
+#####################
+lasers 1
+light 2, 1
+shutter 50000
+snap ${laser_image},3
+lasers 0
+#####################
+
+home
