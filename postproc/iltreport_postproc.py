@@ -45,5 +45,6 @@ if __name__=="__main__":
     configfile = param.get("configfile", "") # 無かったら空文字列が返る
     # シーケンス順に取得
     imgs = natsorted(glob(f"{foldername}/laser/*.png"))
-    # execute
-    ret = subprocess.call(ILTREPORT_SCRIPT + f" {binfile} {configfile} --output {pdfname} {imgs}" )
+    imgs = [path for path in imgs] # convert to absolute path
+    imgsp = " ".join(imgs)
+    ret = subprocess.run(ILTREPORT_SCRIPT + f" --output {output} {binfile} {configfile} {imgsp}", shell=True)
