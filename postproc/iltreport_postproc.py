@@ -23,7 +23,6 @@ def usage():
     exit(1)
 
 if __name__=="__main__":
-    print(f"{sys.argv=}")
     if len(sys.argv) != 3:
         usage()
 
