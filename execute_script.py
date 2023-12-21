@@ -377,7 +377,9 @@ def snap_image(args, scriptParams, devices, mainWindow):
     devices['3Dsensors'].imgPath = scriptParams.baseFolderName + '/' + scriptParams.subFolderName + '/' + fileName[0]
 
     if not scriptParams.isContinue or not os.path.exists(devices['3Dsensors'].imgPath):
-        resume_state(scriptParams, devices, mainWindow)
+        isStop = resume_state(scriptParams, devices, mainWindow)
+        if isStop:
+            return True
         time.sleep(0.2)
 
         img = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
@@ -391,6 +393,7 @@ def snap_image(args, scriptParams, devices, mainWindow):
 
     systate.seqn += 1
     warm_lasers(scriptParams, devices, mainWindow)
+    return False
 
 @timeout(1500)
 def continuous_snap_image(args, scriptParams, devices, mainWindow):
@@ -424,8 +427,12 @@ def continuous_snap_image(args, scriptParams, devices, mainWindow):
 
 
     if not scriptParams.isContinue or False in pathExists:
-        resume_state(scriptParams, devices, mainWindow)
-        async_move_robot(systate.async_pos, scriptParams, devices, mainWindow)
+        isStop = resume_state(scriptParams, devices, mainWindow)
+        if isStop:
+            return True
+        isStop = async_move_robot(systate.async_pos, scriptParams, devices, mainWindow)
+        if isStop:
+            return True
         time.sleep(0.2)
 
         for i in range(snapNum):
@@ -443,6 +450,7 @@ def continuous_snap_image(args, scriptParams, devices, mainWindow):
             img.save(pathNames[i])
 
     warm_lasers(scriptParams, devices, mainWindow)
+    return False
 
 @timeout(15)
 def snap_3D_frame(args, scriptParams, devices, mainWindow):
@@ -488,8 +496,8 @@ def move_robot(args, scriptParams, devices, mainWindow):
             app.processEvents()
 
             print('move_robot', targetPos_d)
-            isStopped = devices['robot'].moveTo(targetPos_d, True, mainWindow.actionStatusCallback)
-            if isStopped:
+            isStop = devices['robot'].moveTo(targetPos_d, True, mainWindow.actionStatusCallback)
+            if isStop:
                 return True
 
             systate.past_parameters.pos = systate.pos
@@ -696,13 +704,17 @@ def resume_state(scriptParams, devices, mainWindow):
         return mainWindow.stopClicked
 
     systate.skip = False
-    move_robot(systate.pos, scriptParams, devices, mainWindow)
+    isStop = move_robot(systate.pos, scriptParams, devices, mainWindow)
+    if isStop:
+        return True
+
     for i in range(len(systate.light)):
         set_light([i + 1, systate.light[i]], scriptParams, devices, mainWindow)
     set_lasers([systate.lasers], scriptParams, devices, mainWindow)
     set_gainiso([systate.gainiso], scriptParams, devices, mainWindow)
     set_shutter([systate.shutter], scriptParams, devices, mainWindow)
-    time.sleep(systate.shutter_IRoff * 1e-6)    # wait for an old frame
+    time.sleep(systate.shutter_IRoff * 1e-6 + 0.5)    # wait for an old frame
+    return False
 
 # def snap_3D_frame():
 
