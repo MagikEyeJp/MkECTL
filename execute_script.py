@@ -661,6 +661,9 @@ def set_light(args, scriptParams, devices, mainWindow):
 
 def wait_pause(args, scriptParams, devices, mainWindow):
     print('---wait_pause---')
+    isStop = resume_state(scriptParams, devices, mainWindow)
+    if isStop:
+        return True
     sec = int(args[0])
     for i in range(sec):
         if isAborted(scriptParams, mainWindow):
