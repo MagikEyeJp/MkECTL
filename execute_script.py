@@ -74,6 +74,7 @@ class Systate():
         self.lightNum = 2
         self.offset = [0, 0, 0]
         self.scale = [1.0, 1.0, 1.0]
+        self.projector_pattern = 1
 
         self.past_parameters = Systate.PastParameters()
         self.sentSig = Systate.SentSig()
@@ -618,6 +619,8 @@ def set_lasers(args, scriptParams, devices, mainWindow):
 
     systate.lasers = int(args[0])
     print('args=', args)
+    if systate.lasers != 0:
+        systate.projector_pattern = systate.lasers
 
     if not systate.skip:
         if not systate.sentSig.lasers or systate.lasers != systate.past_parameters.lasers:
@@ -679,7 +682,7 @@ def show_message(args, scriptParams, devicesNamennnnaa, mainWindow):
 @timeout(5)
 def warm_lasers(scriptParams, devices, mainWindow):
     global systate
-    projector_pattern = 0x01    # should be changed according to sensor type
+    projector_pattern = systate.projector_pattern    # should be changed according to sensor type
 
     if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
