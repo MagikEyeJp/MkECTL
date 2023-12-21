@@ -214,7 +214,12 @@ def execute_script(scriptParams, devices, mainWindow, isdemo=False):
         print(' ########## ' + str(i) + '/' + str(len(com_hist)) + ' ########## ')
 
         systate.args = args_hist[i]
-        systate.skip = commands[com_hist[i]][1]
+        cmd = commands.get(com_hist[i])
+        if cmd is None:
+            QtWidgets.QMessageBox.critical(mainWindow, f'script syntax error',
+                                           f'illegal command "{com_hist[i]}" at step {i}')
+            return True
+        systate.skip = cmd[1]
 
         # GUI
         mainWindow.ui.commandLabel.setText(com_hist[i])
