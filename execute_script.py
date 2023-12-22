@@ -123,9 +123,11 @@ def isAborted(scriptParams, mainWindow):
 
 def countCommandNum(scriptParams, args_hist, com_hist):
 
-    f = open(scriptParams.scriptName)
-    lines = f.read().splitlines()
-    f.close()
+    lines = []
+    if os.path.isfile(scriptParams.scriptName):
+        f = open(scriptParams.scriptName)
+        lines = f.read().splitlines()
+        f.close()
 
     for i, line in enumerate(lines):
 
