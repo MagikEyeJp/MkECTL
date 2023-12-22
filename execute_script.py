@@ -542,9 +542,14 @@ def home_robot(args, scriptParams, devices, mainWindow):
     if isAborted(scriptParams, mainWindow):
         return mainWindow.stopClicked
 
-    pos = np.array([0] * len(devices['robot'].motorSet), dtype=int)
+    systate.pos = [0.0] * len(devices['robot'].motorSet)
 
-    move_robot(pos, scriptParams, devices, mainWindow)
+    app.processEvents()
+    targetPos_d = dict(zip(devices['robot'].motorSet, systate.pos))
+    isStop = devices['robot'].moveTo(targetPos_d, False, mainWindow.actionStatusCallback)
+    systate.past_parameters.pos = systate.pos
+    systate.sentSig.pos = True
+    return isStop
 
 
 @timeout(5)
