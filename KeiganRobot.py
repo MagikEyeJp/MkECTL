@@ -152,7 +152,8 @@ class KeiganRobot(IRobotController):
         GOAL_TIME = 2.0
         m = self.slide
         self.initializeMotor(m)
-        m.speed(10.0)
+        speed = 10.0 if self.params.get('slide', {}).get('scale', 1) < 0.0 else -10.0
+        m.speed(speed)
         maxTorque = m.read_maxTorque()
         m.maxTorque(1.0)
         m.runForward()
@@ -163,7 +164,7 @@ class KeiganRobot(IRobotController):
         time.sleep(0.5)
         while duration < GOAL_TIME:
             (pos, vel, torque) = m.read_motor_measurement()
-            if vel >= GOAL_VELO:
+            if abs(vel) >= GOAL_VELO:
                 prev_time = time.time()
             pos_d = {'slide': pos}
             time.sleep(0.2)
