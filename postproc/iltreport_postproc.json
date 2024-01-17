@@ -2,7 +2,7 @@
     "name": "iltreport postprocess",
     "program": "postproc/iltreport_postproc.py",
     "parameter": {
-        "bindir": "/share/calib/bin",
-        "configfile": "/share/calib/ILT001/configs/config.json"
+        "bindir": "/share/calib/ILT001/ILT001_0453_20231213_192313",
+        "configfile": "/share/calib/ILT001/configs/120fps_afterMkert_1.2.2_RESERVED_ON/config.json"
     }
 }
