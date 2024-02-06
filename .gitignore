@@ -5,3 +5,5 @@ savedPictures/
 data/
 frame3Ddata/
 *venv/
+templog/templog*.csv
+*.bak
