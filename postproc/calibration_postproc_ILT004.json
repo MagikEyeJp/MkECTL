@@ -1,0 +1,13 @@
+{
+    "name": "calibration postprocess",
+    "program": "postproc/calibration_postproc.py",
+    "parameter": {
+        "version": "1.0.0",
+        "outpath": "/share/calib/ILT004",
+        "sensortype": "fisheye",
+        "macrofile": "/share/calib/ILT004/macros.json",
+        "configfile": "/share/calib/ILT004/configs/config.json",
+        "upload": false
+    }
+}
+

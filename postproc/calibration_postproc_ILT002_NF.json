@@ -1,0 +1,12 @@
+{
+    "name": "calibration postprocess",
+    "program": "postproc/calibration_postproc.py",
+    "parameter": {
+        "version": "1.0.0",
+        "outpath": "/share/calib/ILT002",
+        "macrofile": "/share/calib/ILT002/macros_normal_BL12mm.json",
+        "configfile": "/share/calib/ILT002/configs/config_UF1_det02/config_UF1-HR.json",
+        "upload": false
+    }
+}
+

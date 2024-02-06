@@ -4,7 +4,7 @@
     "parameter": {
         "version": "1.0.0",
         "outpath": "/share/calib/ILT001_PRODUCT_0917/",
-        "macrofile": "/share/calib/ILT001/macros.json",
+        "macrofile": "/share/calib/ILT001/macros_N.json",
         "configfile": "/share/calib/ILT001/configs/120fps_afterMkert_1.2.2/config.json",
         "upload": true
     }

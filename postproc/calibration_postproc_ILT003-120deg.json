@@ -1,0 +1,12 @@
+{
+    "name": "calibration postprocess",
+    "program": "postproc/calibration_postproc.py",
+    "parameter": {
+        "version": "1.0.0",
+        "outpath": "/share/calib/ILT003",
+        "macrofile": "/share/calib/ILT003/macros_120deg.json",
+        "configfile": "/share/calib/ILT003/configs/config.json",
+        "upload": true
+    }
+}
+
