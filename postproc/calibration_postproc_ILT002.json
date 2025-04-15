@@ -4,7 +4,7 @@
     "parameter": {
         "version": "1.0.0",
         "outpath": "/share/calib/ILT002",
-        "macrofile": "/share/calib/ILT002/macros_normal_BL15mm.json",
+        "macrofile": "/share/calib/ILT002/macros_normal_BL15mm_N.json",
         "configfile": "/share/calib/ILT002/configs/config_UF1_det02/config_UF1-HR.json",
         "upload": false
     }
