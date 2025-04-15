@@ -74,7 +74,7 @@ class Systate():
         self.lightNum = 2
         self.offset = [0, 0, 0]
         self.scale = [1.0, 1.0, 1.0]
-        self.projector_pattern = 1
+        self.projector_pattern = 15
 
         self.past_parameters = Systate.PastParameters()
         self.sentSig = Systate.SentSig()
@@ -383,7 +383,7 @@ def snap_image(args, scriptParams, devices, mainWindow):
         isStop = resume_state(scriptParams, devices, mainWindow)
         if isStop:
             return True
-        time.sleep(0.2)
+        time.sleep(1.0)
 
         img = devices['3Dsensors'].getImg(devices['3Dsensors'].frames)
         img.convert('L')
@@ -626,8 +626,8 @@ def set_lasers(args, scriptParams, devices, mainWindow):
 
     systate.lasers = int(args[0])
     print('args=', args)
-    if systate.lasers != 0:
-        systate.projector_pattern = systate.lasers
+    # if systate.lasers != 0:
+    #     systate.projector_pattern = systate.lasers
 
     if not systate.skip:
         if not systate.sentSig.lasers or systate.lasers != systate.past_parameters.lasers:
