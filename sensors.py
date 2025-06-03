@@ -13,6 +13,7 @@ import discoverdevices
 import SensorDevice
 # import sensorwindow_ui
 import sensorwindow_dock_ui
+from image_stats_dialog import ImageStatsDialog
 from IMainUI import IMainUI
 import PopupList
 import csv
@@ -198,7 +199,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         # self.ui_s.gridButton.clicked.connect(self.showGrid)
         self.ui_s.SectionGrid.clicked.connect(self.showGrid)
 
+        self.ui_s.statsButton.clicked.connect(self.showImageStats)
         self.ui_s.homeButton.clicked.connect(self.homePosition)
+        self.stats_dialog = None
 
         # Label
         # self.ui_s.CurrentLaserPattern_value.setText(str(format(0, '016b')))
@@ -446,6 +449,8 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
             self.ui_s.sensorImage.setPixMap(pixmap)
             self.ui_s.sensorImage.show()
+            if self.stats_dialog is not None and self.stats_dialog.isVisible():
+                self.stats_dialog.update_image(self.ui_s.sensorImage.getQImage())
             app.processEvents()
 
             if self.ui_s.consecutiveModeButton.isChecked() and self.ui_s.consecutiveModeButton.isEnabled():
@@ -461,6 +466,9 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             pixmap = QtGui.QPixmap.fromImage(image)
             self.ui_s.sensorImage.setPixMap(pixmap)
             self.ui_s.sensorImage.show()
+            if self.stats_dialog is not None and self.stats_dialog.isVisible():
+                self.stats_dialog.update_image(self.ui_s.sensorImage.getQImage())
+           
 
     def saveImg(self, image):
         if self.captureDirPath == '':
@@ -582,6 +590,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
     def homePosition(self):
         self.ui_s.sensorImage.scaleFit()
 
+    def showImageStats(self):
+        self.stats_dialog = ImageStatsDialog(self.ui_s.sensorImage, self)
+        self.stats_dialog.show()
+    
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

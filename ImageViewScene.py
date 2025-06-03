@@ -6,6 +6,8 @@
 import sys
 from math import pow
 from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QBrush, QColor, QPen
 
 ZOOMSCALE_MAX = 50.0
 ZOOMSCALE_MIN = 0.05
@@ -61,6 +63,12 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorViewCenter)
         self.m_scene.addItem(self.m_gridItem)
 
+        # stats mode display
+        self.mode = "none"
+        self.on_pixel_selected = None  # Callback function
+        self._roi_rect = None
+        self._pixel_marker = None
+
     def setPixMap(self, pixmap):
         self.m_pixmapitem.setPixmap(pixmap)
         if self.m_pixmapitem.boundingRect() != self.m_pixmaprect:
@@ -69,6 +77,13 @@ class ImageViewer(QtWidgets.QGraphicsView):
         if self.m_fitmode:
             self.scaleFit()
         self.isPixmapSet = True
+    
+    def getQImage(self):
+        # QImageを取得するメソッド
+        if self.m_pixmapitem.pixmap().isNull():
+            return None
+        else:
+            return self.m_pixmapitem.pixmap().toImage()
 
     def setScale(self, scale, innter=False):
         self.resetTransform()
@@ -104,6 +119,30 @@ class ImageViewer(QtWidgets.QGraphicsView):
         super(ImageViewer, self).resizeEvent(event)
         # self.scene().setSceneRect(QtCore.QRectF(self.rect()))
 
+    def mousePressEvent(self, event):
+        if self.mode == "pixel" and event.button() == Qt.LeftButton:
+            scenepos = self.mapToScene(event.pos())
+            itempos = self.m_pixmapitem.mapFromScene(scenepos)
+            if QtCore.QRect(0,0, self.m_pixmapitem.pixmap().width(), self.m_pixmapitem.pixmap().height()).contains(itempos.toPoint()):
+                x = int(itempos.x())
+                y = int(itempos.y())
+
+                # Draw red circle
+                if self._pixel_marker:
+                    self.m_scene.removeItem(self._pixel_marker)
+                self._pixel_marker = QtWidgets.QGraphicsEllipseItem(x - 3, y - 3, 6, 6)
+                pen = QPen(QColor(255, 0, 0))
+                pen.setWidth(2)
+                self._pixel_marker.setPen(pen)
+                self._pixel_marker.setBrush(QBrush(Qt.NoBrush))  # ← 塗りつぶしなし
+                self.m_scene.addItem(self._pixel_marker)
+
+                # Callback
+                if self.on_pixel_selected:
+                    self.on_pixel_selected(x, y)
+        super().mousePressEvent(event)
+
+
     def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
         self.m_wheelzoom = True
         scenepos = self.mapToScene(event.pos())
@@ -125,7 +164,44 @@ class ImageViewer(QtWidgets.QGraphicsView):
     def setGridParameter(self, p):
         print("setGridParameter")
         self.m_gridItem.makeGrid(self.m_pixmapitem.boundingRect(), p)
+    
+    def set_mode(self, mode: str):
+        self.mode = mode
+        self.clear_overlay()
 
+        if mode == "roi":
+            # ROI 矩形（仮固定、あとでドラッグ可能にする）
+            self._roi_rect = QGraphicsRectItem(100, 100, 100, 100)
+            pen = QPen(QColor(255, 0, 0))
+            pen.setWidth(2)
+            self._roi_rect.setPen(pen)
+            self._roi_rect.setBrush(QBrush(Qt.NoBrush))
+            self.scene.addItem(self._roi_rect)
+
+        elif mode == "pixel":
+            # Nothing until click
+            pass
+
+    def clear_overlay(self):
+        if self._roi_rect:
+            self.m_scene.removeItem(self._roi_rect)
+            self._roi_rect = None
+        if self._pixel_marker:
+            self.m_scene.removeItem(self._pixel_marker)
+            self._pixel_marker = None
+
+    def get_roi_rect(self):
+        """Returns ROI as (x, y, width, height), or None if not set."""
+        if self._roi_rect:
+            rect = self._roi_rect.rect()
+            return (
+                int(rect.x()),
+                int(rect.y()),
+                int(rect.width()),
+                int(rect.height())
+            )
+        return None
+        
 # /////////////////////////////////////////////////////////////////////////////
 
 class GridItem(QtWidgets.QGraphicsPathItem):
@@ -180,7 +256,7 @@ class GridItem(QtWidgets.QGraphicsPathItem):
                                     'Blue': (0, 0, 255),
                                     'Green': (0, 255, 0),
                                     'Yellow': (255, 255, 0)}
-            self.qcolor = QtGui.QColor(*self.colorDict[self.color])  # unpack: https://note.nkmk.me/python-argument-expand/
+            self.qcolor = QColor(*self.colorDict[self.color])  # unpack: https://note.nkmk.me/python-argument-expand/
             self.qcolor.setAlphaF(self.alpha)
 
             self.offset_x: float = 0.0
@@ -192,10 +268,10 @@ class GridItem(QtWidgets.QGraphicsPathItem):
                                      'Dash': QtCore.Qt.DashLine,
                                      'DashDot': QtCore.Qt.DashDotLine}
 
-            # self.pen = QtGui.QPen(QtGui.QColor(*self.colorDict[self.color]).setAlphaF(self.alpha))
-            self.pen = QtGui.QPen(self.qcolor)
+            # self.pen = QPen(QColor(*self.colorDict[self.color]).setAlphaF(self.alpha))
+            self.pen = QPen(self.qcolor)
             self.pen.setStyle(self.pen_styles[self.gridType])
-            # self.pen = QtGui.QPen(QtGui.QColor('#0a64c8'))
+            # self.pen = QPen(QColor('#0a64c8'))
 
 
 if __name__ == '__main__':
