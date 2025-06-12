@@ -17,5 +17,6 @@
         <file>MkECTL.png</file>
         <file>GUI_icons/001-home.png</file>
         <file>GUI_icons/stop.png</file>
+        <file>GUI_icons/labo.png</file>
     </qresource>
 </RCC>
