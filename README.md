@@ -228,8 +228,8 @@ This command can set shutter speed as the 1st argument.
 This command has 2 arguments. The 1st argument is image category, which was defined at [set command](#set-command). The image will be saved based on the state of the robot at that time. The 2nd argument is a frame number for averaging the image.
 
 ### Advanced scripting
-Recent versions include a new DSL parser implemented with Lark.
-You can use expressions, loops and functions.
+Recent versions include a new DSL parser and interpreter implemented with Lark.
+You can use expressions, loops and functions in `dsl_interpreter.py`.
 Example:
 ```dsl
 set x, 10
