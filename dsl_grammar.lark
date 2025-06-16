@@ -1,0 +1,55 @@
+%import common.SIGNED_NUMBER -> NUMBER
+%import common.ESCAPED_STRING -> STRING
+%import common.CNAME -> NAME
+%import common.WS
+
+%ignore WS
+%ignore COMMENT
+COMMENT: /#[^\n]*/
+
+start: statement*
+
+?statement: assignment
+          | command_call
+          | func_def
+          | func_call
+          | if_statement
+          | while_statement
+
+assignment: NAME "=" expr           -> assign
+          | "set" NAME "," expr    -> set_cmd
+
+command_call: NAME [arg_list]        -> command
+
+arg_list: expr ("," expr)*
+
+func_call: NAME "(" [arg_list] ")"  -> call
+
+if_statement: "if" expr "{" block "}" ["else" "{" block "}"]
+
+while_statement: "while" expr "{" block "}"
+
+func_def: "function" NAME "(" [param_list] ")" "{" block "}"
+
+param_list: NAME ("," NAME)*
+
+block: statement*
+
+?expr: comparison
+
+?comparison: arith (COMP_OP arith)?
+
+COMP_OP: ">"|"<"|">="|"<="|"=="|"!="
+
+?arith: arith "+" term   -> add
+      | arith "-" term   -> sub
+      | term
+
+?term: term "*" factor -> mul
+     | term "/" factor -> div
+     | factor
+
+?factor: NUMBER        -> number
+       | STRING        -> string
+       | NAME          -> var
+       | "(" expr ")"
