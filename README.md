@@ -227,6 +227,20 @@ This command can set shutter speed as the 1st argument.
 ### snap (command)
 This command has 2 arguments. The 1st argument is image category, which was defined at [set command](#set-command). The image will be saved based on the state of the robot at that time. The 2nd argument is a frame number for averaging the image.
 
+### Advanced scripting
+Recent versions include a new DSL parser implemented with Lark.
+You can use expressions, loops and functions.
+Example:
+```dsl
+set x, 10
+function repeat_move(n){
+    for i in range(0, n){
+        mov 0, i*10, 0
+    }
+}
+repeat_move(5)
+```
+
 <a id="markdown-flowcharts" name="flowcharts"></a>
 ## Flowcharts
 

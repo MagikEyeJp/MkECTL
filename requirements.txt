@@ -12,3 +12,5 @@ pymkeresapi>=1.3.6
 Pillow<10.0.0
 matplotlib
 docopt
+
+lark
