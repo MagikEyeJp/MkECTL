@@ -1,13 +1,19 @@
 %import common.SIGNED_NUMBER -> NUMBER
 %import common.ESCAPED_STRING -> STRING
 %import common.CNAME -> NAME
-%import common.WS
+%import common.WS_INLINE
 
-%ignore WS
+NEWLINE: /(\r?\n)+/
+
+%ignore WS_INLINE
 %ignore COMMENT
 COMMENT: /#[^\n]*/
 
-start: statement*
+start: line*
+
+line: statement NEWLINE   -> stmt
+    | NEWLINE             -> empty
+    | statement           -> stmt
 
 ?statement: assignment
           | command_call
@@ -52,4 +58,5 @@ COMP_OP: ">"|"<"|">="|"<="|"=="|"!="
 ?factor: NUMBER        -> number
        | STRING        -> string
        | NAME          -> var
+       | "${" NAME "}" -> var_dollar
        | "(" expr ")"

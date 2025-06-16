@@ -46,6 +46,14 @@
 * Ubuntu 18.04.3 LTS
 * Python 3.6.9
 
+### Installation
+Clone the repository and install the dependencies with:
+
+```bash
+pip install -r requirements.txt
+```
+
+
 First, check if the project `keiganGUI` exists at 
 `\home\bin`
 then go to terminal and you can run this command:  
@@ -240,6 +248,7 @@ function repeat_move(n){
 }
 repeat_move(5)
 ```
+To enable the new interpreter, set environment variable `MK_USE_LARK=1` before running the application. If unset, the legacy interpreter is used.
 
 <a id="markdown-flowcharts" name="flowcharts"></a>
 ## Flowcharts
