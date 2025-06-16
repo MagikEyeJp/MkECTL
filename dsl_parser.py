@@ -8,6 +8,15 @@ class Evaluator(Transformer):
         super().__init__()
         self.env = env
 
+    def NEWLINE(self, _):
+        return None
+
+    def stmt(self, items):
+        return items[0] if items else None
+
+    def empty(self, items):
+        return None
+
     def number(self, n):
         return float(n[0])
 
@@ -16,6 +25,9 @@ class Evaluator(Transformer):
 
     def var(self, name):
         return self.env.get(name[0], 0)
+
+    def var_dollar(self, items):
+        return self.env.get(str(items[0]), 0)
 
     def add(self, items):
         return items[0] + items[1]
@@ -95,7 +107,7 @@ class Evaluator(Transformer):
         return ('while', cond, block)
 
     def start(self, items):
-        return items
+        return [i for i in items if i is not None]
 
 
 def parse_script(text, env=None):

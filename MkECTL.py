@@ -21,6 +21,7 @@ from MachineBuilder import Machine, MachineBuilder
 
 from MyDoubleSpinBox import MyDoubleSpinBox
 import execute_script
+import dsl_executor
 import ini
 import json_IO
 import mainwindow_ui
@@ -30,6 +31,7 @@ from SensorInfo import SensorInfo
 from UIState import UIState
 
 VERSION = '1.2.0beta'
+USE_LARK = os.environ.get('MK_USE_LARK', '0') == '1'
 
 class ScriptParams:
     def __init__(self):
@@ -190,7 +192,10 @@ class Ui(QMainWindow, IMainUI):
             print(f"os.path.basename(script_path):{os.path.basename(script_path)}")
             print(f"script_path:{script_path}")
             self.scriptParams.scriptName = script_path
-            self.scriptParams.commandNum = execute_script.countCommandNum(self.scriptParams, [], [])
+            if USE_LARK:
+                self.scriptParams.commandNum = dsl_executor.count_commands_lark(self.scriptParams)
+            else:
+                self.scriptParams.commandNum = execute_script.countCommandNum(self.scriptParams, [], [])
             self.total = self.scriptParams.commandNum
             self.updateScriptProgress()
 
@@ -586,7 +591,10 @@ class Ui(QMainWindow, IMainUI):
                 os.path.basename(fileName))
 
             self.scriptParams.scriptName = fileName
-            self.scriptParams.commandNum = execute_script.countCommandNum(self.scriptParams, [], [])
+            if USE_LARK:
+                self.scriptParams.commandNum = dsl_executor.count_commands_lark(self.scriptParams)
+            else:
+                self.scriptParams.commandNum = execute_script.countCommandNum(self.scriptParams, [], [])
             self.total = self.scriptParams.commandNum
             self.done = 0
             self.updateScriptProgress()
@@ -641,9 +649,16 @@ class Ui(QMainWindow, IMainUI):
             self.states = {UIState.SCRIPT_PROGRESS}
             self.setUIStatus(self.states)
 
-            interrupted = execute_script.execute_script(self.scriptParams, {'robot': self.robotController,
-                                                                            'lights': self.IRLight,
-                                                                            '3Dsensors': self.sensorWindow}, self, True)
+            if USE_LARK:
+                interrupted = dsl_executor.execute_script_lark(self.scriptParams,
+                                                              {'robot': self.robotController,
+                                                               'lights': self.IRLight,
+                                                               '3Dsensors': self.sensorWindow}, self, True)
+            else:
+                interrupted = execute_script.execute_script(self.scriptParams,
+                                                          {'robot': self.robotController,
+                                                           'lights': self.IRLight,
+                                                           '3Dsensors': self.sensorWindow}, self, True)
 
             self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
             self.setUIStatus(self.states)
@@ -720,10 +735,16 @@ class Ui(QMainWindow, IMainUI):
         self.setUIStatus(self.states)
 
         # execute script
-        interrupted = execute_script.execute_script(self.scriptParams,
-                                                    {'robot': self.robotController,
-                                                     'lights': self.IRLight,
-                                                     '3Dsensors': self.sensorWindow}, self)
+        if USE_LARK:
+            interrupted = dsl_executor.execute_script_lark(self.scriptParams,
+                                                          {'robot': self.robotController,
+                                                           'lights': self.IRLight,
+                                                           '3Dsensors': self.sensorWindow}, self)
+        else:
+            interrupted = execute_script.execute_script(self.scriptParams,
+                                                        {'robot': self.robotController,
+                                                         'lights': self.IRLight,
+                                                         '3Dsensors': self.sensorWindow}, self)
 
         self.states = {UIState.SCRIPT, UIState.MOTOR, UIState.IRLIGHT}
         self.setUIStatus(self.states)
