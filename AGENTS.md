@@ -10,7 +10,7 @@ This document serves as a template for future contributors who automate tasks in
 ## Guidelines
 
 1. Use Python 3 for new scripts.
-2. Document new features in `spec_picamcapture.md` and update `README.md` as needed.
+2. Document new features in `spec_MkECTL.md` and update `README.md` as needed.
 3. Before committing changes, ensure scripts run without errors.
 4. Keep the working tree clean by committing all changes.
 
