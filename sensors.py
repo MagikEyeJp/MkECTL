@@ -21,7 +21,7 @@ from SensorInfo import SensorInfo
 from PIL import Image, ImageQt
 import subprocess
 
-app = QtWidgets.qApp
+app = QtWidgets.QApplication.instance()
 
 from qtutils import inmain
 import ini
