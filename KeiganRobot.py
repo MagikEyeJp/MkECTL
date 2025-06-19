@@ -361,9 +361,9 @@ GRAPH_NUM = 100
 
 
 class SettingsWindow(QtWidgets.QWidget):
-    pidChanged = QtCore.pyqtSignal(str, str, int, float)
-    parameterSaved = QtCore.pyqtSignal()
-    graphChanged = QtCore.pyqtSignal(bool, int)
+    pidChanged = QtCore.Signal(str, str, int, float)
+    parameterSaved = QtCore.Signal()
+    graphChanged = QtCore.Signal(bool, int)
 
     def __init__(self, parent=None):
         super(SettingsWindow, self).__init__(parent)
