@@ -53,6 +53,15 @@ Clone the repository and install the dependencies with:
 pip install -r requirements.txt
 ```
 
+Linux 環境で実行する場合は Qt の xcb プラットフォームプラグインに必要なパッケージ
+`libxcb-cursor0` を追加でインストールしてください。これがないと
+`xcb-cursor0 or libxcb-cursor0 is needed to load the Qt xcb platform plugin` という
+エラーが表示されます。
+
+```bash
+sudo apt-get install libxcb-cursor0
+```
+
 This application now uses the PySide6 GUI framework.
 UI ファイルやリソースを更新する際は、`mkectl_uic.sh` と `mkectl_rcc.sh` を使用してください。
 

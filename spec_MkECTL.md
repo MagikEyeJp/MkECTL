@@ -8,6 +8,13 @@
 - PySide6 API に合わせて `Signal` などの記法を更新しました。
 - 変数、数式、ループ、ユーザー定義関数を利用できます。
 
+## PySide6 移行時の注意事項
+* `QFont.setWeight()` には整数ではなく `QFont.Weight` 列挙型を渡します。
+* `exec_()` メソッドは `exec()` に名前が変わっています。
+* Linux 環境では `libxcb-cursor0` が必要です。未インストールの場合は
+  `xcb-cursor0 or libxcb-cursor0 is needed to load the Qt xcb platform plugin`
+  というエラーが発生します。
+
 ## サンプル
 ```dsl
 set x, 3
