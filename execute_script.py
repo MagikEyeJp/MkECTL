@@ -43,7 +43,7 @@ dynvars = {
             'datetime': 't'
             }
 
-app = QtWidgets.qApp
+app = QtWidgets.QApplication.instance()
 isDemo = False
 
 class Systate():
