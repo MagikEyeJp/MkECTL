@@ -10,9 +10,9 @@ import sys
 import time
 from functools import partial
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 from playsound import playsound
 
 import IRobotController
