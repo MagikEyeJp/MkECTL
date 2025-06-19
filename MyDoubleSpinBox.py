@@ -1,12 +1,12 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui, QtCore
 
 
 class MyDoubleSpinBox(QtWidgets.QDoubleSpinBox):
 
-    valueDetermined = QtCore.pyqtSignal()
+    valueDetermined = QtCore.Signal()
 
     def __init__(self, parent):
-        super(QtWidgets.QDoubleSpinBox, self).__init__(parent)
+        super().__init__(parent)
         self.emittable = True
         self.fix()
 

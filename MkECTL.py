@@ -10,9 +10,9 @@ import sys
 import time
 from functools import partial
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 from playsound import playsound
 
 import IRobotController
@@ -117,10 +117,11 @@ class Ui(QMainWindow, IMainUI):
         self.ui.progressBar.setValue(int(self.percent))
         self.ui.stopButton.clicked.connect(self.interrupt)
 
-        # 画面サイズを取得 (a.desktop()は QDesktopWidget )  https://ja.stackoverflow.com/questions/44060/pyqt5%E3%81%A7%E3%82%A6%E3%82%A3%E3%83%B3%E3%83%89%E3%82%A6%E3%82%92%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%81%AE%E4%B8%AD%E5%A4%AE%E3%81%AB%E8%A1%A8%E7%A4%BA%E3%81%97%E3%81%9F%E3%81%84
-        a = qApp
-        desktop = a.desktop()
-        self.geometry = desktop.screenGeometry()
+        # 画面サイズを取得
+        # PySide6 では QtGui モジュールを名前空間として使用しないため
+        # QGuiApplication を直接参照する
+        screen = QGuiApplication.primaryScreen()
+        self.geometry = screen.availableGeometry()
         # ウインドウサイズ(枠込)を取得
         self.framesize = self.frameSize()
         # ウインドウの位置を指定
@@ -1049,12 +1050,43 @@ class Ui(QMainWindow, IMainUI):
         # if connected:
         # else:
 
+def setStyle(app: QApplication):
+    app.setStyle("Fusion")
+    palette = QPalette()
+
+    # 有効状態
+    palette.setColor(QPalette.Window, QColor(240, 240, 240))
+    palette.setColor(QPalette.WindowText, Qt.black)
+    palette.setColor(QPalette.Base, Qt.white)
+    palette.setColor(QPalette.AlternateBase, QColor(225, 225, 225))
+    palette.setColor(QPalette.ToolTipBase, Qt.white)
+    palette.setColor(QPalette.ToolTipText, Qt.black)
+    palette.setColor(QPalette.Text, Qt.black)
+    palette.setColor(QPalette.Button, QColor(240, 240, 240))
+    palette.setColor(QPalette.ButtonText, Qt.black)
+    palette.setColor(QPalette.BrightText, Qt.red)
+    palette.setColor(QPalette.Link, QColor(0, 120, 215))  # Windows風の青
+
+    # プログレスバー等の強調色 (Qt5風の青)
+    palette.setColor(QPalette.Highlight, QColor(0, 120, 215))
+    palette.setColor(QPalette.HighlightedText, Qt.white)
+
+    # 無効状態（グレーアウトを明示）
+    palette.setColor(QPalette.Disabled, QPalette.Text, Qt.gray)
+    palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.gray)
+    palette.setColor(QPalette.Disabled, QPalette.WindowText, Qt.gray)
+    palette.setColor(QPalette.Disabled, QPalette.Highlight, Qt.gray)
+    palette.setColor(QPalette.Disabled, QPalette.HighlightedText, Qt.white)
+
+    app.setPalette(palette)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    setStyle(app)
     app.setWindowIcon(QIcon(':/MkECTL.png'))
     keiganWindow = Ui()
     keiganWindow.show()
     # sensorWindow = SensorWindow()
-    app.exec_()
+    app.exec()
 

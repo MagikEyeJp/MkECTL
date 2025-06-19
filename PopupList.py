@@ -1,12 +1,11 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 class PopupList(QDialog):
     # select signal
-    selected = pyqtSignal(str, str)
-    pidChanged = pyqtSignal(str, str, int, float)
+    selected = Signal(str, str)
+    pidChanged = Signal(str, str, int, float)
 
     def __init__(self, parent=None):
         super().__init__()
@@ -35,7 +34,7 @@ class PopupList(QDialog):
         self.tableWidget.cellClicked.connect(self.cellClicked)
 
     def show(self):
-        self.exec_()
+        self.exec()
 
     def cellClicked(self, row, col):
         self.selected.emit(list(self.dic.keys())[row], list(self.dic.values())[row])

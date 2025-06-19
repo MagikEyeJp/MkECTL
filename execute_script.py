@@ -8,7 +8,7 @@ from PIL import ImageQt
 from playsound import playsound
 from timeout_decorator import timeout, TimeoutError
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui, QtCore
 
 from ini import Ini, LogIni
 
@@ -43,7 +43,12 @@ dynvars = {
             'datetime': 't'
             }
 
-app = QtWidgets.qApp
+# Qt\u30A4\u30D9\u30F3\u30C8\u306E\u51E6\u7406\u3092\u5B89\u5168\u306B\u884C\u3046\u30D8\u30EB\u30D1\u30FC
+def process_events():
+    app = QtWidgets.QApplication.instance()
+    if app is not None:
+        app.processEvents()
+
 isDemo = False
 
 class Systate():
@@ -113,7 +118,7 @@ def timeoutCallback(mainWindow):
 def isAborted(scriptParams, mainWindow):
     global systate
     global isDemo
-    app.processEvents()
+    process_events()
     if mainWindow.stopClicked:
         print('Interrupted')
         if not isDemo:
@@ -131,7 +136,7 @@ def countCommandNum(scriptParams, args_hist, com_hist):
 
     for i, line in enumerate(lines):
 
-        app.processEvents()
+        process_events()
         if(len(line) == 0) or ("#" in line):  # (length of character = 0) or include "#"
             continue
             # https://stackoverflow.com/questions/44205923/checking-if-word-exists-in-a-text-file-python/44206026
@@ -314,7 +319,7 @@ def expand_dynvars(args, devices):
 @timeout(5)
 def set_root(args, scriptParams, devices, mainWindow):
     print('---set_root---')
-    app.processEvents()
+    process_events()
     global systate
     systate.root = args[0]
 
@@ -322,7 +327,7 @@ def set_root(args, scriptParams, devices, mainWindow):
 def set_filename(args, scriptParams, devices, mainWindow):
     print('---set_filename---')
 
-    app.processEvents()
+    process_events()
     global systate
 
     # ---------- make directory for images ----------
@@ -496,7 +501,7 @@ def move_robot(args, scriptParams, devices, mainWindow):
         scaled_pos = list(np.add(np.multiply(systate.pos, systate.scale), systate.offset))
         targetPos_d = dict(zip(devices['robot'].motorSet,scaled_pos))
         if not systate.sentSig.pos or systate.pos != systate.past_parameters.pos:
-            app.processEvents()
+            process_events()
 
             print('move_robot', targetPos_d)
             isStop = devices['robot'].moveTo(targetPos_d, True, mainWindow.actionStatusCallback)
@@ -526,7 +531,7 @@ def async_move_robot(args, scriptParams, devices, mainWindow):
     if not systate.skip:
         scaled_pos = list(np.add(np.multiply(systate.async_pos, systate.scale), systate.offset))
         targetPos_d = dict(zip(devices['robot'].motorSet,scaled_pos))
-        app.processEvents()
+        process_events()
 
         print('async_move_robot', targetPos_d)
         isStopped = devices['robot'].AsyncMoveTo(targetPos_d, True, mainWindow.actionStatusCallback, speed = systate.speed)
@@ -544,7 +549,7 @@ def home_robot(args, scriptParams, devices, mainWindow):
 
     systate.pos = [0.0] * len(devices['robot'].motorSet)
 
-    app.processEvents()
+    process_events()
     targetPos_d = dict(zip(devices['robot'].motorSet, systate.pos))
     isStop = devices['robot'].moveTo(targetPos_d, False, mainWindow.actionStatusCallback)
     systate.past_parameters.pos = systate.pos

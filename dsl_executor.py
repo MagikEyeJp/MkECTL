@@ -1,7 +1,7 @@
 import os
 from typing import Any, List
 
-from PyQt5 import QtWidgets
+from PySide6 import QtWidgets
 
 from dsl_parser import parse_script, ScriptEnvironment
 import execute_script

@@ -1,7 +1,7 @@
 # coding: utf-8
-from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtCore import Qt, QRect, QPoint, pyqtSignal
-from PyQt5.QtWidgets import QApplication, QWidget
+from PySide6 import QtWidgets, QtGui
+from PySide6.QtCore import Qt, QRect, QPoint, Signal
+from PySide6.QtWidgets import QApplication, QWidget
 import sys
 import re
 import os
@@ -21,7 +21,10 @@ from SensorInfo import SensorInfo
 from PIL import Image, ImageQt
 import subprocess
 
-app = QtWidgets.qApp
+def process_events():
+    app = QtWidgets.QApplication.instance()
+    if app is not None:
+        app.processEvents()
 
 from qtutils import inmain
 import ini
@@ -451,7 +454,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
             self.ui_s.sensorImage.show()
             if self.stats_dialog is not None and self.stats_dialog.isVisible():
                 self.stats_dialog.update_image(self.ui_s.sensorImage.getQImage())
-            app.processEvents()
+            process_events()
 
             if self.ui_s.consecutiveModeButton.isChecked() and self.ui_s.consecutiveModeButton.isEnabled():
                 self.ui_s.prev1Button.click()
@@ -599,4 +602,4 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     sensorWindow = SensorWindow()
     sensorWindow.show()
-    app.exec_()
+    app.exec()
