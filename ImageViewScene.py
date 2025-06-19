@@ -121,7 +121,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
 
     def mousePressEvent(self, event):
         if self.mode == "pixel" and event.button() == Qt.LeftButton:
-            scenepos = self.mapToScene(event.pos())
+            scenepos = self.mapToScene(event.position().toPoint())
             itempos = self.m_pixmapitem.mapFromScene(scenepos)
             if QtCore.QRect(0,0, self.m_pixmapitem.pixmap().width(), self.m_pixmapitem.pixmap().height()).contains(itempos.toPoint()):
                 x = int(itempos.x())
@@ -145,7 +145,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
 
     def wheelEvent(self, event: QtGui.QWheelEvent) -> None:
         self.m_wheelzoom = True
-        scenepos = self.mapToScene(event.pos())
+        scenepos = self.mapToScene(event.position().toPoint())
         if event.angleDelta() != 0:
             newscale = self.m_scale * pow(1.5, (event.angleDelta().y() / 120.0))
             if event.angleDelta().y() > 0:
@@ -153,7 +153,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
             else:
                 self.setScale(newscale if ZOOMSCALE_MIN < newscale else ZOOMSCALE_MIN)
             viewpos = self.mapFromScene(scenepos)
-            move = viewpos - event.pos()
+            move = viewpos - event.position().toPoint()
             self.horizontalScrollBar().setValue(move.x() + self.horizontalScrollBar().value())
             self.verticalScrollBar().setValue(move.y() + self.verticalScrollBar().value())
 
