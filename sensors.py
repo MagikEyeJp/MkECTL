@@ -1,6 +1,6 @@
 # coding: utf-8
 from PySide6 import QtWidgets, QtGui
-from PySide6.QtCore import Qt, QRect, QPoint, pyqtSignal
+from PySide6.QtCore import Qt, QRect, QPoint, Signal
 from PySide6.QtWidgets import QApplication, QWidget
 import sys
 import re
@@ -599,4 +599,4 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     sensorWindow = SensorWindow()
     sensorWindow.show()
-    app.exec_()
+    app.exec()
