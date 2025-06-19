@@ -76,8 +76,8 @@ class ImageStatsDialog(QDialog):
         height = qimage.height()
         bytes_per_line = qimage.bytesPerLine()
         ptr = qimage.bits()
-        ptr.setsize(bytes_per_line * height)
-        arr = np.frombuffer(ptr, np.uint8).reshape((height, bytes_per_line))
+        buf = ptr.tobytes()
+        arr = np.frombuffer(buf, np.uint8).reshape((height, bytes_per_line))
         return arr[:, :width].copy()
 
     def show_histogram(self, arr: np.ndarray):
