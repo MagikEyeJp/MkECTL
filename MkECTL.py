@@ -1050,9 +1050,40 @@ class Ui(QMainWindow, IMainUI):
         # if connected:
         # else:
 
+def setStyle(app: QApplication):
+    app.setStyle("Fusion")
+    palette = QPalette()
+
+    # 有効状態
+    palette.setColor(QPalette.Window, QColor(240, 240, 240))
+    palette.setColor(QPalette.WindowText, Qt.black)
+    palette.setColor(QPalette.Base, Qt.white)
+    palette.setColor(QPalette.AlternateBase, QColor(225, 225, 225))
+    palette.setColor(QPalette.ToolTipBase, Qt.white)
+    palette.setColor(QPalette.ToolTipText, Qt.black)
+    palette.setColor(QPalette.Text, Qt.black)
+    palette.setColor(QPalette.Button, QColor(240, 240, 240))
+    palette.setColor(QPalette.ButtonText, Qt.black)
+    palette.setColor(QPalette.BrightText, Qt.red)
+    palette.setColor(QPalette.Link, QColor(0, 120, 215))  # Windows風の青
+
+    # プログレスバー等の強調色 (Qt5風の青)
+    palette.setColor(QPalette.Highlight, QColor(0, 120, 215))
+    palette.setColor(QPalette.HighlightedText, Qt.white)
+
+    # 無効状態（グレーアウトを明示）
+    palette.setColor(QPalette.Disabled, QPalette.Text, Qt.gray)
+    palette.setColor(QPalette.Disabled, QPalette.ButtonText, Qt.gray)
+    palette.setColor(QPalette.Disabled, QPalette.WindowText, Qt.gray)
+    palette.setColor(QPalette.Disabled, QPalette.Highlight, Qt.gray)
+    palette.setColor(QPalette.Disabled, QPalette.HighlightedText, Qt.white)
+
+    app.setPalette(palette)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    setStyle(app)
     app.setWindowIcon(QIcon(':/MkECTL.png'))
     keiganWindow = Ui()
     keiganWindow.show()
