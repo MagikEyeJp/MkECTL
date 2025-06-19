@@ -11,7 +11,7 @@ import math
 from timeout_decorator import timeout, TimeoutError
 import numpy as np
 from qtutils import inmain
-from PyQt5 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore
 import detailedSettings_ui
 import json_IO
 import matplotlib.pyplot as plt

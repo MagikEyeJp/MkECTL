@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import (
+from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QComboBox,
     QLabel, QWidget, QStackedLayout
 )
 import pyqtgraph as pg
 import numpy as np
-from PyQt5.QtGui import QImage
+from PySide6.QtGui import QImage
 import ImageViewScene
 
 class ImageStatsDialog(QDialog):
