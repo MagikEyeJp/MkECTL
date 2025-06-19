@@ -8,7 +8,7 @@ from PIL import ImageQt
 from playsound import playsound
 from timeout_decorator import timeout, TimeoutError
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui, QtCore
 
 from ini import Ini, LogIni
 

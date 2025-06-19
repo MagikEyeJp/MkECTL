@@ -5,9 +5,9 @@
 #            https://mfumi.hatenadiary.org/entry/20141112/1415806010
 import sys
 from math import pow
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush, QColor, QPen
+from PySide6 import QtWidgets, QtGui, QtCore
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QBrush, QColor, QPen
 
 ZOOMSCALE_MAX = 50.0
 ZOOMSCALE_MIN = 0.05

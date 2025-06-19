@@ -53,6 +53,7 @@ Clone the repository and install the dependencies with:
 pip install -r requirements.txt
 ```
 
+This application now uses the PySide6 GUI framework.
 
 First, check if the project `keiganGUI` exists at 
 `\home\bin`

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pyrcc5 resources.qrc -o resources_rc.py
+pyside6-rcc resources.qrc -o resources_rc.py

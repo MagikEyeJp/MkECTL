@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui, QtCore
 
 
 class MyDoubleSpinBox(QtWidgets.QDoubleSpinBox):

@@ -2,12 +2,12 @@
 
 # Form implementation generated from reading ui file 'sensorwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.2
+# Created by: PySide6 UI code generator 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
 
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 
 class Ui_sensor(object):
