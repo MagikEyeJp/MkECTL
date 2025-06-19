@@ -4,7 +4,7 @@ pyserial
 timeout-decorator
 PyGObject
 playsound
-qtutils
+qtutils>=4.0.0
 ssdpy
 psutil
 pymkeapi>=1.3.6

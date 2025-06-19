@@ -53,6 +53,9 @@ Clone the repository and install the dependencies with:
 pip install -r requirements.txt
 ```
 
+PySide6 を利用するには `qtutils` のバージョン `4.0.0` 以上が必要です。
+requirements.txt を更新後は最新版が入っていることを確認してください。
+
 Linux 環境で実行する場合は Qt の xcb プラットフォームプラグインに必要なパッケージ
 `libxcb-cursor0` を追加でインストールしてください。これがないと
 `xcb-cursor0 or libxcb-cursor0 is needed to load the Qt xcb platform plugin` という
