@@ -118,7 +118,9 @@ class Ui(QMainWindow, IMainUI):
         self.ui.stopButton.clicked.connect(self.interrupt)
 
         # 画面サイズを取得
-        screen = QtGui.QGuiApplication.primaryScreen()
+        # PySide6 では QtGui モジュールを名前空間として使用しないため
+        # QGuiApplication を直接参照する
+        screen = QGuiApplication.primaryScreen()
         self.geometry = screen.availableGeometry()
         # ウインドウサイズ(枠込)を取得
         self.framesize = self.frameSize()
