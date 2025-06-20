@@ -59,6 +59,12 @@ class Ui_sensor(object):
 
         self.horizontalLayout_2.addWidget(self.cameraStatusLabel)
 
+        self.smoothingCheckBox = QCheckBox(self.dockWidgetContents)
+        self.smoothingCheckBox.setObjectName(u"smoothingCheckBox")
+        self.smoothingCheckBox.setChecked(True)
+
+        self.horizontalLayout_2.addWidget(self.smoothingCheckBox)
+
         self.statsButton = QPushButton(self.dockWidgetContents)
         self.statsButton.setObjectName(u"statsButton")
         icon = QIcon()
@@ -67,12 +73,6 @@ class Ui_sensor(object):
         self.statsButton.setFlat(False)
 
         self.horizontalLayout_2.addWidget(self.statsButton)
-
-        self.smoothingCheckBox = QCheckBox(self.dockWidgetContents)
-        self.smoothingCheckBox.setObjectName(u"smoothingCheckBox")
-        self.smoothingCheckBox.setChecked(True)
-
-        self.horizontalLayout_2.addWidget(self.smoothingCheckBox)
 
         self.homeButton = QPushButton(self.dockWidgetContents)
         self.homeButton.setObjectName(u"homeButton")
@@ -747,8 +747,8 @@ class Ui_sensor(object):
     def retranslateUi(self, sensor):
         sensor.setWindowTitle(QCoreApplication.translate("sensor", u"Sensor Window", None))
         self.cameraStatusLabel.setText(QCoreApplication.translate("sensor", u"CAMERA STATE", None))
-        self.statsButton.setText("")
         self.smoothingCheckBox.setText(QCoreApplication.translate("sensor", u"Smooth", None))
+        self.statsButton.setText("")
         self.homeButton.setText("")
         self.SectionSensorConnection.setTitle(QCoreApplication.translate("sensor", u"Sensor Connection", None))
         self.connectButton.setText(QCoreApplication.translate("sensor", u"Connect", None))

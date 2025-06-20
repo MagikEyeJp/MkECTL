@@ -215,6 +215,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self._smoothing = enable
         self._update_render_hints()
         self._update_transform_mode()
+        self.viewport().update()
 
     def is_smoothing_enabled(self) -> bool:
         return self._smoothing
