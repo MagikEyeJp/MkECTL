@@ -595,7 +595,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.sensorImage.scaleFit()
 
     def toggleSmoothing(self, state):
-        enable = state == QtCore.Qt.Checked
+        enable = state == QtCore.Qt.CheckState.Checked.value
         self.ui_s.sensorImage.set_smoothing(enable)
 
     def showImageStats(self):
