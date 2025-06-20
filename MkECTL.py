@@ -29,8 +29,9 @@ import sensors
 from IMainUI import IMainUI
 from SensorInfo import SensorInfo
 from UIState import UIState
+from version import __version__
 
-VERSION = '1.2.0beta'
+VERSION = __version__
 USE_LARK = os.environ.get('MK_USE_LARK', '0') == '1'
 
 class ScriptParams:

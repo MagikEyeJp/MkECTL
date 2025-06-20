@@ -68,7 +68,11 @@ sudo apt-get install libxcb-cursor0
 This application now uses the PySide6 GUI framework.
 UI ファイルやリソースを更新する際は、`mkectl_uic.sh` と `mkectl_rcc.sh` を使用してください。
 
-First, check if the project `keiganGUI` exists at 
+### Version
+The application version is defined in `version.py` as `__version__`.  This value
+is used by the GUI and other scripts to display the current version.
+
+First, check if the project `keiganGUI` exists at
 `\home\bin`
 then go to terminal and you can run this command:  
 `python3 bin/keiganGUI/keiganGUI.py`
