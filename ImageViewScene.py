@@ -32,10 +32,8 @@ class ImageViewer(QtWidgets.QGraphicsView):
         # QGraphicsViewの設定。------------------------------------------------
         self.setCacheMode(QtWidgets.QGraphicsView.CacheBackground)
         self.setViewportUpdateMode(QtWidgets.QGraphicsView.SmartViewportUpdate)
-        self.setRenderHints(QtGui.QPainter.Antialiasing |
-                            QtGui.QPainter.SmoothPixmapTransform |
-                            QtGui.QPainter.TextAntialiasing
-                            )
+        self._smoothing = True
+        self._update_render_hints()
         # ---------------------------------------------------------------------
 
         # QGraphicsSceneの作成・および設定。------------------------------------
@@ -43,7 +41,7 @@ class ImageViewer(QtWidgets.QGraphicsView):
         self.m_scene = QtWidgets.QGraphicsScene()
         self.setScene(self.m_scene)
         self.m_pixmapitem = QtWidgets.QGraphicsPixmapItem()
-        self.m_pixmapitem.setTransformationMode(QtCore.Qt.SmoothTransformation)
+        self._update_transform_mode()
         self.m_pixmaprect = QtCore.QRectF(0.0, 0.0, 0.0, 0.0)
         self.m_scene.addItem(self.m_pixmapitem)
         self.isPixmapSet = False
@@ -201,6 +199,25 @@ class ImageViewer(QtWidgets.QGraphicsView):
                 int(rect.height())
             )
         return None
+
+    # --- Smoothing control -------------------------------------------------
+    def _update_render_hints(self):
+        hints = QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing
+        if self._smoothing:
+            hints |= QtGui.QPainter.SmoothPixmapTransform
+        self.setRenderHints(hints)
+
+    def _update_transform_mode(self):
+        mode = QtCore.Qt.SmoothTransformation if self._smoothing else QtCore.Qt.FastTransformation
+        self.m_pixmapitem.setTransformationMode(mode)
+
+    def set_smoothing(self, enable: bool):
+        self._smoothing = enable
+        self._update_render_hints()
+        self._update_transform_mode()
+
+    def is_smoothing_enabled(self) -> bool:
+        return self._smoothing
         
 # /////////////////////////////////////////////////////////////////////////////
 
