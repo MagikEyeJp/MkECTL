@@ -270,6 +270,7 @@ repeat_move(5)
 To enable the new interpreter, set environment variable `MK_USE_LARK=1` before running the application. This switch is provided for the migration period; once the Lark implementation becomes stable it will replace the legacy interpreter and this variable will no longer be required.
 
 For a detailed description of the grammar see [dsl_script_grammar.md](dsl_script_grammar.md).
+The file now includes a table summarizing each grammar rule.
 
 ### Debugging with dummy hardware
 Dummy modules `KMControllersS_dummy`, `IRLightDummy` and `SensorDeviceDummy` allow the application to run without real devices. Running a script with these modules should produce the same console output as with actual hardware, which is useful for regression tests.
