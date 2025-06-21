@@ -13,4 +13,6 @@ Pillow<10.0.0
 matplotlib
 docopt
 
+opencv-python
+
 lark

@@ -9,6 +9,7 @@
 - 変数、数式、ループ、ユーザー定義関数を利用できます。
 - 画像統計ダイアログを追加し、ヒストグラム表示とピクセル情報を確認できるようにしました。
 - `version.py` に `__version__` 変数を設置し、アプリケーションのバージョン管理を容易にしました。
+- `自動センタリング` ボタンを追加し、チャート位置に合わせて pan/tilt を自動補正します。
 
 ## PySide6 移行時の注意事項
 * `QFont.setWeight()` には整数ではなく `QFont.Weight` 列挙型を渡します。
@@ -17,6 +18,7 @@
   `xcb-cursor0 or libxcb-cursor0 is needed to load the Qt xcb platform plugin`
   というエラーが発生します。
 * PySide6 で `qtutils` を利用するにはバージョン `4.0.0` 以上が必要です。
+* 自動センタリング機能で OpenCV を使用するため、`opencv-python` が必要です。
 
 ## サンプル
 ```dsl

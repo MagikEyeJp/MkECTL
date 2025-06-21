@@ -2062,7 +2062,7 @@ QScrollBar::sub-line:vertical {
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="presetButton">
+                  <widget class="QPushButton" name="presetButton">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -2075,10 +2075,17 @@ QScrollBar::sub-line:vertical {
                     <property name="checkable">
                      <bool>false</bool>
                     </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_2">
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="autoCenterButton">
+                   <property name="text">
+                    <string>自動センタリング</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_2">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
                     </property>
