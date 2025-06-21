@@ -21,3 +21,4 @@ This repository does not yet include automated tests. Contributors should manual
 ## Language
 1.基本的に、ユーザーとのやりとりは日本語で行なってください
 2.ブランチ名、ファイル名、フォルダ名など識別子として使われる名前を作成する時はは必ず英語で作成してください。
+3.プログラム中のコード、コメント、UI文字列などは英語で作成してください
