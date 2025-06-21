@@ -83,6 +83,12 @@ class DSLInterpreter:
             self.execute_statement(stmt)
 
     def execute_statement(self, stmt):
+        if stmt.data == 'stmt':
+            if stmt.children:
+                self.execute_statement(stmt.children[0])
+            return
+        if stmt.data == 'empty':
+            return
         if stmt.data == 'assign':
             name_tok = stmt.children[0]
             expr = stmt.children[1]
@@ -97,7 +103,7 @@ class DSLInterpreter:
         if stmt.data == 'command':
             cmd_tok = stmt.children[0]
             args = []
-            if len(stmt.children) > 1:
+            if len(stmt.children) > 1 and stmt.children[1] is not None:
                 args = self.eval_expr(stmt.children[1])
             # if a function with this name exists, call it
             name = cmd_tok.value
