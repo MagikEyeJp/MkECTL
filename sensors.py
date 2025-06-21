@@ -1,5 +1,5 @@
 # coding: utf-8
-from PySide6 import QtWidgets, QtGui
+from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt, QRect, QPoint, Signal
 from PySide6.QtWidgets import QApplication, QWidget
 import sys
@@ -203,6 +203,7 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
         self.ui_s.SectionGrid.clicked.connect(self.showGrid)
 
         self.ui_s.statsButton.clicked.connect(self.showImageStats)
+        self.ui_s.smoothingCheckBox.stateChanged.connect(self.toggleSmoothing)
         self.ui_s.homeButton.clicked.connect(self.homePosition)
         self.stats_dialog = None
 
@@ -592,6 +593,10 @@ class SensorWindow(QtWidgets.QDockWidget):  # https://teratail.com/questions/118
 
     def homePosition(self):
         self.ui_s.sensorImage.scaleFit()
+
+    def toggleSmoothing(self, state):
+        enable = state == QtCore.Qt.CheckState.Checked.value
+        self.ui_s.sensorImage.set_smoothing(enable)
 
     def showImageStats(self):
         self.stats_dialog = ImageStatsDialog(self.ui_s.sensorImage, self)

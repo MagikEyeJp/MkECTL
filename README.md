@@ -378,6 +378,9 @@ Dummy modules `KMControllersS_dummy`, `IRLightDummy` and `SensorDeviceDummy` all
 
 <a id="markdown-other-3" name="other-3"></a>
 #### Other
-12. `Reconnect button`  
-<img src = "flowchart/SensorWindow_12.png" width = "360"> 
+12. `Reconnect button`
+<img src = "flowchart/SensorWindow_12.png" width = "360">
+
+13. `Smooth checkbox`
+画像拡大時のスムージングの有無を切り替えるチェックボックスです。デフォルトではONで、OFFにすると画像を拡大しても補間なしで表示されます。
 

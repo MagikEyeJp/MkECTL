@@ -14,10 +14,6 @@ from natsort import natsorted
 # --- ILT Report script ---
 # iltreport_postproc <folder> <param.json>
 
-# constant
-ILTREPORT_SCRIPT = "/home/proj/EvalCalib/iltreport.py"
-
-
 def usage():
     print("iltreport_postproc <folder> <param.json>")
     exit(1)
@@ -32,7 +28,8 @@ if __name__=="__main__":
     with open(sys.argv[2]) as f:
         j = json.load(f)
     param = j.get("parameter", {})
-
+    
+    reportWriter = param.get("reportwriter")
     sensorInfo = SensorInfo()
     sensorInfo.load_from_file(foldername + "/sensorinfo.json")
 
@@ -47,4 +44,4 @@ if __name__=="__main__":
     imgs = natsorted(glob(f"{foldername}/laser/*.png"))
     imgs = [path for path in imgs] # convert to absolute path
     imgsp = " ".join(imgs)
-    ret = subprocess.run(ILTREPORT_SCRIPT + f" --output {output} {binfile} {configfile} {imgsp}", shell=True)
+    ret = subprocess.run(reportWriter + f" --output {output} {binfile} {configfile} {imgsp}", shell=True)

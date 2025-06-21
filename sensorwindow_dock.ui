@@ -58,7 +58,17 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="statsButton">
+        <widget class="QCheckBox" name="smoothingCheckBox">
+          <property name="text">
+           <string>Smooth</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+        <widget class="QPushButton" name="statsButton">
           <property name="text">
            <string/>
           </property>
