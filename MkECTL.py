@@ -14,6 +14,8 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from playsound import playsound
+import cv2
+import numpy as np
 
 import IRobotController
 import IRLight
@@ -173,6 +175,7 @@ class Ui(QMainWindow, IMainUI):
         self.ui.postProcClearLogBtn.clicked.connect(self.clearPostProcLog)
         self.ui.detailedSettingsButton.clicked.connect(self.robotSettings)
         self.ui.presetButton.clicked.connect(self.presetModifiedPositions)
+        self.ui.autoCenterButton.clicked.connect(self.auto_center_chart)
 
         # Sensor window detached
 #        self.subWindow.topLevelChanged.connect(lambda toplevel: self.topLevelChanged(self.geometry, toplevel))
@@ -790,6 +793,45 @@ class Ui(QMainWindow, IMainUI):
             targetPos_d[axis.name] = float(targetPos[i])
         self.updateTargetPosition(targetPos_d)
         self.moveRobot(targetPos_d)
+
+    def auto_center_chart(self):
+        if not self.sensorWindow.connected:
+            QMessageBox.warning(self, "Sensor", "Sensor is not connected")
+            return
+
+        # scale factor [deg/pixel]
+        pixel_scale = 0.05
+        max_iter = 3
+        threshold_px = 5
+
+        for _ in range(max_iter):
+            img = self.sensorWindow.getImg(1)
+            if img is None:
+                QMessageBox.warning(self, "Capture", "Failed to capture image")
+                return
+
+            gray = np.array(img)
+            if gray.ndim == 3:
+                gray = cv2.cvtColor(gray, cv2.COLOR_RGB2GRAY)
+
+            pattern_size = (4, 3)
+            ret, centers = cv2.findCirclesGrid(gray, pattern_size, flags=cv2.CALIB_CB_SYMMETRIC_GRID)
+            if not ret:
+                QMessageBox.warning(self, "Detection", "Chart not found")
+                return
+
+            center = centers.mean(axis=0)
+            h, w = gray.shape[:2]
+            offset = center - np.array([w / 2, h / 2])
+            if abs(offset[0]) < threshold_px and abs(offset[1]) < threshold_px:
+                break
+
+            current = self.robotController.getPosition()
+            target = {
+                'pan': current.get('pan', 0) - offset[0] * pixel_scale,
+                'tilt': current.get('tilt', 0) - offset[1] * pixel_scale,
+            }
+            self.moveRobot(target)
 
     def showSensorWindow(self, geometry, framesize):
         if self.sensorWindow_isOpen:

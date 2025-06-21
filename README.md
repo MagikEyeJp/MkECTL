@@ -55,6 +55,7 @@ pip install -r requirements.txt
 
 PySide6 を利用するには `qtutils` のバージョン `4.0.0` 以上が必要です。
 requirements.txt を更新後は最新版が入っていることを確認してください。
+自動センタリング機能では OpenCV を利用します。`opencv-python` も requirements.txt に追加したので、アップデート後に再インストールしてください。
 
 Linux 環境で実行する場合は Qt の xcb プラットフォームプラグインに必要なパッケージ
 `libxcb-cursor0` を追加でインストールしてください。これがないと
@@ -303,8 +304,12 @@ To enable the new interpreter, set environment variable `MK_USE_LARK=1` before r
 9. `Set speed`  
 <img src = "flowchart/keiganGUI_9.png" width = "240"> 
 
-10. `Preset`  
-<img src = "flowchart/keiganGUI_10.png" width = "240"> 
+10. `Preset`
+<img src = "flowchart/keiganGUI_10.png" width = "240">
+
+11. `自動センタリング`
+
+カメラ画像からチャートを検出し、pan/tilt を自動補正して中心に合わせます。
 
 11. `SET Origin button`  
 <img src = "flowchart/keiganGUI_11.png" width = "360"> 
