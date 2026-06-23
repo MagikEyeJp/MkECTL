@@ -1,0 +1,32 @@
+# Slider sweep: 200mm -> 1000mm (20cm -> 100cm), 100mm steps.
+#
+# - Only the slider moves; pan/tilt keep their pre-adjusted values (movslide).
+# - reconstruct.py owns the USB sensor, so do NOT connect the sensor in MkECTL
+#   (Initialize the motors only). Connecting it would make the device busy.
+# - Before running, replace <CALIB_DIR> with the directory holding
+#   trajectory_data.bin (reconstruct.py --calib-dir).
+# - If pyusb / iltrecon live in a separate venv, replace "python3" with that
+#   interpreter path. reconstruct.py is referenced by absolute path so its
+#   sibling "iltrecon" package is importable regardless of cwd.
+# - Each location writes data/sweep/dist_XXXX/frame0000..frame0099.ply (+ depth npy).
+#   Use --frame all so every frame is kept; precision = std over those frames,
+#   accuracy = mean vs. the commanded distance.
+
+movslide 200
+exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0200, --prefix, frame
+movslide 300
+exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0300, --prefix, frame
+movslide 400
+exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0400, --prefix, frame
+movslide 500
+exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0500, --prefix, frame
+movslide 600
+exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0600, --prefix, frame
+movslide 700
+exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0700, --prefix, frame
+movslide 800
+exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0800, --prefix, frame
+movslide 900
+exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0900, --prefix, frame
+movslide 1000
+exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_1000, --prefix, frame

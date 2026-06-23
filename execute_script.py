@@ -1,5 +1,6 @@
 import os
 import re
+import subprocess
 import numpy as np
 import datetime
 import time
@@ -29,7 +30,9 @@ commands = {'root': ['set_root', False],
             'pause': ['wait_pause', False],
             'message': ['show_message', False],
             'offset': ['set_offset', False],
-            'scale': ['set_scale', False]
+            'scale': ['set_scale', False],
+            'movslide': ['move_slide', False],
+            'exec': ['exec_command', False]
             }
 dynvars = {
             'seqn': 'd',
@@ -145,7 +148,7 @@ def countCommandNum(scriptParams, args_hist, com_hist):
             com_args[1] = com_args[1].replace(" ", "")  # del space
             com_args[1] = com_args[1].replace("\"", "")  # del double-quotation
             com_args[1] = com_args[1].split(",")
-            if com_args[0] in ('set','root','snap3d','message'):
+            if com_args[0] in ('set','root','snap3d','message','exec'):
                 pass
             elif com_args[0] in ('snap','contsnap'):
                 com_args[1][1] = int(com_args[1][1])
@@ -550,6 +553,73 @@ def home_robot(args, scriptParams, devices, mainWindow):
     systate.past_parameters.pos = systate.pos
     systate.sentSig.pos = True
     return isStop
+
+
+def move_slide(args, scriptParams, devices, mainWindow):
+    """Move only the slider axis, keeping pan/tilt untouched.
+
+    Unlike `mov`, this sends a target dict that contains the slide axis only,
+    so KeiganRobot.moveTo leaves the other axes where the operator put them.
+    The move is performed immediately (wait until reached) and a short settle
+    delay lets the rail stop vibrating before the next command (e.g. exec).
+
+    args: [slide_mm] or [slide_mm, settle_sec]  (settle defaults to 1.0 s)
+    """
+    print('---move_slide---')
+    global systate
+
+    if isAborted(scriptParams, mainWindow):
+        return mainWindow.stopClicked
+
+    pos_mm = float(args[0])
+    settle = float(args[1]) if len(args) > 1 else 1.0
+    systate.pos[0] = pos_mm  # keep slide for dynamic-variable expansion
+
+    app.processEvents()
+    scaled = pos_mm * systate.scale[0] + systate.offset[0]
+    isStop = devices['robot'].moveTo({'slide': scaled}, True, mainWindow.actionStatusCallback)
+    if isStop:
+        return True
+
+    systate.past_parameters.pos[0] = pos_mm
+    time.sleep(settle)
+    return False
+
+
+def exec_command(args, scriptParams, devices, mainWindow):
+    """Run an external command and block until it finishes.
+
+    The DSL parser splits args on commas (spaces/quotes stripped), so each
+    comma-separated token becomes one argv element. The command is run without
+    a shell (list form), which avoids quoting/injection issues.
+
+    args: [program, arg1, arg2, ...]
+    """
+    print('---exec_command---')
+
+    if isAborted(scriptParams, mainWindow):
+        return mainWindow.stopClicked
+
+    argv = [str(a) for a in args]
+    print('exec:', argv)
+
+    try:
+        result = subprocess.run(argv, capture_output=True, text=True)
+    except (FileNotFoundError, OSError) as e:
+        QtWidgets.QMessageBox.critical(mainWindow, 'exec error', str(e))
+        return True
+
+    if result.stdout:
+        print(result.stdout)
+    if result.stderr:
+        print(result.stderr)
+
+    if result.returncode != 0:
+        QtWidgets.QMessageBox.critical(
+            mainWindow, 'exec error',
+            'command failed (code %d):\n%s' % (result.returncode, result.stderr[-500:]))
+        return True
+    return False
 
 
 @timeout(5)
