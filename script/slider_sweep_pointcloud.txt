@@ -13,20 +13,20 @@
 #   accuracy = mean vs. the commanded distance.
 
 movslide 200
-exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0200, --prefix, frame
+exec python3, /home/magikeye/iltpico/pc_reconstruction/reconstruct.py, --calib-dir, /home/magikeye/iltpico/pc_calibration/calib/ILT001/209/out, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0200, --prefix, frame
 movslide 300
-exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0300, --prefix, frame
+exec python3, /home/magikeye/iltpico/pc_reconstruction/reconstruct.py, --calib-dir, /home/magikeye/iltpico/pc_calibration/calib/ILT001/209/out, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0300, --prefix, frame
 movslide 400
-exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0400, --prefix, frame
+exec python3, /home/magikeye/iltpico/pc_reconstruction/reconstruct.py, --calib-dir, /home/magikeye/iltpico/pc_calibration/calib/ILT001/209/out, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0400, --prefix, frame
 movslide 500
-exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0500, --prefix, frame
+exec python3, /home/magikeye/iltpico/pc_reconstruction/reconstruct.py, --calib-dir, /home/magikeye/iltpico/pc_calibration/calib/ILT001/209/out, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0500, --prefix, frame
 movslide 600
-exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0600, --prefix, frame
+exec python3, /home/magikeye/iltpico/pc_reconstruction/reconstruct.py, --calib-dir, /home/magikeye/iltpico/pc_calibration/calib/ILT001/209/out, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0600, --prefix, frame
 movslide 700
-exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0700, --prefix, frame
+exec python3, /home/magikeye/iltpico/pc_reconstruction/reconstruct.py, --calib-dir, /home/magikeye/iltpico/pc_calibration/calib/ILT001/209/out, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0700, --prefix, frame
 movslide 800
-exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0800, --prefix, frame
+exec python3, /home/magikeye/iltpico/pc_reconstruction/reconstruct.py, --calib-dir, /home/magikeye/iltpico/pc_calibration/calib/ILT001/209/out, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0800, --prefix, frame
 movslide 900
-exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0900, --prefix, frame
+exec python3, /home/magikeye/iltpico/pc_reconstruction/reconstruct.py, --calib-dir, /home/magikeye/iltpico/pc_calibration/calib/ILT001/209/out, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0900, --prefix, frame
 movslide 1000
-exec python3, /Users/jyunjikondo/git/bitbucket/usb-rp2040-spi/tools/pc_reconstruction/reconstruct.py, --calib-dir, <CALIB_DIR>, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_1000, --prefix, frame
+exec python3, /home/magikeye/iltpico/pc_reconstruction/reconstruct.py, --calib-dir, /home/magikeye/iltpico/pc_calibration/calib/ILT001/209/out, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_1000, --prefix, frame
