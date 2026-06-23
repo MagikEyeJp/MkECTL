@@ -774,8 +774,8 @@ class Ui(QMainWindow, IMainUI):
             self.sensorWindow.show()
         else:
             self.sensorWindow.show()
-            self.sensorWindow.move(geometry.width() / 2 - framesize.width() / 16,
-                                   geometry.height() / 2 - framesize.height() / 3)
+            self.sensorWindow.move(int(geometry.width() / 2 - framesize.width() / 16),
+                                   int(geometry.height() / 2 - framesize.height() / 3))
             self.sensorWindow_isOpen = True
         self.restoreDockWidget(self.sensorWindow)
         # self.subWindow.resize(QSize(909, 616))   # windowがfloatingしてるときはworkする。。
