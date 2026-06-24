@@ -11,6 +11,13 @@
 # - Each location writes data/sweep/dist_XXXX/frame0000..frame0099.ply (+ depth npy).
 #   Use --frame all so every frame is kept; precision = std over those frames,
 #   accuracy = mean vs. the commanded distance.
+#
+# Mounting offset between the slider z command and the true sensor-to-wall
+# distance (calibrated: offset = commanded - measured). With this set, the
+# movslide arguments below are TRUE sensor-to-wall distances, so the dist_XXXX
+# folder names are correct ground-truth labels for the accuracy computation.
+
+offset -115, 0, 0
 
 movslide 200
 exec python3, /home/magikeye/iltpico/pc_reconstruction/reconstruct.py, --calib-dir, /home/magikeye/iltpico/pc_calibration/calib/ILT001/209/out, --input, usb, --frame, all, --max-frames, 100, --emit, ply, --emit, depth-npy, --out, data/sweep/dist_0200, --prefix, frame
