@@ -221,8 +221,45 @@ python calibrate.py config.json -o out
 - Pass the **absolute path** of this `out/` to `--calib-dir` in the following
   steps (e.g. `<usb-rp2040-spi>/tools/pc_calibration/out`).
 
-> Once `out/` is ready, proceed to Step A. The following commands run in the
-> **MkECTL environment** (not the mkestudio venv).
+### 4-5. Flash trajectory_data.bin to the sensor
+
+**Write the generated `trajectory_data.bin` to the sensor you will measure, too.**
+The firmware has no USB command to upload a trajectory, so write the `.bin`
+directly to the flash calibration region. The destination is the XIP address
+**`0x100c0000`** (offset `0x000C0000` = `FLASH_ADRS_TRAJECTORY_DATA`). Only this
+region is touched; the firmware and other data are left intact.
+
+Flash it with `picotool` (BOOTSEL mode). Use either method below.
+
+**Option A — convert to UF2 and flash**
+
+```bash
+# from the directory containing trajectory_data.bin
+picotool uf2 convert trajectory_data.bin traj.uf2 -o 0x100c0000
+# (add --family rp2040 if picotool complains about the family id)
+```
+
+`-o` is the **offset, not the output file**; `<infile> <outfile>` are positional.
+Then hold **BOOTSEL** while plugging in the Pico and copy `traj.uf2` onto the
+`RPI-RP2` drive (or `picotool load traj.uf2`).
+
+**Option B — flash directly with picotool load (no UF2)**
+
+```bash
+# with the device plugged in while holding BOOTSEL
+picotool load trajectory_data.bin -o 0x100c0000 -v
+picotool reboot
+```
+
+> **meta fields must be valid**: on entering measurement the device runs
+> `VERIFY`, which checks `h_total / v_total / exposure / gain / blc_target`
+> (besides the signature and distance range). Zeros are rejected. Set the `meta`
+> block in `config.json` (4-3) to the values used when the calibration images
+> were captured (firmware defaults are `1280 / 525 / 30 / 16 / 256`, `laser=1`).
+> After flashing, enter measurement mode — a 3D point cloud means success.
+
+> Once `out/` is ready and the sensor has been flashed, proceed to Step A. The
+> following commands run in the **MkECTL environment** (not the mkestudio venv).
 
 ---
 

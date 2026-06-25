@@ -208,7 +208,44 @@ python calibrate.py config.json -o out
 - この `out/` の **絶対パス** を、以降の手順の `--calib-dir` に渡します
   （例: `<usb-rp2040-spi>/tools/pc_calibration/out`）。
 
-> ここまでで `out/` が用意できたら、手順 A へ進みます。
+### 4-5. trajectory_data.bin をセンサーへ書き込む
+
+**測定するセンサー自身にも、生成した `trajectory_data.bin` を書き込んでください。**
+ファームウェアには trajectory をアップロードする USB コマンドが無いため、`.bin` を
+フラッシュのキャリブ領域へ直接書き込みます。書き込み先は XIP アドレス
+**`0x100c0000`**（オフセット `0x000C0000` = `FLASH_ADRS_TRAJECTORY_DATA`）です。
+この領域のみが書き換わり、ファームや他データはそのまま残ります。
+
+`picotool`（BOOTSEL モード）で書き込みます。次のどちらかを使います。
+
+**方法A — UF2 に変換して書き込む**
+
+```bash
+# trajectory_data.bin のあるディレクトリで
+picotool uf2 convert trajectory_data.bin traj.uf2 -o 0x100c0000
+# （picotool が family id で文句を言う場合は --family rp2040 を付ける）
+```
+
+`-o` は **出力ファイルではなくオフセット**で、`<入力> <出力>` は位置引数です。続いて
+**BOOTSEL を押しながら** Pico を接続し、`traj.uf2` を `RPI-RP2` ドライブにコピー
+（または `picotool load traj.uf2`）します。
+
+**方法B — picotool load で直接書き込む（UF2 不要）**
+
+```bash
+# BOOTSEL を押しながら接続した状態で
+picotool load trajectory_data.bin -o 0x100c0000 -v
+picotool reboot
+```
+
+> **meta フィールドを正しく**: 測定開始時にデバイスは `VERIFY` を実行し、
+> `h_total / v_total / exposure / gain / blc_target`（署名・距離レンジに加えて）を
+> 検証します。ゼロは拒否されます。4-3 の `config.json` の `meta` ブロックを、
+> キャリブ画像を撮影したときの値に合わせてください（ファーム既定値は
+> `1280 / 525 / 30 / 16 / 256`, `laser=1`）。書き込み後に測定モードへ入り、
+> 3D 点群が出れば成功です。
+
+> ここまでで `out/` の用意とセンサーへの書き込みが済んだら、手順 A へ進みます。
 > 以降のコマンドは **MkECTL 環境** で実行します（mkestudio venv ではない）。
 
 ---
