@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "analyze-sweep"
+version = "1.0.0"
+description = "Evaluate per-distance Accuracy / Precision of wall-distance measurements from PLY point clouds and plot the result"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Jyunji Kondo", email = "jyunji@magik-eye.com" }]
+keywords = ["pointcloud", "ply", "accuracy", "precision", "depth", "metrology"]
+
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "plyfile",
+]
+
+[project.optional-dependencies]
+# open3d is preferred for PLY loading when present (works with plyfile otherwise)
+open3d = ["open3d"]
+
+[project.scripts]
+analyze-sweep = "analyze_sweep:main"
+
+[project.urls]
+Homepage = "https://magik-eye.com"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/analyze_sweep"]
+
+[tool.hatch.build.targets.sdist]
+# Exclude measurement data (sweep) and virtual envs from the sdist
+include = [
+    "src/analyze_sweep",
+    "README.md",
+    "pyproject.toml",
+]
