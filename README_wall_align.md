@@ -33,8 +33,11 @@ running there fails when it tries to connect the motors.
 Install the point-cloud engine into that same env once:
 
 ```bash
-pip install .../pc_reconstruction/dist/pyiltrs2-0.1.0-py3-none-any.whl
-pip install pyusb        # only needed for --input usb (live)
+pip install ./pyiltrs2-0.1.0-py3-none-any.whl
+
+# For live USB (--input usb), pyusb ships as an optional dependency of
+# pyiltrs2, so install it via the extra instead of a separate pip install:
+pip install "./pyiltrs2-0.1.0-py3-none-any.whl[usb]"   # [usb] = extra name per the whl
 ```
 
 If `wall_align.py` is run from outside the MkECTL repo, point it at the sources
